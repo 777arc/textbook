@@ -41,7 +41,9 @@ Take a moment to try to answer these questions:
 .. raw:: html
 
    </details>
+
 |
+
 *******************
 Wireless Symbols
 *******************
@@ -64,9 +66,9 @@ In what ways can we modulation the carrier?  Well what are the different propert
 
 We can modulate our data onto a carrier by modifying any one (or more) of these three.  
 
-*******************
+****************************
 Amplitude Shift Keying (ASK)
-*******************
+****************************
 
 Amplitude Shift Keying (ASK) is the first digital modulation scheme we wil discuss, because it's the simplest to visualize of the three.  We literally just modulate the **amplitude** of the carrier.  Example of 2-level ASK, called 2-ASK:
 
@@ -94,6 +96,7 @@ Five symbols, 10 bits of information
    </details>
 
 |
+
 So how do we actually create this signal in real life?  All we really have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid to modulate it onto a carrier (the sinusoid acts as that carrier).  
 
 .. image:: ../_static/ask3.png
@@ -102,9 +105,9 @@ So how do we actually create this signal in real life?  All we really have to do
 
 The top plot shows the discrete samples represented by dots, and then the bottom plot shows what the resuling signal looks like, which could be represented digitally or even transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there might be thousands, depending on how high in the spectrum the signal is being transmitted.  
 
-*******************
+************************
 Phase Shift Keying (PSK)
-*******************
+************************
 
 Now lets look at modulating the phase in a similar manner as we did with the amplitude.  The simplest form is Binary PSK, a.k.a. BPSK, where there are two levels of phase:
 
@@ -125,9 +128,9 @@ It’s not very fun to look at plots like this:
 
 So instead we usually represent the phase in the complex plane.  
 
-*******************
+***********************
 IQ Plots/Constellations
-*******************
+***********************
 
 You have seen IQ plots before in the complex numbers subsection of the sampling chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot (we will assume a magnitude of 1):
 
@@ -173,6 +176,7 @@ There is nothing invalid about this, you could certainly use it, but because the
    </details>
 
 |
+
 And a quick detour back to ASK for a moment- note that we can show ASK on the IQ plot just like PSK.  Here is the IQ plot of 2-ASK, 4-ASK, and 8-ASK:
 
 .. image:: ../_static/ask_set.png
@@ -181,9 +185,9 @@ And a quick detour back to ASK for a moment- note that we can show ASK on the IQ
 
 As you may have noticed, 2-ASK and BPSK are the same thing. A 180 degree phase shift is the same as multiplying the sinusoid by -1.  We call it BPSK, probably because PSK is used way more than ASK.
 
-*******************
+**************************************
 Quadrature Amplitude Modulation (QAM)
-*******************
+**************************************
 What if we combine ASK and PSK?  We call this Quadrature Amplitude Modulation (QAM) and it usually looks something like this:
 
 .. image:: ../_static/64qam.png
@@ -210,9 +214,9 @@ Back to the time domain for a second.  Everything except the various ASK's and B
 
 This is why we usually use IQ plots, instead of showing the time domain signal.
 
-*******************
+****************************
 Frequency Shift Keying (FSK)
-*******************
+****************************
 
 Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to understand, we just shift between N frequencies, each frequency is one possible symbol.  However, because we are modulating a carrier, it’s really our carrier frequency +/- these N frequencies. E.g. we might be at a carrier of 1.2 GHz and shift between these four frequencies:
 

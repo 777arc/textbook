@@ -5,7 +5,6 @@ The Frequency Domain
 One of the coolest side effects of learning about DSP and wireless communications is that you will also learn to think in the frequency domain.  Most people's experience with *working* in the frequency domain is limited to adjusting the bass/mid/treble knobs on a car's audio system.  Most people's experience with *viewing* something in the frequency domain is limited to seeing an audio equalizer, such as this clip:
 
 .. image:: ../_static/audio_equalizer.webp
-   :scale: 100 %
    :align: center
    
 In this chapter we cover what the frequency domain means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use later on.  But by the end of this textbook you will be a master at working in the frequency domain, gauranteed! 
@@ -222,7 +221,7 @@ The point is, the FFT is a function with one input and one output.  It converts 
 We will only be dealing with 1 dimension FFTs in this textbook (2D is used for image processing and other applications).  So you can think of the FFT function as having one input- a vector of samples, and one output- the frequency domain version of that vector of samples.  The size of the output is always the same as the size of the input, so if I feed 1024 samples into the FFT, I will get 1024 on the output.  But the confusing part is that the output will always be in the frequency domain, and thus the "span" of the x-axis if we were to plot it doesn't change based on the number of samples in the time domain input.
 
 .. image:: ../_static/fft-io.png
-   :scale: 60 % 
+   :scale: 80 % 
    :align: center 
 
 Because the output is in the frequency domain, the span of the x-axis is based on the sample rate, which we will dive into next chapter.  What happens when we use more samples for the input vector is that we get a better resolution in the frequency domain (in addition to just processing more samples at once).  We don't actually see more frequencies.  
@@ -230,23 +229,23 @@ Because the output is in the frequency domain, the span of the x-axis is based o
 So how do we actually plot this output?  As an example let's say that our sample rate was 1 million samples per second (1 MHz).  As we will learn next chapter, that means we can only see signals up to 0.5 MHz, regardless of how many samples we feed into the FFT.  The way the output of the FFT gets plotted is as follows:
 
 .. image:: ../_static/negative-frequencies.png
-   :scale: 60 % 
+   :scale: 70 % 
    :align: center 
 
 This will always be the case; the output of the FFT will always show :math:`-f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  The output will always have a negative portion and positive portion, assuming the input was a complex number (which is usually the case in DSP).
 
-*******************
+****************************
 Order in time doesn't matter
-*******************
+****************************
 As we mentioned, the FFT function sort of "mixes around" the input signal to form the output, which has a different scale and units, we are no longer in the time domain after all.  A good way to internalize this is realizing that changing the order things happen in the time domain doesn't change the frequency domain version.  I.e., the FFT of the following two signals will be the same, the output will look like two spikes, because the signal is just two sine waves at different frequencies.  Changing the order the sine waves occur doesn't change the fact that it's still just two sine waves at different frequencies.
 
 .. image:: ../_static/fft_signal_order.PNG
    :scale: 60 % 
    :align: center 
 
-*******************
+********************
 Negative Frequencies
-*******************
+********************
 
 Back to the representation of the output of an FFT- What in the world is a negative frequency?  Well for now, just know that they have to do with using complex numbers (imaginary numbers), and that there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz:
 

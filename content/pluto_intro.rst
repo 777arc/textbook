@@ -88,6 +88,7 @@ Open a new terminal (in your VM) and type the following commands:
 
 If you get this far without an error then continue with the next steps
 
+
 "Hack" PlutoSDR to Increase RF Range
 ####################################
 
@@ -111,6 +112,12 @@ Type the following commands in:
  reboot
 
 You should now be able to tune up to 6 GHz and use a sample rate up to 56 MHz!
+
+************************
+Python Exercises
+************************
+
+Instead of just giving you code to run, I have create multiple exercises where 95% of the code is provided, and the remaining code is fairly straightforward Python.  They aren't meant to be difficult exercises, they are missing just enough code to get you to think.
 
 Exercise 1: Determine Your USB Throughput
 #########################################

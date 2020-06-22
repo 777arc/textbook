@@ -33,6 +33,32 @@ extensions = [
 ]
 imgmath_image_format = 'svg' # way better looking than pngs (its vectorized after all!)
 
+imgmath_font_size = 14 # default is 12 and it looked a bit small
+
+# Additional LaTeX code to put into the preamble of the LaTeX files used to translate the math snippets. This is left empty by default. Use it e.g. to add packages which modify the fonts used for math, such as '\\usepackage{newtxsf}' for sans-serif fonts, or '\\usepackage{fouriernc}' for serif fonts. Indeed, the default LaTeX math fonts have rather thin glyphs which (in HTML output) often do not match well with the font for text.
+# The code below makes math equations not right-align which was so ugly
+imgmath_latex_preamble = r'''
+\makeatletter
+\renewenvironment{aligned}[1][c]{%
+    \alignedspace@left
+    \if #1t\vtop \else \if#1b\vbox \else \vcenter \fi\fi \bgroup
+        \Let@ \chardef\dspbrk@context\@ne \restore@math@cr
+        \spread@equation
+        \ialign\bgroup
+            \hfil\strut@$\m@th\displaystyle##$\hfil
+            \crcr
+}{%
+  \crcr\egroup
+  \restorecolumn@
+  \egroup
+}
+\makeatother
+'''
+
+# dvisvgm is the program used to generate the svg equations, and these are its settings:
+# https://dvisvgm.de/Manpage/
+#imgmath_dvisvgm_args = ['--exact-bbox', '--keep'] # I added this to fix the bottom-edges from being clipped
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -48,7 +74,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PySDR: Learn SDR and DSP with Python and GNU Radio'
+project = u'PySDR: A Guide to SDR and DSP using Python'
 copyright = u'2020, Marc Lichtman'
 author = u'Marc Lichtman'
 
@@ -140,6 +166,9 @@ html_theme_options = {'display_version': False}
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# These paths are either relative to html_static_path or fully qualified paths (eg. https://...)
+html_css_files = ['custom.css',]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -284,3 +313,10 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# I needed to add this in order for the custom.css to be processed
+rst_prolog = """
+.. include:: <s5defs.txt>
+.. default-role::
+
+"""

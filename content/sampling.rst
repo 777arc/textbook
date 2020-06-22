@@ -154,9 +154,9 @@ What comes in is a real signal that was received by our antenna, and what comes 
 One last important note: the figure above shows what's happening **inside** of the SDR, we don't actually have to generate a sine wave, shift by 90, multiply or add, the SDR does that for us.  We tell the SDR what frequency we want to sample at, or what frequency we want to transmit our samples at.  On the receiver side, the SDR will provide us the IQ samples, and then for the transmitting side we have to provide the SDR the IQ samples.  In terms of data type, they will either be complex ints or floats.  
 
 
-*************************
+**************************
 Carrier and Downconversion
-*************************
+**************************
 
 Up until this point we really didn't talk about frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air, so the electromagnetic wave's frequency.  We call this the "carrier", because it carries our information (stored in I and Q) on a certain frequency. 
 

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-PySDR: Learn SDR and DSP with Python and GNU Radio
+PySDR: A Guide to SDR and DSP using Python
 ==================================================
 
 by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
@@ -18,16 +18,20 @@ Contents:
    content/sampling
    content/digital_modulation
    content/pluto_intro
-..   content/filters
-..   content/noise
-..   content/channel_coding
-..   content/timing_sync
-..   content/frequency_sync
-..   content/wireless_channels
-..   content/equalization
-..   content/link_budgets
-..   content/spread_spectrum
-..   content/ofdm
-..   content/mimo
-..   content/appendix_text_comparison
+   content/noise
+   content/filters
+   content/link_budgets
+   content/channel_coding
+   content/iq_files
+   content/multipath_fading
+   content/pulse_shaping
+   content/appendix_text_comparison
+.. 
+   content/timing_sync
+   content/frequency_sync
+   content/equalization
+   content/spread_spectrum
+   content/ofdm
+   content/mimo
+   
 
