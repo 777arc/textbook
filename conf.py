@@ -151,6 +151,8 @@ html_sidebars = {
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {'description':'By <a href="https://www.cs.umd.edu/people/sdr">Dr. Marc Lichtman</a>',
+                      'logo': 'logo.svg',
+                      'logo_name': True, # used if the logo doesn't contain the project name itself
                       'fixed_sidebar': True,
                       'page_width': '1000px',
                       'sidebar_width': '280px',
