@@ -7,7 +7,7 @@ One of the coolest side effects of learning about DSP and wireless communication
 .. image:: ../_static/audio_equalizer.webp
    :align: center
    
-In this chapter we cover what the frequency domain means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use later on.  But by the end of this textbook you will be a master at working in the frequency domain, gauranteed! 
+In this chapter we cover what the frequency domain means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use later on.  But by the end of this textbook you will be a master at working in the frequency domain, guaranteed! 
 
 First, why do we like to look at signals in the frequency domain?  Well here are two example signals, shown in both the time and frequency domain.
 
@@ -75,7 +75,7 @@ Now what if we had an impulse in the time domain?  One example is a sound record
    :scale: 100 % 
    :align: center  
 
-As we can see, a spike/impulse in the time domain is flat in the frequency domain, and theoretically contains every frequency, although there is no theoretically perfect impulse because it would have to be infinitely short in the time domain.  Similar to the sine wave, it doesn't matter where in the time domain the impulse happens.  The important take-away here is that quick changes in time domain result in many frequencies occuring. 
+As we can see, a spike/impulse in the time domain is flat in the frequency domain, and theoretically contains every frequency, although there is no theoretically perfect impulse because it would have to be infinitely short in the time domain.  Similar to the sine wave, it doesn't matter where in the time domain the impulse happens.  The important take-away here is that quick changes in time domain result in many frequencies occurring. 
 
 Next lets look at the time and frequency domain plots of a square wave:
 
@@ -104,7 +104,7 @@ Mathematically, the "transform" we use to go from the time domain to the frequen
 .. math::
    X(f) = \int x(t) e^{-j2\pi ft} dt
 
-So for a signal x(t) we can get the frequency domain version, X(f), using this formula.  We will represent the time domain version of a function with x(t) or y(t), and the corresponding frequency domain version with X(f) and Y(f).  Note the "t" for time, and "f" for frequency. The j is simply the imaginary number, you may have seen it as i in highschool math class.  We use j in engineering and computer science because i is often refering to current, and in programming it's often used as an iterator. 
+So for a signal x(t) we can get the frequency domain version, X(f), using this formula.  We will represent the time domain version of a function with x(t) or y(t), and the corresponding frequency domain version with X(f) and Y(f).  Note the "t" for time, and "f" for frequency. The j is simply the imaginary number, you may have seen it as i in high school math class.  We use j in engineering and computer science because i is often referring to current, and in programming it's often used as an iterator. 
 
 To go back to the time domain it's almost exactly the same aside from a scaling factor and negative sign:
 
@@ -132,7 +132,7 @@ remember that next chapter i go into the details of the fft/shift/window/abs/etc
 Time-Frequency Properties
 *************************
 
-Earlier we looked at a bunch of examples of signals in the time domain, and what they look like in the frequency domain.  Now, we will go over five important "Fourier properies".  These are properties that tell us if we do ____ to our time domain signal, then ____ happens to our frequency domain signal.  This will give us a lot of important insight into the type of Digital Signal Processing (DSP) we will perform on time domain signals in practice.  
+Earlier we looked at a bunch of examples of signals in the time domain, and what they look like in the frequency domain.  Now, we will go over five important "Fourier properties".  These are properties that tell us if we do ____ to our time domain signal, then ____ happens to our frequency domain signal.  This will give us a lot of important insight into the type of Digital Signal Processing (DSP) we will perform on time domain signals in practice.  
 
 Linearity Property:
 
@@ -169,7 +169,7 @@ On the left hand side, we can see that we are scaling our signal x(t) in the tim
    :scale: 60 % 
    :align: center 
 
-Scaling in time is essentially shrinking or expanding the signal in the x-axis.  What this property tells us is that when we do that, the frequency domain also scales, but inversely.  So, for example, when we transmit bits faster, we have to use more frequencies.  This is why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional then the celluler carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
+Scaling in time is essentially shrinking or expanding the signal in the x-axis.  What this property tells us is that when we do that, the frequency domain also scales, but inversely.  So, for example, when we transmit bits faster, we have to use more frequencies.  This is why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional then the cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
 
 Convolution Property:
 
@@ -178,7 +178,7 @@ Convolution Property:
 
 This one is called the convolution property because in the time domain we are convolving x(t) and y(t).  You may not know about the convolution operation yet, so for now just imagine it like a cross-correlation. When we convolve time domain signals, it's equivalent to multiplying the frequency domain versions of those two signals.  This is very different from just adding together two signals.  When you add two signals, as we saw, nothing really happens, you just add together the frequency domain version.  But when you convolve two signals, it's like creating a new third signal out of them.  Convolution is the single most important technique in DSP, but for a reason we won't understand until we get into how filters work.
 
-But before we move on, to breifly explain why this property is so important, consider the situation in which you have one signal you want to receive, and there is an interfering signal next to it. 
+But before we move on, to briefly explain why this property is so important, consider the situation in which you have one signal you want to receive, and there is an interfering signal next to it. 
 
 .. image:: ../_static/two-signals.png
    :scale: 60 % 
@@ -190,7 +190,7 @@ The concept of masking is heavily used in programming, so let's use it here.  Wh
    :scale: 60 % 
    :align: center 
 
-We usually perform DSP operations in the time domain, so we can use the convolution property to see how we can do this masking in the time domain.  Let's say that x(t) is our received signal.  We know that Y(f) is the mask we want to apply, in the ferquency domain.  Well that means y(t) is the time domain representation of our mask, and if we convolve it with x(t), we can "filter out" the signal we don't want.
+We usually perform DSP operations in the time domain, so we can use the convolution property to see how we can do this masking in the time domain.  Let's say that x(t) is our received signal.  We know that Y(f) is the mask we want to apply, in the frequency domain.  Well that means y(t) is the time domain representation of our mask, and if we convolve it with x(t), we can "filter out" the signal we don't want.
 
 .. image:: ../_static/masking-equation.png
    :scale: 100 % 
@@ -315,7 +315,7 @@ But we want 0 Hz (DC) in the center and negative freqs to the left (that's just 
    :scale: 70 % 
    :align: center 
 
-For our convinience, Numpy has an FFT shift function.  Just replace the np.fft.fft() line with:
+For our convenience, Numpy has an FFT shift function.  Just replace the np.fft.fft() line with:
 
 .. code-block:: python
 
@@ -344,7 +344,7 @@ Note that we see our spike at 0.15 Hz, which is the frequency we used when creat
 
 The last thing to note is on FFT sizing.  The best FFT size is always an order of 2, and common sizes are between 128 and 4096, although you can certainly go larger.  In practice we may have to process signals that are millions or billions of samples long, so we need to break up the signal and do many FFTs.  That means we will get many outputs, so we can either average them up, or plot them over time (especially when our signal is changing over time).  You don't have to put **every** sample of a signal through an FFT to get a good frequency domain representation of that signal, for example you could only FFT 1024 out of every 100k samples in the signal and it will still probably look fine, as long as the signal is always on.
 
-A waterfall plot, a.k.a. spectrogram, is the plot that shows frequency over time, often in realtime.  A spectrum analyzer is the piece of equipment that shows this waterfall/spectrogram.  Here is an example of a waterfall plot, with frequency on the horizontal/x-axis and time on the vertical/y-axis.  There seems to be a spike at DC, in the center.
+A waterfall plot, a.k.a. spectrogram, is the plot that shows frequency over time, often in real-time.  A spectrum analyzer is the piece of equipment that shows this waterfall/spectrogram.  Here is an example of a waterfall plot, with frequency on the horizontal/x-axis and time on the vertical/y-axis.  There seems to be a spike at DC, in the center.
 
 .. image:: ../_static/waterfall.png
    :scale: 120 % 

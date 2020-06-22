@@ -14,7 +14,7 @@ All realistic wireless channels include many "reflectors", RF signals bounce aft
    :scale: 70 % 
    :align: center 
 
-Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase, at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in Physics.  In wireless, when the paths descrutively combine, we call this being in a "deep fade", because our signal breifly disappears. 
+Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase, at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in Physics.  In wireless, when the paths destructively combine, we call this being in a "deep fade", because our signal briefly disappears. 
 
 .. image:: ../_static/destructive_interference.PNG
    :scale: 70 % 
@@ -30,7 +30,7 @@ Paths can also add up constructively, causing a strong signal to be received.  E
 Fading
 *************************
 
-What usually happens is we get a mix of constructive and destrucive intereference, and it changes over time as the RX, TX, or environment, is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel over time.  So that's why we often refer to it as "multipath fading", it's really the combination of constructive/destructive intereference, and a changing environment. What we end up with is an SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the TX/RX is moving:
+What usually happens is we get a mix of constructive and destructive interference, and it changes over time as the RX, TX, or environment, is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel over time.  So that's why we often refer to it as "multipath fading", it's really the combination of constructive/destructive interference, and a changing environment. What we end up with is an SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the TX/RX is moving:
 
 .. image:: ../_static/multipath_fading.PNG
    :scale: 100 % 
@@ -43,7 +43,7 @@ There are two types of fading from a time domain perspective:
 
 There are also two types of fading from a frequency domain perspective:
 
-**Frequency Selective Fading** means the constructive/destructive interference changes within the frequency range of the signal.  When we have a wideband signal, we span a large range of center frequencies.  Recall that wavelength determines whether it's constructive or destructive.  Well if our signal spans a wide frequency range, it also spans a wide wavelength range (since wavelegnth is the inverse of frequency).  This means we can get different channel qualities in different portions of our signal (in the frequency domain).  Hence the name frequency selective fading.
+**Frequency Selective Fading** means the constructive/destructive interference changes within the frequency range of the signal.  When we have a wideband signal, we span a large range of center frequencies.  Recall that wavelength determines whether it's constructive or destructive.  Well if our signal spans a wide frequency range, it also spans a wide wavelength range (since wavelength is the inverse of frequency).  This means we can get different channel qualities in different portions of our signal (in the frequency domain).  Hence the name frequency selective fading.
 
 **Flat Fading** occurs when the signal's bandwidth is narrow enough that all frequencies experience roughly the same channel.  If there is a deep fade then the whole signal will disappear (for the duration of the deep fade).  
 

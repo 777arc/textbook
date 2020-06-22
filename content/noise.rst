@@ -16,7 +16,7 @@ Most people are aware of the concept of noise, and how if plotting in the time d
 
 Note how the average value is zero.  If the average value wasn't zero then we could just subtract the average value, call it a bias, and we would be left with an average of zero.  Also note that the individual points are *not* "uniformly random", i.e. larger values are rarer, most of the points are closer to zero.
 
-We call this type of noise "Gaussian noise", and it's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms.  The central limit theorem tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individal processes have some other distribution.  I.e., when we have a lot of random things happen, and they accumulate, the result appears Gaussian, even if the individual things are not.  The Gaussian distribution is also called the "Normal" distribution (recall bell curve).  
+We call this type of noise "Gaussian noise", and it's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms.  The central limit theorem tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have some other distribution.  I.e., when we have a lot of random things happen, and they accumulate, the result appears Gaussian, even if the individual things are not.  The Gaussian distribution is also called the "Normal" distribution (recall bell curve).  
 
 The Gaussian distribution has two parameters: mean and variance.  We already discussed how the mean can be considered zero, because you can always remove the mean if it's not zero.  The variance changes how "strong" the noise is, a higher variance will result in larger numbers.  It is for this reason that variance defines the noise power.  
 
@@ -69,7 +69,7 @@ But don't get caught up in the formula, there is a key concept to take away here
 Some common errors people will run into when new to dB are:
 
 1. Using nature log instead of log base 10, because most programming language's log() function is actually the natural log.
-2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to idenitify it somewhere.
+2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to identify it somewhere.
 3. When you're in dB you add/subtract values instead of multiplying/dividing, e.g.:
 
 .. image:: ../_static/db.PNG
@@ -144,7 +144,7 @@ But wait!  The equation above doesn't generate the same "amount" of noise as `np
 
  power = np.var(x)
 
-Where np.var() is the function for variance.  It turns out that the power of our signal n is 2.  In order to generate complex noise with "unit power", i.e. a power of 1 (which makes things convinient), we have to use:
+Where np.var() is the function for variance.  It turns out that the power of our signal n is 2.  In order to generate complex noise with "unit power", i.e. a power of 1 (which makes things convenient), we have to use:
 
 .. code-block:: python
 

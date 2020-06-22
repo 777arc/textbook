@@ -11,7 +11,7 @@ Filter Basics
 Filters are used in many disciplines, for example image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which filters out solids from liquid.  In DSP, filters are primarily used for:
 
 1. Separation of signals that have been combined (e.g. pulling out the signal you want)
-2. Removing excess noise after reciving a signal
+2. Removing excess noise after receiving a signal
 3. Restoration of signals that have been distorted in some way (e.g. an audio equalizer is a filter)
 
 There are certainly other uses for filters.  
@@ -279,7 +279,7 @@ A moving average filter is a low pass filter because it smooths out "high freque
 
    </details>
 
-Now for an FIR example.  Have any of you ever done this: x = x*0.99 + new_value*0.01, where the 0.99/0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convinient way to slowly update some variable without having to remember the last several values.  This is actually a form of low pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
+Now for an FIR example.  Have any of you ever done this: x = x*0.99 + new_value*0.01, where the 0.99/0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convenient way to slowly update some variable without having to remember the last several values.  This is actually a form of low pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
 
 *************************
 Filter Design Tools
@@ -310,7 +310,7 @@ This app even includes the C++ source code to implement and use this filter.  No
 Convolution
 *************************
 
-We will take a breif detour to introduce the convolution operator, feel free to skip this section if you are already familiar with it.
+We will take a brief detour to introduce the convolution operator, feel free to skip this section if you are already familiar with it.
 
 Adding two signals together is one way of combining two signals into one, in the Fourier chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent in a cross-correlation in many cases.  
 
@@ -435,7 +435,7 @@ Note that it's not very straight... It doesn't match our original very well, rec
    :scale: 50 % 
    :align: center 
 
-Both options seemed to work.  Which one would you choose?  The second method resulted in more taps, but the first method resulting in a frequency response that wasn't very sharp, and the falling edge wasn't very steep.  There are many ways to design a filter, and many tradeoffs along the way, many consider it an art.
+Both options seemed to work.  Which one would you choose?  The second method resulted in more taps, but the first method resulting in a frequency response that wasn't very sharp, and the falling edge wasn't very steep.  There are many ways to design a filter, and many trade-offs along the way, many consider it an art.
 
 
 *************************

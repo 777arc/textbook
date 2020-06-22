@@ -10,13 +10,13 @@ Inter-Symbol-Interference (ISI)
 
 In the Filters chapter we learned that blocky shaped symbols/pulses use an excess amount of spectrum, and we can greatly reduce the amount of spectrum used by "shaping" our pulses.  But you can't just use any low-pass filter, or you might get inter-symbol-interference (ISI), which is when symbols bleed into each other and interfere with each other.
 
-When we transmit digital symbols, we transmit them back-to-back (as opposed to waiting a while between symbols).  But when you apply a pulse-shaping filter, it elongates the pulse in the time domain (in order to condense it in frequency), which causes adjancent symbols to overlap with each other.  And this is fine, as long as your pulse shaping filter meets this one criterion: All of the pulses must add up to zero at every multiple of our symbol period T, except for one of the pulses.  This is best understood through the following visualization:
+When we transmit digital symbols, we transmit them back-to-back (as opposed to waiting a while between symbols).  But when you apply a pulse-shaping filter, it elongates the pulse in the time domain (in order to condense it in frequency), which causes adjacent symbols to overlap with each other.  And this is fine, as long as your pulse shaping filter meets this one criterion: All of the pulses must add up to zero at every multiple of our symbol period T, except for one of the pulses.  This is best understood through the following visualization:
 
 .. image:: ../_static/pulse_train.PNG
    :scale: 70 % 
    :align: center 
 
-As you can see, at every interval of T, there is one peak of a pulse, and the rest of the pulses are at 0 (they cross the x-axis).  What happens at the receiver, is right before demodulation, the signal is sampled at the perfect time (at the peak of the pulses), so that is the only point in time which matters.  Usually there is a symbol synchronization block at the reciever that makes sure the symbols are sampled at the peaks.
+As you can see, at every interval of T, there is one peak of a pulse, and the rest of the pulses are at 0 (they cross the x-axis).  What happens at the receiver, is right before demodulation, the signal is sampled at the perfect time (at the peak of the pulses), so that is the only point in time which matters.  Usually there is a symbol synchronization block at the receiver that makes sure the symbols are sampled at the peaks.
 
 **********************************
 Matched Filter
@@ -24,7 +24,7 @@ Matched Filter
 
 One trick we use in wireless communications is called matched filtering.  To understand matched filtering you must first understand these two points:
 
-1. The pulses we discussed above only have to be aligned perfeclty at the receiver, right before the sampling occurs.  Until that point it doesn't really matter if there is ISI.  
+1. The pulses we discussed above only have to be aligned perfectly at the receiver, right before the sampling occurs.  Until that point it doesn't really matter if there is ISI.  
 
 2. We want a low-pass filter in our transmitter to reduce the amount of spectrum our signal uses.  But the receiver also needs a low-pass filter, to get rid of as much noise/interference next to the signal as possible.  So we have a low-pass filter at the Tx, another at the Rx, and sampling occurs after both filters (and the wireless channel's effects).   
 
@@ -102,13 +102,13 @@ Luckily it's a heavily used filter and there are plenty of implementations, incl
 Other Pulse-Shaping Filters
 ###########################
 
-Other filters include the Gaussian filter, which has an impulse response resmbling a Gaussian function, as well as the sinc filter, which is equivalent to the raised-cosine filter when :math:`\beta = 0`, and is more of an idealistic filter.
+Other filters include the Gaussian filter, which has an impulse response resembling a Gaussian function, as well as the sinc filter, which is equivalent to the raised-cosine filter when :math:`\beta = 0`, and is more of an idealistic filter.
 
 **********************************
 Roll-off Factor
 **********************************
 
-Let's look more into the parameter :math:`\beta`.  It is a number betwee 0 and 1, and is called the "roll-off" factor, or sometimes "excess bandwidth".  It determines how fast, in the time domain, the filter rolls off to zero.  Remember, to be used as a filter, the impulse response should decay to zero on both sides:
+Let's look more into the parameter :math:`\beta`.  It is a number between 0 and 1, and is called the "roll-off" factor, or sometimes "excess bandwidth".  It determines how fast, in the time domain, the filter rolls off to zero.  Remember, to be used as a filter, the impulse response should decay to zero on both sides:
 
 .. image:: ../_static/rrc_rolloff.PNG
    :scale: 80 % 
@@ -206,11 +206,11 @@ This plot might look complicated, so let's step through it.
 
 First off, there are transient samples before and after the data, because of the filter and the way convolution works.  These extra samples get included in our transmission but they don't actually contain "peaks" of pulses.  
 
-The verticle lines were creating in the for loop, and they are meant to show where intervals of Ts occur, which represents where this signal will actually be sampled by the receiver.  
+The vertical lines were creating in the for loop, and they are meant to show where intervals of Ts occur, which represents where this signal will actually be sampled by the receiver.  
 
 Note how on intervals of Ts, the curve has the value of exactly 1.0 or -1.0, that's the biggest thing to take away here.  This signal is really just a bunch of our impulse responses summed together, with half of the multiplied by -1 first.
 
-If we were to upconvert and transmit this signal, the reciever would have to figure out there the boundaries of Ts are, using a symbol synchronization algorithm, so that it knows exactly where to sample to get the right data.  If it samples a little too early or late, it will see values that are a bit skewed, and if it's way off then it will get a bunch of weird numbers.  Here is an example created using GNU Radio that shows what the IQ plot (a.k.a. constellation) looks like when we sample at the right and wrong time.  Here are the original pulses, with the bit values annotated:
+If we were to upconvert and transmit this signal, the receiver would have to figure out there the boundaries of Ts are, using a symbol synchronization algorithm, so that it knows exactly where to sample to get the right data.  If it samples a little too early or late, it will see values that are a bit skewed, and if it's way off then it will get a bunch of weird numbers.  Here is an example created using GNU Radio that shows what the IQ plot (a.k.a. constellation) looks like when we sample at the right and wrong time.  Here are the original pulses, with the bit values annotated:
 
 .. image:: ../_static/symbol_sync1.PNG
    :scale: 50 % 

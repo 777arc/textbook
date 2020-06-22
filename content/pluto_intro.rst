@@ -92,7 +92,7 @@ If you get this far without an error then continue with the next steps
 "Hack" PlutoSDR to Increase RF Range
 ####################################
 
-The PlutoSDR's ship with a limited center frequency range and sampling rate, but the underlying chip is capable of much higher, and these steps will unlock the ful range.  Note that this process is provided by Analog Devices, it is as low risk as you can get, the reason for the limitation has to do with Analog Devices "binning" the AD9364 based on strict performance requirements at the higher frequencies, stuff we don't really care about as SDR enthusaists.
+The PlutoSDR's ship with a limited center frequency range and sampling rate, but the underlying chip is capable of much higher, and these steps will unlock the ful range.  Note that this process is provided by Analog Devices, it is as low risk as you can get, the reason for the limitation has to do with Analog Devices "binning" the AD9364 based on strict performance requirements at the higher frequencies, stuff we don't really care about as SDR enthusiasts.
 
 Open terminal (either host or VM, doesn't matter)
 
@@ -158,7 +158,7 @@ In addition, in order to time how long something takes, you can use the followin
 
 My hint is that you'll need to put the line "samples = sdr.rx()" into a loop, and count how many samples you get each call to sdr.rx(), while keeping track of how much time has elapsed.  Second hint- just because you are calculating samples per second, doesn't mean you have to perform exactly 1 second worth of receiving samples, you can always divide the number of samples you received by the amount of time that passed.
 
-As part of this exersize you will get an idea for the max throughput of USB 2.0, something you can look up online to verify your findings. 
+As part of this exercise you will get an idea for the max throughput of USB 2.0, something you can look up online to verify your findings. 
 
 As a bonus, try changing the center_freq to see if/how it impacts the rate you can receive samples off the Pluto.
 
@@ -166,15 +166,15 @@ As a bonus, try changing the center_freq to see if/how it impacts the rate you c
 Exercise 2: Create a Spectrogram/Waterfall
 ##########################################
 
-For this exersize you will create a spectrogram, a.k.a. waterfall, like we learned about at the end of the Frequency Domain chapter.  A spectrogram is simply a bunch of FFT's displayed stacked on top of each other, i.e. it's an image with one axis representing frequency and the other axis representing time. 
+For this exercise you will create a spectrogram, a.k.a. waterfall, like we learned about at the end of the Frequency Domain chapter.  A spectrogram is simply a bunch of FFT's displayed stacked on top of each other, i.e. it's an image with one axis representing frequency and the other axis representing time. 
 
-In the Frequency Domain chapter we saw the Python code to perform an FFT.  For this exersize you can use code snippets from the previous exersize, as well as a little bit of basic python code.
+In the Frequency Domain chapter we saw the Python code to perform an FFT.  For this exercise you can use code snippets from the previous exercise, as well as a little bit of basic python code.
 
 Hints:
 
 1. Try setting sdr.rx_buffer_size to the FFT size so that you always perform 1 FFT for each call to `sdr.rx()`.
 2. Build a 2d array to hold all the FFT results, each row is 1 FFT.  A 2d array filled with zeros can be created with: `np.zeros((num_rows, fft_size))`.  Access row i of the array with: `waterfall_2darray[i,:]`. 
-3. `plt.imshow()` is a convinient way to display a 2d array, and have it scale the color automatically.
+3. `plt.imshow()` is a convenient way to display a 2d array, and have it scale the color automatically.
 
 As a stretch goal, make the spectrogram update live.
 

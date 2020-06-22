@@ -68,7 +68,7 @@ We can modulate our data onto a carrier by modifying any one (or more) of these 
 Amplitude Shift Keying (ASK)
 ****************************
 
-Amplitude Shift Keying (ASK) is the first digital modulation scheme we wil discuss, because it's the simplest to visualize of the three.  We literally just modulate the **amplitude** of the carrier.  Example of 2-level ASK, called 2-ASK:
+Amplitude Shift Keying (ASK) is the first digital modulation scheme we will discuss, because it's the simplest to visualize of the three.  We literally just modulate the **amplitude** of the carrier.  Example of 2-level ASK, called 2-ASK:
 
 .. image:: ../_static/ASK.PNG
    :scale: 50 % 
@@ -99,7 +99,7 @@ So how do we actually create this signal in real life?  All we really have to do
    :scale: 80 % 
    :align: center 
 
-The top plot shows the discrete samples represented by dots, and then the bottom plot shows what the resuling signal looks like, which could be represented digitally or even transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there might be thousands, depending on how high in the spectrum the signal is being transmitted.  
+The top plot shows the discrete samples represented by dots, and then the bottom plot shows what the resulting signal looks like, which could be represented digitally or even transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there might be thousands, depending on how high in the spectrum the signal is being transmitted.  
 
 ************************
 Phase Shift Keying (PSK)
@@ -136,7 +136,7 @@ You have seen IQ plots before in the complex numbers subsection of the sampling 
 
 The above IQ plot shows what we will transmit, or rather the set of symbols we will transmit from.  It does not show the carrier, so you can think about it as representing the symbols at baseband.  When we show the set of possible symbols for a given modulation scheme, we call it the "constellation".  Many modulation schemes can be defined by their constellation.  
 
-To receive and decode BPSK we can use IQ sampling, like we learned about, and simply look at where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel, since the signal will have some random delay as it passes through the air and into the receiver.  The random phase rotation can be compensated for using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the reicever (this does not include noise): 
+To receive and decode BPSK we can use IQ sampling, like we learned about, and simply look at where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel, since the signal will have some random delay as it passes through the air and into the receiver.  The random phase rotation can be compensated for using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the receiver (this does not include noise): 
 
 .. image:: ../_static/bpsk3.PNG
    :scale: 60 % 
@@ -165,7 +165,7 @@ Question- What’s wrong with using a PSK scheme like this?  Is this a valid PSK
    <details>
    <summary><a>Answer</a></summary>
 
-There is nothing invalid about this, you could certainly use it, but because the symbols are not uniformly spaced, it means this scheme is not as effective as it could be, something that will become clear once we talk about how noise impacts our symbols.  The short answer is, we want to leave as much room as possible in between the symbols, in case there is noise, so that one symbol does not get interpreted at the reciever as one of the other (incorrect) symbols.  We don't want a 0 being recieved as a 1.
+There is nothing invalid about this, you could certainly use it, but because the symbols are not uniformly spaced, it means this scheme is not as effective as it could be, something that will become clear once we talk about how noise impacts our symbols.  The short answer is, we want to leave as much room as possible in between the symbols, in case there is noise, so that one symbol does not get interpreted at the receiver as one of the other (incorrect) symbols.  We don't want a 0 being received as a 1.
 
 .. raw:: html
 
@@ -194,7 +194,7 @@ Here are some other examples of QAM:
    :scale: 50 % 
    :align: center 
 
-For a QAM modulation scheme, we can technically put points whereevr we want to on the IQ plot, since QAM means the phase and amplitude are being modulated.  The "parameters" of a given QAM scheme are best defined by simply showing the QAM constellation. Alternatively, you could simply list the I and Q values for each point, like below for QPSK:
+For a QAM modulation scheme, we can technically put points wherever we want to on the IQ plot, since QAM means the phase and amplitude are being modulated.  The "parameters" of a given QAM scheme are best defined by simply showing the QAM constellation. Alternatively, you could simply list the I and Q values for each point, like below for QPSK:
 
 .. image:: ../_static/qpsk_list.PNG
    :scale: 100 % 
@@ -283,6 +283,6 @@ Note how all the symbols we generated overlap, that's because there's no noise, 
    :scale: 100 % 
    :align: center 
 
-Note how AWGN noise produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpretted by the reicever as an incorrect symbol.  Try increasing noise_power until that happens.
+Note how AWGN noise produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing noise_power until that happens.
 
-We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this excersize we just did 1 sample per symbol), you will learn why once we discuss pulse shaping. 
+We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol), you will learn why once we discuss pulse shaping. 

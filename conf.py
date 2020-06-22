@@ -150,7 +150,7 @@ html_sidebars = {
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'description':'By Marc Lichtman',
+html_theme_options = {'description':'By <a href="https://www.cs.umd.edu/people/sdr">Dr. Marc Lichtman</a>',
                       'fixed_sidebar': True,
                       'page_width': '1000px',
                       'sidebar_width': '280px',

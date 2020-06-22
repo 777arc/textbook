@@ -24,6 +24,7 @@ by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
    content/multipath_fading
    content/pulse_shaping
    content/appendix_text_comparison
+   content/about_author
 .. 
    content/timing_sync
    content/frequency_sync

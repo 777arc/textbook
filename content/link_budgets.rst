@@ -36,7 +36,7 @@ Let us define the following four system parameters:
 Transmit Power
 #####################
 
-Transmit power is fairly straightforward, it will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  Analogy- the watts of a lightbulb determine how much light it "transmits".  Examples of approximate max transmit power for different technologies:
+Transmit power is fairly straightforward, it will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  Analogy- the watts of a light bulb determine how much light it "transmits".  Examples of approximate max transmit power for different technologies:
 
 ==================  =====  =======
 \                       Power    
@@ -50,7 +50,7 @@ FM station          10kW   40 dBW
 Antenna Gains
 #####################
 
-Transmit and receive antenna gains are very important, the numbers will be in dB (unitless).  Typically, antennas are either omnidirectional or directional.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna can have a gain anywhere up to 50 dB or so.  
+Transmit and receive antenna gains are very important, the numbers will be in dB (unit-less).  Typically, antennas are either omnidirectional or directional.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna can have a gain anywhere up to 50 dB or so.  
 
 .. image:: ../_static/antenna_gain_patterns.PNG
    :scale: 80 % 
@@ -85,7 +85,7 @@ Free Space Path Loss (FSPL) tells us the path loss when there are no obstacles, 
  \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ dB \right]
 
 :math:`d` is in meters and is the distance between the transmitter and receiver
-:math:`f` is in Hz and is the carrier frequency.  In link budgets it will show up in dB, unitless because it is a loss.
+:math:`f` is in Hz and is the carrier frequency.  In link budgets it will show up in dB, unit-less because it is a loss.
 
 There's only one problem with this simple equation; we won't always have free space between the transmitter and receiver.  E.g. indoors there is a lot of bouncing (most frequencies can go through walls, just not metal or thick masonry). For these situations there are various non-free-space models. a common one is the Okumura–Hata model, for cities and suburban areas (e.g. cellular):
 
@@ -109,7 +109,7 @@ where :math:`L_{path}` is the path loss in dB, :math:`h_B` is the height of the 
 .. math::
  C_H = 3.2 ( log_{10}(11.75 h_M))^2 - 4.97
 
-where :math:`h_M` is the height of the reciving antenna above ground level in meters.  Don't worry if the above Okumura–Hata model seemed confusing, it is mainly shown here to demonstrate how non-free-space path loss models are much more complicated than our simple FSPL equation.  The final result of any of these models is a single number we can use for the path loss portion of our link budget.
+where :math:`h_M` is the height of the receiving antenna above ground level in meters.  Don't worry if the above Okumura–Hata model seemed confusing, it is mainly shown here to demonstrate how non-free-space path loss models are much more complicated than our simple FSPL equation.  The final result of any of these models is a single number we can use for the path loss portion of our link budget.
 
 Misc Losses
 #####################
@@ -121,7 +121,7 @@ In our link budget we also want to take into account miscellaneous losses.  We w
 -Antenna pointing imperfections
 -Rain
 
-The plot below shows atmospheric loss in dB/km, over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis you'll see that short range communications below 40 GHz, that are less than 1 km, have 1 dB or less of atmosphieric loss, and thus we can usually ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the air.
+The plot below shows atmospheric loss in dB/km, over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis you'll see that short range communications below 40 GHz, that are less than 1 km, have 1 dB or less of atmospheric loss, and thus we can usually ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the air.
 
 .. image:: ../_static/atmospheric_attenuation.PNG
    :scale: 80 % 
@@ -135,7 +135,7 @@ Now it's time to put all of these gains and losses together, to calculate our si
 .. math::
  P_r = P_t + G_t + G_r - L_p - L_{misc} \quad \mathrm{dBW}
 
-Overall it's a pretty simple equation, we are just adding up gains/losses, some might not even consider it an equation at all.  We usually show it in a table, similar to accouting, like this:
+Overall it's a pretty simple equation, we are just adding up gains/losses, some might not even consider it an equation at all.  We usually show it in a table, similar to accounting, like this:
 
 .. list-table::
    :widths: 15 10
@@ -196,13 +196,13 @@ The Physical (PHY) Layer of ADS-B has the following characteristics:
 - Signal has 50 kHz of bandwidth (which is very small)
 - PPM modulation
 - Messages carry 15 bytes of data each, so multiple messages are usually needed
-- Multiple access is achieved by having messages broadcasted with a period that ranges randomly between 0.4 and 0.6 seconds.  This randomization is designed to prevent aircraft from having all of their transmissions on top of each other (some may still collide but that’s fine)
+- Multiple access is achieved by having messages broadcast with a period that ranges randomly between 0.4 and 0.6 seconds.  This randomization is designed to prevent aircraft from having all of their transmissions on top of each other (some may still collide but that’s fine)
 - ADS-B antennas are vertically polarized
 - Transmit power – varies, but is about 200 W (23 dBW)
 - Transmit antenna gain is omnidirectional but only pointed downward, so let's say 3 dB
 - ADS-B receivers also have an omnidirectional antenna gain, so let's say 0 dB
 
-The path loss depends on how far away the aircraft is from our receiver.  As an example, it's about 30 km between University of Maryland (where the course that this textbook's content originated from was taught) and BWI airport.  Another option is to leave this as a variable in the link budget and figure out how far away we can hear signals based on a required SNR.  If we assume FSPL, we can calulate the path loss easily:
+The path loss depends on how far away the aircraft is from our receiver.  As an example, it's about 30 km between University of Maryland (where the course that this textbook's content originated from was taught) and BWI airport.  Another option is to leave this as a variable in the link budget and figure out how far away we can hear signals based on a required SNR.  If we assume FSPL, we can calculate the path loss easily:
 
 .. math::
 	\mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55  \left[ \mathrm{dB} \right]

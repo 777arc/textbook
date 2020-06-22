@@ -32,13 +32,13 @@ In yellow is the original sine wave we are sampling, red shows the samples, and 
    :scale: 70% 
    :align: center 
 
-Once again, there is a different signal that could fit in these samples, and that ambiguitity means that if someone gave us the list of samples, we wouldn't know which signal was the original one.  How about sampling at 1.5f:
+Once again, there is a different signal that could fit in these samples, and that ambiguity means that if someone gave us the list of samples, we wouldn't know which signal was the original one.  How about sampling at 1.5f:
 
 .. image:: ../_static/sampling3.png
    :scale: 70% 
    :align: center 
 
-Still not fast enough.  It turns out you have to sample at **twice** the frequency of the signal in order to remove the ambiguitity.  Or rather, twice the frequency of the maximum frequency component in our signal, because like we learned last chapter, a given signal can have many frequency components in it:
+Still not fast enough.  It turns out you have to sample at **twice** the frequency of the signal in order to remove the ambiguity.  Or rather, twice the frequency of the maximum frequency component in our signal, because like we learned last chapter, a given signal can have many frequency components in it:
 
 .. image:: ../_static/max_freq.png
    :scale: 70% 
@@ -76,9 +76,9 @@ We can see this visually by plotting I and Q equal to 1:
    :scale: 70% 
    :align: center 
 
-We call the cos() the "in phase" component, hence the name I, and the sin() is the 90 degrees out of phase or "quadrature" component, hence Q.  Although if you accidently mix it up and assign Q to the cos() and I to the sin(), it won't actually break anything for most situations. 
+We call the cos() the "in phase" component, hence the name I, and the sin() is the 90 degrees out of phase or "quadrature" component, hence Q.  Although if you accidentally mix it up and assign Q to the cos() and I to the sin(), it won't actually break anything for most situations. 
 
-IQ sampling is more easily understoof by using the transmitter's point of view, i.e. considering the task of transmitting an RF signal through the air.  What we do as the transmitter is add the sin() and cos().  Let's say x(t) is our signal to transmit:
+IQ sampling is more easily understood by using the transmitter's point of view, i.e. considering the task of transmitting an RF signal through the air.  What we do as the transmitter is add the sin() and cos().  Let's say x(t) is our signal to transmit:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
@@ -149,7 +149,7 @@ Now let's reverse everything and take the perspective of a radio receiver, that 
    :scale: 70% 
    :align: center
 
-What comes in is a real signal that was received by our antenna, and what comes out are IQ values.  What we do is sample the I and Q branch individually, using two analog to digital converters (ADCs), and then we combine the pairs and store them as complex numbers.  In other words, at each time step, you will sample one I value and one Q value, and combine them in the form :math:`I + jQ`, i.e. one complex number per IQ sample.  There will always be a "sample rate", the rate sampling is performed.  For example, someone migth say "I have an SDR running at 2 MHz sample rate" which just means it's receiving two million IQ samples per second.  If someone gives you a bunch of IQ samples, it will look like a 1D array/vector of complex numbers.  This is pretty much what this entire chapter has been leading up to, and we finally made it.  Throughout this textbook you will become **very** familiar with how IQ samples work, how to receive and transmit them with an SDR, how to process them in Python or GNU Radio, how to record them for later analysis, etc.  
+What comes in is a real signal that was received by our antenna, and what comes out are IQ values.  What we do is sample the I and Q branch individually, using two analog to digital converters (ADCs), and then we combine the pairs and store them as complex numbers.  In other words, at each time step, you will sample one I value and one Q value, and combine them in the form :math:`I + jQ`, i.e. one complex number per IQ sample.  There will always be a "sample rate", the rate sampling is performed.  For example, someone might say "I have an SDR running at 2 MHz sample rate" which just means it's receiving two million IQ samples per second.  If someone gives you a bunch of IQ samples, it will look like a 1D array/vector of complex numbers.  This is pretty much what this entire chapter has been leading up to, and we finally made it.  Throughout this textbook you will become **very** familiar with how IQ samples work, how to receive and transmit them with an SDR, how to process them in Python or GNU Radio, how to record them for later analysis, etc.  
 
 One last important note: the figure above shows what's happening **inside** of the SDR, we don't actually have to generate a sine wave, shift by 90, multiply or add, the SDR does that for us.  We tell the SDR what frequency we want to sample at, or what frequency we want to transmit our samples at.  On the receiver side, the SDR will provide us the IQ samples, and then for the transmitting side we have to provide the SDR the IQ samples.  In terms of data type, they will either be complex ints or floats.  
 
@@ -170,7 +170,7 @@ When we change our IQ values really quickly and transmit our carrier, it's calle
 
 As a simple example, lets say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  I.e. we go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`.  All that happens is our carrier shifts phase by 90 degrees when we switch from one sample to another. 
 
-Now back to sampling for a second.  Instead of receiving a single by multiplying it by a cos() and sin() and then recording I and Q, what if we just fed it straight into a single analog to digital converter?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we will see in the next subsection.  Well that's extremley fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from 
+Now back to sampling for a second.  Instead of receiving a single by multiplying it by a cos() and sin() and then recording I and Q, what if we just fed it straight into a single analog to digital converter?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we will see in the next subsection.  Well that's extremely fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from 
 
 .. math::
   I \cos(2\pi ft)
@@ -210,7 +210,7 @@ This is called a "DC offset" or "DC spike" or sometimes "LO leakage" because the
    :align: center
    
 Remember that because the SDR tunes to a center frequency, the 0 Hz portion of the FFT really corresponds to the center frequency.
-That being said, a DC spike doesn't nessesarily mean there is energy at the center frequency.
+That being said, a DC spike doesn't necessarily mean there is energy at the center frequency.
 If there is only a DC spike, and the rest of the FFT looks like noise, there is most likely not actually a signal present where it is showing you one.
 
 A DC offset is a common artifact in direct conversion receivers, which is the architecture used for SDRs like the PlutoSDR, RTL-SDR, LimeSDR, and many Ettus USRPs.
@@ -228,7 +228,7 @@ Instead what we can do is sample at 20 MHz, at a center frequency of 95 MHz.
    :align: center
    
 Our LO will be set to 95 MHz because that is the frequency we ask the SDR to tune to, which is outside the observation window we are interested in.
-There is only one problem: if we want our signal to actually be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample ourself (something we will learn how to do later).
+There is only one problem: if we want our signal to actually be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample ourselves (something we will learn how to do later).
 Fortunately, this process of offtuning, a.k.a applying an LO offset, is often built into the SDRs, where they will automatically do the offtuning and then shift the frequency to your desired center frequency automatically.  It's great when the SDR can do it internally because it means we don't have to send a higher sample rate over our USB or ethernet connection, which is usually the bottleneck for how high a sample rate we can use.  
    
 
@@ -260,7 +260,7 @@ We will not go into it here, but in general, in signal processing you can calcul
 See <here> for a nice guide about the difference between power and energy in the context of wireless comms and SDR.
 
 Here is a very useful trick for calculating the average power of a sampled signal.
-If your signal has (roughly) zero mean, which is usually the case in SDR (we will see why later), then the signal power can be found by simplying taking the variance of the samples, e.g.:
+If your signal has (roughly) zero mean, which is usually the case in SDR (we will see why later), then the signal power can be found by simply taking the variance of the samples, e.g.:
 
 .. code-block:: python
 

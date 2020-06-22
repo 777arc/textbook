@@ -50,7 +50,7 @@ All error correction includes some form of redundancy.  That means if we want to
 - Only 100 bits represent information
 - Code-rate = 100/300 = 1/3
 
-The code rate will always be less than 1, and there is a tradeoff between redundancy and throughput.
+The code rate will always be less than 1, and there is a trade-off between redundancy and throughput.
 
 ***************************
 Modulation and Coding
