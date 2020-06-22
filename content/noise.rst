@@ -10,7 +10,7 @@ Gaussian Noise
 
 Most people are aware of the concept of noise, and how if plotting in the time domain it looks something like: 
 
-.. image:: ../_static/noise.png
+.. image:: ../_static/noise.PNG
    :scale: 70 % 
    :align: center 
 
@@ -36,7 +36,7 @@ Example 2: A garbage disposal is 100,000 times louder than a quiet rural area, a
 
 Without dB, i.e. working in normal "linear" terms, we need to use a lot of 0's, and if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor, because the scale of the y-axis might go from 0 to 3 mW for example, causing the noise to be too small to show up in the plot.  By using dB we are essentially just working in a log-scale.  Below is an example waterfall showing three signals, the left-hand side is the original signal, and the right-hand side shows it converted to dB.  Both use the exact same colormap, where blue is lowest value and yellow is highest.  Note how you can barely see the signal on the left, in the linear scale.
 
-.. image:: ../_static/linear_vs_log.png
+.. image:: ../_static/linear_vs_log.PNG
    :scale: 70 % 
    :align: center 
 
@@ -72,7 +72,7 @@ Some common errors people will run into when new to dB are:
 2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to idenitify it somewhere.
 3. When you're in dB you add/subtract values instead of multiplying/dividing, e.g.:
 
-.. image:: ../_static/db.png
+.. image:: ../_static/db.PNG
    :scale: 70 % 
    :align: center 
 
@@ -99,7 +99,7 @@ Noise in Frequency Domain
 
 In the Frequency Domain chapter we looked at "Fourier pairs", i.e. what a certain time domain signal looks like in the frequency domain.  Well what does Gaussian noise look like in the frequency domain?  Below shows some simulated noise in the time domain, and then a plot of the FFT of that noise (many FFT's were averaged together).
 
-.. image:: ../_static/noise_freq.png
+.. image:: ../_static/noise_freq.PNG
    :scale: 110 % 
    :align: center 
 
@@ -160,7 +160,7 @@ To plot complex noise in the time domain, like any complex signal we need two li
  plt.legend(['real','imag'])
  plt.show()
 
-.. image:: ../_static/noise3.png
+.. image:: ../_static/noise3.PNG
    :scale: 80 % 
    :align: center 
 
@@ -175,7 +175,7 @@ What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot 
  plt.axis([-2, 2, -2, 2])
  plt.show()
 
-.. image:: ../_static/noise_iq.png
+.. image:: ../_static/noise_iq.PNG
    :scale: 80 % 
    :align: center 
 

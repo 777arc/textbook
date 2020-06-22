@@ -1,5 +1,5 @@
 ####################################
-Getting Started with Pluto in Python
+PlutoSDR Basics
 ####################################
 
 .. image:: ../_static/pluto.png

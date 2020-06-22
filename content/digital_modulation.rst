@@ -11,13 +11,13 @@ New term alert!  Our transmit signal is going to be made up of "symbols".  Each 
 
 As a simplified example, let's say we have a wire and are sending 1's and 0's using high and low voltage levels.  A symbol is one of those 1's or 0's:
 
-.. image:: ../_static/symbols.png
+.. image:: ../_static/symbols.PNG
    :scale: 60 % 
    :align: center 
 
 In the above example each symbol represents one bit.  How can we convey more than one bit per symbol?  Let's look at the signals that travel down Ethernet cables, which is defined in an IEEE standard called IEEE 802.3 1000BASE-T.  The common operating mode of ethernet uses a 4-level amplitude modulation (2 bits per symbol) with 8 ns symbols.  
 
-.. image:: ../_static/ethernet.png
+.. image:: ../_static/ethernet.PNG
    :scale: 80 % 
    :align: center 
 
@@ -41,8 +41,6 @@ Take a moment to try to answer these questions:
 .. raw:: html
 
    </details>
-
-|
 
 *******************
 Wireless Symbols
@@ -72,7 +70,7 @@ Amplitude Shift Keying (ASK)
 
 Amplitude Shift Keying (ASK) is the first digital modulation scheme we wil discuss, because it's the simplest to visualize of the three.  We literally just modulate the **amplitude** of the carrier.  Example of 2-level ASK, called 2-ASK:
 
-.. image:: ../_static/ASK.png
+.. image:: ../_static/ASK.PNG
    :scale: 50 % 
    :align: center 
 
@@ -95,11 +93,9 @@ Five symbols, 10 bits of information
 
    </details>
 
-|
-
 So how do we actually create this signal in real life?  All we really have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid to modulate it onto a carrier (the sinusoid acts as that carrier).  
 
-.. image:: ../_static/ask3.png
+.. image:: ../_static/ask3.PNG
    :scale: 80 % 
    :align: center 
 
@@ -116,13 +112,13 @@ Now lets look at modulating the phase in a similar manner as we did with the amp
 	
 Example of BPSK (note the phase changes):
 
-.. image:: ../_static/bpsk.png
+.. image:: ../_static/bpsk.PNG
    :scale: 90 % 
    :align: center 
 
 It’s not very fun to look at plots like this:
 
-.. image:: ../_static/bpsk2.png
+.. image:: ../_static/bpsk2.PNG
    :scale: 90 % 
    :align: center 
 
@@ -134,7 +130,7 @@ IQ Plots/Constellations
 
 You have seen IQ plots before in the complex numbers subsection of the sampling chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot (we will assume a magnitude of 1):
 
-.. image:: ../_static/bpsk_iq.png
+.. image:: ../_static/bpsk_iq.PNG
    :scale: 90 % 
    :align: center 
 
@@ -142,25 +138,25 @@ The above IQ plot shows what we will transmit, or rather the set of symbols we w
 
 To receive and decode BPSK we can use IQ sampling, like we learned about, and simply look at where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel, since the signal will have some random delay as it passes through the air and into the receiver.  The random phase rotation can be compensated for using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the reicever (this does not include noise): 
 
-.. image:: ../_static/bpsk3.png
+.. image:: ../_static/bpsk3.PNG
    :scale: 60 % 
    :align: center 
 
 Back to PSK- what if we want four different levels of phase?  I.e. 0, 90, 180, and 270 degrees.  In this case it would be represented like so on the IQ plot, and it forms a modulation scheme we call Quadrature Phase Shift Keying (QPSK):
 
-.. image:: ../_static/qpsk.png
+.. image:: ../_static/qpsk.PNG
    :scale: 70 % 
    :align: center 
 
 For PSK we always have N different phases, equally spaced around 360 degrees for best results.  We often show the unit circle to emphasize that all points have the same magnitude:
 
-.. image:: ../_static/psk_set.png
+.. image:: ../_static/psk_set.PNG
    :scale: 60 % 
    :align: center 
 
 Question- What’s wrong with using a PSK scheme like this?  Is this a valid PSK modulation scheme?
 
-.. image:: ../_static/weird_psk.png
+.. image:: ../_static/weird_psk.PNG
    :scale: 90 % 
    :align: center 
 
@@ -175,11 +171,9 @@ There is nothing invalid about this, you could certainly use it, but because the
 
    </details>
 
-|
-
 And a quick detour back to ASK for a moment- note that we can show ASK on the IQ plot just like PSK.  Here is the IQ plot of 2-ASK, 4-ASK, and 8-ASK:
 
-.. image:: ../_static/ask_set.png
+.. image:: ../_static/ask_set.PNG
    :scale: 70 % 
    :align: center 
 
@@ -190,25 +184,25 @@ Quadrature Amplitude Modulation (QAM)
 **************************************
 What if we combine ASK and PSK?  We call this Quadrature Amplitude Modulation (QAM) and it usually looks something like this:
 
-.. image:: ../_static/64qam.png
+.. image:: ../_static/64qam.PNG
    :scale: 90 % 
    :align: center 
    
 Here are some other examples of QAM:
 
-.. image:: ../_static/qam.png
+.. image:: ../_static/qam.PNG
    :scale: 50 % 
    :align: center 
 
 For a QAM modulation scheme, we can technically put points whereevr we want to on the IQ plot, since QAM means the phase and amplitude are being modulated.  The "parameters" of a given QAM scheme are best defined by simply showing the QAM constellation. Alternatively, you could simply list the I and Q values for each point, like below for QPSK:
 
-.. image:: ../_static/qpsk_list.png
+.. image:: ../_static/qpsk_list.PNG
    :scale: 100 % 
    :align: center 
 
 Back to the time domain for a second.  Everything except the various ASK's and BPSK are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain, note how it's not easy to see the phase of each symbol.
 
-.. image:: ../_static/qam_time_domain.png
+.. image:: ../_static/qam_time_domain.PNG
    :scale: 50 % 
    :align: center 
 
@@ -227,7 +221,7 @@ Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to under
 
 This would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in the frequency domain might look something like this:
 
-.. image:: ../_static/fsk.png
+.. image:: ../_static/fsk.PNG
    :scale: 90 % 
    :align: center 
 

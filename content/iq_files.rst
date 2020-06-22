@@ -18,7 +18,7 @@ When we want to save complex numbers to a file, all we do is save them in the fo
 
 While it's possible to store these numbers in a text file, or csv file, we almost always prefer to save them in what's called a "binary file" in order to save space.  At high sample rates your signal recordings could easily be multiple GB, so we want to be as memory efficient as possible.  If you have ever opened a file in a text editor and it looked like the screenshot below, it was probably a binary file.  Binary files are just a series of bytes, and you have to keep track of the format yourself.  They are the most efficient way to store data, assuming all possible compression has been performed. Because our signals usually appear a lot like a random sequence of floats, we don't typically attempt to perform compression.  Binary files are used for plenty of other things, e.g. compiled programs (called "binaries").  When used to save signals we call them binary "IQ files", and often use the file extension .iq. 
 
-.. image:: ../_static/binary_file.png
+.. image:: ../_static/binary_file.PNG
    :scale: 70 % 
    :align: center 
 

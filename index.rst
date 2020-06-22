@@ -1,17 +1,15 @@
-.. textbook documentation master file, created by
-   sphinx-quickstart on Thu Nov 15 16:36:13 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
+==========================================
 PySDR: A Guide to SDR and DSP using Python
-==================================================
+==========================================
 
 by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
 
-Contents:
+
+
+
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    
    content/intro
    content/frequency_domain

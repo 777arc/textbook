@@ -1,6 +1,6 @@
-##############
+##################
 Link Budgets
-##############
+##################
 
 *************************
 Intro
@@ -82,7 +82,7 @@ As a signal moves through the air (or vacuum) it will reduce in strength.  Imagi
 Free Space Path Loss (FSPL) tells us the path loss when there are no obstacles, in dB.  In its general form, :math:`\mathrm{FSPL} = ( 4\pi d / \lambda )^2`. Google Friis transmission formula for more info.  For generating link budgets, just use this equation:
 
 .. math::
-	\mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f − 147.55  \left[ dB \right]
+ \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ dB \right]
 
 :math:`d` is in meters and is the distance between the transmitter and receiver
 :math:`f` is in Hz and is the carrier frequency.  In link budgets it will show up in dB, unitless because it is a loss.
@@ -205,9 +205,9 @@ The Physical (PHY) Layer of ADS-B has the following characteristics:
 The path loss depends on how far away the aircraft is from our receiver.  As an example, it's about 30 km between University of Maryland (where the course that this textbook's content originated from was taught) and BWI airport.  Another option is to leave this as a variable in the link budget and figure out how far away we can hear signals based on a required SNR.  If we assume FSPL, we can calulate the path loss easily:
 
 .. math::
-	\mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f − 147.55  \left[ \mathrm{dB} \right]
+	\mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55  \left[ \mathrm{dB} \right]
     
-	\mathrm{FSPL}_{dB} = 20 \log_{10} 30e3 + 20 \log_{10} 1090e6 − 147.55  \left[ \mathrm{dB} \right]
+	\mathrm{FSPL}_{dB} = 20 \log_{10} 30e3 + 20 \log_{10} 1090e6 - 147.55  \left[ \mathrm{dB} \right]
 	
 	\mathrm{FSPL}_{dB} = 122.7 \left[ \mathrm{dB} \right]
 

@@ -117,7 +117,7 @@ This is sometimes called a "phasor diagram" which sounds more complicated than i
 .. math::
   \mathrm{magnitude} = \sqrt{a^2 + b^2} = 0.806
   
-  \mathrm{phase} = \tan^{-1} \left( \frac{b}{a} \right) = −29.7^{\circ} = −0.519 \quad \mathrm{radians} 
+  \mathrm{phase} = \tan^{-1} \left( \frac{b}{a} \right) = -29.7^{\circ} = -0.519 \quad \mathrm{radians} 
   
 In Python you can just use np.abs(x) and np.angle(x) for the magnitude and phase, the input can be a scalar or a vector of complex numbers, and the output will be a **real** number(s), i.e. floats. 
 
