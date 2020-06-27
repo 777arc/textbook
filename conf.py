@@ -153,7 +153,7 @@ html_sidebars = {
 html_theme_options = {'description':'By <a href="https://www.cs.umd.edu/people/sdr">Dr. Marc Lichtman</a>',
                       'logo': 'logo.svg',
                       'logo_name': True, # used if the logo doesn't contain the project name itself
-                      'fixed_sidebar': True,
+                      #'fixed_sidebar': True, # on smaller screens you cant see the whole sidebar, and it wont scroll
                       'page_width': '1000px',
                       'sidebar_width': '280px',
                       'show_powered_by': False,}

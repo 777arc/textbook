@@ -197,7 +197,7 @@ As an example of complex taps, let's go back to the filtering use-case, except t
    :scale: 70 % 
    :align: center 
 
-One way to design this kind of filter is to make a low-pass filter with a cutoff of 3 kHz and then frequency shift it.  Remember that we can frequency shift x(t) (time domain) by multiplying it by :math:`e^{j2\pi f_0t}`.  So in this case :math:`f_0` should be 10 kHz, that way it shifts our filter up by 10 kHz. Recall that in our Python code from above, h was the filter taps of the low-pass filter.  In order to create our band-pass filter we just have to multiply those taps by :math:`e^{j2\pi f_0t}`, although that involves creating a vector to represent time, based on our sample period (inverse of sample rate):
+One way to design this kind of filter is to make a **low**-pass filter with a cutoff of 3 kHz and then frequency shift it.  Remember that we can frequency shift x(t) (time domain) by multiplying it by :math:`e^{j2\pi f_0t}`.  So in this case :math:`f_0` should be 10 kHz, that way it shifts our filter up by 10 kHz. Recall that in our Python code from above, h was the filter taps of the low-pass filter.  In order to create our band-pass filter we just have to multiply those taps by :math:`e^{j2\pi f_0t}`, although that involves creating a vector to represent time, based on our sample period (inverse of sample rate):
 
 .. code-block:: python
 	
@@ -292,7 +292,7 @@ where the 0.99 and 0.01 represent the speed the value updates (or rate of decay,
 Filter Design Tools
 *************************
 
-Like I mentioned, we typically use a filter designer tool in practice.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz. 
+In practice, most people will use a filter designer tool, or a function in code that designs the filter.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz. 
 
 .. image:: ../_static/filter_designer1.PNG
    :scale: 70 % 
@@ -319,7 +319,7 @@ Convolution
 
 We will take a brief detour to introduce the convolution operator, feel free to skip this section if you are already familiar with it.
 
-Adding two signals together is one way of combining two signals into one, in the Fourier chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent in a cross-correlation in many cases.  
+Adding two signals together is one way of combining two signals into one, in the Fourier chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent to a cross-correlation in many cases.  
 
 I believe the convolution operation is best learned through examples.  Please watch both of these videos:
 
@@ -328,19 +328,21 @@ I believe the convolution operation is best learned through examples.  Please wa
 
 In both examples, we have two input signals (one red, one blue), and then the output of the convolution is displayed.  You can see that the output is the integration of the two signals as one slides across the other.  Because of this "sliding" nature, the length of the output is actually longer than the input.  If one signal is :code:`M` samples and the other signal is :code:`N` samples, the convolution of the two can produce :code:`N+M-1` samples.  However, functions such as :code:`numpy.convolve()` have a way to specify whether you want the whole output, or just :code:`max(M, N)` samples, or just the samples where the signals overlapped completely, which is :code:`max(M, N) - min(M, N) + 1` if you were curious.  No need to get caught up in this detail, just know that the length of the output of a convolution is not just the length of the inputs.  
 
-Now why does convolution matter in DSP?  Well for starters, to filter a signal, we can simply take the impulse response and convolve it with the signal.  FIR filters are just a discrete convolution.  
+So why does convolution matter in DSP?  Well for starters, to filter a signal, we can simply take the impulse response of that filter and convolve it with the signal.  It turns out FIR filtering is just a convolution operation.  
 
 .. image:: ../_static/filter_convolve.PNG
    :scale: 70 % 
    :align: center 
 
-This might be confusing because I mentioned that convolution takes in two signals and outputs one signal.  Well we can treat the impulse response like a signal, convolution is just a math operator after all, which operates on two 1D arrays.  If one of those 1D arrays is the filter's impulse response, the other 1D array can be a piece of the input signal, and the output will be a filtered version of the input.  Let's see another example to help this click.  In the example below, the triangle will represent our filter's impulse response, and the :green:`green` signal is our signal being filtered.  
+This might be confusing because earlier we mentioned that convolution takes in two *signals* and outputs one signal.  Well we can treat the impulse response like a signal, convolution is just a math operator after all, which operates on two 1D arrays.  If one of those 1D arrays is the filter's impulse response, the other 1D array can be a piece of the input signal, and the output will be a filtered version of the input.  Let's see another example to help this click.  In the example below, the triangle will represent our filter's impulse response, and the :green:`green` signal is our signal being filtered.  
 
 .. image:: ../_static/convolution.gif
    :scale: 70 % 
    :align: center 
 
-The :red:`red` output is the filtered signal.  What kind of filter was the triangle?  Well it smoothed out the high frequency components of the green signal (i.e. the sharp transitions of the square) so it's acting as a low-pass filter.  
+The :red:`red` output is the filtered signal.  
+
+Question: What kind of filter was the triangle?  Well it smoothed out the high frequency components of the green signal (i.e. the sharp transitions of the square) so it's acting as a low-pass filter.  
 
 *************************
 Filter Design in Python
@@ -366,7 +368,7 @@ And the code used to create this is fairly simple:
 	plt.show()
 
 
-Why know this will lead to a filter with complex taps, why?
+:code:`hstack()` is just one way to concatenate arrays in numpy.  We know this will lead to a filter with complex taps, why?
 
 .. raw:: html
 
@@ -379,25 +381,25 @@ It's not symmetrical around 0 Hz
 
    </details>
 
-Our end goal is to find the taps of this filter so we can actually use it.  How do we get the taps, given the frequency response?  Well, how do we convert from the frequency domain back to the time domain?  Inverse FFT (IFFT)!  And recall that the IFFT function is almost exactly the same as the FFT function.
+Our end goal is to find the taps of this filter so we can actually use it.  How do we get the taps, given the frequency response?  Well, how do we convert from the frequency domain back to the time domain?  Inverse FFT (IFFT)!  And recall that the IFFT function is almost exactly the same as the FFT function.  We also need to ifftshift our desired frequency response before the ifft, and then we need yet another iffshift after the ifft (no, they don't cancel themselves out, you can try).  This might seem confusing, but just remember that you always should fftshift after an fft, and iffshift after an ifft.  
 
 .. code-block:: python
 
-	h = np.fft.fftshift(np.fft.ifft(H))
+	h = np.fft.ifftshift(np.fft.ifft(np.fft.ifftshift(H)))
 	plt.plot(np.real(h))
 	plt.plot(np.imag(h))
 	plt.legend(['real','imag'], loc=1)
 	plt.show()
 	
 .. image:: ../_static/filter_design2.PNG
-   :scale: 70 % 
+   :scale: 90 % 
    :align: center 
 
 Now let's say we use these taps shown above as our filter.  We know that the impulse response is just plotting the taps, so what we see above *is* our impulse response.  Lets take the FFT of our taps to see what the frequency domain actually looks like.  We will do a 1024 point FFT to get a high resolution:
 
 .. code-block:: python
 
-	H_fft = np.abs(np.fft.fft(h, 1024))
+	H_fft = np.fft.fftshift(np.abs(np.fft.fft(h, 1024)))
 	plt.plot(H_fft)
 	plt.show()
 
@@ -435,8 +437,10 @@ Note that it's not very straight... It doesn't match our original very well, rec
    :align: center 
 
 .. image:: ../_static/filter_design6.PNG
-   :scale: 50 % 
+   :scale: 70 % 
    :align: center 
+
+|
 
 .. image:: ../_static/filter_design7.PNG
    :scale: 50 % 
@@ -451,7 +455,7 @@ Intro to Pulse Shaping
 
 We will briefly introduce a very interesting topic within DSP, pulse shaping, a topic we explore in depth in its own chapter.  
 
-As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK to modulate a carrier so they can be sent wirelessly.  When we simulated QPSK in the Digital Modulation chapter, we only simulated one sample per symbol, i.e. each complex number we created was one of the points on the constellation, it was one symbol.  In practice we usually generate multiple samples per symbol, and the reason has to do with filtering. 
+As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc, to modulate a carrier so they can be sent wirelessly.  When we simulated QPSK in the Digital Modulation chapter, we only simulated one sample per symbol, i.e. each complex number we created was one of the points on the constellation, it was one symbol.  In practice we usually generate multiple samples per symbol, and the reason has to do with filtering. 
 
 We use filters to craft the "shape" of our symbols, since the shape in the time domain will change the shape in the frequency domain.  The frequency domain is what tells us how much spectrum/bandwidth our signal is going to use, and we usually want to minimize it.  Now what's important to understand is that the spectral characteristics (frequency domain) of the baseband symbols doesn't change when we modulate a carrier, it just shifts it up in frequency, the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's kind of like transmitting square pulses, in fact BPSK using 1 sample per symbol *is* just a square wave of random 1's and -1's:
 
