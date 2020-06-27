@@ -28,7 +28,7 @@ Note that source coding is not the same as channel coding; source coding is mean
 Types of Codes
 ***************************
 
-To perform channel coding we use an "error correction code".  This code tells us, given what bits we have to transmit, what bits do we actually transmit?  For the repetition-3 code, the code is simply:
+To perform channel coding we use an "error correction code".  This code tells us, given what bits we have to transmit, what bits do we actually transmit?  The most basic code is called "repetition coding", and it's when you simply repeat the bit N times, in a row.  For the repetition-3 code, the code is simply:
 
 .. role::  raw-html(raw)
     :format: html
@@ -36,29 +36,29 @@ To perform channel coding we use an "error correction code".  This code tells us
 - 0 :raw-html:`&rarr;` 000
 - 1 :raw-html:`&rarr;` 111
 
-So the message 10010110 is transmitted as 111000000111000111111000.  Some codes work on "blocks" of input bits, others use a stream approach. Codes that work on blocks are called "Block Codes", while codes that work on a stream of bits are called "Convolutional Codes".  These are the two primary types of codes.
+So the message 10010110 is transmitted as 111000000111000111111000.  Some codes work on "blocks" of input bits, others use a stream approach. Codes that work on blocks are called "Block Codes", while codes that work on a stream of bits are called "Convolutional Codes".  These are the two primary types of codes.  Our repetition-3 code was a block code, and worked on blocks of three bits.
 
-As an aside- these error correction codes are not just used in channel coding for wireless links.  Ever store information to a hard drive or SSD and wonder how there are never bit errors when reading information back off?  Writing, then reading, from memory is kind of like a communication system, and hard drive/SSD controllers have error correct built in, it's transparent to the OS, and can be proprietary since it's all onboard the hard drive/SSD.  For portable media like CDs, the error correction must be standardized.  Reed Solomon codes were common in CD-ROMs.
+As an aside- these error correction codes are not just used in channel coding for wireless links.  Ever store information to a hard drive or SSD and wonder how there are never bit errors when reading information back off?  Writing, then reading, from memory is kind of like a communication system.  Hard drive/SSD controllers have error correction built in, it's transparent to the OS, and can be proprietary since it's all onboard the hard drive/SSD.  For portable media like CDs, the error correction must be standardized.  Reed Solomon codes were common in CD-ROMs.
 
 ***************************
 Code-Rate
 ***************************
 
-All error correction includes some form of redundancy.  That means if we want to transmit 100 bits of information, we will have to actually send over 100 bits.  **Code-rate** is the ratio between the number of information bits and the total number of bits sent (i.e. information plus redundancy bits).  E.g. if I have 100 bits of information and I use repetition-3 coding:
+All error correction includes some form of redundancy.  That means if we want to transmit 100 bits of information, we will have to actually send **more than** 100 bits.  "Code-rate" is the ratio between the number of information bits and the total number of bits sent (i.e. information plus redundancy bits).  E.g. if I have 100 bits of information and I use repetition-3 coding:
 
 - 300 bits are sent
 - Only 100 bits represent information
 - Code-rate = 100/300 = 1/3
 
-The code rate will always be less than 1, and there is a trade-off between redundancy and throughput.
+The code rate will always be less than 1, and there is a trade-off between redundancy and throughput.  A lower code-rate means more redundancy and less throughput.
 
 ***************************
 Modulation and Coding
 ***************************
 
-In the Digital Modulation chapter we talked about how at low SNR you need a low-order modulation scheme (e.g. QPSK) to deal with the noise, and at high SNR you can use modulation like 256QAM.  Channel coding is the same; you want lower code-rates at low SNR, and at high SNR you can use a code-rate of almost 1.  What modern communications systems do is have a set of combined modulation and coding schemes, called MCS.  Each MCS specified a modulation scheme and a coding scheme, and there is a minimum SNR it works under.  
+In the Digital Modulation chapter we talked about how at low SNR you need a low-order modulation scheme (e.g. QPSK) to deal with the noise, and at high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNR, and at high SNR you can use a code-rate of almost 1.  What modern communications systems do is have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme, and there is a minimum SNR it works under.  
 
-Modern communications adaptively change the MCS in real-time, based on the wireless channel conditions.  The receiver sends feedback to the transmitter, indicating the channel quality.  Feedback must be shared before the wireless channel changes, which could be on the order of ms.  This adaptive process leads to the highest throughput comms possible, and is used by modern technologies like LTE, 5G, WiFi.
+Modern communications adaptively change the MCS in real-time, based on the wireless channel conditions.  The receiver sends feedback to the transmitter, indicating the channel quality.  Feedback must be shared before the wireless channel changes, which could be on the order of ms.  This adaptive process leads to the highest throughput comms possible, and is used by modern technologies like LTE, 5G, and WiFi.
 
 .. image:: ../_static/adaptive_mcs.PNG
    :scale: 80 % 
@@ -94,7 +94,7 @@ The following are three important properties of Hamming codes:
 - It can correct one-bit errors
 - It can detect but not correct two-bit errors
 
-Algorithmically, the coding process can be done using a simple matrix multiply, using what is called a "generator matrix" (and parity-check matrix on the decoding end).  In the example below, the vector 1011 is the data to be encoded, i.e. the information we want to send to the receiver.  The 2d matrix is the generator matrix, and it defines the code scheme.  The result of the multiply provides the code word to transmit.
+Algorithmically, the coding process can be done using a simple matrix multiply, using what is called the "generator matrix".  In the example below, the vector 1011 is the data to be encoded, i.e. the information we want to send to the receiver.  The 2D matrix is the generator matrix, and it defines the code scheme.  The result of the multiply provides the code word to transmit.
 
 .. image:: ../_static/hamming3.PNG
    :scale: 60 % 
@@ -115,7 +115,7 @@ Recall that at the receiver, demodulation comes before decoding.  The demodulato
 - **Soft decision decoding** – uses the soft values
 - **Hard decision decoding** – uses only the 1's and 0's
 
-Soft is more effective because you are using all of the information at your disposal, but soft is also much more complicated to implement.  The Hamming Codes we talked about used hard decisions, convolutional codes tend to use soft. 
+Soft is more robust because you are using all of the information at your disposal, but soft is also much more complicated to implement.  The Hamming Codes we talked about used hard decisions, convolutional codes tend to use soft. 
 
 ***************************
 Shannon Limit
@@ -124,7 +124,7 @@ Shannon Limit
 The Shannon limit is an incredible piece of theory, it tells us how many bits per second of error-free information we can send:
 
 .. math::
- C = B log_2 \left( 1 + \frac{S}{N}   \right)
+ C = B \cdot log_2 \left( 1 + \frac{S}{N}   \right)
 
 - C – Channel capacity [bits/sec]
 - B – Bandwidth of channel [Hz]
@@ -165,5 +165,5 @@ Both of these codes approach the Shannon Limit (i.e., almost hit it under certai
 
 Low-density parity-check (LDPC) codes are a class of highly efficient linear block codes.  They were first introduced by Robert G. Gallager in his PhD dissertation in 1960 at MIT.  Due to the computational complexity in implementing them, they were ignored until the 1990s!  He is 89 at the time of writing this, still alive, and has won many prizes for his work (decades after he did it).  It is not patented, so free to use (unlike turbo codes), which is why it was used in many open protocols. 
 
-Turbo codes are based on convolutional codes.  It's a class of code that combines two or more simpler convolutional codes and an interleaver.  The fundamental patent application for turbo codes was filed on April 23, 1991.  The inventors were French, so when Qualcomm wanted to use turbo codes in CDMA they had to create a fee-bearing patent license agreement with France Telecom.  The primary patent expired August 29, 2013. 
+Turbo codes are based on convolutional codes.  It's a class of code that combines two or more simpler convolutional codes and an interleaver.  The fundamental patent application for turbo codes was filed on April 23, 1991.  The inventors were French, so when Qualcomm wanted to use turbo codes in CDMA for 3G they had to create a fee-bearing patent license agreement with France Telecom.  The primary patent expired August 29, 2013. 
 

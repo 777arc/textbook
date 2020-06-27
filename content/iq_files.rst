@@ -28,7 +28,7 @@ In Python, the default complex type is np.complex128, which uses two 64-bit floa
 Python Examples
 *************************
 
-In Python, and numpy specifically, we use the tofile() function to store a numpy array to a file.  Here is a short example of creating a simple BPSK signal plus noise and saving it to a file in the same directory we ran our script from.
+In Python, and numpy specifically, we use the :code:`tofile()` function to store a numpy array to a file.  Here is a short example of creating a simple BPSK signal plus noise and saving it to a file in the same directory we ran our script from:
 
 .. code-block:: python
 
@@ -54,7 +54,7 @@ In Python, and numpy specifically, we use the tofile() function to store a numpy
 
 Now look at the details of the file that was produced and check how many bytes it is.  It should be num_symbols * 8, because we used np.complex64 which is 8 bytes per sample, 4 bytes per float (2 floats per sample).  
 
-Using a new Python script, we can read in this file using np.fromfile(), like so:
+Using a new Python script, we can read in this file using :code:`np.fromfile()`, like so:
 
 .. code-block:: python
 
@@ -93,7 +93,7 @@ For those who have a PlutoSDR, the below code will grab a set of samples from th
 Max Values and Saturation
 *************************
 
-When receiving samples off an SDR it's important to know what the maximum sample value is.  Many SDRs will have a maximum value of 1.0 and minimum value of -1.0.  Some SDRs give you samples as integers, usually 16-bit, in which case the max and min values will be +32767 and -32768, and you will want to divide by 32768 to convert them to floats from -1.0 to 1.0.  The reason to be aware of what the maximum value is for your SDR, is because when an extremely loud signal gets received (or the gain is set too high), the receiver will "saturate" and it will truncate the high values to whatever the maximum sample value is.  This is all because the ADCs on our SDRs have a limited number of bits.  When making an SDR app it's wise to always be checking for saturating.
+When receiving samples off an SDR it's important to know what the maximum sample value is.  Many SDRs will have a maximum value of 1.0 and minimum value of -1.0.  Some SDRs give you samples as integers, usually 16-bit, in which case the max and min values will be +32767 and -32768, and you will want to divide by 32768 to convert them to floats from -1.0 to 1.0.  The reason to be aware of what the maximum value is for your SDR, is because when an extremely loud signal gets received (or the gain is set too high), the receiver will "saturate" and it will truncate the high values to whatever the maximum sample value is.  This is all because the ADCs on our SDRs have a limited number of bits.  When making an SDR app it's wise to always be checking for saturation, and when it happens you should indicate it somehow.
 
 A signal that is saturated will look choppy in the time domain, like this:
 
@@ -101,7 +101,7 @@ A signal that is saturated will look choppy in the time domain, like this:
    :scale: 30 % 
    :align: center 
 
-And because of the sudden changes in time domain, due to the truncation, the frequency domain might look smeared.  In other words, the frequency domain will include false features; features that resulted from the saturation and are not actually part of the signal, which can throw people off. 
+And because of the sudden changes in time domain, due to the truncation, the frequency domain might look smeared.  In other words, the frequency domain will include false features; features that resulted from the saturation and are not actually part of the signal, which can throw people off when analyzing a signal. 
 
 *************************
 Annotating IQ Files
