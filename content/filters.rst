@@ -36,9 +36,9 @@ There are four basic types of filters:
    :scale: 70 % 
    :align: center 
 
-ADD DIAGRAM OF NEGATIVE FREQS TOO
+(ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
 
-Each filter lets certain frequencies through, and blocks other frequencies.  The frequencies it lets through is known as the "passband", and the "stopband" is what gets blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband. 
+Each filter lets certain frequencies through, and blocks other frequencies.  The range of frequencies it lets through is known as the "passband", and the "stopband" is what gets blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband. 
 
 Do not get this confused with the different types of filter implementation (e.g. IIR vs FIR).  The most common type by far is the low-pass filter (LPF), because we often represent signals at baseband, so the LPF lets us filter out everything "around" our signal, to get rid of excess noise and other signals.  
 
@@ -46,7 +46,7 @@ Do not get this confused with the different types of filter implementation (e.g.
 Filter Representation
 *************************
 
-For most filters we will see (known as FIR type filters), we can represent the filter itself with a single array of floats.  For symmetrical filters, which 99% are, these floats will be real (versus complex), and there will usually be an odd number of floats.  We call this array of floats the "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
+For most filters we will see (known as FIR type filters), we can represent the filter itself with a single array of floats.  For symmetrical filters, these floats will be real (versus complex), and there will usually be an odd number of floats.  We call this array of floats the "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
 
 .. code-block:: python
 
@@ -79,7 +79,7 @@ Because our signal is already centered at DC (0 Hz), we know we want a low pass 
    :scale: 70 % 
    :align: center 
 
-However, the way most low pass filters work, the negative frequency boundary will be -3 kHz as well.  I.e., it’s symmetrical around DC (later on you will see why).  So our passband will look something like this:
+However, the way most low pass filters work, the negative frequency boundary will be -3 kHz as well.  I.e., it’s symmetrical around DC (later on you will see why).  So our cutoff frequencies will look something like this (the passband is the area in between):
 
 .. image:: ../_static/filter_use_case3.PNG
    :scale: 70 % 
@@ -102,7 +102,7 @@ In addition to cutoff frequency, the other main parameter of our low-pass filter
 You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations, we will see why shortly.  A 50 tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
 Typically we use a filter designer tool, then see how many taps it outputs, and if it's way too many (e.g. more than 100) we increase the transition width.  It all depends on the application and hardware running the filter, of course.
 
-In the filtering example above, I had used a cutoff of 3 kHz and a transition width of 1 kHz (it's hard to actually see the transition width just looking at these screenshots).  The resulting filter had 77 taps.
+In the filtering example above, we had used a cutoff of 3 kHz and a transition width of 1 kHz (it's hard to actually see the transition width just looking at these screenshots).  The resulting filter had 77 taps.
 
 Back to filter representation.  Even though we might show the list of taps for a filter, we usually represent filters visually in the frequency domain.  We call this the "frequency response" of the filter, and it shows us the behavior of the filter in frequency..  E.g. this is the frequency response of the filter we were just using:
 
@@ -110,7 +110,7 @@ Back to filter representation.  Even though we might show the list of taps for a
    :scale: 100 % 
    :align: center 
 
-Note that what I'm showing here is *not* a signal, it's just the frequency domain representaiton of the filter.  That can be a little hard to wrap your head around at first, but as we look at examples and code, it will click.
+Note that what I'm showing here is *not* a signal, it's just the frequency domain representation of the filter.  That can be a little hard to wrap your head around at first, but as we look at examples and code, it will click.
 
 A given filter also has a time domain representation; it’s called the "impulse response" of the filter, because it is what you see in the time domain if you take an impulse and put it through the filter (Google "Dirac delta function" for more info about what an impulse is). For an FIR type filter, the impulse response is simply the taps themselves.  For that 77 tap filter we used earlier, the taps are:
 
@@ -161,6 +161,17 @@ And even though we haven't gotten into filter design yet, here is the Python cod
 	# plot the impulse response
 	plt.subplot(121)
 	plt.plot(h, '.-')
+	plt.show()
+
+Simply plotting this array of floats gives us the filter's impulse response:
+
+.. image:: ../_static/impulse_response.PNG
+   :scale: 100 % 
+   :align: center 
+
+And here is the code that was used to produce the frequency response, shown earlier.  It's a little more complicated because we have to create the x-axis array of frequencies. 
+
+.. code-block:: python
 
 	# plot the frequency response
 	_, H = signal.freqz(h, whole=True)
@@ -169,14 +180,7 @@ And even though we haven't gotten into filter design yet, here is the Python cod
 	w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
 	plt.subplot(122)
 	plt.plot(w, H, '.-’)
-
 	plt.show()
-
-Simply plotting this array of floats gives us the filter's impulse response:
-
-.. image:: ../_static/impulse_response.PNG
-   :scale: 100 % 
-   :align: center 
 
 Real vs. Complex Filters
 ########################
@@ -187,7 +191,7 @@ The filter I showed you had real taps, but taps can also be complex.  Whether th
    :scale: 80 % 
    :align: center 
 
-As an example of complex taps, let's go back to the filtering use-case, except this time let's say we want to receive the other signal (without having to re-tune the radio).  That means we want a band-pass filter, but not a symmetrical one, because we only want to keep (a.k.a "pass") frequencies between around 7 kHz to 13 kHz:
+As an example of complex taps, let's go back to the filtering use-case, except this time let's say we want to receive the other signal (without having to re-tune the radio).  That means we want a band-pass filter, but not a symmetrical one, because we only want to keep (a.k.a "pass") frequencies between around 7 kHz to 13 kHz (we don't want to also pass -13 kHz to -7 kHz):
 
 .. image:: ../_static/filter_use_case6.PNG
    :scale: 70 % 
@@ -239,7 +243,7 @@ Filter Implementation
 We aren't going to dive too deep into the implementation of filters, I rather focus on design of filters (you can find read-to-use implementations in any programming language anyway).  But for now, here is one take-away:  To filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  So in the discrete world we use a discrete convolution (example below).  The b's are the taps.  :math:`z^{-1}` just means delay by one time step.  
 
 .. image:: ../_static/discrete_convolution.PNG
-   :scale: 100 % 
+   :scale: 80 % 
    :align: center 
 
 You might be able to see why we call them filter "taps" now, based on the way the filter itself is implemented. 
@@ -252,7 +256,7 @@ There are two main classes of digital filters: FIR and IIR
 1. Finite impulse response (FIR)
 2. Infinite impulse response (IIR)
 
-We won't get too deep into the theory, but for now just remember: FIR filters are easier to design, and can do anything you want if you use enough taps.  IIR filters are more complicated, have potential to be unstable, but are more efficient (use less CPU and memory for the given filter). If someone just gives you a list of taps, it's assumed they are taps for an FIR filter.  If they start mentioning "poles", they are talking about IIR filters.  We will stick with FIR filters in this class
+We won't get too deep into the theory, but for now just remember: FIR filters are easier to design, and can do anything you want if you use enough taps.  IIR filters are more complicated, have potential to be unstable, but are more efficient (use less CPU and memory for the given filter). If someone just gives you a list of taps, it's assumed they are taps for an FIR filter.  If they start mentioning "poles", they are talking about IIR filters.  We will stick with FIR filters in this textbook.
 
 Below is an example frequency response, showing the comparison of an FIR and IIR filter that do almost exactly the same filtering; they have a similar transition-width, which as we learned will determine how many taps are required.  The FIR filter has 50 taps and the IIR filter has 12 poles, which is like having 12 taps in terms of computations required. 
 
@@ -265,8 +269,7 @@ The main take-away is that the FIR filter requires way more computational resour
 Here are some real-world examples of FIR and IIR filters that you may have used before.
 
 If you do a "moving average" across a list of numbers, that's just an FIR filter with taps of 1's:
-- h = [1 1 1 1 1 1 1 1 1 1] for a moving average filter with window size = 10 
-It also happens to be a low pass type filter; why is that?  What's the difference between using 1's and using taps that decay to zero?
+- h = [1 1 1 1 1 1 1 1 1 1] for a moving average filter with window size of 10.  It also happens to be a low pass type filter; why is that?  What's the difference between using 1's and using taps that decay to zero?
 
 .. raw:: html
 
@@ -279,13 +282,17 @@ A moving average filter is a low pass filter because it smooths out "high freque
 
    </details>
 
-Now for an FIR example.  Have any of you ever done this: x = x*0.99 + new_value*0.01, where the 0.99/0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convenient way to slowly update some variable without having to remember the last several values.  This is actually a form of low pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
+Now for an FIR example.  Have any of you ever done this: 
+
+    x = x*0.99 + new_value*0.01
+
+where the 0.99 and 0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convenient way to slowly update some variable without having to remember the last several values.  This is actually a form of low pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
 
 *************************
 Filter Design Tools
 *************************
 
-Like I mentioned, we typically use a filter designer tool in practice.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com/>.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz. 
+Like I mentioned, we typically use a filter designer tool in practice.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz. 
 
 .. image:: ../_static/filter_designer1.PNG
    :scale: 70 % 

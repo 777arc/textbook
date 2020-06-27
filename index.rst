@@ -4,12 +4,9 @@ PySDR: A Guide to SDR and DSP using Python
 
 by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
 
-
-
-
-
 .. toctree::
    :maxdepth: 2
+   :numbered: 1
    
    content/intro
    content/frequency_domain
@@ -25,12 +22,3 @@ by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
    content/pulse_shaping
    content/appendix_text_comparison
    content/about_author
-.. 
-   content/timing_sync
-   content/frequency_sync
-   content/equalization
-   content/spread_spectrum
-   content/ofdm
-   content/mimo
-   
-
