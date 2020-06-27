@@ -321,10 +321,18 @@ We will take a brief detour to introduce the convolution operator, feel free to 
 
 Adding two signals together is one way of combining two signals into one, in the Fourier chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent to a cross-correlation in many cases.  
 
-I believe the convolution operation is best learned through examples.  Please watch both of these videos:
+I believe the convolution operation is best learned through examples.  In this first example, we convolve two square pulses together:
 
-1. https://www.youtube.com/watch?v=HW4IamyQnzw
-2. https://www.youtube.com/watch?v=O9-HN-yzsFQ
+
+.. image:: ../_static/convolution_animation1.gif
+   :scale: 100 % 
+   :align: center 
+   
+Because it's just a sliding integreation, the result is a triangle, with a maximum at the point where both square pulses lined up perfectly.  Let's look at what happens if we convolve a square pulse with a triangular pulse:
+
+.. image:: ../_static/convolution_animation2.gif
+   :scale: 150 % 
+   :align: center 
 
 In both examples, we have two input signals (one red, one blue), and then the output of the convolution is displayed.  You can see that the output is the integration of the two signals as one slides across the other.  Because of this "sliding" nature, the length of the output is actually longer than the input.  If one signal is :code:`M` samples and the other signal is :code:`N` samples, the convolution of the two can produce :code:`N+M-1` samples.  However, functions such as :code:`numpy.convolve()` have a way to specify whether you want the whole output, or just :code:`max(M, N)` samples, or just the samples where the signals overlapped completely, which is :code:`max(M, N) - min(M, N) + 1` if you were curious.  No need to get caught up in this detail, just know that the length of the output of a convolution is not just the length of the inputs.  
 
@@ -469,13 +477,19 @@ And as we have learned, square pulses are not the best, they use an excess amoun
    :scale: 70 % 
    :align: center 
 
-So what we do is we "pulse shape" these blocky looking symbols so that they take up less bandwidth in the frequency domain.  We do this using a low-pass filter, because it will filter out the higher frequency components of our symbols.  Below shows an example of symbols in the time domain, before and after a pulse shaping filter has been applied.  
+So what we do is we "pulse shape" these blocky looking symbols so that they take up less bandwidth in the frequency domain.  We do this using a low-pass filter, because it will filter out the higher frequency components of our symbols.  Below shows an example of symbols in the time (top) and frequency (bottom) domain, before and after a pulse shaping filter has been applied:
 
 .. image:: ../_static/pulse_shaping.PNG
    :scale: 70 % 
    :align: center 
 
-INSERT PICTURE OF THE SPECTRUM BEFORE AND AFTER
+|
+
+.. image:: ../_static/pulse_shaping_freq.png
+   :scale: 90 % 
+   :align: center 
+
+Note how much quicker the signal drops off in frequency; the sidelobes are around 30 dB lower after pulse shaping, that's 1000x less!  And more importantly, the main lobe is more narrow, so less spectrum is used for the same amount of bits per second.
 
 For now, be aware that common pulse shaping filters include:
 

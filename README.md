@@ -9,6 +9,6 @@ to build on windows:
 
 sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe" . _build
 
-On Ubuntu with latest sphinx installed with pip:
+On Ubuntu with *latest* sphinx  (3.1.1 at the time of this writing) installed with pip:
 
-python3 /usr/local/lib/python3.6/dist-packages/sphinx/cmd/build.py -b html . _build
+sphinx-build -b html . _build
