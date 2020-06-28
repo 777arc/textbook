@@ -1,3 +1,5 @@
+.. _noise-chapter:
+
 #############
 Noise and dB
 #############
@@ -70,7 +72,7 @@ In Python:
 
  x = 10.0 ** (x_db / 10.0)
 
-But don't get caught up in the formula, there is a key concept to take away here.  In DSP we deal with really big numbers and really small numbers together (e.g. the strength of a signal compared to the strength of the noise), and dB lets us have more dynamic range when we express numbers or plot them.  It also provides some conveniences like being able to add when we would normally multiply (as we will see in the Link Budget chapter).
+But don't get caught up in the formula, there is a key concept to take away here.  In DSP we deal with really big numbers and really small numbers together (e.g. the strength of a signal compared to the strength of the noise), and dB lets us have more dynamic range when we express numbers or plot them.  It also provides some conveniences like being able to add when we would normally multiply (as we will see in the :ref:`link-budgets-chapter` chapter).
 
 Some common errors people will run into when new to dB are:
 
@@ -103,7 +105,7 @@ Linear   dB
 Noise in Frequency Domain
 *************************
 
-In the Frequency Domain chapter we looked at "Fourier pairs", i.e. what a certain time domain signal looks like in the frequency domain.  Well what does Gaussian noise look like in the frequency domain?  Below shows some simulated noise in the time domain, and then a plot of the FFT of that noise (many FFT's were averaged together).
+In the :ref:`freq-domain-chapter` chapter we looked at "Fourier pairs", i.e. what a certain time domain signal looks like in the frequency domain.  Well what does Gaussian noise look like in the frequency domain?  Below shows some simulated noise in the time domain, and then a plot of the FFT of that noise (many FFT's were averaged together).
 
 .. image:: ../_static/noise_freq.PNG
    :scale: 110 % 
@@ -204,7 +206,7 @@ We are starting to get a feel why transmitting data wireless isn't that simple, 
 AWGN
 *************************
 
-In the DSP and SDR world you will hear the abbreviation "AWGN" a lot.  It stands for Additive White Gaussian Noise.  The GN, Gaussian Noise, we already discussed.  Additive just means the noise is being added to our received signal.  White means in the frequency domain, the spectrum is flat across our entire observation band.  It will almost always be white in practice, or approximately white.  In this textbook we will use AWGN as the only form of noise, when dealing with communications links and link budgets and such.  Non-AWGN noise tends to be a niche topic.
+Additive White Gaussian Noise (AWGN) is an abbreviation you will hear a lot in the DSP and SDR world.  The GN, Gaussian Noise, we already discussed.  Additive just means the noise is being added to our received signal.  White means in the frequency domain, the spectrum is flat across our entire observation band.  It will almost always be white in practice, or approximately white.  In this textbook we will use AWGN as the only form of noise, when dealing with communications links and link budgets and such.  Non-AWGN noise tends to be a niche topic.
 
 *************************
 SNR

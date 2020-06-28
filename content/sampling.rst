@@ -1,3 +1,5 @@
+.. _sampling-chapter:
+
 ##################
 IQ Sampling
 ##################
@@ -56,7 +58,7 @@ So we must identify the highest one, then double it, and make sure we sample at 
    :scale: 70% 
    :align: center 
 
-If we don't sample fast enough we get something called aliasing, which we will learn about later, but we try to avoid it at all costs.  In general, our SDRs will make sure that we are sampling fast enough to avoid aliasing, which means if we give our SDR a sample rate that's too low, we will simply cut off the signal (in frequency), and not be able to see the whole thing.  Our SDRs go to great lengths to provide us with samples free of aliasing and other imperfections. 
+If we don't sample fast enough we get something called aliasing, which we will learn about later, but we try to avoid it at all costs.  What our SDRs do (and most receivers in general), is filter out everything above Fs/2 right before the sampling is performed. So if we attempt to receive a signal with too low a sample rate, that filter will chop off part of the signal.  Our SDRs go to great lengths to provide us with samples free of aliasing and other imperfections.
 
 *************************
 Quadrature Sampling
@@ -119,7 +121,7 @@ A complex number is really just two numbers together, a real and an imaginary po
    :scale: 70% 
    :align: center
 
-This is sometimes called a "phasor diagram" which sounds more complicated than it is.  It's really just plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  
+This is sometimes called a "phasor diagram" which sounds more complicated than it is.  It's really just plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
 
 .. math::
   \mathrm{magnitude} = \sqrt{a^2 + b^2} = 0.806
@@ -250,7 +252,7 @@ Sampling Using the PlutoSDR
 
 Sampling using the PlutoSDR's Python API is pretty straightforward.  With any SDR app we know we must tell the SDR the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three are nessesary for the SDR to have enough information to do anything.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will just start sampling as soon as you initialize it, and just drop the samples as the buffer fills up. All SDR APIs have some sort of "receive samples" function, for the pluto it's rx(), and it returns a certain number of samples, defined by the buffer size that was set beforehand.
 
-Refer to the PlutoSDR Basics chapter for installing the software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, center frequency to 100 MHz, and gain to 50 dB, with automatic gain control turned off.  It usually doesn't matter what order you set the center frequency, gain, and sample rate.  We tell the Pluto that we want it to give us 10,000 samples per call to rx().  
+Refer to the :ref:`pluto-chapter` chapter for installing the software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, center frequency to 100 MHz, and gain to 50 dB, with automatic gain control turned off.  It usually doesn't matter what order you set the center frequency, gain, and sample rate.  We tell the Pluto that we want it to give us 10,000 samples per call to rx().  
 
 .. code-block:: python
 

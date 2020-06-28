@@ -1,3 +1,5 @@
+.. _channel-coding-chapter:
+
 #####################
 Channel Coding
 #####################
@@ -8,7 +10,7 @@ In this chapter we take a brief look into the basics of channel coding, a.k.a. f
 Why We Need Channel Coding
 ***************************
 
-As we learned in the Noise chapter, wireless channels are noisy, and our digital symbols won't reach the receiver perfectly.  If you have taken a networking course you may already know about cyclic redundancy checks (CRCs) which **detect** errors at the receiving end.  The purpose of channel coding is to detect **and correct** errors at the receiver.  If we allow some room for error, then we can transmit at a higher order modulation scheme, for example, without having a broken link.  As a visual example, consider the following constellations showing QPSK (left) and 16QAM (right), under the same amount of noise.  QPSK provides 2 bits per symbol, 16QAM uses 4 bits per symbol, so twice the data rate.  But note how in the QPSK constellation, the symbols tend to not pass the symbol decision boundary which is the x-axis and y-axis for QPSK, which means the symbols will be received correctly.  Meanwhile in the 16QAM plot, there is overlap in the clusters and there will be many incorrectly received symbols. 
+As we learned in the :ref:`noise-chapter` chapter, wireless channels are noisy, and our digital symbols won't reach the receiver perfectly.  If you have taken a networking course you may already know about cyclic redundancy checks (CRCs) which **detect** errors at the receiving end.  The purpose of channel coding is to detect **and correct** errors at the receiver.  If we allow some room for error, then we can transmit at a higher order modulation scheme, for example, without having a broken link.  As a visual example, consider the following constellations showing QPSK (left) and 16QAM (right), under the same amount of noise.  QPSK provides 2 bits per symbol, 16QAM uses 4 bits per symbol, so twice the data rate.  But note how in the QPSK constellation, the symbols tend to not pass the symbol decision boundary which is the x-axis and y-axis for QPSK, which means the symbols will be received correctly.  Meanwhile in the 16QAM plot, there is overlap in the clusters and there will be many incorrectly received symbols. 
 
 .. image:: ../_static/qpsk_vs_16qam.PNG
    :scale: 90 % 
@@ -56,7 +58,7 @@ The code rate will always be less than 1, and there is a trade-off between redun
 Modulation and Coding
 ***************************
 
-In the Digital Modulation chapter we talked about how at low SNR you need a low-order modulation scheme (e.g. QPSK) to deal with the noise, and at high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNR, and at high SNR you can use a code-rate of almost 1.  What modern communications systems do is have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme, and there is a minimum SNR it works under.  
+In the :ref:`modulation-chapter` chapter we talked about how at low SNR you need a low-order modulation scheme (e.g. QPSK) to deal with the noise, and at high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNR, and at high SNR you can use a code-rate of almost 1.  What modern communications systems do is have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme, and there is a minimum SNR it works under.  
 
 Modern communications adaptively change the MCS in real-time, based on the wireless channel conditions.  The receiver sends feedback to the transmitter, indicating the channel quality.  Feedback must be shared before the wireless channel changes, which could be on the order of ms.  This adaptive process leads to the highest throughput comms possible, and is used by modern technologies like LTE, 5G, and WiFi.
 

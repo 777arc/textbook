@@ -1,3 +1,5 @@
+.. _pluto-chapter:
+
 ####################################
 PlutoSDR Basics
 ####################################
@@ -33,7 +35,7 @@ Connecting PlutoSDR
 1. If running OSX, within OSX, not the VM, in system preferences, enable "kernel extensions".  Then install HoRNDIS (you may need to reboot after).
 2. If running Windows, install this driver: https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
 3. If running Linux you shouldn't have to do anything special
-4. Plug Pluto into the host machine over USB, make sure to use middle port on Pluto.  It should create a virtual network adapter, i.e. the Pluto appears like a USB ethernet adapter
+4. Plug Pluto into the host machine over USB, make sure to use middle USB port on Pluto, the other one is power only.  It should create a virtual network adapter, i.e. the Pluto appears like a USB ethernet adapter
 5. On the host machine (not VM), open a terminal or whatever ping tool you want and ping 192.168.2.1.  If that doesn't work stop here, and debug the network interface. 
 6. Within the VM, open a new terminal
 7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  If the ping works then you should be good to go, assuming 192.168.2.1 was actually the Pluto and not some random computer on the network (unlikely but possible)
@@ -88,6 +90,10 @@ Open a new terminal (in your VM) and type the following commands:
 
 If you get this far without an error then continue with the next steps
 
+Changing Pluto's IP Address
+####################################
+
+If for some reason the default IP of 192.168.2.1 won't work because you already have a 192.168.2.0 subnet, or because you want multiple Pluto's connected at the same time, you can change the IP by editing the config.txt file on the PlutoSDR mass storage device (i.e. the USB-drive looking thing that shows up after you plug in the Pluto).  
 
 "Hack" PlutoSDR to Increase RF Range
 ####################################
@@ -111,7 +117,7 @@ Type the following commands in:
  fw_setenv attr_val ad9364
  reboot
 
-You should now be able to tune up to 6 GHz and use a sample rate up to 56 MHz!
+You should now be able to tune up to 6 GHz, down to 70 MHz, and use a sample rate up to 56 MHz!  Yay!
 
 ************************
 Python Exercises
@@ -166,9 +172,9 @@ As a bonus, try changing the center_freq to see if/how it impacts the rate you c
 Exercise 2: Create a Spectrogram/Waterfall
 ##########################################
 
-For this exercise you will create a spectrogram, a.k.a. waterfall, like we learned about at the end of the Frequency Domain chapter.  A spectrogram is simply a bunch of FFT's displayed stacked on top of each other, i.e. it's an image with one axis representing frequency and the other axis representing time. 
+For this exercise you will create a spectrogram, a.k.a. waterfall, like we learned about at the end of the :ref:`freq-domain-chapter` chapter.  A spectrogram is simply a bunch of FFT's displayed stacked on top of each other, i.e. it's an image with one axis representing frequency and the other axis representing time. 
 
-In the Frequency Domain chapter we saw the Python code to perform an FFT.  For this exercise you can use code snippets from the previous exercise, as well as a little bit of basic python code.
+In the :ref:`freq-domain-chapter` chapter we saw the Python code to perform an FFT.  For this exercise you can use code snippets from the previous exercise, as well as a little bit of basic python code.
 
 Hints:
 

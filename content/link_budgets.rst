@@ -1,3 +1,5 @@
+.. _link-budgets-chapter:
+
 ##################
 Link Budgets
 ##################

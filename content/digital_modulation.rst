@@ -1,3 +1,5 @@
+.. _modulation-chapter:
+
 ###################
 Digital Modulation
 ###################
@@ -48,7 +50,7 @@ Wireless Symbols
 Question- Why can’t we directly transmit the ethernet signal shown in the figure above?  There are many reasons, the biggest two being:
 
 1. Low frequencies require *huge* antennas
-2. Square waves take an excessive amount of spectrum for the bits per second, recall from the Frequency Domain chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
+2. Square waves take an excessive amount of spectrum for the bits per second, recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
 
 .. image:: ../_static/square-wave.png
    :scale: 100 % 
@@ -128,7 +130,7 @@ So instead we usually represent the phase in the complex plane.
 IQ Plots/Constellations
 ***********************
 
-You have seen IQ plots before in the complex numbers subsection of the sampling chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot. We will assume a magnitude of 1, in practice it doesn't really matter what magnitude you use, a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
+You have seen IQ plots before in the complex numbers subsection of the :ref:`sampling-chapter` chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot. We will assume a magnitude of 1, in practice it doesn't really matter what magnitude you use, a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
 
 .. image:: ../_static/bpsk_iq.PNG
    :scale: 90 % 
@@ -285,5 +287,5 @@ Note how all the symbols we generated overlap, that's because there's no noise, 
 
 Note how AWGN noise produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
 
-We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol), you will learn why once we discuss pulse shaping.  The Python exercise in the Pulse Shaping chapter will continue where we left off here.
+We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol), you will learn why once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 

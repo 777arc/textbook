@@ -1,3 +1,5 @@
+.. _pulse-shaping-chapter:
+
 #######################
 Pulse Shaping
 #######################
@@ -8,7 +10,7 @@ You can consider this Part II of the Filters chapter, where we take a deeper div
 Inter-Symbol-Interference (ISI)
 **********************************
 
-In the Filters chapter we learned that blocky shaped symbols/pulses use an excess amount of spectrum, and we can greatly reduce the amount of spectrum used by "shaping" our pulses.  But you can't just use any low-pass filter, or you might get inter-symbol-interference (ISI), which is when symbols bleed into each other and interfere with each other.
+In the :ref:`filters-chapter` chapter we learned that blocky shaped symbols/pulses use an excess amount of spectrum, and we can greatly reduce the amount of spectrum used by "shaping" our pulses.  But you can't just use any low-pass filter, or you might get inter-symbol-interference (ISI), which is when symbols bleed into each other and interfere with each other.
 
 When we transmit digital symbols, we transmit them back-to-back (as opposed to waiting some time between symbols).  But when you apply a pulse-shaping filter, it elongates the pulse in the time domain (in order to condense it in frequency), which causes adjacent symbols to overlap with each other.  And this is fine, as long as your pulse shaping filter meets this one criterion: all of the pulses must add up to zero at every multiple of our symbol period T, except for one of the pulses.  This is best understood through the following visualization:
 
@@ -164,7 +166,7 @@ At this point our symbols are still 1's and -1's, don't get too caught up in the
  BPSK symbols: [-1, 1, 1, 1, 1, -1, -1, -1, 1, 1]
  Applying 8 samples per symbol: [-1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, ...]
 
-We will create a raised-cosine filter, using a beta of 0.35, and make it 101 taps which will give it enough time to decay to zero.   While the raised cosine equation asks for our symbol period, and a time vector (t), we can just assume a **sample** period of 1 second, to sort of "normalize" our simulation.  This means our symbol period (Ts) is 8, because we have 8 samples per symbol.  So our time vector will just be a list of integers.  With the way the raised-cosine equation works, we want t=0 to be in the center, so we will generate the 101-length time vector starting at -51 and ending on -51:
+We will create a raised-cosine filter, using a beta of 0.35, and make it 101 taps which will give it enough time to decay to zero.   While the raised cosine equation asks for our symbol period, and a time vector (t), we can just assume a **sample** period of 1 second, to sort of "normalize" our simulation.  This means our symbol period (Ts) is 8, because we have 8 samples per symbol.  So our time vector will just be a list of integers.  With the way the raised-cosine equation works, we want t=0 to be in the center, so we will generate the 101-length time vector starting at -51 and ending on +51:
 
 .. code-block:: python
 

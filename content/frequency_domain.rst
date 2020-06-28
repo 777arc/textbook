@@ -1,5 +1,7 @@
+.. _freq-domain-chapter:
+
 #####################
-The Frequency Domain
+Frequency Domain
 #####################
 
 One of the coolest side effects of learning about DSP and wireless communications is that you will also learn to think in the frequency domain.  Most people's experience with *working* in the frequency domain is limited to adjusting the bass/mid/treble knobs on a car's audio system.  Most people's experience with *viewing* something in the frequency domain is limited to seeing an audio equalizer, such as this clip:
@@ -55,6 +57,8 @@ At this point you may have realized that a "signal" is essentially just a functi
    
 When we decompose a signal into a summation of sine waves, each one will have a certain amplitude, phase, and frequency.  Each sine wave's **amplitude** will tell us how strong that **frequency** existed in the original signal.  Don't worry too much about **phase** for now, other than realizing that the only difference between sin() and cos() is a phase shift (time shift).
 
+It's more important to understand the underlying concept, than the actual equations to solve for a Fourier series, but for those who are interested in the equations I refer you to Wolfram's concise explaination: https://mathworld.wolfram.com/FourierSeries.html.  
+
 ********************
 Time-Frequency Pairs
 ********************
@@ -80,10 +84,10 @@ As we can see, a spike/impulse in the time domain is flat in the frequency domai
 Next lets look at the time and frequency domain plots of a square wave:
 
 .. image:: ../_static/square-wave.png
-   :scale: 70 % 
+   :scale: 80 % 
    :align: center 
    
-This one is also less intuitive, but we can see that the frequency domain seems to keep going, and this is because of the quick change in time domain, just like in the previous example.  But it's not flat in frequency, it has spikes at intervals, and the level seems to decay as the frequency gets higher.  It turns out that a square wave in time domain has a sin(x)/x pattern in the frequency domain, which is known as the sinc() function.  
+This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  This is because of the quick change in time domain, just like in the previous example.  But it's not flat in frequency, it has spikes at intervals, and the level slowly decays (although it will continue forever).  It turns out that a square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).  
 
 Now what if we have a constant signal in the time domain?  A constant signal has no "frequency".   Let's see:
 
@@ -123,7 +127,9 @@ The above equation for the Fourier Transform is the continuous form, which you w
 .. math::
    X_k = \sum_{n=0}^{N-1} x_n e^{-\frac{j2\pi}{N}kn}
    
-Note that the main difference is we replaced the integral with a summation.  
+Note that the main difference is we replaced the integral with a summation.  The index :math:`k` goes from 0 to N.  
+
+It's OK if none of these equations mean much to you, we actually don't need to use them directly to do cool stuff with DSP and SDRs.
 
 *************************
 Time-Frequency Properties
@@ -168,6 +174,8 @@ On the left hand side, we can see that we are scaling our signal x(t) in the tim
 
 Scaling in time is essentially shrinking or expanding the signal in the x-axis.  What this property tells us is that when we do that, the frequency domain also scales, but inversely.  So, for example, when we transmit bits faster, we have to use more frequencies.  This is why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional then the cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
 
+Those already familiar with this property may notice a scaling factor missing; it is left out for the sake of simplicity, for practical purposes it just doesn't make a difference.
+
 4. Convolution Property:
 
 .. math::
@@ -207,7 +215,7 @@ There are other properties, but the above four are the most important ones to un
 Fast Fourier Transform (FFT)
 ******************************
 
-Now back to the Fourier Transform. I showed you the equation for the discrete Fourier Transform, but what you will be using while coding 99.9% of the time will be the FFT function, fft().  The Fast Fourier Transform (FFT) is simply an algorithm to compute the discrete Fourier Transform.  It was developed decades ago, and even though there are variations on the implementation, it's still the reigning leader for computing a DFT, which is lucky considering they used "Fast" in the name.
+Now back to the Fourier Transform. I showed you the equation for the discrete Fourier Transform, but what you will be using while coding 99.9% of the time will be the FFT function, fft().  The Fast Fourier Transform (FFT) is simply an algorithm to compute the discrete Fourier Transform.  It was developed decades ago, and even though there are variations on the implementation, it's still the reigning leader for computing a discrete Fourier transform, which is lucky considering they used "Fast" in the name.
 
 The FFT is a function with one input and one output.  It converts a signal from time to frequency: 
 
@@ -231,20 +239,11 @@ So how do we actually plot this output?  As an example let's say that our sample
 
 This will always be the case; the output of the FFT will always show :math:`\text{-} f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  The output will always have a negative portion and positive portion, assuming the input was a complex number (which is usually the case in DSP).
 
-****************************
-Order in Time Doesn't Matter
-****************************
-The FFT function sort of "mixes around" the input signal to form the output, which has a different scale and units, we are no longer in the time domain after all.  A good way to internalize this is realizing that changing the order things happen in the time domain doesn't change the frequency domain version.  I.e., the FFT of the following two signals will be the same, the output will look like two spikes, because the signal is just two sine waves at different frequencies.  Changing the order the sine waves occur doesn't change the fact that it's still just two sine waves at different frequencies.
-
-.. image:: ../_static/fft_signal_order.PNG
-   :scale: 50 % 
-   :align: center 
-
 ********************
 Negative Frequencies
 ********************
 
-Back to the representation of the output of an FFT.  What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers), and that there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
+What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers), and that there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
 
 .. image:: ../_static/negative-frequencies2.png
    :scale: 60 % 
@@ -258,11 +257,22 @@ Now, when the SDR gives us the samples, it will appear like this:
 
 We just have to remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  This will make more sense as we dive into sampling and using our SDRs.  
 
+****************************
+Order in Time Doesn't Matter
+****************************
+One last property before we jump into taking FFT's.  The FFT function sort of "mixes around" the input signal to form the output, which has a different scale and units, we are no longer in the time domain after all.  A good way to internalize this is realizing that changing the order things happen in the time domain doesn't change the frequency components in the signal.  I.e., the FFT of the following two signals will both have the same two spikes, because the signal is just two sine waves at different frequencies.  Changing the order the sine waves occur doesn't change the fact that it's still just two sine waves at different frequencies.
+
+.. image:: ../_static/fft_signal_order.PNG
+   :scale: 50 % 
+   :align: center 
+   
+Technically, the phase of the FFT will change because of the time-shift of the sinusoids, but 99% of the time we are only concerned with the magnitude of the FFT, as we will learn shortly.
+   
 *******************
 FFT in Python
 *******************
 
-Now that we have learned about what an FFT is and how the output is represented, let's actually look at some Python code and use Numpy's FFT function, np.fft.fft(). 
+Now that we have learned about what an FFT is and how the output is represented, let's actually look at some Python code and use Numpy's FFT function, np.fft.fft().  It is recommended that you use a full Python console/IDE on your computer, but in a pinch you can use the online web-based Python console linked at the bottom of the navigation bar on the left.
 
 First, let us create a signal in the time domain.  Feel free to follow along with your own Python console. To keep things simple, we will make a simple sine wave at 0.15 Hz.  We will also use a sample rate of 1 Hz, meaning in time we sample at 0, 1, 2, 3 seconds, etc. 
 
@@ -320,7 +330,7 @@ For our convenience, Numpy has an FFT shift function, :code:`np.fft.fftshift()`.
 
  S = np.fft.fftshift(np.fft.fft(s))
 
-We also need to figure out the x-axis values/label.  Recall that we used a sample rate of 1 Hz to keep things simple.  That means the left edge of the frequency domain plot will be -0.5 Hz and the right edge will be 0.5 Hz.  If that doesn't make sense, it will after you get through the chapter on sampling.  Let's stick to that assumption that our sample rate was 1 Hz, and plot the FFT output's magnitude and phase with a proper x-axis label.  Here is the final version of this Python example, and the output:
+We also need to figure out the x-axis values/label.  Recall that we used a sample rate of 1 Hz to keep things simple.  That means the left edge of the frequency domain plot will be -0.5 Hz and the right edge will be 0.5 Hz.  If that doesn't make sense, it will after you get through the chapter on :ref:`sampling-chapter`.  Let's stick to that assumption that our sample rate was 1 Hz, and plot the FFT output's magnitude and phase with a proper x-axis label.  Here is the final version of this Python example, and the output:
 
 .. code-block:: python
 
@@ -330,14 +340,38 @@ We also need to figure out the x-axis values/label.  Recall that we used a sampl
  S_mag = np.abs(S)
  S_phase = np.angle(S)
  f = np.arange(-0.5,0.5,1/100.0)
+ plt.figure(0)
  plt.plot(f, S_mag,'.-')
+ plt.figure(1)
  plt.plot(f, S_phase,'.-')
+ plt.show()
 
 .. image:: ../_static/fft-python5.png
    :scale: 80 % 
    :align: center 
 
 Note that we see our spike at 0.15 Hz, which is the frequency we used when creating the sine wave. So that means our FFT worked!  If we did not know the code used to generate that sine wave, but we were just given the list of samples, we could use the FFT to determine the frequency. The reason why we see a spike also at -0.15 Hz has to do with the fact it was a real signal, not complex, and we will get deeper into that later. 
+
+******************************
+Windowing
+******************************
+
+When we use an FFT to measure the frequency components of our signal, the FFT assumes that it's being given a piece of a *periodic* signal.  It behaves as if the piece of signal we provided continues to repeat indefintely, it's as if the last sample of the slice connects back to the first sample.  This just stems out of the theory behind the Fourier Transform.  But what this means is that we want to avoid sudden transitions between the first and last sample, because sudden transitions in the time domain look like many frequencies, and in reality our last sample doesn't actually connect back to our first sample.  To put it simply: if we are doing a 1024-point FFT using :code:`np.fft.fft(x)`, we want :code:`x[0]` and :code:`x[1023]` to be equal, or close in value.  
+
+The way we make up for this cyclic property is through "windowing".  Right before the FFT, we multiply the slice of signal by a window function, which is just any function that tapers to zero on both ends.  That ensures the slice of signal will begin and end at zero, and connect.  Common window functions include Hamming, Hanning, Blackman, and Kaiser.  When you don't apply any windowing, it's called using a "rectangular" window, because it's like multiplying by an array of ones.   Here is what several window functions look like:
+
+.. image:: ../_static/windows.png
+   :scale: 80 % 
+   :align: center 
+
+A simple approach for beginners is to just stick with a Hamming window, which can be created in Python with :code:`np.hamming(N)` where N is the number of elements in the array, which is just your FFT size.  In the above exercise, we would apply the window right before the FFT, so after the 2nd line of code we would insert:
+
+.. code-block:: python
+
+ s = s * np.hamming(1024)
+
+If you are afraid of choosing the wrong window, don't be.  The difference between Hamming, Hanning, Blackman, and Kaiser is very minimal compared to just not using a window at all, since they all taper to zero on both sides and solve the underlying problem. 
+
 
 *******************
 FFT Sizing

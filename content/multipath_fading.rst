@@ -1,3 +1,5 @@
+.. _multipath-chapter:
+
 #######################
 Multipath Fading
 #######################

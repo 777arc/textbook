@@ -1,3 +1,5 @@
+.. _filters-chapter:
+
 #############
 Filters
 #############
@@ -319,7 +321,7 @@ Convolution
 
 We will take a brief detour to introduce the convolution operator, feel free to skip this section if you are already familiar with it.
 
-Adding two signals together is one way of combining two signals into one, in the Fourier chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent to a cross-correlation in many cases.  
+Adding two signals together is one way of combining two signals into one, in the :ref:`freq-domain-chapter` chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent to a cross-correlation in many cases.  
 
 I believe the convolution operation is best learned through examples.  In this first example, we convolve two square pulses together:
 
@@ -350,7 +352,27 @@ This might be confusing because earlier we mentioned that convolution takes in t
 
 The :red:`red` output is the filtered signal.  
 
-Question: What kind of filter was the triangle?  Well it smoothed out the high frequency components of the green signal (i.e. the sharp transitions of the square) so it's acting as a low-pass filter.  
+Question: What kind of filter was the triangle?  
+
+.. raw:: html
+
+   <details>
+   <summary><a>Answers</a></summary>
+
+It smoothed out the high frequency components of the green signal (i.e. the sharp transitions of the square) so it's acting as a low-pass filter.
+
+.. raw:: html
+
+   </details>
+
+
+Now that we are starting to understand convolution, I will present to you the mathematical equation for it.  The asterisk is typically used as the symbol for convolution:
+
+.. math::
+
+ (f * g)(t) = \int f(\tau) g(t - \tau) d\tau
+ 
+In this above expression, :math:`g(t)` is the one that is flipped and slides across :math:`f(t)`, but they can be swapped and it's still the same expression.  Typically, the shorter array will be used as :math:`g(t)`.  Convolution is equal to a cross-correlation, defined as :math:`\int f(\tau) g(t+\tau)`, when :math:`g(t)` is symmetrical, i.e. when it doesn't change when flipped about the origin. 
 
 *************************
 Filter Design in Python
@@ -463,7 +485,7 @@ Intro to Pulse Shaping
 
 We will briefly introduce a very interesting topic within DSP, pulse shaping, a topic we explore in depth in its own chapter.  
 
-As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc, to modulate a carrier so they can be sent wirelessly.  When we simulated QPSK in the Digital Modulation chapter, we only simulated one sample per symbol, i.e. each complex number we created was one of the points on the constellation, it was one symbol.  In practice we usually generate multiple samples per symbol, and the reason has to do with filtering. 
+As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc, to modulate a carrier so they can be sent wirelessly.  When we simulated QPSK in the :ref:`modulation-chapter` chapter, we only simulated one sample per symbol, i.e. each complex number we created was one of the points on the constellation, it was one symbol.  In practice we usually generate multiple samples per symbol, and the reason has to do with filtering. 
 
 We use filters to craft the "shape" of our symbols, since the shape in the time domain will change the shape in the frequency domain.  The frequency domain is what tells us how much spectrum/bandwidth our signal is going to use, and we usually want to minimize it.  Now what's important to understand is that the spectral characteristics (frequency domain) of the baseband symbols doesn't change when we modulate a carrier, it just shifts it up in frequency, the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's kind of like transmitting square pulses, in fact BPSK using 1 sample per symbol *is* just a square wave of random 1's and -1's:
 
@@ -506,7 +528,7 @@ And these filters usually have some parameter you can adjust to tell it how tigh
 
 You can see that a lower value of :math:`\beta` leads to less spectrum being used (for the same amount of data), but if you go too low then the time domain symbols take longer to decay to zero, in fact when :math:`\beta=0` they never fully decay to zero which means we can't actually transmit such symbols in practice.  A :math:`\beta` around 0.35 is common. 
 
-You will learn a lot more about pulse shaping, including some special properties that pulse shaping filters must satisfy, in the chapter dedicated to pulse shaping filters.
+You will learn a lot more about pulse shaping, including some special properties that pulse shaping filters must satisfy, in the :ref:`pulse-shaping-chapter` chapter.
 
 
 

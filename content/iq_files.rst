@@ -1,3 +1,5 @@
+.. _iq-files-chapter:
+
 #############
 IQ Files
 #############

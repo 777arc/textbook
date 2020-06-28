@@ -1,3 +1,5 @@
+.. _intro-chapter:
+
 #############
 Introduction
 #############
@@ -44,4 +46,13 @@ If you get through any amount of this textbook and email me at pysdr@vt.edu with
 But on a more grand scale, you can help contribute to this textbook in the same way as any open source software project- through git.  This textbook might be hosted as a website, but the underlying material all lives on the textbook's GitHub page (link coming soon).  Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable PRs will be permanently added to the acknowledgments section.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
 
 The website this textbook is hosted on is ad-free, because we all hate ads.  I also don't provide a paypal or bitcoin address where I accept donations.  There is literally no way for me to get paid for this textbook.  Instead, I merely suggest just trying to share this textbook with colleagues who may be interested in the material. 
+
+*****************
+Acknowledgements
+*****************
+
+Thank you to anyone who has read any portion of this textbook and provided feedback, and especially to:
+
+- Barry Duggan, KV4FV
+- Matthew Hannon
 
