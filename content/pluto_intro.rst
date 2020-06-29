@@ -58,11 +58,11 @@ The terminal commands below should build and install the latest version of:
  git clone https://github.com/analogdevicesinc/libiio.git
  cd libiio
  cmake ./
- make all -j3
+ make all -j4
  sudo make install
- 
  cd bindings/python/
- sudo python3 setup.py install
+ sudo python3 setup.py.cmakein install
+ 
  cd ~
  git clone https://github.com/analogdevicesinc/libad9361-iio.git
  cd libad9361-iio
