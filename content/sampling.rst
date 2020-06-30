@@ -56,7 +56,7 @@ Since most signals will have many frequency components to them, it's really "twi
    :scale: 70% 
    :align: center 
    
-So we must identify the highest one, then double it, and make sure we sample at that rate or faster. The minimum frequency is known as the Nyquist Rate, and it's an extremely important piece of theory that shows up in more fields than just DSP and SDR.
+So we must identify the highest one, then double it, and make sure we sample at that rate or faster. The minimum frequency is known as the Nyquist Rate, and it's an extremely important piece of theory within DSP and SDR, that serves as a bridge between continuous and discrete signals.
 
 .. image:: ../_static/nyquist_rate.png
    :scale: 70% 
@@ -101,10 +101,10 @@ What happens when we add a sin and cosine?  Or rather, what happens when we add 
    :scale: 100% 
    :align: center 
 
-The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude. Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q.  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this is extremely useful, because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
+The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude. Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cos or sin).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this is extremely useful, because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
 
 .. image:: ../_static/IQ_diagram.png
-   :scale: 70% 
+   :scale: 80% 
    :align: center 
 
 We only need to generate one sine wave, and then just shift it by 90 degrees to get the Q portion.  
@@ -177,13 +177,13 @@ Up until this point we really didn't talk about frequency, but we saw there was 
    :scale: 70% 
    :align: center
    
-Just for reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc, usually use a frequency (i.e. a carrier) between 100 MHz and 6 GHz.  These frequencies travel really well through the air, but don't require super long antennas or a ton of power to transmit on.  Your microwave cooks food with electromagnetic waves that are at 2.4 GHz, and if there is a leak in the door then your microwave will jam WiFi signals, and possibly also burn your skin.  Another form of electromagnetic waves is light, and visible light has a frequency of around 500 THz.  It's so high that we don't use traditional antennas to transmit light, we use other methods like LEDs that are semiconductor devices, that create light when electrons jump in between the atomic orbits of the semiconductor material.  But for frequencies below 100 GHz we tend to use normal antennas. 
+Just for reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc, usually use a frequency (i.e. a carrier) between 100 MHz and 6 GHz.  These frequencies travel really well through the air, but don't require super long antennas or a ton of power.  The higher the frequency, the quicker the signal loses power as it travels through space, but the lower the frequency, the larger the antenna gets, and the less spectrum is available.  Your microwave cooks food with electromagnetic waves that are at 2.4 GHz, and if there is a leak in the door then your microwave will jam WiFi signals, and possibly also burn your skin.  Another form of electromagnetic waves is light, and visible light has a frequency of around 500 THz.  It's so high that we don't use traditional antennas to transmit light, we use other methods like LEDs that are semiconductor devices, that create light when electrons jump in between the atomic orbits of the semiconductor material.  Technically, radio frequency (RF) is defined as the range from roughly 20 kHz to 300 GHz, because these are the frequencies at which energy from an oscillating electric current can radiate off a conductor and travel through space.  But the 100 MHz to 6 GHz range are the more useful frequencies, at least for most modern applications.
 
 When we change our IQ values really quickly and transmit our carrier, it's called "modulating" the carrier (with data or whatever we want).  Because when we change I and Q, we are changing the phase and amplitude of the carrier.  A third option is to change the frequency of the carrier, i.e. shift it slightly up or down, which is what FM radio does. 
 
 As a simple example, lets say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  I.e. we go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`.  All that happens is our carrier shifts phase by 90 degrees when we switch from one sample to another. 
 
-Now back to sampling for a second.   Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin(), then recording I and Q, what if we just fed the signal from the antenna straight into a single analog to digital converter?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  Well that's extremely fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from 
+Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin(), then recording I and Q, what if we *hypothetically* just fed the signal from the antenna straight into a single analog to digital converter?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  Well that's extremely fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from:
 
 .. math::
   I \cos(2\pi ft)
@@ -198,7 +198,7 @@ to just I and Q.  Let's visualize this in the frequency domain:
 
 When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz, but is simply based on the signal's characteristics, because we have removed the carrier.  Most signals are around 100 kHz to 20 MHz wide in bandwidth, so we are talking about sampling at a much much lower rate.  The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
 
-This downconverting process is 
+Once again, this downconverting process is done by our SDR, as a user of the SDR we don't have to do anything other than tell it what frequency to tune to.  
 
 *************************
 Baseband
@@ -336,7 +336,7 @@ In Python this looks like:
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
-And optionally we can apply a window, which we will learn about later.  This gets added before the line with fft().
+And optionally we can apply a window, like we learned about in the :ref:`freq-domain-chapter` chapter, windowing would occur right before the line with fft().
 
 .. code-block:: python
 
@@ -360,7 +360,7 @@ In Python this looks like:
 And we should be left with a beautiful PSD.  
 If you want to find the PSD of millions of samples, don't just do a million-point FFT, because it will probably take forever, and it will give you an output of a million "frequency bins" which is too much to show in a plot. 
 Instead I suggest doing multiple smaller PSDs and averaging them together, or displaying them using a spectrogram plot.
-Alternatively, if you know your signal is not changing, it's not a sin to only use a few thousand samples and just find the PSD of those, because within that time-frame of a few thousands samples you will likely capture enough of the signal to get a nice representation.
+Alternatively, if you know your signal is not changing fast, it's adequate to only use a few thousand samples and just find the PSD of those, because within that time-frame of a few thousand samples you will likely capture enough of the signal to get a nice representation.
 
 Here is a full example which also includes generating a signal and noise.  Note that N, the number of samples to simulate, becomes the FFT length because we take the FFT of the entire simulated signal.
 
