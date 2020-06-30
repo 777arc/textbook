@@ -362,7 +362,7 @@ If you want to find the PSD of millions of samples, don't just do a million-poin
 Instead I suggest doing multiple smaller PSDs and averaging them together, or displaying them using a spectrogram plot.
 Alternatively, if you know your signal is not changing fast, it's adequate to only use a few thousand samples and just find the PSD of those, because within that time-frame of a few thousand samples you will likely capture enough of the signal to get a nice representation.
 
-Here is a full example which also includes generating a signal and noise.  Note that N, the number of samples to simulate, becomes the FFT length because we take the FFT of the entire simulated signal.
+Here is a full example which also includes generating a signal (complex exponential at 50 Hz) and noise.  Note that N, the number of samples to simulate, becomes the FFT length because we take the FFT of the entire simulated signal.
 
 .. code-block:: python
 
@@ -371,10 +371,10 @@ Here is a full example which also includes generating a signal and noise.  Note 
  
  Fs = 300 # sample rate
  Ts = 1/Fs # sample period
- N = 5048 # number of samples to simulate
+ N = 2048 # number of samples to simulate
  
  t = Ts*np.arange(N)
- x = np.sin(2*np.pi*50*t + 1) # simulates sinusoid at 50 Hz
+ x = np.exp(1j*2*np.pi*50*t) # simulates sinusoid at 50 Hz
  
  n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # complex noise with unity power
  noise_power = 2
@@ -387,11 +387,13 @@ Here is a full example which also includes generating a signal and noise.  Note 
  f = np.linspace(Fs/-2.0, Fs/2.0, N) # lazy method
  
  plt.plot(f, PSD_shifted)
+ plt.xlabel("Frequency [Hz]")
+ plt.ylabel("Magnitude [dB]")
  plt.grid(True)
  plt.show()
  
 Output:
 
-.. image:: ../_static/fft_example1.png
+.. image:: ../_static/fft_example1.svg
    :scale: 100 %
    :align: center
