@@ -376,7 +376,7 @@ Here is a full example which also includes generating a signal and noise.  Note 
  t = Ts*np.arange(N)
  x = np.sin(2*np.pi*50*t + 1) # simulates sinusoid at 50 Hz
  
- n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # AWGN with unity power
+ n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # complex noise with unity power
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
