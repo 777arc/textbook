@@ -28,25 +28,29 @@ Nyquist Sampling
 
 When we sample something, we need to be mindful of the sample period, i.e. the time between samples are taken.  If you calculate the inverse of the sample period, you will get the sample rate, which is usually what we will use when talking about SDRs.
 
-For a given signal, the big question often is, how fast must we sample?  Let's look at a signal that is just a sine wave, of frequency f.  Let's say we sample at a rate Fs.  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
+For a given signal, the big question often is, how fast must we sample?  Let's look at a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs, samples shown in blue.  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
 
-.. image:: ../_static/sampling1.png
-   :scale: 40% 
+.. image:: ../_static/sampling_Fs_0.3.svg
    :align: center 
 
-In yellow is the original sine wave we are sampling, red shows the samples, and then in blue we show a different (incorrect) function that could have lead to the same samples being recorded.  This indicates that our sample rate was too low.  Let's try sampling a little faster, at Fs = 1.2f:
+The red shows a different (incorrect) function that could have lead to the same samples being recorded.  This indicates that our sample rate was too low, because the same samples could have come from two different functions, leading to ambiguity.  Let's try sampling a little faster, at Fs = 1.2f:
 
-.. image:: ../_static/sampling2.png
-   :scale: 40% 
+.. image:: ../_static/sampling_Fs_0.36.svg
    :align: center 
 
 Once again, there is a different signal that could fit in these samples, and that ambiguity means that if someone gave us the list of samples, we wouldn't know which signal was the original one.  How about sampling at Fs = 1.5f:
 
-.. image:: ../_static/sampling3.png
-   :scale: 40% 
+.. image:: ../_static/sampling_Fs_0.45.svg
    :align: center 
 
-Still not fast enough.  It turns out you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing.  Since most signals will have many frequency components to them, it's really "twice the frequency of the maximum frequency component" in our signal.  Here's a way to visualize that:
+Still not fast enough.  It turns out you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:  
+
+.. image:: ../_static/sampling_Fs_0.6.svg
+   :align: center 
+
+There's no incorrect signal this time, because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
+
+Since most signals will have many frequency components to them, it's really "twice the frequency of the maximum frequency component" in our signal.  Here's a way to visualize that:
 
 .. image:: ../_static/max_freq.png
    :scale: 70% 
