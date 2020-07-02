@@ -38,8 +38,8 @@ Connecting PlutoSDR
 4. Plug Pluto into the host machine over USB, make sure to use middle USB port on Pluto, the other one is power only.  It should create a virtual network adapter, i.e. the Pluto appears like a USB ethernet adapter
 5. On the host machine (not VM), open a terminal or whatever ping tool you want and ping 192.168.2.1.  If that doesn't work stop here, and debug the network interface. 
 6. Within the VM, open a new terminal
-7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  If the ping works then you should be good to go, assuming 192.168.2.1 was actually the Pluto and not some random computer on the network (unlikely but possible)
-8. If you want to be 100% sure 192.168.2.1 is your pluto, try doing “ssh root@192.168.2.1” pass: analog, and it should log into it
+7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  If the ping works then you should be good to go, assuming 192.168.2.1 was actually the Pluto and not some random computer on the network (unlikely but possible).  If you want to be 100% sure 192.168.2.1 is your pluto, try doing “ssh root@192.168.2.1” pass: analog, and it should log into it.
+8. Write down the IP address somewhere because you'll need it when we start using the Pluto in Python
 
 Installing PlutoSDR Driver
 ##########################
@@ -60,6 +60,7 @@ The terminal commands below should build and install the latest version of:
  cmake ./
  make all -j4
  sudo make install
+ sudo ldconfig
  cd bindings/python/
  sudo python3 setup.py.cmakein install
  
@@ -84,7 +85,7 @@ Open a new terminal (in your VM) and type the following commands:
 
  python3
  import adi
- sdr = adi.Pluto('ip:192.168.2.1')
+ sdr = adi.Pluto('ip:192.168.2.1') # or whatever your Pluto's IP is
  sdr.sample_rate = int(2.5e6)
  sdr.rx()
 
@@ -93,7 +94,13 @@ If you get this far without an error then continue with the next steps
 Changing Pluto's IP Address
 ####################################
 
-If for some reason the default IP of 192.168.2.1 won't work because you already have a 192.168.2.0 subnet, or because you want multiple Pluto's connected at the same time, you can change the IP by editing the config.txt file on the PlutoSDR mass storage device (i.e. the USB-drive looking thing that shows up after you plug in the Pluto).  
+If for some reason the default IP of 192.168.2.1 won't work because you already have a 192.168.2.0 subnet, or because you want multiple Pluto's connected at the same time, you can change the IP using these steps:
+
+1. Edit the config.txt file on the PlutoSDR mass storage device (i.e. the USB-drive looking thing that shows up after you plug in the Pluto).  Enter the new IP you want.
+2. Eject the mass storage device (don't unplug the Pluto!), in Ubuntu 18 there's an eject symbol next to the PlutoSDR device, when looking at the file explorer.  
+3. Give it a few seconds, and then cycle power by unplugging it and plugging it back in.  Go back into the config.txt to make sure it stuck.
+
+Note that this procedure is also used to flash a different firmware image onto the Pluto, for more details see https://wiki.analog.com/university/tools/pluto/users/firmware.
 
 "Hack" PlutoSDR to Increase RF Range
 ####################################

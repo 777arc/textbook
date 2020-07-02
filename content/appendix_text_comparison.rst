@@ -31,3 +31,4 @@ But for now, below is a list of all SDR textbooks I could find, some are pretty 
 #. PMR446 SDR: Long distance communication using GNU Radio\.\.\., 2013
 #. SDR: From Smart(er) to Cognitive, 2011
 #. SDR: The Software Communications Architecture, 2013 
+#. The ARRL Handbook chapter 8: DSP and SDR Fundamentals, 2019

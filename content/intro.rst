@@ -53,6 +53,6 @@ Acknowledgements
 
 Thank you to anyone who has read any portion of this textbook and provided feedback, and especially to:
 
-- Barry Duggan, KV4FV
+- Barry Duggan (github.com/duggabe)
 - Matthew Hannon
 

@@ -115,12 +115,12 @@ To go back to the time domain it's almost exactly the same aside from a scaling 
 .. math::
    x(t) = \frac{1}{2 \pi} \int X(f) e^{j2\pi ft} df
 
-Note that a lot of textbooks and other resources use :math:`w` instead of :math:`f`.  :math:`w` is angular frequency in radians, while :math:`f` is in Hz.  All you have to know that 
+Note that a lot of textbooks and other resources use :math:`w` in place of the :math:`2\pi f`.  :math:`w` is angular frequency in radians, while :math:`f` is in Hz.  All you have to know that 
 
 .. math::
    \omega = 2 \pi f
 
-Even though it adds a :math:`2 \pi` term to many equations, I find it easier to just stick with frequency in Hz since that is what ends up being used when you actually implement DSP algorithms.  
+Even though it adds a :math:`2 \pi` term to many equations, it's easier to just stick with frequency in Hz, since Hz will ultimately be the units you work with in your SDR application.  
 
 The above equation for the Fourier Transform is the continuous form, which you will only see in math problems.  The discrete form is much closer to what is implemented in code:
 
@@ -147,15 +147,15 @@ This property is probably the easiest to understand.  If we add two signals in t
 2. Frequency Shift Property:
 
 .. math::
-   e^{jf_0t}x(t) \leftrightarrow X(f-f_0)
+   e^{2 \pi j f_0 t}x(t) \leftrightarrow X(f-f_0)
 
-The term to the left of x(t) is what we call a "complex sinusoid" or "complex exponential", and for now all we need to know is that it's essentially just a sine wave.  So what this property is telling us is that if we take a signal x(t) and multiply it by a sine wave, then in the frequency domain we get the same X(f) except shifted by a certain frequency.  Here is a visual showing what I mean by shifted in frequency:
+The term to the left of x(t) is what we call a "complex sinusoid" or "complex exponential", and for now all we need to know is that it's essentially just a sine wave at frequency :math:`f_0`.  So what this property is telling us is that if we take a signal :math:`x(t)` and multiply it by a sine wave, then in the frequency domain we get :math:`X(f)` except shifted by a certain frequency, :math:`f_0`.  This shift in frequency might be easier to visualize:
 
 .. image:: ../_static/freq-shift.png
    :scale: 130 % 
    :align: center 
 
-This is a very important concept in DSP, because we will want to shift signals up and down in frequency for many reasons, and this property tells us how to do that (multiply by a sine wave).  Here's another way to think about that:
+This is a very important concept in DSP, because we will want to shift signals up and down in frequency for many reasons, and this property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
 
 .. image:: ../_static/freq-shift-diagram.png
    :scale: 110 % 
