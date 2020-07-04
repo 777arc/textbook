@@ -82,8 +82,7 @@ As we can see, a spike/impulse in the time domain is flat in the frequency domai
 
 Next lets look at the time and frequency domain plots of a square wave:
 
-.. image:: ../_static/square-wave.png
-   :scale: 80 % 
+.. image:: ../_static/square-wave.svg
    :align: center 
    
 This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  This is because of the quick change in time domain, just like in the previous example.  But it's not flat in frequency, it has spikes at intervals, and the level slowly decays (although it will continue forever).  It turns out that a square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).  
