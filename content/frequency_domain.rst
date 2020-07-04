@@ -282,7 +282,7 @@ First, let us create a signal in the time domain.  Feel free to follow along wit
 If we plot s it looks like:
 
 .. image:: ../_static/fft-python1.png
-   :scale: 100 % 
+   :scale: 70 % 
    :align: center 
 
 Next let's use Numpy's FFT function:
@@ -358,8 +358,7 @@ When we use an FFT to measure the frequency components of our signal, the FFT as
 
 The way we make up for this cyclic property is through "windowing".  Right before the FFT, we multiply the slice of signal by a window function, which is just any function that tapers to zero on both ends.  That ensures the slice of signal will begin and end at zero, and connect.  Common window functions include Hamming, Hanning, Blackman, and Kaiser.  When you don't apply any windowing, it's called using a "rectangular" window, because it's like multiplying by an array of ones.   Here is what several window functions look like:
 
-.. image:: ../_static/windows.png
-   :scale: 80 % 
+.. image:: ../_static/windows.svg
    :align: center 
 
 A simple approach for beginners is to just stick with a Hamming window, which can be created in Python with :code:`np.hamming(N)` where N is the number of elements in the array, which is just your FFT size.  In the above exercise, we would apply the window right before the FFT, so after the 2nd line of code we would insert:
