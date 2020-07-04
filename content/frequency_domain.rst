@@ -47,10 +47,9 @@ To understand how we can break down a signal into sine waves, we need to first r
 #. Phase
 #. Frequency
 
-Amplitude indicates the "strength" of the wave, while phase is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees.  Frequency is the number of waves per second, and is the inverse of period.
+Amplitude indicates the "strength" of the wave, while phase is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  Frequency is the number of waves per second, and is the inverse of period.
 
-.. image:: ../_static/amplitude_and_phase.gif
-   :scale: 100 % 
+.. image:: ../_static/amplitude_phase_period.svg
    :align: center  
    
 At this point you may have realized that a "signal" is essentially just a function, usually represented "over time".  I.e., the x-axis is time.  This means the period of a sinusoid is the amount of time, in seconds, for the wave to finish one cycle.  Thus, the units of frequency, is 1/seconds, or Hz.
