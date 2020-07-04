@@ -32,13 +32,13 @@ The basics of the frequency domain starts with understanding that any signal can
 Here is another example; the red curve below shows an approximation of a sawtooth wave using up to five sine waves added together.  We can see that it's not a perfect reconstruction, it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
 
 .. image:: ../_static/fourier_series_triangle.gif
-   :scale: 100 %   
+   :scale: 70 %   
    :align: center  
    
 Some signals require more sine waves than others, and some require an infinite amount of sine waves, although they can always be approximated with a limited number.  Here is another example of a signal being broken down into a series of sine waves:
 
 .. image:: ../_static/fourier_series_arbitrary_function.gif
-   :scale: 100 %   
+   :scale: 70 %   
    :align: center  
 
 To understand how we can break down a signal into sine waves, we need to first review the three attributes of a sine wave, also known as sinusoid:
