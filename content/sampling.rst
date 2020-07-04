@@ -14,8 +14,7 @@ We will first talk about sampling in general, before jumping into IQ sampling.
 
 Whether we are dealing with audio or RF signals, we must sample if we want to capture and process or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  Sampling a signal simply means grabbing values at moments in time, and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
 
-.. image:: ../_static/sampling.png
-   :scale: 50% 
+.. image:: ../_static/sampling.svg
    :align: center 
 
 We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds.  :math:`S_n` represents sample :math:`n`, usually an integer starting at 0. Using this convention, that means the sampling process can be represented mathametically as :math:`S_n = S(nT)` for integer values of :math:`n`.  Our sampling frequency is simply :math:`\frac{1}{T}`.
