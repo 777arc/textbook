@@ -52,8 +52,7 @@ Question- Why can’t we directly transmit the ethernet signal shown in the figu
 1. Low frequencies require *huge* antennas
 2. Square waves take an excessive amount of spectrum for the bits per second, recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
 
-.. image:: ../_static/square-wave.png
-   :scale: 100 % 
+.. image:: ../_static/square-wave.svg
    :align: center 
    
 What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g. FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many ways).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.  
@@ -133,7 +132,7 @@ IQ Plots/Constellations
 You have seen IQ plots before in the complex numbers subsection of the :ref:`sampling-chapter` chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot. We will assume a magnitude of 1, in practice it doesn't really matter what magnitude you use, a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
 
 .. image:: ../_static/bpsk_iq.PNG
-   :scale: 90 % 
+   :scale: 80 % 
    :align: center 
 
 The above IQ plot shows what we will transmit, or rather the set of symbols we will transmit from.  It does not show the carrier, so you can think about it as representing the symbols at baseband.  When we show the set of possible symbols for a given modulation scheme, we call it the "constellation".  Many modulation schemes can be defined by their constellation.  
@@ -223,8 +222,7 @@ Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to under
 
 This would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in the frequency domain might look something like this:
 
-.. image:: ../_static/fsk.PNG
-   :scale: 90 % 
+.. image:: ../_static/fsk.svg
    :align: center 
 
 If you are going to use FSK, there is one big question to ask: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f`, in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  So the faster we transmit symbols, the wider each carrier will get, and the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.

@@ -67,11 +67,7 @@ If we don't sample fast enough we get something called aliasing, which we will l
 Quadrature Sampling
 *************************
 
-The term "quadrature" has many meanings, but in the context of DSP and SDR it refers to two waves that are 90 degrees out of phase.  Why 90 degrees out of phase?  Well we will see first hand, but first consider how two waves that are 180 degrees out of phase are essentially the same wave, with one multiplied by -1. By being 90 degrees out of phase they become orthogonal, and there's a lot of cool stuff you can do with orthogonal functions.  For the sake of simplicity, we use sine and cosine as our two sine waves that are 90 degrees out of phase:
-
-.. image:: ../_static/quadrature.png
-   :scale: 70% 
-   :align: center 
+The term "quadrature" has many meanings, but in the context of DSP and SDR it refers to two waves that are 90 degrees out of phase.  Why 90 degrees out of phase?  Well we will see first hand, but first consider how two waves that are 180 degrees out of phase are essentially the same wave, with one multiplied by -1. By being 90 degrees out of phase they become orthogonal, and there's a lot of cool stuff you can do with orthogonal functions.  For the sake of simplicity, we use sine and cosine as our two sine waves that are 90 degrees out of phase.
 
 Next let's assign variables to represent the **amplitude** of the sine and cosine.  We will use :math:`I` for the cos() and :math:`Q` for the sin():
 
@@ -238,7 +234,7 @@ As an example, lets say we want to view 5 MHz of spectrum at 100 MHz.
 Instead what we can do is sample at 20 MHz, at a center frequency of 95 MHz. 
 
 .. image:: ../_static/offtuning.png
-   :scale: 30 %
+   :scale: 40 %
    :align: center
    
 The blue box above shows what is actually sampled by the SDR, and then the green box shows the piece of spectrum we want.  Our LO will be set to 95 MHz because that is the frequency we ask the SDR to tune to, which is outside of the green box, so we won't get any DC spike inside our green box.  
