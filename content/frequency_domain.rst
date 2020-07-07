@@ -276,6 +276,7 @@ First, let us create a signal in the time domain.  Feel free to follow along wit
 
 .. code-block:: python
 
+ import numpy as np
  t = np.arange(100)
  s = np.sin(0.15*2*np.pi*t)
 
@@ -301,6 +302,7 @@ Hint: regardless of what you’re doing, if you ever run into complex numbers, t
 
 .. code-block:: python
 
+ import matplotlib.pyplot as plt
  S_mag = np.abs(S)
  S_phase = np.angle(S)
  plt.plot(t,S_mag,'.-')
@@ -332,6 +334,9 @@ We also need to figure out the x-axis values/label.  Recall that we used a sampl
 
 .. code-block:: python
 
+ import numpy as np
+ import matplotlib.pyplot as plt
+ 
  t = np.arange(100)
  s = np.sin(0.15*2*np.pi*t)
  S = np.fft.fftshift(np.fft.fft(s))
@@ -354,7 +359,7 @@ Note that we see our spike at 0.15 Hz, which is the frequency we used when creat
 Windowing
 ******************************
 
-When we use an FFT to measure the frequency components of our signal, the FFT assumes that it's being given a piece of a *periodic* signal.  It behaves as if the piece of signal we provided continues to repeat indefintely, it's as if the last sample of the slice connects back to the first sample.  This just stems out of the theory behind the Fourier Transform.  But what this means is that we want to avoid sudden transitions between the first and last sample, because sudden transitions in the time domain look like many frequencies, and in reality our last sample doesn't actually connect back to our first sample.  To put it simply: if we are doing a 1024-point FFT using :code:`np.fft.fft(x)`, we want :code:`x[0]` and :code:`x[1023]` to be equal, or close in value.  
+When we use an FFT to measure the frequency components of our signal, the FFT assumes that it's being given a piece of a *periodic* signal.  It behaves as if the piece of signal we provided continues to repeat indefintely, it's as if the last sample of the slice connects back to the first sample.  This just stems out of the theory behind the Fourier Transform.  But what this means is that we want to avoid sudden transitions between the first and last sample, because sudden transitions in the time domain look like many frequencies, and in reality our last sample doesn't actually connect back to our first sample.  To put it simply: if we are doing an FFT of 100 samples, using :code:`np.fft.fft(x)`, we want :code:`x[0]` and :code:`x[99]` to be equal, or close in value.  
 
 The way we make up for this cyclic property is through "windowing".  Right before the FFT, we multiply the slice of signal by a window function, which is just any function that tapers to zero on both ends.  That ensures the slice of signal will begin and end at zero, and connect.  Common window functions include Hamming, Hanning, Blackman, and Kaiser.  When you don't apply any windowing, it's called using a "rectangular" window, because it's like multiplying by an array of ones.   Here is what several window functions look like:
 
@@ -365,7 +370,7 @@ A simple approach for beginners is to just stick with a Hamming window, which ca
 
 .. code-block:: python
 
- s = s * np.hamming(1024)
+ s = s * np.hamming(100)
 
 If you are afraid of choosing the wrong window, don't be.  The difference between Hamming, Hanning, Blackman, and Kaiser is very minimal compared to just not using a window at all, since they all taper to zero on both sides and solve the underlying problem. 
 
