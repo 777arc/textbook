@@ -13,6 +13,7 @@ by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
    content/sampling
    content/digital_modulation
    content/pluto_intro
+   content/pluto_advanced
    content/noise
    content/filters
    content/link_budgets

@@ -55,4 +55,5 @@ Thank you to anyone who has read any portion of this textbook and provided feedb
 
 - Barry Duggan (github.com/duggabe)
 - Matthew Hannon
+- James Hayek
 

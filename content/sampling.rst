@@ -55,7 +55,7 @@ Since most signals will have many frequency components to them, it's really "twi
    :scale: 70% 
    :align: center 
    
-So we must identify the highest one, then double it, and make sure we sample at that rate or faster. The minimum frequency is known as the Nyquist Rate, and it's an extremely important piece of theory within DSP and SDR, that serves as a bridge between continuous and discrete signals.
+So we must identify the highest one, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample, is known as the Nyquist Rate.  I.e., the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  This is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
 
 .. image:: ../_static/nyquist_rate.png
    :scale: 70% 
