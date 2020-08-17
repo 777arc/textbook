@@ -38,7 +38,7 @@ Take a moment to try to answer these questions:
 1. 250 Mbps
 2. Four (which is what ethernet cables have)
 3. 4 bits per symbol
-4. 1 Gbps
+4. 0.5 Gbps
 
 .. raw:: html
 
