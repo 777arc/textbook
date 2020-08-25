@@ -25,7 +25,7 @@ In the above example each symbol represents one bit.  How can we convey more tha
 
 Take a moment to try to answer these questions:
 
-1. How many bits per second are transmitted in the example shown below? 
+1. How many bits per second are transmitted in the example shown below?
 2. How many pairs of these data wires would be needed to transmit 1 gigabit/sec?
 3. If a modulation scheme had 16 different levels, how many bits per symbol is that?
 4. With 16 different levels and 8 ns symbols, how many bits per second is that?
@@ -35,10 +35,10 @@ Take a moment to try to answer these questions:
    <details>
    <summary><a>Answers</a></summary>
 
-1. 250 Mbps
+1. 250 Mbps - (1/8e-9)*2
 2. Four (which is what ethernet cables have)
-3. 4 bits per symbol
-4. 0.5 Gbps
+3. 4 bits per symbol - log_2(16)
+4. 0.5 Gbps - (1/8e-9)*4
 
 .. raw:: html
 

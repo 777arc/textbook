@@ -130,6 +130,12 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 #todo_include_todos = False
 
+# Auto add Figure X to captions
+numfig = True
+numfig_format = {'figure': '- Figure %s', 
+                 'table': 'Table %s', 
+                 'code-block': 'Listing %s',
+                 'section': 'Section %s'}
 
 # -- Options for HTML output ----------------------------------------------
 

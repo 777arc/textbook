@@ -14,7 +14,7 @@ The sections in this chapter are split up based on where they show up in the tx-
 
 <make diagram of following sequence>
 
-bits from higher layer --> channel coding --> modulation --> pulse shaping --> wireless channel --> undo pulse shaping via matched filter --> coarse freqency sync --> time sync --> fine freq sync --> frame detect/sync --> demodulation --> channel decoding --> bits
+bits from higher layer --> channel coding --> modulation --> pulse shaping --> wireless channel --> undo pulse shaping via matched filter --> coarse frequency sync --> time sync --> fine freq sync --> frame detect/sync --> demodulation --> channel decoding --> bits
 
 
 
@@ -22,7 +22,7 @@ bits from higher layer --> channel coding --> modulation --> pulse shaping --> w
 Simulating Wireless Channel
 ***************************
 
-Before we jump into how to perform time and frequency synchronization, we need to make our simulated signals more realistic.  Without adding some random time delay, the act of synchronizing in time is trival, in fact you don't have to do anything besides take into account the sample delay of any filters you use.  We also want to simulate a frequency offset, because as we will discuss, oscillators are not perfect, so there will always be some offset between the transmitter and reicever's center frequency.  
+Before we jump into how to perform time and frequency synchronization, we need to make our simulated signals more realistic.  Without adding some random time delay, the act of synchronizing in time is trivial, in fact you don't have to do anything besides take into account the sample delay of any filters you use.  We also want to simulate a frequency offset, because as we will discuss, oscillators are not perfect, so there will always be some offset between the transmitter and receiver's center frequency.  
 
 In this section we will discuss and look at the Python code for simulating a non-integer delay, as well as a frequency offset.  The Python code in this chapter will start from the code we wrote during the pulse shaping Python exercise, click below if you need it, you can consider this the starting point of the code in this chapter, all new code will come after. 
 
@@ -38,7 +38,7 @@ In this section we will discuss and look at the Python code for simulating a non
     from scipy import signal
     import math
 
-    # this part came from pulse shaping exersize
+    # this part came from pulse shaping exercise
     num_symbols = 100
     sps = 8
     bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
@@ -64,7 +64,7 @@ In this section we will discuss and look at the Python code for simulating a non
 
    </details>
 
-We will also be leaving out the plotting-related code, because by now you have probably learned how to plot any signal you want.  Making the plots look pretty, as they often do in this textbook, requires a lot of extra lines of code that is not nessesary to understand. 
+We will also be leaving out the plotting-related code, because by now you have probably learned how to plot any signal you want.  Making the plots look pretty, as they often do in this textbook, requires a lot of extra lines of code that is not necessary to understand. 
 
 
 Adding a Delay
@@ -95,7 +95,7 @@ If we plot the "before" and "after" on the same plot we can see the fractional d
 Adding a Frequency Offset
 ##########################
 
-Next we will add a frequency offset to our simulated signal, to make things more realistic.  Let's say that our sample rate in this simulation is 1 MHz (it doesn't actually matter what it is, but you'll see why it makes it easier to choose a number).  If we want to simulate a frequency offset of 1.3 kHz (some arbitrary number), we can do it using the following code:
+Next we will add a frequency offset to our simulated signal, to make things more realistic.  Let's say that our sample rate in this simulation is 1 MHz (it doesn't actually matter what it is, but you'll see why it makes it easier to choose a number).  If we want to simulate a frequency offset of 13 kHz (some arbitrary number), we can do it using the following code:
 
 .. code-block:: python
 
@@ -159,12 +159,19 @@ The following Python code implements the Mueller and Muller clock recovery techn
 
 What's happening is that the timing recovery block is being fed in "received" samples, and it's producing an output sample one at a time (note the i_out being incremented by 1 each iteration of the loop).  But it doesn't just use the "received" samples one after another, because of the way the loop adjusts i_in, it will skip some samples, in an attempt to pull the "correct" sample, i.e. the one at the peak of the pulse.  As the loop processes samples it slowly synchronizes to the symbol, or at least it attempts to, by adjusting :code:`mu`.  Because of the way the code is structured, the integer part of :code:`mu` gets added to :code:`i_in`, and then removed from :code:`mu` (keep in mind that :code:`mm_val` can be negative or positive each loop).   Once it is fully synchronized, the loop should be only pulling the center sample from each symbol/pulse.  You can adjust the constant 0.3, which will change how fast the feedback loop reacts; a higher value will make it react faster, but has higher risk of stability issues.
 
-Below shows an example output, where we have **disabled** the fractional time delay as well as the frequency offset.  We are only showing I, because Q is all zeros, since we disabled the frequency offset.  The top plot shows the original BPSK symbols, i.e. 1's and -1's.  Recall that there are zeros in between because we want 8 samples per symbol, but each 1 and -1 is a separate symbol.  The middle plot our samples after pulse shaping but before the synchronizer.  The bottom plot shows the output of the symbol synchronizer, which provides just 1 sample per symbol, i.e. these samples can be fed directly into a demodulator, which for BPSK is just checking whether the value is greater than or less than 0.  
+The next plot shows an example output, where we have *disabled* the fractional time delay as well as the frequency offset.  We are only showing I, because Q is all zeros, since we disabled the frequency offset.  The three plots are stacked right on top of each other so it's easier to see the bits line up vertically.  
+
+**Top Plot**
+    Original BPSK symbols, i.e. 1's and -1's.  Recall that there are zeros in between because we want 8 samples per symbol.
+**Middle Plot**
+    Samples after pulse shaping but before the synchronizer.
+**Bottom plot**
+    Output of the symbol synchronizer, which provides just 1 sample per symbol, i.e. these samples can be fed directly into a demodulator, which for BPSK is just checking whether the value is greater than or less than 0.  
 
 .. image:: ../_static/time-sync-output.svg
    :align: center 
 
-As you can see, it took around 30 symbols for the synchronization to lock into the right delay.  This is why many communications protocols use a preamble that contains a synchronization sequence, it acts as a way to announce that a new packet has arrived, and gives the receiver time to sync to it.  But after these samples the synchronizer works perfectly. It helps that this example didn't have any noise added, feel free to add noise, or time shifts, and see how the synchronizer behaves.  The result is simply a train of 1's and 1's (since we are using BPSK), that match the input data, at least after the first 30 symbols.  If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.  
+Let's focus on the bottom plot, which is the output of the synchronizer.  You can see it took around 30 symbols for the synchronization to lock into the right delay.  This is why many communications protocols use a preamble that contains a synchronization sequence, it acts as a way to announce that a new packet has arrived, and gives the receiver time to sync to it.  But after these ~30 samples, the synchronizer works perfectly, we are left with perfect 1's and -1's that match the input data. It helps that this example didn't have any noise added, feel free to add noise, or time shifts, and see how the synchronizer behaves.   If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.  
 
 
 ****************************************
@@ -210,7 +217,7 @@ If we just enable the frequency offset, using an offset frequency of 1 kHz, we g
 
 It might be hard to see, but the time sync is still working just fine, it takes about 20 to 30 symbols before it's locked in.  But there's a sinusoid pattern because we still have a frequency offset, we will learn how to deal with it in the next section.
 
-Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization, remember you can plot samples on an IQ plot using a scatter plot: :code:`ax2.plot(np.real(samples), np.imag(samples), '.')`.  In the anim below we have specifically left out the first 30 symbols, because those occured before the time sync had finished.  You can see that the symbols left are all roughly on the unit circle, but because of the frequency offset.
+Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization, remember you can plot samples on an IQ plot using a scatter plot: :code:`ax2.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols, because those occurred before the time sync had finished.  You can see that the symbols left are all roughly on the unit circle, but because of the frequency offset.
 
 .. image:: ../_static/time-sync-constellation.svg
    :align: center 
@@ -230,7 +237,7 @@ Next we will look into frequency synchronization, which we split up into coarse 
 Coarse Frequency Synchronization
 **********************************
 
-Even though we tell the transmitter and receiver to operate on the same center frequency, there is going to be a slight frequency offset between the two, due to either imperfections in hardware (e.g. the oscillator), or a doppler shift due to movement.  This frequency offset is going to be very small relative to the carrier frequency, but even a small offset can throw off a digital signal, and the offset is likely going to be changing over time, so once again we need an always-running feedback loop to correct the offset.  As an example, the oscillator inside the Pluto has a max offset spec of 25 PPM, so that's 25 parts per million relative to the center frequency.  So if you are tuned to 2.4 GHz, it would be +/- 60 kHz max offset.  The samples our SDR provides us are at baseband, so any frequency offset is going to show up in that baseband signal.  For example, a BPSK signal with a small carrier offset will look something like the below time plot, which is obviously not great for demodulating bits, we need to remove any frequency offsets before demodulation.
+Even though we tell the transmitter and receiver to operate on the same center frequency, there is going to be a slight frequency offset between the two, due to either imperfections in hardware (e.g. the oscillator), or a Doppler shift due to movement.  This frequency offset is going to be very small relative to the carrier frequency, but even a small offset can throw off a digital signal, and the offset is likely going to be changing over time, so once again we need an always-running feedback loop to correct the offset.  As an example, the oscillator inside the Pluto has a max offset spec of 25 PPM, so that's 25 parts per million relative to the center frequency.  So if you are tuned to 2.4 GHz, it would be +/- 60 kHz max offset.  The samples our SDR provides us are at baseband, so any frequency offset is going to show up in that baseband signal.  For example, a BPSK signal with a small carrier offset will look something like the below time plot, which is obviously not great for demodulating bits, we need to remove any frequency offsets before demodulation.
 
 .. image:: ../_static/carrier-offset.png
    :scale: 60 % 
@@ -278,9 +285,9 @@ But for our case of BPSK we have an order 2 modulation scheme, so we will use th
 
 We talked about what happens to the :math:`s(t)` portion of the equation, so what about the sinusoid part?  I.e. the complex exponential.  Well as we can see, it's just adding the :math:`N` term, which makes it equivalent to a sinusoid at a frequency :math:`Nf_o` instead of just :math:`f_o`.  A simple method for figuring out :math:`f_o` is just taking the FFT of the signal after we square it N times, and seeing where the spike occurs.  So let's simulate this in Python, we will go back to generating our BPSK signal, and instead of applying a fractional-delay to it, we will apply a frequency offset to it, by multiplying the signal by :math:`e^{j2\pi f_o t}` just like we did in chapter :ref:`filters-chapter` to convert a low-pass filter to a high-pass filter.
 
-Using the code from the beginning of this chapter, apply a +1 kHz frequency offset to your digital signal.  It could happen right before or right after the fractional-delay is added, doesn't matter, but it must happen *after* pulse shaping, but before we do any receive-side functions such as time sync. 
+Using the code from the beginning of this chapter, apply a +13 kHz frequency offset to your digital signal.  It could happen right before or right after the fractional-delay is added, doesn't matter, but it must happen *after* pulse shaping, but before we do any receive-side functions such as time sync. 
 
-Alright, now that we have a signal with a 1 kHz frequency offset, let's plot the FFT before and after doing the squaring, to see what happens.  By now you should know how to do an FFT, including the abs() and fftshift() operation.  For this exercise it doesn't matter whether or not you take the log, or whether you square it after taking the abs(). 
+Alright, now that we have a signal with a 13 kHz frequency offset, let's plot the FFT before and after doing the squaring, to see what happens.  By now you should know how to do an FFT, including the abs() and fftshift() operation.  For this exercise it doesn't matter whether or not you take the log, or whether you square it after taking the abs(). 
 
 First let's look at the signal before squaring (just a normal FFT):
 
@@ -327,7 +334,7 @@ It's up to you if you want to correct it, or just change the initial frequency o
 Fine Frequency Synchronization
 **********************************
 
-Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero, and maintain it at zero, even if the offset is changing over time.  I.e., we have to continuosuly track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time, at the symbol level, so the code we discuss in this section will come *after* timing sync.
+Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero, and maintain it at zero, even if the offset is changing over time.  I.e., we have to continuously track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time, at the symbol level, so the code we discuss in this section will come *after* timing sync.
 
 We will be using a technique called a Costas Loop, which is a form of PLL that is specifically designed for carrier frequency offset correction, for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950s, and had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset, and it will also fix any phase offset, so that the energy is aligned with the I axis.  Recall that frequency is just a change in phase, so they can be tracked as one.  The Costas Loop is summarized using the following diagram:
 
@@ -368,7 +375,7 @@ Below is the Python code that is our Costas Loop:
     plt.plot(freq_log,'.-')
     plt.show()
 
-There is a lot here so let's step through it; some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the ouput samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code, they contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation, we just multiply the real part of the sample by the imaginary part.  For a 4th order Costas Loop, it's still relatively simple but not quite one line, if you are curious what it looks like click below, but we won't be using it in our code for now.
+There is a lot here so let's step through it; some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code, they contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation, we just multiply the real part of the sample by the imaginary part.  For a 4th order Costas Loop, it's still relatively simple but not quite one line, if you are curious what it looks like click below, but we won't be using it in our code for now.
 
 .. raw:: html
 
@@ -414,7 +421,7 @@ And the frequency offset estimation over time (y-axis is Hz):
 
 You can see it takes about 70 samples to fully lock it on the frequency offset.  You can also see that in my simulated example, there were about -300 Hz left over after the coarse frequency sync, yours may vary.  Like I mentioned before, you can disable the coarse frequency sync, and just set the initial frequency offset to whatever value you want, and see if the Costas Loop figures it out.   
 
-Also note how the Costas Loop, in addition to removing the frequency offset, also aligned our BPSK signal to be on the I portion, so Q is now zero again.  This is a convinient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator, because now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1, because there may or may not be an inversion, there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play, it removes the ambiguitity because 1's and 0's are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK, we would just be adding a differential coding block right before modulation on the tx side, and right after demodulation on the rx side.  
+Also note how the Costas Loop, in addition to removing the frequency offset, also aligned our BPSK signal to be on the I portion, so Q is now zero again.  This is a convenient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator, because now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1, because there may or may not be an inversion, there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play, it removes the ambiguity because 1's and 0's are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK, we would just be adding a differential coding block right before modulation on the tx side, and right after demodulation on the rx side.  
 
 
 ***************************
@@ -447,7 +454,7 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
 .. image:: ../_static/barker-code.svg
    :align: center 
 
-You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  So it works great for finding the start of a packet, because it's essentially integrating 11 symbols worth of energy, in an attempt to create 1 bit spike in the outpout of the cross-correlation.  In fact, the hardest part of doing the detection is figuring out a good threshold, because you don't want packets that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't get into here.  In deciding a threshold, you have to make a trade-off between probability of detection, and probability of false alarms.  Remember that the packet header itself will have information, so some false alarms are OK, you will quickly find out its not actually a packet when you go to decode the header and a CRC fails.  But missing a packet detection altogether is bad.
+You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  So it works great for finding the start of a packet, because it's essentially integrating 11 symbols worth of energy, in an attempt to create 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of doing the detection is figuring out a good threshold, because you don't want packets that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't get into here.  In deciding a threshold, you have to make a trade-off between probability of detection, and probability of false alarms.  Remember that the packet header itself will have information, so some false alarms are OK, you will quickly find out its not actually a packet when you go to decode the header and a CRC fails.  But missing a packet detection altogether is bad.
 
 Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE, and they have the benefit of being in sets, so you can have multiple different sequences that all have good autocorrelation properties, but won't trigger each other (i.e. also good cross-correlation properties, when you cross-correlate different sequences in the set).  Because of that feature, different cell towers will be assigned different sequences, so that a phone can not only find the start of the frame, but also know which tower it is receiving from.
 

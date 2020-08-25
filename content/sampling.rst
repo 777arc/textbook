@@ -390,5 +390,4 @@ Here is a full example which also includes generating a signal (complex exponent
 Output:
 
 .. image:: ../_static/fft_example1.svg
-   :scale: 100 %
    :align: center
