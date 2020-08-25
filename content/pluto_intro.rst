@@ -137,11 +137,11 @@ Exercise 1: Determine Your USB Throughput
 
 Let's try receiving samples from the PlutoSDR, and in the process, see how many samples per second we can push through the USB 2.0 connection.  
 
-**Your task is to create a Python script that determines the rate samples are actually being received in Python, i.e. count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer sizes to see how it impacts the highest achievable rate.**  
+**Your task is to create a Python script that determines the rate samples are actually being received in Python, i.e. count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer_size's to see how it impacts the highest achievable rate.**  
 
-Note that if you find you are receiving less samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's. 
+Kepe in mind, if you receive less samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's, since the Pluto only uses USB 2.0. 
 
-The following code will act as a starting point, and provides almost all the code you need to accomplish this task.  
+The following code will act as a starting point, and provides almost all the code you need to accomplish this task. 
 
 .. code-block:: python
 
@@ -169,11 +169,17 @@ In addition, in order to time how long something takes, you can use the followin
  end_time = time.time()
  print('seconds elapsed:', end_time - start_time)
 
-My hint is that you'll need to put the line "samples = sdr.rx()" into a loop, and count how many samples you get each call to sdr.rx(), while keeping track of how much time has elapsed.  Second hint- just because you are calculating samples per second, doesn't mean you have to perform exactly 1 second worth of receiving samples, you can always divide the number of samples you received by the amount of time that passed.
+Hint 1: You'll need to put the line "samples = sdr.rx()" into a loop that runs many times (e.g. 100 times), and count how many samples you get each call to sdr.rx(), while keeping track of how much time has elapsed.
+
+Hint 2: Just because you are calculating samples per second, doesn't mean you have to perform exactly 1 second worth of receiving samples, you can always divide the number of samples you received by the amount of time that passed.
+
+Hint 3: Start at sample_rate = 10e6 like the code shows, because this is way more than USB 2.0 can support, but that means we will be able to see what gets through.  Then tweak rx_buffer_size, make it a lot larger and see what happens.  Once you have a working script, and fiddled with rx_buffer_size, try adjusting sample_rate, see how low you have to go until you are able to receive 100% of samples in Python (i.e. sample at a 100% duty cycle). 
+
+Hint 4: In your loop where you call sdr.rx(), try to do as little as possible, so that it doesn't add extra delay, like don't print anything out inside the loop.
 
 As part of this exercise you will get an idea for the max throughput of USB 2.0, something you can look up online to verify your findings. 
 
-As a bonus, try changing the center_freq to see if/how it impacts the rate you can receive samples off the Pluto.
+As a bonus, try changing the center_freq and rx_rf_bandwidth to see if it impacts the rate you can receive samples off the Pluto.
 
 
 Exercise 2: Create a Spectrogram/Waterfall
