@@ -17,7 +17,7 @@ Whether we are dealing with audio or RF signals, we must sample if we want to ca
 .. image:: ../_static/sampling.svg
    :align: center 
 
-We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds.  :math:`S_n` represents sample :math:`n`, usually an integer starting at 0. Using this convention, that means the sampling process can be represented mathametically as :math:`S_n = S(nT)` for integer values of :math:`n`.  Our sampling frequency is simply :math:`\frac{1}{T}`.
+We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds.  :math:`S_n` represents sample :math:`n`, usually an integer starting at 0. Using this convention, that means the sampling process can be represented mathematically as :math:`S_n = S(nT)` for integer values of :math:`n`.  Our sampling frequency is simply :math:`\frac{1}{T}`.
 
 An example of sampling is recording audio with a microphone.  The mic is a transducer that converts sound waves into an electric signal (a voltage level). Our SDRs are similar except instead of a mic, we have an antenna.  In both cases the voltage level is sampled with an analog-to-digital converter.  What comes out is just a bunch of numbers, either floats or ints.
 
@@ -163,6 +163,16 @@ One last important note: the figure above shows what's happening **inside** of t
 
 
 **************************
+Receiver Architectures
+**************************
+
+In the figure above we see how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion" or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to just not downconvert at all, and sample so fast that it captures everything from 0 Hz to 1/2 the sample rate.  This is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne", and it involves downconversion, but not all the way to 0 Hz, it places the signal of interest at an intermediate frequency, known as "IF".  Here are the block diagrams of these three architectures:
+
+.. image:: ../_static/receiver_arch_diagram.svg
+   :align: center
+   
+   
+**************************
 Carrier and Downconversion
 **************************
 
@@ -178,7 +188,7 @@ When we change our IQ values really quickly and transmit our carrier, it's calle
 
 As a simple example, lets say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  I.e. we go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`.  All that happens is our carrier shifts phase by 90 degrees when we switch from one sample to another. 
 
-Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin(), then recording I and Q, what if we *hypothetically* just fed the signal from the antenna straight into a single analog to digital converter?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  Well that's extremely fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from:
+Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin(), then recording I and Q, what if we just fed the signal from the antenna straight into a single analog to digital converter, like in the direct sampling architecture we just discussed?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  Well that's extremely fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from:
 
 .. math::
   I \cos(2\pi ft)
