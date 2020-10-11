@@ -223,7 +223,7 @@ The FFT is a function with one input and one output.  It converts a signal from 
    :align: center
    :target: ../_static/fft-block-diagram.svg
    
-We will only be dealing with 1 dimension FFTs in this textbook (2D is used for image processing and other applications).  So you can think of the FFT function as having one input: a vector of samples, and one output: the frequency domain version of that vector of samples.  The size of the output is always the same as the size of the input, so if I feed 1024 samples into the FFT, I will get 1024 out.  But the confusing part is that the output will always be in the frequency domain, and thus the "span" of the x-axis if we were to plot it doesn't change based on the number of samples in the time domain input.  Let's visualize that by looking at the input and output arrays, and the units of their indecies:
+We will only be dealing with 1 dimension FFTs in this textbook (2D is used for image processing and other applications).  So you can think of the FFT function as having one input: a vector of samples, and one output: the frequency domain version of that vector of samples.  The size of the output is always the same as the size of the input, so if I feed 1024 samples into the FFT, I will get 1024 out.  But the confusing part is that the output will always be in the frequency domain, and thus the "span" of the x-axis if we were to plot it doesn't change based on the number of samples in the time domain input.  Let's visualize that by looking at the input and output arrays, and the units of their indices:
 
 .. image:: ../_static/fft-io.svg
    :align: center
