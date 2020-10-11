@@ -25,9 +25,9 @@ Fourier Series
 
 The basics of the frequency domain starts with understanding that any signal can be represented by a bunch of sine waves summed together.  When we break a signal down into a bunch of sine waves, we call it a Fourier Series.  Here is an example of a signal that is made up of only two sine waves: 
 
-.. image:: ../_static/summing_sinusoids.png
-   :scale: 50 %
-   :align: center   
+.. image:: ../_static/summing_sinusoids.svg
+   :align: center
+   :target: ../_static/summing_sinusoids.svg
    
 Here is another example; the red curve below shows an approximation of a sawtooth wave using up to five sine waves added together.  We can see that it's not a perfect reconstruction, it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
 
@@ -50,7 +50,8 @@ To understand how we can break down a signal into sine waves, we need to first r
 Amplitude indicates the "strength" of the wave, while phase is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  Frequency is the number of waves per second, and is the inverse of period.
 
 .. image:: ../_static/amplitude_phase_period.svg
-   :align: center  
+   :align: center
+   :target: ../_static/amplitude_phase_period.svg
    
 At this point you may have realized that a "signal" is essentially just a function, usually represented "over time".  I.e., the x-axis is time.  This means the period of a sinusoid is the amount of time, in seconds, for the wave to finish one cycle.  Thus, the units of frequency, is 1/seconds, or Hz.
    
@@ -84,6 +85,7 @@ Next lets look at the time and frequency domain plots of a square wave:
 
 .. image:: ../_static/square-wave.svg
    :align: center 
+   :target: ../_static/square-wave.svg
    
 This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  This is because of the quick change in time domain, just like in the previous example.  But it's not flat in frequency, it has spikes at intervals, and the level slowly decays (although it will continue forever).  It turns out that a square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).  
 
@@ -149,15 +151,15 @@ This property is probably the easiest to understand.  If we add two signals in t
 
 The term to the left of x(t) is what we call a "complex sinusoid" or "complex exponential", and for now all we need to know is that it's essentially just a sine wave at frequency :math:`f_0`.  So what this property is telling us is that if we take a signal :math:`x(t)` and multiply it by a sine wave, then in the frequency domain we get :math:`X(f)` except shifted by a certain frequency, :math:`f_0`.  This shift in frequency might be easier to visualize:
 
-.. image:: ../_static/freq-shift.png
-   :scale: 130 % 
+.. image:: ../_static/freq-shift.svg
    :align: center 
+   :target: ../_static/freq-shift.svg
 
 This is a very important concept in DSP, because we will want to shift signals up and down in frequency for many reasons, and this property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
 
-.. image:: ../_static/freq-shift-diagram.png
-   :scale: 110 % 
-   :align: center 
+.. image:: ../_static/freq-shift-diagram.svg
+   :align: center
+   :target: ../_static/freq-shift-diagram.svg
    
 3. Scaling in Time Property:
 
@@ -166,9 +168,9 @@ This is a very important concept in DSP, because we will want to shift signals u
 
 On the left hand side, we can see that we are scaling our signal x(t) in the time domain. Here is an example of a signal being scaled in time, and then what happens to the frequency domain versions of each one.
 
-.. image:: ../_static/time-scaling.png
-   :scale: 80 % 
-   :align: center 
+.. image:: ../_static/time-scaling.svg
+   :align: center
+   :target: ../_static/time-scaling.svg
 
 Scaling in time is essentially shrinking or expanding the signal in the x-axis.  What this property tells us is that when we do that, the frequency domain also scales, but inversely.  So, for example, when we transmit bits faster, we have to use more frequencies.  This is why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional then the cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
 
@@ -183,15 +185,15 @@ This one is called the convolution property because in the time domain we are co
 
 Before we move on, to briefly explain why this property is so important, consider the situation in which you have one signal you want to receive, and there is an interfering signal next to it. 
 
-.. image:: ../_static/two-signals.png
-   :scale: 60 % 
-   :align: center 
+.. image:: ../_static/two-signals.svg
+   :align: center
+   :target: ../_static/two-signals.svg
    
 The concept of masking is heavily used in programming, so let's use it here.  What if we could create the mask below, and multiply it by the signal above in order to mask out the one we don't want.  
 
-.. image:: ../_static/masking.png
-   :scale: 90 % 
-   :align: center 
+.. image:: ../_static/masking.svg
+   :align: center
+   :target: ../_static/masking.svg
 
 We usually perform DSP operations in the time domain, so we can use the convolution property to see how we can do this masking in the time domain.  Let's say that x(t) is our received signal.  Let Y(f) be the mask we want to apply, in the frequency domain.  Well that means y(t) is the time domain representation of our mask, and if we convolve it with x(t), we can "filter out" the signal we don't want.
 
@@ -217,23 +219,23 @@ Now back to the Fourier Transform. I showed you the equation for the discrete Fo
 
 The FFT is a function with one input and one output.  It converts a signal from time to frequency: 
 
-.. image:: ../_static/fft-block-diagram.png
-   :scale: 60 % 
-   :align: center 
+.. image:: ../_static/fft-block-diagram.svg
+   :align: center
+   :target: ../_static/fft-block-diagram.svg
    
 We will only be dealing with 1 dimension FFTs in this textbook (2D is used for image processing and other applications).  So you can think of the FFT function as having one input: a vector of samples, and one output: the frequency domain version of that vector of samples.  The size of the output is always the same as the size of the input, so if I feed 1024 samples into the FFT, I will get 1024 out.  But the confusing part is that the output will always be in the frequency domain, and thus the "span" of the x-axis if we were to plot it doesn't change based on the number of samples in the time domain input.  Let's visualize that by looking at the input and output arrays, and the units of their indecies:
 
-.. image:: ../_static/fft-io.png
-   :scale: 80 % 
-   :align: center 
+.. image:: ../_static/fft-io.svg
+   :align: center
+   :target: ../_static/fft-io.svg
 
 Because the output is in the frequency domain, the span of the x-axis is based on the sample rate, which we will dive into next chapter.  What happens when we use more samples for the input vector is that we get a better resolution in the frequency domain (in addition to just processing more samples at once).  We don't actually "see" more frequencies by having a larger input, the only way would be to increase the sample rate (decrease the sample period :math:`\Delta t`).
 
 So how do we actually plot this output?  As an example let's say that our sample rate was 1 million samples per second (1 MHz).  As we will learn next chapter, that means we can only see signals up to 0.5 MHz, regardless of how many samples we feed into the FFT.  The way the output of the FFT gets plotted is as follows:
 
-.. image:: ../_static/negative-frequencies.png
-   :scale: 80 % 
-   :align: center 
+.. image:: ../_static/negative-frequencies.svg
+   :align: center
+   :target: ../_static/negative-frequencies.svg
 
 This will always be the case; the output of the FFT will always show :math:`\text{-} f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  The output will always have a negative portion and positive portion, assuming the input was a complex number (which is usually the case in DSP).
 
@@ -243,15 +245,15 @@ Negative Frequencies
 
 What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers), and that there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
 
-.. image:: ../_static/negative-frequencies2.png
-   :scale: 60 % 
-   :align: center 
+.. image:: ../_static/negative-frequencies2.svg
+   :align: center
+   :target: ../_static/negative-frequencies2.svg
    
 Now, when the SDR gives us the samples, it will appear like this:
 
-.. image:: ../_static/negative-frequencies3.png
-   :scale: 80 % 
-   :align: center 
+.. image:: ../_static/negative-frequencies3.svg
+   :align: center
+   :target: ../_static/negative-frequencies3.svg
 
 We just have to remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  This will make more sense as we dive into sampling and using our SDRs.  
 
@@ -314,15 +316,15 @@ Hint: regardless of what you’re doing, if you ever run into complex numbers, t
 
 Right now we aren't providing any x-axis to the plots, it's just the index of the array (counting up from 0).  Due to mathematical reasons, the output of the FFT has the following format:
 
-.. image:: ../_static/fft-python3.png
-   :scale: 50 % 
-   :align: center 
+.. image:: ../_static/fft-python3.svg
+   :align: center
+   :target: ../_static/fft-python3.svg
    
 But we want 0 Hz (DC) in the center and negative freqs to the left (that's just how we like to visualize things).  So any time we do an FFT we need to perform an "FFT shift", which is just a simple array rearrangement operation, kind of like a circular shift but more of a "put this here and that there".  The diagram below fully defines what the FFT shift operation does:
 
-.. image:: ../_static/fft-python4.png
-   :scale: 70 % 
-   :align: center 
+.. image:: ../_static/fft-python4.svg
+   :align: center
+   :target: ../_static/fft-python4.svg
 
 For our convenience, Numpy has an FFT shift function, :code:`np.fft.fftshift()`.  Replace the np.fft.fft() line with:
 
@@ -364,7 +366,8 @@ When we use an FFT to measure the frequency components of our signal, the FFT as
 The way we make up for this cyclic property is through "windowing".  Right before the FFT, we multiply the slice of signal by a window function, which is just any function that tapers to zero on both ends.  That ensures the slice of signal will begin and end at zero, and connect.  Common window functions include Hamming, Hanning, Blackman, and Kaiser.  When you don't apply any windowing, it's called using a "rectangular" window, because it's like multiplying by an array of ones.   Here is what several window functions look like:
 
 .. image:: ../_static/windows.svg
-   :align: center 
+   :align: center
+   :target: ../_static/windows.svg
 
 A simple approach for beginners is to just stick with a Hamming window, which can be created in Python with :code:`np.hamming(N)` where N is the number of elements in the array, which is just your FFT size.  In the above exercise, we would apply the window right before the FFT, so after the 2nd line of code we would insert:
 
