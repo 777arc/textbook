@@ -338,8 +338,9 @@ Next we will switch gears to fine frequency sync.  The previous trick is more fo
 
 We will be using a technique called a Costas Loop, which is a form of PLL that is specifically designed for carrier frequency offset correction, for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950s, and had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset, and it will also fix any phase offset, so that the energy is aligned with the I axis.  Recall that frequency is just a change in phase, so they can be tracked as one.  The Costas Loop is summarized using the following diagram:
 
-.. image:: ../_static/costas-loop.png
+.. image:: ../_static/costas-loop.svg
    :align: center 
+   :target: ../_static/costas-loop.svg
 
 The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case this is all digital so it's not actually a voltage, it's just a level represented by a variable, that determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This arrangement looks a lot like how an SDR downconverts and creates the I and Q branches.
 
