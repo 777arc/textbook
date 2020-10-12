@@ -19,9 +19,9 @@ As a simplified example, let's say we have a wire and are sending 1's and 0's us
 
 In the above example each symbol represents one bit.  How can we convey more than one bit per symbol?  Let's look at the signals that travel down Ethernet cables, which is defined in an IEEE standard called IEEE 802.3 1000BASE-T.  The common operating mode of ethernet uses a 4-level amplitude modulation (2 bits per symbol) with 8 ns symbols.  
 
-.. image:: ../_static/ethernet.PNG
-   :scale: 80 % 
+.. image:: ../_static/ethernet.svg
    :align: center 
+   :target: ../_static/ethernet.svg
 
 Take a moment to try to answer these questions:
 
@@ -54,6 +54,7 @@ Question- Why can’t we directly transmit the ethernet signal shown in the figu
 
 .. image:: ../_static/square-wave.svg
    :align: center 
+   :target: ../_static/square-wave.svg
    
 What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g. FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many ways).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.  
 
@@ -113,15 +114,15 @@ Now lets look at modulating the phase in a similar manner as we did with the amp
 	
 Example of BPSK (note the phase changes):
 
-.. image:: ../_static/bpsk.PNG
-   :scale: 90 % 
+.. image:: ../_static/bpsk.svg
    :align: center 
+   :target: ../_static/bpsk.svg
 
 It’s not very fun to look at plots like this:
 
-.. image:: ../_static/bpsk2.PNG
-   :scale: 90 % 
+.. image:: ../_static/bpsk2.svg
    :align: center 
+   :target: ../_static/bpsk2.svg
 
 So instead we usually represent the phase in the complex plane.  
 
@@ -224,19 +225,20 @@ This would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in 
 
 .. image:: ../_static/fsk.svg
    :align: center 
+   :target: ../_static/fsk.svg
 
 If you are going to use FSK, there is one big question to ask: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f`, in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  So the faster we transmit symbols, the wider each carrier will get, and the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
 
 IQ plots can't be used to show different frequencies, they only show magnitude and phase.  While it is possible to show FSK in the time domain, any more than 2 frequencies and it gets hard to see the difference between symbols:
 
-.. image:: ../_static/fsk2.jpg
-   :scale: 100 % 
-   :align: center 
+.. image:: ../_static/fsk2.svg
+   :align: center
+   :target: ../_static/fsk2.svg
 
 As an aside, note that FM radio uses Frequency Modulation (FM) which is like an analog version of FSK.  Instead of having discrete frequencies we jump between, FM radio uses a continuous audio signal to modulate the frequency of the carrier.  Here is an example of FM and AM modulation, the "signal" at the top is the audio signal being modulated onto to the carrier.
 
-.. image:: ../_static/AM_FM.gif
-   :scale: 120 % 
+.. image:: https://www.thenakedscientists.com/sites/default/files/media/Amfm3-en-de.gif.pagespeed.ce.0o6A-u33nd.gif
+   :width: 400
    :align: center 
 
 In this textbook we are mainly concerned about digital forms of modulation.

@@ -489,9 +489,9 @@ As we learned, digital signals use symbols to represent one or more bits of info
 
 We use filters to craft the "shape" of our symbols, since the shape in the time domain will change the shape in the frequency domain.  The frequency domain is what tells us how much spectrum/bandwidth our signal is going to use, and we usually want to minimize it.  Now what's important to understand is that the spectral characteristics (frequency domain) of the baseband symbols doesn't change when we modulate a carrier, it just shifts it up in frequency, the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's kind of like transmitting square pulses, in fact BPSK using 1 sample per symbol *is* just a square wave of random 1's and -1's:
 
-.. image:: ../_static/bpsk.PNG
-   :scale: 90 % 
+.. image:: ../_static/bpsk.svg
    :align: center 
+   :target: ../_static/bpsk.svg
 
 And as we have learned, square pulses are not the best, they use an excess amount of spectrum:
 
