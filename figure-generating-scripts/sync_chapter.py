@@ -70,7 +70,7 @@ if True:
 
 if True:
     # apply a freq offset
-    fo = 13000 # simulate freq offset
+    fo = 100 # simulate freq offset
     Ts = 1/fs # calc sample period
     t = np.arange(0, Ts*len(samples), Ts) # create time vector
     
@@ -293,9 +293,9 @@ for i in range(N):
     phase += freq + (alpha * error)
     
     # Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
-    while phase > 2*np.pi:
+    while phase >= 2*np.pi:
         phase -= 2*np.pi
-    while phase < -2*np.pi:
+    while phase < 0:
         phase += 2*np.pi
         
     # Limit frequency to range -1 to 1

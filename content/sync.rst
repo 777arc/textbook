@@ -359,16 +359,16 @@ Below is the Python code that is our Costas Loop:
     for i in range(N):
         out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
         error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
-
+        
         # Advance the loop (recalc phase and freq offset)
         freq += (beta * error)
         freq_log.append(freq / 50.0 * fs)
         phase += freq + (alpha * error)
         
-        # Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
-        while phase > 2*np.pi:
+        # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
+        while phase >= 2*np.pi:
             phase -= 2*np.pi
-        while phase < -2*np.pi:
+        while phase < 0:
             phase += 2*np.pi
 
     # Plot freq over time to see how long it takes to hit the right offset
