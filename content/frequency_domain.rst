@@ -9,7 +9,7 @@ One of the coolest side effects of learning about DSP and wireless communication
 .. image:: ../_static/audio_equalizer.webp
    :align: center
    
-In this chapter we cover what the frequency domain means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use later on.  But by the end of this textbook you will be a master at working in the frequency domain, guaranteed! 
+In this chapter we cover what the frequency domain means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use later on.  By the end of this textbook, you will be a master at working in the frequency domain, guaranteed!
 
 First, why do we like to look at signals in the frequency domain?  Well here are two example signals, shown in both the time and frequency domain.
 
@@ -17,37 +17,37 @@ First, why do we like to look at signals in the frequency domain?  Well here are
    :scale: 40 %
    :align: center   
 
-As you can see, in the time domain they both just kind of look like noise, but in the frequency domain we can see different features.  Everything is in the time domain in it's nature form; when we sample signals we will be sampling them in the time domain, because you cant *directly* sample a signal in the frequency domain.  But the interesting stuff usually happens in the frequency domain. 
+As you can see, in the time domain they both may appear to be noise, but in the frequency domain we can see different features.  Everything viewed in the time domain is in its natural form; when we sample signals we will be sampling them in the time domain, because you cant *directly* sample a signal in the frequency domain.  Interesting features can normally be distinguished in the frequency domain.
 
 ***************
 Fourier Series
 ***************
 
-The basics of the frequency domain starts with understanding that any signal can be represented by a bunch of sine waves summed together.  When we break a signal down into a bunch of sine waves, we call it a Fourier Series.  Here is an example of a signal that is made up of only two sine waves: 
+The basics of the frequency domain start with understanding that any signal can be represented by sine waves summed together.  When we break a signal down into its composite sine waves, we call it a Fourier Series.  Here is an example of a signal that is made up of only two sine waves:
 
 .. image:: ../_static/summing_sinusoids.svg
    :align: center
    :target: ../_static/summing_sinusoids.svg
    
-Here is another example; the red curve below shows an approximation of a sawtooth wave using up to five sine waves added together.  We can see that it's not a perfect reconstruction, it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
+Here is another example; the red curve in the below approximates a sawtooth wave by summing up to five sine waves.  We can see that it's not a perfect reconstruction--it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
 
 .. image:: ../_static/fourier_series_triangle.gif
    :scale: 70 %   
    :align: center  
    
-Some signals require more sine waves than others, and some require an infinite amount of sine waves, although they can always be approximated with a limited number.  Here is another example of a signal being broken down into a series of sine waves:
+Some signals require more sine waves than others, and some require an infinite amount, although they can always be approximated with a limited number.  Here is another example of a signal being broken down into a series of sine waves:
 
 .. image:: ../_static/fourier_series_arbitrary_function.gif
    :scale: 70 %   
    :align: center  
 
-To understand how we can break down a signal into sine waves, we need to first review the three attributes of a sine wave, also known as sinusoid:
+To understand how we can break down a signal into sine waves, or sinusoids, we need to first review the three attributes of a sine wave:
 
 #. Amplitude
 #. Phase
 #. Frequency
 
-Amplitude indicates the "strength" of the wave, while phase is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  Frequency is the number of waves per second, and is the inverse of period.
+**Amplitude** indicates the "strength" of the wave, while **phase** is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  **Frequency** is the number of waves per second, and is the inverse of period.
 
 .. image:: ../_static/amplitude_phase_period.svg
    :align: center
