@@ -23,7 +23,7 @@ As you can see, in the time domain they both may appear to be noise, but in the 
 Fourier Series
 ***************
 
-The basics of the frequency domain start with understanding that any signal can be represented by sine waves summed together.  When we break a signal down into its composite sine waves, we call it a Fourier Series.  Here is an example of a signal that is made up of only two sine waves:
+The basics of the frequency domain start with understanding that any signal can be represented by sine waves summed together.  When we break a signal down into its composite sine waves, we call it a Fourier series.  Here is an example of a signal that is made up of only two sine waves:
 
 .. image:: ../_static/summing_sinusoids.svg
    :align: center
@@ -47,17 +47,17 @@ To understand how we can break down a signal into sine waves, or sinusoids, we n
 #. Phase
 #. Frequency
 
-**Amplitude** indicates the "strength" of the wave, while **phase** is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  **Frequency** is the number of waves per second, and is the inverse of period.
+**Amplitude** indicates the "strength" of the wave, while **phase** is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  **Frequency** is the number of waves per second.
 
 .. image:: ../_static/amplitude_phase_period.svg
    :align: center
    :target: ../_static/amplitude_phase_period.svg
    
-At this point you may have realized that a "signal" is essentially just a function, usually represented "over time".  I.e., the x-axis is time.  This means the period of a sinusoid is the amount of time, in seconds, for the wave to finish one cycle.  Thus, the units of frequency, is 1/seconds, or Hz.
+At this point you may have realized that a "signal" is essentially just a function, usually represented "over time" (i.e., the x-axis). Another attribute that is easy to remember is **period**, which is the inverse of **frequency**. The **period** of a sinusoid is the amount of time, in seconds, for the wave to finish one cycle.  Thus, the unit of frequency is 1/seconds, or Hz.
    
-When we decompose a signal into a summation of sine waves, each one will have a certain amplitude, phase, and frequency.  Each sine wave's **amplitude** will tell us how strong that **frequency** existed in the original signal.  Don't worry too much about **phase** for now, other than realizing that the only difference between sin() and cos() is a phase shift (time shift).
+When we decompose a signal into a summation of sine waves, each one will have a certain **amplitude**, **phase**, and **frequency**.  Each sine wave's **amplitude** will tell us how strong the **frequency** existed in the original signal.  Don't worry too much about **phase** for now, other than realizing that the only difference between sin() and cos() is a phase shift (time shift).
 
-It's more important to understand the underlying concept, than the actual equations to solve for a Fourier series, but for those who are interested in the equations I refer you to Wolfram's concise explaination: https://mathworld.wolfram.com/FourierSeries.html.  
+It's more important to understand the underlying concept than the actual equations to solve for a Fourier series, but for those who are interested in the equations I refer you to Wolfram's concise explaination: https://mathworld.wolfram.com/FourierSeries.html.  
 
 ********************
 Time-Frequency Pairs
