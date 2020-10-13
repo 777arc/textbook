@@ -129,7 +129,7 @@ You can picture timing recovery as a block in the receiver, which takes in a str
 
 Most timing recovery methods rely on the fact that our digital symbols rise and then fall, and the crest is the point at which we want to sample the symbol, i.e. the maximum point after taking the absolute value:
 
-.. image:: ../_static/symbol_sync2.PNG
+.. image:: ../_static/symbol_sync2.png
    :scale: 40 % 
    :align: center 
 

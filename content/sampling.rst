@@ -210,7 +210,7 @@ Baseband
 *************************
 When we discuss a signal centered around 0 Hz, we refer to this as "baseband". The opposite of baseband is called "bandpass", when a signal exists at some RF frequency, no where near 0 Hz.  A signal at baseband might be perfectly centered around 0 Hz like the right-hand portion of the figure above, or it might just be *near* 0 Hz, like the two signals shown below, which are still considered baseband.   Also shown is an example bandpass signal, centered at some very high frequency, denoted :math:`f_c`.  
 
-.. image:: ../_static/baseband_bandpass.PNG
+.. image:: ../_static/baseband_bandpass.png
    :scale: 50% 
    :align: center
 

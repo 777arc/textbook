@@ -14,7 +14,7 @@ In the :ref:`filters-chapter` chapter we learned that blocky shaped symbols/puls
 
 When we transmit digital symbols, we transmit them back-to-back (as opposed to waiting some time between symbols).  But when you apply a pulse-shaping filter, it elongates the pulse in the time domain (in order to condense it in frequency), which causes adjacent symbols to overlap with each other.  And this is fine, as long as your pulse shaping filter meets this one criterion: all of the pulses must add up to zero at every multiple of our symbol period T, except for one of the pulses.  This is best understood through the following visualization:
 
-.. image:: ../_static/pulse_train.PNG
+.. image:: ../_static/pulse_train.png
    :scale: 40 % 
    :align: center 
 
@@ -34,7 +34,7 @@ What we do in modern comms is split the pulse shaping filter equally between the
 
 Another way of thinking about matched filters is that the receiver correlates the received signal with the known template signal.  The template signal is essentially the pulses the transmitter sends, irrespective of the phase/amplitude shifts applied to them.  Recall that filtering is done by convolution, which is essentially correlation (in fact they are mathematically the same when the template is symmetrical).  This process of correlating the received signal with the template gives us our best chance at recovering what was sent, and is why it's theoretically optimal.  As an analogy, think of an image recognition system that looks for faces using a template of a face, and a 2d correlation:
 
-.. image:: ../_static/face_template.PNG
+.. image:: ../_static/face_template.png
    :scale: 70 % 
    :align: center 
 
@@ -71,13 +71,13 @@ Raised-Cosine Filter
 
 The most popular pulse-shaping filter seems to be the "raised-cosine" filter.  It's a good low-pass filter for limiting the bandwidth our signal will occupy, and it also has the property of summing to zero at intervals of T:
 
-.. image:: ../_static/raised_cosine.PNG
+.. image:: ../_static/raised_cosine.png
    :scale: 70 % 
    :align: center 
 
 Note that the above plot is in the time domain, it shows the impulse response of the filter.  The :math:`\beta` parameter is the only parameter for the raised-cosine filter, and it determines how quickly the filter tapers off in the time domain, which will be inversely proportional with how quickly it tapers off in frequency:
 
-.. image:: ../_static/raised_cosine_freq.PNG
+.. image:: ../_static/raised_cosine_freq.png
    :scale: 50 % 
    :align: center 
 
@@ -95,7 +95,7 @@ Root Raised-Cosine Filter
 
 The root raised-cosine (RRC) filter is what we actually implement in our Tx and Rx, combined they form a normal raised-cosine filter, as we discussed.  Because splitting a filter in half involves a frequency-domain square root, the impulse response gets a bit messy:
 
-.. image:: ../_static/rrc_filter.PNG
+.. image:: ../_static/rrc_filter.png
    :scale: 50 % 
    :align: center 
 
@@ -112,7 +112,7 @@ Roll-off Factor
 
 Let's look more into the parameter :math:`\beta`.  It is a number between 0 and 1, and is called the "roll-off" factor, or sometimes "excess bandwidth".  It determines how fast, in the time domain, the filter rolls off to zero.  Remember, to be used as a filter, the impulse response should decay to zero on both sides:
 
-.. image:: ../_static/rrc_rolloff.PNG
+.. image:: ../_static/rrc_rolloff.png
    :scale: 80 % 
    :align: center 
 
@@ -154,7 +154,7 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
 	plt.grid(True)
 	plt.show()
 
-.. image:: ../_static/pulse_shaping_python1.PNG
+.. image:: ../_static/pulse_shaping_python1.png
    :scale: 80 % 
    :align: center 
 
@@ -182,7 +182,7 @@ We will create a raised-cosine filter, using a beta of 0.35, and make it 101 tap
 	plt.show()
 
 
-.. image:: ../_static/pulse_shaping_python2.PNG
+.. image:: ../_static/pulse_shaping_python2.png
    :scale: 80 % 
    :align: center 
 
@@ -201,7 +201,7 @@ Lastly, we can filter our signal x and look at the result.  Don't get too caught
 	plt.grid(True)
 	plt.show()
 
-.. image:: ../_static/pulse_shaping_python3.PNG
+.. image:: ../_static/pulse_shaping_python3.png
    :scale: 60 % 
    :align: center 
   
@@ -213,25 +213,25 @@ The vertical lines were created in the for loop, for visualization sake, and the
 
 If we were to upconvert and transmit this signal, the receiver would have to figure out when the boundaries of Ts are, using a symbol synchronization algorithm, so that it knows exactly when to sample to get the right data.  If it samples a little too early or late, it will see values that are a bit skewed due to ISI, and if it's way off then it will get a bunch of weird numbers.  Here is an example created using GNU Radio that shows what the IQ plot (a.k.a. constellation) looks like when we sample at the right and wrong time.  Here are the original pulses, with the bit values annotated:
 
-.. image:: ../_static/symbol_sync1.PNG
+.. image:: ../_static/symbol_sync1.png
    :scale: 50 % 
    :align: center 
 
 And below shows the ideal position in time to sample, along with the IQ plot:
 
-.. image:: ../_static/symbol_sync2.PNG
+.. image:: ../_static/symbol_sync2.png
    :scale: 40 % 
    :align: center 
 
 Below shows the worst time to sample, note the three clusters in the constellation.  We are sampling directly in between each symbol, so our samples are going to be way off.
 
-.. image:: ../_static/symbol_sync3.PNG
+.. image:: ../_static/symbol_sync3.png
    :scale: 40 % 
    :align: center 
 
 This is somewhere in between, note the 4 clusters.  With a high SNR we might be able to get away with this.
 
-.. image:: ../_static/symbol_sync4.PNG
+.. image:: ../_static/symbol_sync4.png
    :scale: 40 % 
    :align: center 
    
