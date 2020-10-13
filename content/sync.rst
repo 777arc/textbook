@@ -8,15 +8,11 @@ Synchronization
 Introduction
 ***************************
 
-We have discussed how to transmit digitally over the air, e.g. using a digital modulation scheme like QPSK, and by applying pulse shaping to limit the bandwidth of your signal.  Channel coding can be used to deal with noisy channels, i.e. when you have low SNR at the receiver.  Filtering out as much as possible before digitally processing the signal always helps.  In this chapter we will investigate how synchronization is performed on the receiving end; a set of processing that is performed *before* demodulation and channel decoding.  
+We have discussed how to transmit digitally over the air, e.g. using a digital modulation scheme like QPSK, and by applying pulse shaping to limit the bandwidth of your signal.  Channel coding can be used to deal with noisy channels, i.e. when you have low SNR at the receiver.  Filtering out as much as possible before digitally processing the signal always helps.  In this chapter we will investigate how synchronization is performed on the receiving end; a set of processing that is performed *before* demodulation and channel decoding.  The overall tx-channel-rx chain is shown below, with the blocks discussed in this chapter highlighted in yellow (note this diagram is not all-encompassing, e.g. most systems also include equalization and multiplexing).  
 
-The sections in this chapter are split up based on where they show up in the tx-channel-rx chain (although not in order, for reasons you'll see later):
-
-<make diagram of following sequence>
-
-bits from higher layer --> channel coding --> modulation --> pulse shaping --> wireless channel --> undo pulse shaping via matched filter --> coarse frequency sync --> time sync --> fine freq sync --> frame detect/sync --> demodulation --> channel decoding --> bits
-
-
+.. image:: ../_static/sync-diagram.svg
+   :align: center 
+   :target: ../_static/sync-diagram.svg
 
 ***************************
 Simulating Wireless Channel
@@ -88,7 +84,8 @@ As you can see, we are calculating the filter taps using a sinc() function, reca
 If we plot the "before" and "after" on the same plot we can see the fractional delay.  We must also shift the "after" by (num_taps-1)/2 samples, that's the delay associated with filters in general.  In the plot below, we zoom way in, to only a couple symbols, otherwise the fractional delay is not viewable. 
 
 .. image:: ../_static/fractional-delay-filter.svg
-   :align: center 
+   :align: center
+   :target: ../_static/fractional-delay-filter.svg
 
 
 
@@ -109,7 +106,8 @@ Next we will add a frequency offset to our simulated signal, to make things more
 Below shows the signal before and after the frequency offset is applied.
  
 .. image:: ../_static/sync-freq-offset.svg
-   :align: center 
+   :align: center
+   :target: ../_static/sync-freq-offset.svg
 
 We had not been displaying the Q portion until now, because we were transmitting BPSK so the Q portion was always zero.  But now that we add a frequency shift, the energy gets spread across I and Q.  So from this point on we should be plotting both I and Q.  Feel free to adjust the offset, from 13 kHz to some other number.  If you lower it to around 1 kHz you'll be able to see the sinusoid in the envelope of the signal, because it's oscillating slow enough to span several symbols.  
 
@@ -169,7 +167,8 @@ The next plot shows an example output, where we have *disabled* the fractional t
     Output of the symbol synchronizer, which provides just 1 sample per symbol, i.e. these samples can be fed directly into a demodulator, which for BPSK is just checking whether the value is greater than or less than 0.  
 
 .. image:: ../_static/time-sync-output.svg
-   :align: center 
+   :align: center
+   :target: ../_static/time-sync-output.svg
 
 Let's focus on the bottom plot, which is the output of the synchronizer.  You can see it took around 30 symbols for the synchronization to lock into the right delay.  This is why many communications protocols use a preamble that contains a synchronization sequence, it acts as a way to announce that a new packet has arrived, and gives the receiver time to sync to it.  But after these ~30 samples, the synchronizer works perfectly, we are left with perfect 1's and -1's that match the input data. It helps that this example didn't have any noise added, feel free to add noise, or time shifts, and see how the synchronizer behaves.   If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.  
 
@@ -198,7 +197,8 @@ A quick way to interpolate a signal in Python is to use scipy's :code:`signal.re
 If we zoom *way* in, we see that it's the same signal, but with 16x as many points:
 
 .. image:: ../_static/time-sync-interpolated-samples.svg
-   :align: center 
+   :align: center
+   :target: ../_static/time-sync-interpolated-samples.svg
 
 Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear, these extra samples will let us take into account a fraction of a sample delay. To actually use this in our time synchronizer, we only have to modify one line, the first line inside the while loop:
 
@@ -213,14 +213,16 @@ The actual plot output of this new code should look roughly the same as before, 
 If we just enable the frequency offset, using an offset frequency of 1 kHz, we get the following time sync performance.  We have to show both I and Q now that we added a frequency offset:
 
 .. image:: ../_static/time-sync-output2.svg
-   :align: center 
+   :align: center
+   :target: ../_static/time-sync-output2.svg
 
 It might be hard to see, but the time sync is still working just fine, it takes about 20 to 30 symbols before it's locked in.  But there's a sinusoid pattern because we still have a frequency offset, we will learn how to deal with it in the next section.
 
 Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization, remember you can plot samples on an IQ plot using a scatter plot: :code:`ax2.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols, because those occurred before the time sync had finished.  You can see that the symbols left are all roughly on the unit circle, but because of the frequency offset.
 
 .. image:: ../_static/time-sync-constellation.svg
-   :align: center 
+   :align: center
+   :target: ../_static/time-sync-constellation.svg
     
 To get even more insight, we can look at the constellation over time, to see what's actually happening to the symbols.  Note how at the very beginning, for a short period of time, the symbols are not 0 or on the unit circle, that is the period in which time sync is finding the right delay (it's very quick, watch closely!).  The spinning is just the frequency offset, remember that frequency is a constant change in phase, so a frequency offset causes spinning of the BPSK (causing a circle in the static/persistent plot above).  
 
@@ -299,7 +301,8 @@ First let's look at the signal before squaring (just a normal FFT):
     plt.show()
 
 .. image:: ../_static/coarse-freq-sync-before.svg
-   :align: center 
+   :align: center
+   :target: ../_static/coarse-freq-sync-before.svg
    
 We don't actually see any peak associated with the carrier offset, it's covered up by our signal.
 
@@ -313,7 +316,8 @@ Now with the squaring added (just a power of 2, because it's BPSK):
 We have to zoom way in to see which frequency the spike is on:
 
 .. image:: ../_static/coarse-freq-sync.svg
-   :align: center 
+   :align: center
+   :target: ../_static/coarse-freq-sync.svg
 
 You can try increasing the number of symbols simulated (e.g. 1000 symbols), so that we have enough samples to work with, the more samples that go into our FFT, the more accurate we will be able to estimate the frequency offset.  Just as a reminder, the code above should come *before* the timing synchronizer. 
 
@@ -336,7 +340,7 @@ Fine Frequency Synchronization
 
 Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero, and maintain it at zero, even if the offset is changing over time.  I.e., we have to continuously track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time, at the symbol level, so the code we discuss in this section will come *after* timing sync.
 
-We will be using a technique called a Costas Loop, which is a form of PLL that is specifically designed for carrier frequency offset correction, for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950s, and had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset, and it will also fix any phase offset, so that the energy is aligned with the I axis.  Recall that frequency is just a change in phase, so they can be tracked as one.  The Costas Loop is summarized using the following diagram:
+We will be using a technique called a Costas Loop, which is a form of PLL that is specifically designed for carrier frequency offset correction, for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950s, and had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset, and it will also fix any phase offset, so that the energy is aligned with the I axis.  Recall that frequency is just a change in phase, so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2's have been left out of the equations because they don't functionally matter).
 
 .. image:: ../_static/costas-loop.svg
    :align: center 
@@ -413,12 +417,14 @@ After recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase
 Our signal before and after the Costas Loop looks like this:
 
 .. image:: ../_static/costas-loop-output.svg
-   :align: center 
+   :align: center
+   :target: ../_static/costas-loop-output.svg
 
 And the frequency offset estimation over time (y-axis is Hz):
 
 .. image:: ../_static/costas-loop-freq-tracking.svg
-   :align: center 
+   :align: center
+   :target: ../_static/costas-loop-freq-tracking.svg
 
 You can see it takes about 70 samples to fully lock it on the frequency offset.  You can also see that in my simulated example, there were about -300 Hz left over after the coarse frequency sync, yours may vary.  Like I mentioned before, you can disable the coarse frequency sync, and just set the initial frequency offset to whatever value you want, and see if the Costas Loop figures it out.   
 
@@ -453,7 +459,8 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
     plt.show()
     
 .. image:: ../_static/barker-code.svg
-   :align: center 
+   :align: center
+   :target: ../_static/barker-code.svg
 
 You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  So it works great for finding the start of a packet, because it's essentially integrating 11 symbols worth of energy, in an attempt to create 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of doing the detection is figuring out a good threshold, because you don't want packets that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't get into here.  In deciding a threshold, you have to make a trade-off between probability of detection, and probability of false alarms.  Remember that the packet header itself will have information, so some false alarms are OK, you will quickly find out its not actually a packet when you go to decode the header and a CRC fails.  But missing a packet detection altogether is bad.
 
