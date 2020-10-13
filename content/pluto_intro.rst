@@ -139,7 +139,7 @@ Let's try receiving samples from the PlutoSDR, and in the process, see how many 
 
 **Your task is to create a Python script that determines the rate samples are actually being received in Python, i.e. count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer_size's to see how it impacts the highest achievable rate.**  
 
-Kepe in mind, if you receive less samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's, since the Pluto only uses USB 2.0. 
+Keep in mind, if you receive less samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's, since the Pluto only uses USB 2.0. 
 
 The following code will act as a starting point, and provides almost all the code you need to accomplish this task. 
 
