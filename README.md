@@ -4,9 +4,9 @@ This repo contains the source content used to generate my textbook, **PySDR: A G
 
 Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes be permanently added to the acknowledgments section.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
 
-## Notes to self:
+## Building:
 
-to build on windows:
+On windows:
 
 sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe" . _build
 
@@ -14,7 +14,9 @@ On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) i
 
 sphinx-build -b html . _build
 
-chapter name references, for my reference when writing:
+## Misc
+
+chapter name refs, for my reference when writing:
 
 * sampling-chapter
 * pulse-shaping-chapter
