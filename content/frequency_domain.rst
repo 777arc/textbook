@@ -17,7 +17,7 @@ First, why do we like to look at signals in the frequency domain?  Well here are
    :scale: 40 %
    :align: center   
 
-As you can see, in the time domain they both just kind of look like noise, but in the frequency domain we can see different features.  Everything is in the time domain in it's nature form; when we sample signals we will be sampling them in the time domain, because you cant *directly* sample a signal in the frequency domain.  But the interesting stuff usually happens in the frequency domain. 
+As you can see, in the time domain they both just kind of look like noise, but in the frequency domain we can see different features.  Everything is in the time domain in it's nature form; when we sample signals we will be sampling them in the time domain, because you can't *directly* sample a signal in the frequency domain.  But the interesting stuff usually happens in the frequency domain. 
 
 ***************
 Fourier Series
