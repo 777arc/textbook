@@ -20,7 +20,7 @@ Signal Power Budget
 
 Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e. from a transmitter (Tx) to receiver (Rx).  For a given system, we know the transmit power, it is usually a setting in the transmitter, so how do we figure out the received power at the receiver?
 
-.. image:: ../_static/tx_rx_system.PNG
+.. image:: ../_static/tx_rx_system.png
    :scale: 50 % 
    :align: center 
 
@@ -31,7 +31,7 @@ Let us define the following four system parameters:
 - **Gr** - Gain of receive antenna
 - **Lp** - Distance between Tx and Rx (i.e. how much wireless path loss)
 
-.. image:: ../_static/tx_rx_system_params.PNG
+.. image:: ../_static/tx_rx_system_params.png
    :scale: 80 % 
    :align: center 
 
@@ -54,7 +54,7 @@ Antenna Gains
 
 Transmit and receive antenna gains are very important, the numbers will be in dB (unit-less).  Typically, antennas are either omnidirectional or directional.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna can have a gain anywhere up to 50 dB or so.  
 
-.. image:: ../_static/antenna_gain_patterns.PNG
+.. image:: ../_static/antenna_gain_patterns.png
    :scale: 80 % 
    :align: center 
 
@@ -64,7 +64,7 @@ When a directional antenna is used, it must be either:
 - It could also be attached to a mechanical gimbal
 - It could also be a phased array which can be electronically steered (i.e. in software)
 
-.. image:: ../_static/antenna_steering.PNG
+.. image:: ../_static/antenna_steering.png
    :scale: 80 % 
    :align: center 
    
@@ -77,7 +77,7 @@ Path Loss
 
 As a signal moves through the air (or vacuum), it will reduce in strength.  Imagine holding a small solar panel up in front of a light bulb.  The further away the solar panel is, the less energy it will absorb from the light bulb.  **Flux** is a term in physics and mathematics, defined as "how much stuff goes through your thing".  For us, it's the amount of electromagnetic field passing into our receive antenna.  We want to know how much power is lost, for a given distance.  
 
-.. image:: ../_static/flux.PNG
+.. image:: ../_static/flux.png
    :scale: 80 % 
    :align: center 
 
@@ -126,7 +126,7 @@ In our link budget we also want to take into account miscellaneous losses.  We w
 
 The plot below shows atmospheric loss in dB/km, over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis you'll see that short range communications below 40 GHz, that are less than 1 km, have 1 dB or less of atmospheric loss, and thus we can usually ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the air.
 
-.. image:: ../_static/atmospheric_attenuation.PNG
+.. image:: ../_static/atmospheric_attenuation.png
    :scale: 80 % 
    :align: center 
 
@@ -183,7 +183,7 @@ SNR
 
 Now that we have both numbers, we can take the ratio to find SNR:
 
-.. image:: ../_static/SNR.PNG
+.. image:: ../_static/SNR.png
    :scale: 50 % 
    :align: center 
 
