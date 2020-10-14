@@ -86,11 +86,7 @@ Free Space Path Loss (FSPL) tells us the path loss when there are no obstacles, 
 .. math::
  \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ dB \right]
 
-:math:`d` is in meters and is the distance between the transmitter and receiver.
-
-:math:`f` is in Hz and is the carrier frequency.  In link budgets it will show up in dB, unit-less because it is a loss.
-
-There's only one problem with this simple equation; we won't always have free space between the transmitter and receiver.  E.g. indoors there is a lot of bouncing (most frequencies can go through walls, just not metal or thick masonry). For these situations there are various non-free-space models. A common one for cities and suburban areas (e.g. cellular) is the Okumura–Hata model:
+In link budgets it will show up in dB, unit-less because it is a loss.  :math:`d` is in meters and is the distance between the transmitter and receiver.  :math:`f` is in Hz and is the carrier frequency.  There's only one problem with this simple equation; we won't always have free space between the transmitter and receiver.  E.g. indoors there is a lot of bouncing (most frequencies can go through walls, just not metal or thick masonry). For these situations there are various non-free-space models. A common one for cities and suburban areas (e.g. cellular) is the Okumura–Hata model:
 
 .. math::
  L_{path} = 69.55 + 26.16 \log_{10} f - 13.82 \log_{10} h_B - C_H + \left[ 44.9 - 6.55 \log_{10} h_B \right] \log_{10} d
