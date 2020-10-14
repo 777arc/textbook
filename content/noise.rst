@@ -12,7 +12,7 @@ Gaussian Noise
 
 Most people are aware of the concept of noise, and how it looks something like: 
 
-.. image:: ../_static/noise.PNG
+.. image:: ../_static/noise.png
    :scale: 70 % 
    :align: center 
 
@@ -44,7 +44,7 @@ Example 2: A garbage disposal is 100,000 times louder than a quiet rural area, a
 
 Without dB, i.e. working in normal "linear" terms, we need to use a lot of 0's, and if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor, because the scale of the y-axis might go from 0 to 3 watts for example, causing the noise to be too small to show up in the plot.  By using dB we are essentially just working in a log-scale.  Below is an example waterfall showing three signals, the left-hand side is the original signal, and the right-hand side shows it converted to dB.  Both use the exact same colormap, where blue is lowest value and yellow is highest.  Note how you can barely see the signal on the left, in the linear scale.
 
-.. image:: ../_static/linear_vs_log.PNG
+.. image:: ../_static/linear_vs_log.png
    :scale: 70 % 
    :align: center 
 
@@ -80,7 +80,7 @@ Some common errors people will run into when new to dB are:
 2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to identify it somewhere.
 3. When you're in dB you add/subtract values instead of multiplying/dividing, e.g.:
 
-.. image:: ../_static/db.PNG
+.. image:: ../_static/db.png
    :scale: 60 % 
    :align: center 
 
@@ -107,7 +107,7 @@ Noise in Frequency Domain
 
 In the :ref:`freq-domain-chapter` chapter we looked at "Fourier pairs", i.e. what a certain time domain signal looks like in the frequency domain.  Well what does Gaussian noise look like in the frequency domain?  Below shows some simulated noise in the time domain, and then a plot of the FFT of that noise (many FFT's were averaged together).
 
-.. image:: ../_static/noise_freq.PNG
+.. image:: ../_static/noise_freq.png
    :scale: 110 % 
    :align: center 
 
@@ -169,7 +169,7 @@ To plot complex noise in the time domain, like any complex signal we need two li
  plt.legend(['real','imag'])
  plt.show()
 
-.. image:: ../_static/noise3.PNG
+.. image:: ../_static/noise3.png
    :scale: 80 % 
    :align: center 
 
@@ -184,19 +184,19 @@ What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot 
  plt.axis([-2, 2, -2, 2])
  plt.show()
 
-.. image:: ../_static/noise_iq.PNG
+.. image:: ../_static/noise_iq.png
    :scale: 60 % 
    :align: center 
 
 It looks how we would expect; a random blob centered around 0 + 0j, i.e. the origin.  Just for fun, let's try adding noise to a QPSK signal to see what the IQ plot looks like:
 
-.. image:: ../_static/noisey_qpsk.PNG
+.. image:: ../_static/noisey_qpsk.png
    :scale: 60 % 
    :align: center 
 
 Now what happens when the noise is stronger?  
 
-.. image:: ../_static/noisey_qpsk2.PNG
+.. image:: ../_static/noisey_qpsk2.png
    :scale: 50 % 
    :align: center 
 
@@ -214,7 +214,7 @@ SNR
 
 Signal-to-Noise Ratio (SNR) is how we will measure the differences in strength between the signal and noise, it's a ratio (so it's unit-less).  SNR is almost always in dB, in practice.  Often times in simulation we code in a way that our signals are unit power (power = 1).  That way, we can create an SNR of 10 dB by creating noise that is -10 dB in power, by adjusting the variance when we generate the noise.  
 
-.. image:: ../_static/SNR.PNG
+.. image:: ../_static/SNR.png
    :scale: 40 % 
    :align: center 
 
@@ -222,7 +222,7 @@ If someone says "SNR = 0 dB" it means the signal and noise power are the same.  
 
 Like we mentioned before, the power in a signal is equal to the variance of the signal.  So we can represent SNR as the ratio of the signal variance to noise variance:
 
-.. image:: ../_static/SNR2.PNG
+.. image:: ../_static/SNR2.png
    :scale: 40 % 
    :align: center 
 

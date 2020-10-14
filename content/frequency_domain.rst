@@ -17,7 +17,7 @@ First, why do we like to look at signals in the frequency domain?  Well here are
    :scale: 40 %
    :align: center   
 
-As you can see, in the time domain they both may appear to be noise, but in the frequency domain we can see different features.  Everything viewed in the time domain is in its natural form; when we sample signals we will be sampling them in the time domain, because you cant *directly* sample a signal in the frequency domain.  Interesting features can normally be distinguished in the frequency domain.
+As you can see, in the time domain they both just kind of look like noise, but in the frequency domain we can see different features.  Everything is in the time domain in it's nature form; when we sample signals we will be sampling them in the time domain, because you can't *directly* sample a signal in the frequency domain.  But the interesting stuff usually happens in the frequency domain. 
 
 ***************
 Fourier Series
@@ -262,7 +262,7 @@ Order in Time Doesn't Matter
 ****************************
 One last property before we jump into taking FFT's.  The FFT function sort of "mixes around" the input signal to form the output, which has a different scale and units, we are no longer in the time domain after all.  A good way to internalize this is realizing that changing the order things happen in the time domain doesn't change the frequency components in the signal.  I.e., the FFT of the following two signals will both have the same two spikes, because the signal is just two sine waves at different frequencies.  Changing the order the sine waves occur doesn't change the fact that it's still just two sine waves at different frequencies.
 
-.. image:: ../_static/fft_signal_order.PNG
+.. image:: ../_static/fft_signal_order.png
    :scale: 50 % 
    :align: center 
    

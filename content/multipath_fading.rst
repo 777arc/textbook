@@ -12,19 +12,19 @@ Multipath
 
 All realistic wireless channels include many "reflectors", RF signals bounce after all.  Any object between or near the Tx or Rx can cause additional paths the signal travels along.  Each path experiences a different phase shift (delay) and attenuation (amplitude scaling).  At the receiver, all of the paths add up.  They can add up constructively, or destructively, or a mix of both.  We call this concept of multiple signal paths "multipath".  There is the Line-of-Sight (LOS) path, and then all other paths.  In the example below, we show the LOS path and a single non-LOS path:
 
-.. image:: ../_static/multipath.PNG
+.. image:: ../_static/multipath.png
    :scale: 80 % 
    :align: center 
 
 Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase, at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in physics class.  In wireless, when the paths destructively combine, we call this being in a "deep fade", because our signal briefly disappears. 
 
-.. image:: ../_static/destructive_interference.PNG
+.. image:: ../_static/destructive_interference.png
    :scale: 70 % 
    :align: center 
 
 Paths can also add up constructively, causing a strong signal to be received.  Each path has a different phase shift and amplitude, which we can visualize on a plot in the time domain, called a "power delay profile":
 
-.. image:: ../_static/multipath2.PNG
+.. image:: ../_static/multipath2.png
    :scale: 70 % 
    :align: center 
 
@@ -36,7 +36,7 @@ Fading
 
 What usually happens is we get a mix of constructive and destructive interference, and it changes over time as the Rx, Tx, or environment, is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel **changing** over time.  So that's why we often refer to it as "multipath fading", it's really the combination of constructive/destructive interference, and a changing environment. What we end up with is an SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the Tx/Rx is moving:
 
-.. image:: ../_static/multipath_fading.PNG
+.. image:: ../_static/multipath_fading.png
    :scale: 100 % 
    :align: center 
 
@@ -53,13 +53,13 @@ There are also two types of fading from a **frequency** domain perspective:
 
 In the figure below, the :red:`red` shape shows our signal in the frequency domain, and the black curvy line shows the current channel condition over frequency.  Because the narrower signal is experiencing the same channel conditions throughout the whole signal, it's experiencing flat fading.  The wider signal is very much experiencing frequency selective fading.
 
-.. image:: ../_static/flat_vs_freq_selective.PNG
+.. image:: ../_static/flat_vs_freq_selective.png
    :scale: 70 % 
    :align: center 
 
 Here is an example of a 16 MHz wide signal that is continuously transmitting.  There are several moments in the middle where there's a period of time where a piece of signal is missing.  This is an example of frequency selective fading, it causes holes in the signal that wipe out some frequencies but not others.
 
-.. image:: ../_static/fading_example.PNG
+.. image:: ../_static/fading_example.png
    :scale: 60 % 
    :align: center 
    
@@ -75,7 +75,7 @@ CDMA
 
 3G cellular uses a technology called code division multiple access (CDMA).  With CDMA you take a narrowband signal and spread it over a wide bandwidth before transmitting it (using a spread spectrum technique called DSSS).  Under frequency selective fading, it's unlikely that all frequencies will be in a deep null at the same time.  At the receiver, the spreading is reversed, and this de-spreading process greatly mitigates a deep null.
 
-.. image:: ../_static/cdma.PNG
+.. image:: ../_static/cdma.png
    :scale: 100 % 
    :align: center 
 

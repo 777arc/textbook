@@ -13,7 +13,7 @@ New term alert!  Our transmit signal is going to be made up of "symbols".  Each 
 
 As a simplified example, let's say we have a wire and are sending 1's and 0's using high and low voltage levels.  A symbol is one of those 1's or 0's:
 
-.. image:: ../_static/symbols.PNG
+.. image:: ../_static/symbols.png
    :scale: 60 % 
    :align: center 
 
@@ -72,7 +72,7 @@ Amplitude Shift Keying (ASK)
 
 Amplitude Shift Keying (ASK) is the first digital modulation scheme we will discuss, because it's the simplest to visualize of the three.  We literally just modulate the **amplitude** of the carrier.  Example of 2-level ASK, called 2-ASK:
 
-.. image:: ../_static/ASK.PNG
+.. image:: ../_static/ASK.png
    :scale: 50 % 
    :align: center 
 
@@ -97,7 +97,7 @@ Five symbols, 10 bits of information
 
 So how do we actually create this signal digitally, in code?  All we really have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).  
 
-.. image:: ../_static/ask3.PNG
+.. image:: ../_static/ask3.png
    :scale: 80 % 
    :align: center 
 
@@ -132,7 +132,7 @@ IQ Plots/Constellations
 
 You have seen IQ plots before in the complex numbers subsection of the :ref:`sampling-chapter` chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot. We will assume a magnitude of 1, in practice it doesn't really matter what magnitude you use, a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
 
-.. image:: ../_static/bpsk_iq.PNG
+.. image:: ../_static/bpsk_iq.png
    :scale: 80 % 
    :align: center 
 
@@ -140,25 +140,25 @@ The above IQ plot shows what we will transmit, or rather the set of symbols we w
 
 To receive and decode BPSK we can use IQ sampling, like we learned about last chapter, and simply look at where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel, since the signal will have some random delay as it passes through the air between antennas.  The random phase rotation can be reversed using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the receiver (this does not include noise): 
 
-.. image:: ../_static/bpsk3.PNG
+.. image:: ../_static/bpsk3.png
    :scale: 60 % 
    :align: center 
 
 Back to PSK.  What if we want four different levels of phase?  I.e. 0, 90, 180, and 270 degrees.  In this case it would be represented like so on the IQ plot, and it forms a modulation scheme we call Quadrature Phase Shift Keying (QPSK):
 
-.. image:: ../_static/qpsk.PNG
+.. image:: ../_static/qpsk.png
    :scale: 60 % 
    :align: center 
 
 For PSK we always have N different phases, equally spaced around 360 degrees for best results.  We often show the unit circle to emphasize that all points have the same magnitude:
 
-.. image:: ../_static/psk_set.PNG
+.. image:: ../_static/psk_set.png
    :scale: 60 % 
    :align: center 
 
 Question- What’s wrong with using a PSK scheme like this?  Is this a valid PSK modulation scheme?
 
-.. image:: ../_static/weird_psk.PNG
+.. image:: ../_static/weird_psk.png
    :scale: 60 % 
    :align: center 
 
@@ -175,7 +175,7 @@ There is nothing invalid about this, you could certainly use it, but because the
 
 Let's detour back to ASK for a moment.  Note that we can show ASK on the IQ plot just like PSK.  Here is the IQ plot of 2-ASK, 4-ASK, and 8-ASK:
 
-.. image:: ../_static/ask_set.PNG
+.. image:: ../_static/ask_set.png
    :scale: 60 % 
    :align: center 
 
@@ -186,25 +186,25 @@ Quadrature Amplitude Modulation (QAM)
 **************************************
 What if we combine ASK and PSK?  We call this Quadrature Amplitude Modulation (QAM) and it usually looks something like this:
 
-.. image:: ../_static/64qam.PNG
+.. image:: ../_static/64qam.png
    :scale: 90 % 
    :align: center 
    
 Here are some other examples of QAM:
 
-.. image:: ../_static/qam.PNG
+.. image:: ../_static/qam.png
    :scale: 50 % 
    :align: center 
 
 For a QAM modulation scheme, we can technically put points wherever we want to on the IQ plot, since QAM means the phase and amplitude are being modulated.  The "parameters" of a given QAM scheme are best defined by simply showing the QAM constellation. Alternatively, you could simply list the I and Q values for each point, like below for QPSK:
 
-.. image:: ../_static/qpsk_list.PNG
+.. image:: ../_static/qpsk_list.png
    :scale: 80 % 
    :align: center 
 
 Back to the time domain for a second.  Everything except the various ASK's and BPSK are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain, note how it's tough to see the phase of each symbol:
 
-.. image:: ../_static/qam_time_domain.PNG
+.. image:: ../_static/qam_time_domain.png
    :scale: 50 % 
    :align: center 
 

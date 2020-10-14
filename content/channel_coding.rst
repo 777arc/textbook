@@ -12,7 +12,7 @@ Why We Need Channel Coding
 
 As we learned in the :ref:`noise-chapter` chapter, wireless channels are noisy, and our digital symbols won't reach the receiver perfectly.  If you have taken a networking course you may already know about cyclic redundancy checks (CRCs) which **detect** errors at the receiving end.  The purpose of channel coding is to detect **and correct** errors at the receiver.  If we allow some room for error, then we can transmit at a higher order modulation scheme, for example, without having a broken link.  As a visual example, consider the following constellations showing QPSK (left) and 16QAM (right), under the same amount of noise.  QPSK provides 2 bits per symbol, 16QAM uses 4 bits per symbol, so twice the data rate.  But note how in the QPSK constellation, the symbols tend to not pass the symbol decision boundary which is the x-axis and y-axis for QPSK, which means the symbols will be received correctly.  Meanwhile in the 16QAM plot, there is overlap in the clusters and there will be many incorrectly received symbols. 
 
-.. image:: ../_static/qpsk_vs_16qam.PNG
+.. image:: ../_static/qpsk_vs_16qam.png
    :scale: 90 % 
    :align: center 
    
@@ -20,7 +20,7 @@ A failed CRC will usually result in a retransmission, at least when using a prot
 
 We discussed why we need channel coding, but now let's see where it occurs in the transmit and receive chain:
 
-.. image:: ../_static/tx_rx_chain.PNG
+.. image:: ../_static/tx_rx_chain.png
    :scale: 60 % 
    :align: center 
 
@@ -62,13 +62,13 @@ In the :ref:`modulation-chapter` chapter we talked about how at low SNR you need
 
 Modern communications adaptively change the MCS in real-time, based on the wireless channel conditions.  The receiver sends feedback to the transmitter, indicating the channel quality.  Feedback must be shared before the wireless channel changes, which could be on the order of ms.  This adaptive process leads to the highest throughput comms possible, and is used by modern technologies like LTE, 5G, and WiFi.
 
-.. image:: ../_static/adaptive_mcs.PNG
+.. image:: ../_static/adaptive_mcs.png
    :scale: 80 % 
    :align: center 
 
 When using adaptive MCS, if you plot throughput over SNR, you get a staircase shaped curve.  Protocols like LTE often have a table indicating which MCS should be used at what SNR.
 
-.. image:: ../_static/adaptive_mcs2.PNG
+.. image:: ../_static/adaptive_mcs2.png
    :scale: 100 % 
    :align: center 
 
@@ -80,13 +80,13 @@ Let's look at one of the simpler error correcting codes.  Hamming Code was the f
 
 In Hamming Codes, extra bits are added for redundancy, and are called parity bits.  All bit positions that are powers of two are parity bits: 1, 2, 4, 8, etc,  highlighted in green below.  Each parity bit "covers" all bits where the bitwise AND of the parity and the bit position is non-zero, marked with a red X below.  If we want to use a data bit, we need the parity bits that cover it.  E.g. to be able to go up to data bit d9, we need parity bit p8 and all the parity bits that come before it, so this tells us how many parity bits we need for a certain number of bits.  This pattern continues indefinitely.  
 
-.. image:: ../_static/hamming.PNG
+.. image:: ../_static/hamming.png
    :scale: 60 % 
    :align: center 
 
 Hamming codes are block codes so they operate on N data bits at a time.  So with 3 parity bits we can operate on blocks of four data bits at a time.  We call it Hamming(7,4), first arg is total bits transmitted, second arg is data bits. 
 
-.. image:: ../_static/hamming2.PNG
+.. image:: ../_static/hamming2.png
    :scale: 80 % 
    :align: center 
 
@@ -98,13 +98,13 @@ The following are three important properties of Hamming codes:
 
 Algorithmically, the coding process can be done using a simple matrix multiply, using what is called the "generator matrix".  In the example below, the vector 1011 is the data to be encoded, i.e. the information we want to send to the receiver.  The 2D matrix is the generator matrix, and it defines the code scheme.  The result of the multiply provides the code word to transmit.
 
-.. image:: ../_static/hamming3.PNG
+.. image:: ../_static/hamming3.png
    :scale: 60 % 
    :align: center 
 
 The point of diving into Hamming codes was to give a taste of how coding works.  Block codes tend to follow this type of pattern.  Convolutional codes work totally differently but we won't get into it here; they often use Trellis-style decoding, which often involves a diagram that looks like this:
 
-.. image:: ../_static/trellis.PNG
+.. image:: ../_static/trellis.png
    :scale: 100 % 
    :align: center 
 
@@ -151,7 +151,7 @@ The max throughput of 802.11n WiFi operating in the 2.4 GHz band (which uses 20 
 
 The proof behind the Shannon limit is pretty crazy, it involves math that looks like this:
 
-.. image:: ../_static/shannon_limit_proof.PNG
+.. image:: ../_static/shannon_limit_proof.png
    :scale: 70 % 
    :align: center
 
