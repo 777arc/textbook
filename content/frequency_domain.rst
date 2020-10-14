@@ -29,7 +29,7 @@ The basics of the frequency domain start with understanding that any signal can 
    :align: center
    :target: ../_static/summing_sinusoids.svg
    
-Here is another example; the red curve in the below approximates a sawtooth wave by summing up to five sine waves.  We can see that it's not a perfect reconstruction--it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
+Here is another example; the red curve in the below approximates a sawtooth wave by summing up to 10 sine waves.  We can see that it's not a perfect reconstruction--it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
 
 .. image:: ../_static/fourier_series_triangle.gif
    :scale: 70 %   
