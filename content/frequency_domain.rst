@@ -63,7 +63,7 @@ It's more important to understand the underlying concept than the actual equatio
 Time-Frequency Pairs
 ********************
 
-Knowing that a signal can be broken down into sine waves is one thing, but now let's actually plot signals in the frequency domain.  In other words, instead of the x-axis being time, it will be frequency.  For a given signal we can plot it in both time *and* frequency.  Let's look at some example signals, we will start with simple ones.
+We have established that signals can be represented as sine waves, which have several attributes. Now, let's learn to plot signals in the frequency domain. While the time domain demonstrates how a signal changes over time, the frequency domain displays how much of a signal rests in which frequencies. Instead of the x-axis being time it will be frequency.  We can plot a given signal in both time *and* frequency.  Let's look at some simple examples to start.
 
 Here is what a sine wave, with frequency f, looks like in the time and frequency domain:
 
@@ -71,23 +71,23 @@ Here is what a sine wave, with frequency f, looks like in the time and frequency
    :scale: 70 % 
    :align: center  
 
-The time domain should look very familiar, it's simply an oscillating function, don't worry about at what point in the cycle it starts, or how long it lasts.  The take-away is that it has only a **single frequency**, which is why we see a single spike/peak in the frequency domain.  Whatever frequency that sine wave is oscillating at will be where we see the spike in the frequency domain.  The mathematical name for a spike like this is called an "impulse". 
+The time domain should look very familiar. It's an oscillating function. Don't worry about at what point in the cycle it starts or how long it lasts.  The take-away is that the signal has a **single frequency**, which is why we see a single spike/peak in the frequency domain.  Whichever frequency that sine wave oscillates at will be where we see the spike in the frequency domain.  The mathematical name for a spike like this is called an "impulse".
 
-Now what if we had an impulse in the time domain?  One example is a sound recording of someone clapping their hands, or hitting a nail with a hammer.  This time-frequency pair is a little less intuitive.  
+Now what if we had an impulse in the time domain?  Imagine a sound recording of someone clapping their hands or hitting a nail with a hammer.  This time-frequency pair is a little less intuitive.
 
 .. image:: ../_static/impulse.png
    :scale: 70 % 
    :align: center  
 
-As we can see, a spike/impulse in the time domain is flat in the frequency domain, and theoretically contains every frequency, although there is no theoretically perfect impulse because it would have to be infinitely short in the time domain.  Similar to the sine wave, it doesn't matter where in the time domain the impulse happens.  The important take-away here is that quick changes in time domain result in many frequencies occurring. 
+As we can see, a spike/impulse in the time domain is flat in the frequency domain, and theoretically it contains every frequency. There is no theoretically perfect impulse because it would have to be infinitely short in the time domain.  Like the sine wave, it doesn't matter where in the time domain the impulse happens.  The important take-away here is that quick changes in time domain result in many frequencies occurring.
 
-Next lets look at the time and frequency domain plots of a square wave:
+Next let's look at the time and frequency domain plots of a square wave:
 
 .. image:: ../_static/square-wave.svg
    :align: center 
    :target: ../_static/square-wave.svg
    
-This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  This is because of the quick change in time domain, just like in the previous example.  But it's not flat in frequency, it has spikes at intervals, and the level slowly decays (although it will continue forever).  It turns out that a square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).  
+This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  It is due to the quick change in time domain, just like in the previous example.  But it's not flat in frequency. It has spikes at intervals, and the level slowly decays (although it will continue forever).  A square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).
 
 Now what if we have a constant signal in the time domain?  A constant signal has no "frequency".   Let's see:
 
@@ -95,7 +95,7 @@ Now what if we have a constant signal in the time domain?  A constant signal has
    :scale: 100 % 
    :align: center 
    
-Because there is no frequency, in the frequency domain we have a spike at 0 Hz, which makes sense if you think about it.  The frequency domain is not going to be "empty", because that only happens when there is no signal present (i.e. time domain of 0's).  We call 0 Hz in the frequency domain "DC", because it's caused by a DC signal in time (a constant signal that doesn't change).  Note that if we increase the amplitude of our DC signal in the time domain, the spike at 0 Hz in the frequency domain will also increase.  
+Because there is no frequency, in the frequency domain we have a spike at 0 Hz. It makes sense if you think about it.  The frequency domain is not going to be "empty" because that only happens when there is no signal present (i.e., time domain of 0s).  We call 0 Hz in the frequency domain "DC", because it's caused by a DC signal in time (a constant signal that doesn't change).  Note that if we increase the amplitude of our DC signal in the time domain, the spike at 0 Hz in the frequency domain will also increase.
 
 Later on we will learn about what exactly the y-axis in the frequency domain plot means, but for now you can think of it as a sort of amplitude that tells you how much of that frequency was present in the time domain signal.
    
@@ -108,19 +108,19 @@ Mathematically, the "transform" we use to go from the time domain to the frequen
 .. math::
    X(f) = \int x(t) e^{-j2\pi ft} dt
 
-So for a signal x(t) we can get the frequency domain version, X(f), using this formula.  We will represent the time domain version of a function with x(t) or y(t), and the corresponding frequency domain version with X(f) and Y(f).  Note the "t" for time, and "f" for frequency. The j is simply the imaginary number, you may have seen it as i in high school math class.  We use j in engineering and computer science because i is often referring to current, and in programming it's often used as an iterator. 
+For a signal x(t) we can get the frequency domain version, X(f), using this formula.  We will represent the time domain version of a function with x(t) or y(t), and the corresponding frequency domain version with X(f) and Y(f).  Note the "t" for time, and "f" for frequency. The "j" is simply the imaginary number. You may have seen it as "i" in high school math class.  We use "j" in engineering and computer science because "i" is often referring to current, and in programming it's often used as an iterator.
 
-To go back to the time domain it's almost exactly the same aside from a scaling factor and negative sign:
+To return to the time domain from frequency is almost the same, aside from a scaling factor and negative sign:
 
 .. math::
    x(t) = \frac{1}{2 \pi} \int X(f) e^{j2\pi ft} df
 
-Note that a lot of textbooks and other resources use :math:`w` in place of the :math:`2\pi f`.  :math:`w` is angular frequency in radians, while :math:`f` is in Hz.  All you have to know that 
+Note that a lot of textbooks and other resources use :math:`w` in place of the :math:`2\pi f`.  :math:`w` is angular frequency in radians, while :math:`f` is in Hz.  All you have to know is that
 
 .. math::
    \omega = 2 \pi f
 
-Even though it adds a :math:`2 \pi` term to many equations, it's easier to just stick with frequency in Hz, since Hz will ultimately be the units you work with in your SDR application.  
+Even though it adds a :math:`2 \pi` term to many equations, it's easier to stick with frequency in Hz. Ultimately you will work with Hz in your SDR application.
 
 The above equation for the Fourier Transform is the continuous form, which you will only see in math problems.  The discrete form is much closer to what is implemented in code:
 
@@ -129,33 +129,33 @@ The above equation for the Fourier Transform is the continuous form, which you w
    
 Note that the main difference is we replaced the integral with a summation.  The index :math:`k` goes from 0 to N.  
 
-It's OK if none of these equations mean much to you, we actually don't need to use them directly to do cool stuff with DSP and SDRs.
+It's OK if none of these equations mean much to you. We actually don't need to use them directly to do cool stuff with DSP and SDRs!
 
 *************************
 Time-Frequency Properties
 *************************
 
-Earlier we looked at a bunch of examples of signals in the time domain, and what they look like in the frequency domain.  Now, we will go over five important "Fourier properties".  These are properties that tell us if we do ____ to our time domain signal, then ____ happens to our frequency domain signal.  This will give us a lot of important insight into the type of Digital Signal Processing (DSP) we will perform on time domain signals in practice.  
+Earlier we examined examples of how signals appear in the time domain and the frequency domain.  Now, we will cover five important "Fourier properties".  These are properties that tell us if we do ____ to our time domain signal, then ____ happens to our frequency domain signal.  It will give us an important insight into the type of Digital Signal Processing (DSP) we will perform on time domain signals in practice.
 
 1. Linearity Property:
 
 .. math::
    a x(t) + b y(t) \leftrightarrow a X(f) + b Y(f)
 
-This property is probably the easiest to understand.  If we add two signals in time, then the frequency domain version will also be the two frequency domain signals added together.  It also tells us that if we multiply either one by a scaling factor, the frequency domain will also scale by the same amount.  The utility of this property will become more apparent when we start looking at multiple signals being added together.
+This property is probably the easiest to understand.  If we add two signals in time, then the frequency domain version will also be the two frequency domain signals added together.  It also tells us that if we multiply either one by a scaling factor, the frequency domain will also scale by the same amount.  The utility of this property will become more apparent when we add together multiple signals.
 
 2. Frequency Shift Property:
 
 .. math::
    e^{2 \pi j f_0 t}x(t) \leftrightarrow X(f-f_0)
 
-The term to the left of x(t) is what we call a "complex sinusoid" or "complex exponential", and for now all we need to know is that it's essentially just a sine wave at frequency :math:`f_0`.  So what this property is telling us is that if we take a signal :math:`x(t)` and multiply it by a sine wave, then in the frequency domain we get :math:`X(f)` except shifted by a certain frequency, :math:`f_0`.  This shift in frequency might be easier to visualize:
+The term to the left of x(t) is what we call a "complex sinusoid" or "complex exponential". For now, all we need to know is that it's essentially just a sine wave at frequency :math:`f_0`.  This property tells us that if we take a signal :math:`x(t)` and multiply it by a sine wave, then in the frequency domain we get :math:`X(f)` except shifted by a certain frequency, :math:`f_0`.  This shift in frequency may be easier to visualize:
 
 .. image:: ../_static/freq-shift.svg
    :align: center 
    :target: ../_static/freq-shift.svg
 
-This is a very important concept in DSP, because we will want to shift signals up and down in frequency for many reasons, and this property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
+Frequency shift is inteogral to DSP because we will want to shift signals up and down in frequency for many reasons. This property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
 
 .. image:: ../_static/freq-shift-diagram.svg
    :align: center
@@ -166,49 +166,49 @@ This is a very important concept in DSP, because we will want to shift signals u
 .. math::
    x(at) \leftrightarrow X\left(\frac{f}{a}\right)
 
-On the left hand side, we can see that we are scaling our signal x(t) in the time domain. Here is an example of a signal being scaled in time, and then what happens to the frequency domain versions of each one.
+On the left hand side of the equation, we can see that we are scaling our signal x(t) in the time domain. Here is an example of a signal being scaled in time, and then what happens to the frequency domain versions of each one.
 
 .. image:: ../_static/time-scaling.svg
    :align: center
    :target: ../_static/time-scaling.svg
 
-Scaling in time is essentially shrinking or expanding the signal in the x-axis.  What this property tells us is that when we do that, the frequency domain also scales, but inversely.  So, for example, when we transmit bits faster, we have to use more frequencies.  This is why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional then the cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
+Scaling in time essentially shrinks or expands the signal in the x-axis.  What this property tells us is that scaling in the time domain causes inverse scaling in the the frequency domain.  For example, when we transmit bits faster we have to use more frequencies.  The property helps to explain why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional, cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
 
-Those already familiar with this property may notice a scaling factor missing; it is left out for the sake of simplicity, for practical purposes it just doesn't make a difference.
+Those already familiar with this property may notice a scaling factor missing; it is left out for the sake of simplicity. For practical purposes it doesn't make a difference.
 
 4. Convolution Property:
 
 .. math::
    \int x(\tau) y(t-\tau) d\tau  \leftrightarrow X(f)Y(f)
 
-This one is called the convolution property because in the time domain we are convolving x(t) and y(t).  You may not know about the convolution operation yet, so for now just imagine it like a cross-correlation. When we convolve time domain signals, it's equivalent to multiplying the frequency domain versions of those two signals.  This is very different from just adding together two signals.  When you add two signals, as we saw, nothing really happens, you just add together the frequency domain version.  But when you convolve two signals, it's like creating a new third signal out of them.  Convolution is the single most important technique in DSP, but for a reason we won't understand until we get into how filters work.
+It is called the convolution property because in the time domain we are convolving x(t) and y(t).  You may not know about the convolution operation yet, so for now imagine it like a cross-correlation. When we convolve time domain signals, it's equivalent to multiplying the frequency domain versions of those two signals.  It is very different from adding together two signals.  When you add two signals, as we saw, nothing really happens, you just add together the frequency domain version.  But when you convolve two signals, it's like creating a new third signal from them.  Convolution is the single most important technique in DSP, though we must understand how filters work first to fully grasp it.
 
-Before we move on, to briefly explain why this property is so important, consider the situation in which you have one signal you want to receive, and there is an interfering signal next to it. 
+Before we move on, to briefly explain why this property is so important, consider this situation: you have one signal you want to receive, and there is an interfering signal next to it.
 
 .. image:: ../_static/two-signals.svg
    :align: center
    :target: ../_static/two-signals.svg
    
-The concept of masking is heavily used in programming, so let's use it here.  What if we could create the mask below, and multiply it by the signal above in order to mask out the one we don't want.  
+The concept of masking is heavily used in programming, so let's use it here.  What if we could create the mask below, and multiply it by the signal above in order to mask out the one we don't want?
 
 .. image:: ../_static/masking.svg
    :align: center
    :target: ../_static/masking.svg
 
-We usually perform DSP operations in the time domain, so we can use the convolution property to see how we can do this masking in the time domain.  Let's say that x(t) is our received signal.  Let Y(f) be the mask we want to apply, in the frequency domain.  Well that means y(t) is the time domain representation of our mask, and if we convolve it with x(t), we can "filter out" the signal we don't want.
+We usually perform DSP operations in the time domain, so let's utilize the convolution property to see how we can do this masking in the time domain.  Let's say that x(t) is our received signal.  Let Y(f) be the mask we want to apply in the frequency domain.  Well that means y(t) is the time domain representation of our mask, and if we convolve it with x(t), we can "filter out" the signal we don't want.
 
 .. image:: ../_static/masking-equation.png
    :scale: 100 % 
    :align: center 
    
-This will make a lot more sense once we get into filtering.
+When we discuss filtering, the colvolution property will make more sense.
 
 Lastly, I want to point out that the convolution property works in reverse, although we won't be using it as much as the time domain convolution:
 
 .. math::
    x(t)y(t)  \leftrightarrow  \int X(g) Y(f-g) dg
 
-There are other properties, but the above four are the most important ones to understand in my opinion.  Even though we didn't bother going through the proof for each property, the point is we use the mathematical properties to gain insight into what happens to real signals when we do analysis and processing.  Don't get caught up on the equations, just try to make sure you understand the description of each property.
+There are other properties, but the above four are the most crucial to understand in my opinion.  Even though we didn't step through the proof for each property, the point is we use the mathematical properties to gain insight into what happens to real signals when we do analysis and processing.  Don't get caught up on the equations. Make sure you understand the description of each property.
 
 
 ******************************
