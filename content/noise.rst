@@ -84,7 +84,7 @@ Some common errors people will run into when new to dB are:
    :scale: 60 % 
    :align: center 
 
-It is also important to understand that dB is not technically a "unit".  A value in dB alone is unit-less, like if something is 2x larger, there are no units until I tell you the units.  dB is a relative thing.  In audio when they say dB they really mean dBA which is units for sound level (the A is the units). In wireless we typically refer to watts, to refer to an actual power level, so you might see dBW which is relative to 1 W, or dBmW (often written dBm for short) which is relative to 1 mW.   For example, someone might say "our transmitter is set to 3 dBW" (so 5 watts).  Sometimes we just say dB, meaning it is relative, there are no units, e.g. "our signal was received 20 dB above the noise floor".  A little tip: 0 dBm = -30 dBW.
+It is also important to understand that dB is not technically a "unit".  A value in dB alone is unit-less, like if something is 2x larger, there are no units until I tell you the units.  dB is a relative thing.  In audio when they say dB they really mean dBA which is units for sound level (the A is the units). In wireless we typically refer to watts, to refer to an actual power level, so you might see dBW which is relative to 1 W, or dBmW (often written dBm for short) which is relative to 1 mW.   For example, someone might say "our transmitter is set to 3 dBW" (so 2 watts).  Sometimes we just say dB, meaning it is relative, there are no units, e.g. "our signal was received 20 dB above the noise floor".  A little tip: 0 dBm = -30 dBW.
 
 Lastly, here are some common conversions that I would recommend remembering:
 
