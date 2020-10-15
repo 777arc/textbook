@@ -203,7 +203,7 @@ One way to design this kind of filter is to make a **low**-pass filter with a cu
 
 .. code-block:: python
 	
-	# (h was found using the previous code snippet)
+	# (h was found using the first code snippet)
 	
 	# Shift the filter in frequency by multiplying by exp(j*2*pi*f0*t)
 	f0 = 10e3 # amount we will shift
@@ -218,7 +218,6 @@ One way to design this kind of filter is to make a **low**-pass filter with a cu
 	plt.plot(np.real(h_band_pass), '.-')
 	plt.plot(np.imag(h_band_pass), '.-')
 	plt.legend(['real', 'imag'], loc=1)
-	plt.show()
 	
 	# plot the frequency response
 	_, H = signal.freqz(h, whole=True) # shortcut for plotting frequency response
@@ -227,7 +226,7 @@ One way to design this kind of filter is to make a **low**-pass filter with a cu
 	w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
 	plt.subplot(122)
 	plt.plot(w, H, '.-')
-	plt.xlabel('Frequency [kHz]')
+	plt.xlabel('Frequency [Hz]')
 	plt.show()
 
 The plot of the impulse response should look like this:
