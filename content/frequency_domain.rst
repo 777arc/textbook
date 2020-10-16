@@ -155,7 +155,7 @@ The term to the left of x(t) is what we call a "complex sinusoid" or "complex ex
    :align: center 
    :target: ../_static/freq-shift.svg
 
-Frequency shift is inteogral to DSP because we will want to shift signals up and down in frequency for many reasons. This property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
+Frequency shift is integral to DSP because we will want to shift signals up and down in frequency for many reasons. This property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
 
 .. image:: ../_static/freq-shift-diagram.svg
    :align: center
@@ -243,7 +243,7 @@ It is always the case; the output of the FFT will always show :math:`\text{-} f_
 Negative Frequencies
 ********************
 
-What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers)--there isn't really such thing as a "negative frequency". It's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
+What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers)--there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
 
 .. image:: ../_static/negative-frequencies2.svg
    :align: center
@@ -255,7 +255,7 @@ Now, when the SDR gives us the samples, it will appear like this:
    :align: center
    :target: ../_static/negative-frequencies3.svg
 
-Remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  It will make more sense when we sample and use our SDRs.
+Remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  It will make more sense when we learn more about sampling and use our SDRs.
 
 ****************************
 Order in Time Doesn't Matter
