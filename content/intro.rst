@@ -53,7 +53,7 @@ Acknowledgements
 
 Thank you to anyone who has read any portion of this textbook and provided feedback, and especially to:
 
-- `Barry Duggan <github.com/duggabe>`_
+- `Barry Duggan <http://github.com/duggabe>`_
 - Matthew Hannon
 - James Hayek
 - `Deidre Stuffer <http://kd9qgl.wordpress.com/>`_
