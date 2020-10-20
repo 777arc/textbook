@@ -10,27 +10,27 @@ In this chapter we introduce a concept called IQ Sampling, a.k.a. complex sampli
 Sampling Basics
 *************************
 
-Before jumping into IQ sampling, let's discuss what sampling actually means. You may have encountered sampling without realizing it by recording audio with a microphone. The microphone is a transducer that converts sound waves into an electric signal (a voltage level). That electric signal is transformed by an analog-to-digital converter, producing a digital representation of the sound wave. To simplify, the microphone captures sound waves that are converted into electricity, and that electricity in turn is converted into numbers, be they floats or integers. SDRs are surprisingly similar. Instead of a microphone, however, they utilize an antenna. In both cases, the voltage level is sampled with an analog-to-digital converter. For SDRs, think radio waves in then numbers out.
+Before jumping into IQ sampling, let's discuss what sampling actually means. You may have encountered sampling without realizing it by recording audio with a microphone. The microphone is a transducer that converts sound waves into an electric signal (a voltage level). That electric signal is transformed by an analog-to-digital converter, producing a digital representation of the sound wave. To simplify, the microphone captures sound waves that are converted into electricity, and that electricity in turn is converted into numbers. SDRs are surprisingly similar. Instead of a microphone, however, they utilize an antenna. In both cases, the voltage level is sampled with an analog-to-digital converter. For SDRs, think radio waves in then numbers out.
 
 Whether we are dealing with audio or radio frequencies, we must sample if we want to capture, process, or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  A more technical way to think of sampling a signal is grabbing values at moments in time and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
 
 .. image:: ../_static/sampling.svg
    :align: center 
 
-We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds.  :math:`S_n` represents sample :math:`n`, usually an integer starting at 0. Using this convention, the sampling process can be represented mathematically as :math:`S_n = S(nT)` for integer values of :math:`n`.  Our sampling frequency, or the number of samples taken per second, is simply :math:`\frac{1}{T}`.
+We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds, known as the **sample period**.  The frequency at which we sample, i.e., the number of samples taken per second, is simply :math:`\frac{1}{T}`.  We call this the **sample rate**, and its the inverse of the sample period.  For example, if we have a sample rate of 10 Hz, then the sample period is 0.1 seconds; there will be 0.1 seconds between each sample.  In practice our sample rates will be on the order of hundreds of kHz to tens of MHz or even higher.  When we sample signals, we need to be mindful of the sample rate, it's a very important parameter. 
+
+For those who prefer to see the math; let :math:`S_n` represent sample :math:`n`, usually an integer starting at 0. Using this convention, the sampling process can be represented mathematically as :math:`S_n = S(nT)` for integer values of :math:`n`.  I.e., we evaluate the analog signal :math:`S(t)` at these intervals of :math:`nT`.
 
 *************************
 Nyquist Sampling
 *************************
-
-When we sample signals, we need to be mindful of the sample period, i.e., the time difference between samples.  If you calculate the inverse of the sample period, you will get the sample rate. Sample rate is another way to say sample frequency, and these terms can be used interchangeably. The sample rate is usually what we will use when talking about SDRs.
 
 For a given signal, the big question often is how fast must we sample?  Let's examine a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs (samples shown in blue).  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
 
 .. image:: ../_static/sampling_Fs_0.3.svg
    :align: center 
 
-The red dashed line in the above image reconstructs a different (incorrect) function that could have lead to the same samples being recorded. It indicates that our sample rate was too low because the same samples could have come from two different functions, leading to ambiguity. The sampling rate needs to enable us to accurately reconstruct the original signals.
+The red dashed line in the above image reconstructs a different (incorrect) function that could have lead to the same samples being recorded. It indicates that our sample rate was too low because the same samples could have come from two different functions, leading to ambiguity. If we want to accurately reconstruct the original signal, we can't have this ambiguity.
 
 Let's try sampling a little faster, at Fs = 1.2f:
 
@@ -44,14 +44,14 @@ How about sampling at Fs = 1.5f:
 .. image:: ../_static/sampling_Fs_0.45.svg
    :align: center 
 
-Still not fast enough!  You have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
+Still not fast enough!  According to a piece of DSP theory we won't dive into, you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
 
 .. image:: ../_static/sampling_Fs_0.6.svg
    :align: center 
 
 There's no incorrect signal this time because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
 
-Since most signals will have many frequency components to them, to accurately sample them the rate must be "twice the frequency of the maximum frequency component" in our signal.  Here's a way to visualize that:
+In the above example our signal was just a simple sine wave, most actual signals will have many frequency components to them.  To accurately sample any given signal, the sample rate must be "at least twice the frequency of the maximum frequency component".  Here's a way to visualize that:
 
 .. image:: ../_static/max_freq.png
    :scale: 70% 
@@ -261,7 +261,7 @@ This subsection discussing DC offsets is a good example of where this textbook d
 Sampling Using the PlutoSDR
 ****************************
 
-Sampling using the PlutoSDR's Python API is pretty straightforward.  With any SDR app we know we must tell the SDR the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three are nessesary for the SDR to have enough information to do anything.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will just start sampling as soon as you initialize it, and just drop the samples as the buffer fills up. All SDR APIs have some sort of "receive samples" function, for the pluto it's rx(), and it returns a certain number of samples, defined by the buffer size that was set beforehand.
+Sampling using the PlutoSDR's Python API is pretty straightforward.  With any SDR app we know we must tell the SDR the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three are necessary for the SDR to have enough information to do anything.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will just start sampling as soon as you initialize it, and just drop the samples as the buffer fills up. All SDR APIs have some sort of "receive samples" function, for the Pluto it's rx(), and it returns a certain number of samples, defined by the buffer size that was set beforehand.
 
 Refer to the :ref:`pluto-chapter` chapter for installing the software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, center frequency to 100 MHz, and gain to 50 dB, with automatic gain control turned off.  It usually doesn't matter what order you set the center frequency, gain, and sample rate.  We tell the Pluto that we want it to give us 10,000 samples per call to rx().  
 
