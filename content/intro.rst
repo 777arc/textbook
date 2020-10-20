@@ -34,7 +34,7 @@ This textbook was designed specifically for students in Computer Science, althou
 
 To cover foundational DSP theory, an entire semester of "Signals and Systems", a typical course within electrical engineering, is condensed into a few chapters.  Once the DSP fundamentals are covered, we lauch into SDRs, although DSP and wireless communications concepts continue to come up throughout the textbook.
 
-Code examples are provided in Python.  They utilize NumPy, which is Python's standard library for arrays and high-level math.  The examples also rely upon Matplotlib, which is a Python plotting library that provides an easy way to visualize signals, arrays, and complex numbers.  Note that while Python is "slower" than C++ in general, many math functions are implemented in C/C++ and heavily optimized; the SDR API is simply a set of Python bindings for C++ functions/classes.
+Code examples are provided in Python.  They utilize NumPy, which is Python's standard library for arrays and high-level math.  The examples also rely upon Matplotlib, which is a Python plotting library that provides an easy way to visualize signals, arrays, and complex numbers.  Note that while Python is "slower" than C++ in general, many math functions within Python/NumPy are implemented in C/C++ and heavily optimized; the SDR API is simply a set of Python bindings for C/C++ functions/classes.
 
 
 ***************
@@ -53,7 +53,7 @@ Acknowledgements
 
 Thank you to anyone who has read any portion of this textbook and provided feedback, and especially to:
 
-- Barry Duggan (github.com/duggabe)
+- `Barry Duggan <http://github.com/duggabe>`_
 - Matthew Hannon
 - James Hayek
-
+- `Deidre Stuffer <http://kd9qgl.wordpress.com/>`_

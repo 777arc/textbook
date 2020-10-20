@@ -17,7 +17,7 @@ First, why do we like to look at signals in the frequency domain?  Well here are
    :scale: 40 %
    :align: center   
 
-As you can see, in the time domain they both just kind of look like noise, but in the frequency domain we can see different features.  Everything is in the time domain in it's nature form; when we sample signals we will be sampling them in the time domain, because you can't *directly* sample a signal in the frequency domain.  But the interesting stuff usually happens in the frequency domain. 
+As you can see, in the time domain they both just kind of look like noise, but in the frequency domain we can see different features.  Everything is in the time domain in its natural form; when we sample signals we will be sampling them in the time domain, because you can't *directly* sample a signal in the frequency domain.  But the interesting stuff usually happens in the frequency domain. 
 
 ***************
 Fourier Series
@@ -29,7 +29,7 @@ The basics of the frequency domain start with understanding that any signal can 
    :align: center
    :target: ../_static/summing_sinusoids.svg
    
-Here is another example; the red curve in the below approximates a sawtooth wave by summing up to five sine waves.  We can see that it's not a perfect reconstruction--it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
+Here is another example; the red curve in the below approximates a sawtooth wave by summing up to 10 sine waves.  We can see that it's not a perfect reconstruction--it would take an infinite number of sine waves to reproduce this sawtooth wave due to the sharp transitions:
 
 .. image:: ../_static/fourier_series_triangle.gif
    :scale: 70 %   
@@ -127,7 +127,7 @@ The above equation for the Fourier Transform is the continuous form, which you w
 .. math::
    X_k = \sum_{n=0}^{N-1} x_n e^{-\frac{j2\pi}{N}kn}
    
-Note that the main difference is we replaced the integral with a summation.  The index :math:`k` goes from 0 to N.  
+Note that the main difference is we replaced the integral with a summation.  The index :math:`k` goes from 0 to N-1.  
 
 It's OK if none of these equations mean much to you. We actually don't need to use them directly to do cool stuff with DSP and SDRs!
 
@@ -155,7 +155,7 @@ The term to the left of x(t) is what we call a "complex sinusoid" or "complex ex
    :align: center 
    :target: ../_static/freq-shift.svg
 
-Frequency shift is inteogral to DSP because we will want to shift signals up and down in frequency for many reasons. This property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
+Frequency shift is integral to DSP because we will want to shift signals up and down in frequency for many reasons. This property tells us how to do that (multiply by a sine wave).  Here's another way to visualize this property:
 
 .. image:: ../_static/freq-shift-diagram.svg
    :align: center
@@ -243,7 +243,7 @@ It is always the case; the output of the FFT will always show :math:`\text{-} f_
 Negative Frequencies
 ********************
 
-What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers)--there isn't really such thing as a "negative frequency". It's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
+What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers)--there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
 
 .. image:: ../_static/negative-frequencies2.svg
    :align: center
@@ -255,7 +255,7 @@ Now, when the SDR gives us the samples, it will appear like this:
    :align: center
    :target: ../_static/negative-frequencies3.svg
 
-Remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  It will make more sense when we sample and use our SDRs.
+Remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  It will make more sense when we learn more about sampling and use our SDRs.
 
 ****************************
 Order in Time Doesn't Matter

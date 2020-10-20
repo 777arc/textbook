@@ -44,8 +44,6 @@ In this section we will discuss and look at the Python code for simulating a non
         pulse[0] = bit*2-1 # set the first value to either a 1 or -1
         pulse_train = np.concatenate((pulse_train, pulse)) # add the 8 samples to the signal
 
-    original_data = x # save for plotting later
-
     # Create our raised-cosine filter
     num_taps = 101
     beta = 0.35
