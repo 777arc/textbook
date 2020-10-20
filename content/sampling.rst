@@ -4,64 +4,66 @@
 IQ Sampling
 ##################
 
-In this chapter we introduce a concept called IQ Sampling, a.k.a. complex sampling or quadrature sampling.  This is the form of sampling that an SDR performs, as well as many digital receivers (and transmitters) in general.  It's just a slightly more complex version of regular digital sampling (pun intended).  
+In this chapter we introduce a concept called IQ Sampling, a.k.a. complex sampling or quadrature sampling.  It is the form of sampling that an SDR performs, as well as many digital receivers (and transmitters).  It's just a slightly more complex version of regular digital sampling (pun intended).
 
 *************************
 Sampling Basics
 *************************
 
-We will first talk about sampling in general, before jumping into IQ sampling.  
+Before jumping into IQ sampling, let's discuss what sampling actually means. You may have encountered sampling without realizing it by recording audio with a microphone. The microphone is a transducer that converts sound waves into an electric signal (a voltage level). That electric signal is transformed by an analog-to-digital converter, producing a digital representation of the sound wave. To simplify, the microphone captures sound waves that are converted into electricity, and that electricity in turn is converted into numbers, be they floats or integers. SDRs are surprisingly similar. Instead of a microphone, however, they utilize an antenna. In both cases, the voltage level is sampled with an analog-to-digital converter. For SDRs, think radio waves in then numbers out.
 
-Whether we are dealing with audio or RF signals, we must sample if we want to capture and process or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  Sampling a signal simply means grabbing values at moments in time, and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
+Whether we are dealing with audio or radio frequencies, we must sample if we want to capture, process, or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  A more technical way to think of sampling a signal is grabbing values at moments in time and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
 
 .. image:: ../_static/sampling.svg
    :align: center 
 
-We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds.  :math:`S_n` represents sample :math:`n`, usually an integer starting at 0. Using this convention, that means the sampling process can be represented mathematically as :math:`S_n = S(nT)` for integer values of :math:`n`.  Our sampling frequency is simply :math:`\frac{1}{T}`.
-
-An example of sampling is recording audio with a microphone.  The mic is a transducer that converts sound waves into an electric signal (a voltage level). Our SDRs are similar except instead of a mic, we have an antenna.  In both cases the voltage level is sampled with an analog-to-digital converter.  What comes out is just a bunch of numbers, either floats or ints.
+We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds.  :math:`S_n` represents sample :math:`n`, usually an integer starting at 0. Using this convention, the sampling process can be represented mathematically as :math:`S_n = S(nT)` for integer values of :math:`n`.  Our sampling frequency, or the number of samples taken per second, is simply :math:`\frac{1}{T}`.
 
 *************************
 Nyquist Sampling
 *************************
 
-When we sample something, we need to be mindful of the sample period, i.e. the time between samples are taken.  If you calculate the inverse of the sample period, you will get the sample rate, which is usually what we will use when talking about SDRs.
+When we sample signals, we need to be mindful of the sample period, i.e., the time difference between samples.  If you calculate the inverse of the sample period, you will get the sample rate. Sample rate is another way to say sample frequency, and these terms can be used interchangeably. The sample rate is usually what we will use when talking about SDRs.
 
-For a given signal, the big question often is, how fast must we sample?  Let's look at a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs, samples shown in blue.  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
+For a given signal, the big question often is how fast must we sample?  Let's examine a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs (samples shown in blue).  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
 
 .. image:: ../_static/sampling_Fs_0.3.svg
    :align: center 
 
-The red shows a different (incorrect) function that could have lead to the same samples being recorded.  This indicates that our sample rate was too low, because the same samples could have come from two different functions, leading to ambiguity.  Let's try sampling a little faster, at Fs = 1.2f:
+The red dashed line in the above image reconstructs a different (incorrect) function that could have lead to the same samples being recorded. It indicates that our sample rate was too low because the same samples could have come from two different functions, leading to ambiguity. The sampling rate needs to enable us to accurately reconstruct the original signals.
+
+Let's try sampling a little faster, at Fs = 1.2f:
 
 .. image:: ../_static/sampling_Fs_0.36.svg
    :align: center 
 
-Once again, there is a different signal that could fit in these samples, and that ambiguity means that if someone gave us the list of samples, we wouldn't know which signal was the original one.  How about sampling at Fs = 1.5f:
+Once again, there is a different signal that could fit these samples. This ambiguity means that if someone gave us this list of samples, we could not distinguish which signal was the original one based on our sampling.
+
+How about sampling at Fs = 1.5f:
 
 .. image:: ../_static/sampling_Fs_0.45.svg
    :align: center 
 
-Still not fast enough.  It turns out you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:  
+Still not fast enough!  You have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
 
 .. image:: ../_static/sampling_Fs_0.6.svg
    :align: center 
 
-There's no incorrect signal this time, because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
+There's no incorrect signal this time because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
 
-Since most signals will have many frequency components to them, it's really "twice the frequency of the maximum frequency component" in our signal.  Here's a way to visualize that:
+Since most signals will have many frequency components to them, to accurately sample them the rate must be "twice the frequency of the maximum frequency component" in our signal.  Here's a way to visualize that:
 
 .. image:: ../_static/max_freq.png
    :scale: 70% 
    :align: center 
    
-So we must identify the highest one, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample, is known as the Nyquist Rate.  I.e., the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  This is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
+We must identify the highest frequency component, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample is known as the Nyquist Rate.  In other words, the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  It is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
 
 .. image:: ../_static/nyquist_rate.png
    :scale: 70% 
    :align: center 
 
-If we don't sample fast enough we get something called aliasing, which we will learn about later, but we try to avoid it at all costs.  What our SDRs do (and most receivers in general), is filter out everything above Fs/2 right before the sampling is performed. So if we attempt to receive a signal with too low a sample rate, that filter will chop off part of the signal.  Our SDRs go to great lengths to provide us with samples free of aliasing and other imperfections.
+If we don't sample fast enough we get something called aliasing, which we will learn about later, but we try to avoid it at all costs.  What our SDRs do (and most receivers in general) is filter out everything above Fs/2 right before the sampling is performed. If we attempt to receive a signal with too low a sample rate, that filter will chop off part of the signal.  Our SDRs go to great lengths to provide us with samples free of aliasing and other imperfections.
 
 *************************
 Quadrature Sampling
