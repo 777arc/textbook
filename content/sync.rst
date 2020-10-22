@@ -141,7 +141,7 @@ The following Python code implements the Mueller and Muller clock recovery techn
     i_in = 0 # input samples index
     i_out = 2 # output index (let first two outputs be 0)
     while i_out < len(samples) and i_in < len(samples):
-        out[i_out] = samples_interpolated[i_in + int(mu)] # grab what we think is the "best" sample
+        out[i_out] = samples[i_in + int(mu)] # grab what we think is the "best" sample
         out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
         x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
         y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
@@ -179,7 +179,7 @@ One thing usually done by a symbol synchronizer like this, that we didn't do in 
 
 Go ahead and enable the fractional time delay that we implemented at the beginning of this chapter, so that our received signal has a more realistic delay.  Leave the frequency offset disabled for now.  If you re-run the simulation, you'll find that the synchronizer fails to fully synchronize to the signal, and that's because we aren't interpolating, so it has no way to "sample between samples" to make up for the fractional delay.   Let's add in the interpolation to deal with this.
 
-A quick way to interpolate a signal in Python is to use scipy's :code:`signal.resample` or :code:`signal.resample_poly`, they both do the same thing but work differently under the hood, we will use the latter because it tends to be faster.  Let's interpolate by 16, i.e. we will be inserting 15 extra samples between each sample.  This can be done in one line, but let's also plot the before and after to see the difference:
+A quick way to interpolate a signal in Python is to use scipy's :code:`signal.resample` or :code:`signal.resample_poly`, they both do the same thing but work differently under the hood, we will use the latter because it tends to be faster.  Let's interpolate by 16, i.e. we will be inserting 15 extra samples between each sample.  This can be done in one line, and it should happen *before* we go to perform time sync (i.e., before the large code snippet above).  Let's also plot the before and after to see the difference:
 
 .. code-block:: python
 
@@ -198,11 +198,11 @@ If we zoom *way* in, we see that it's the same signal, but with 16x as many poin
    :align: center
    :target: ../_static/time-sync-interpolated-samples.svg
 
-Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear, these extra samples will let us take into account a fraction of a sample delay. To actually use this in our time synchronizer, we only have to modify one line, the first line inside the while loop:
+Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear, these extra samples will let us take into account a fraction of a sample delay. To actually use this in our time synchronizer, we only have to modify one line; change the first line inside the while loop to become:
 
 .. code-block:: python
 
- out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # grab what we think is the "best" sample
+ out[i_out] = samples_interpolated[i_in*16 + int(mu*16)]
 
 We did a couple things here.  First, we can't just use :code:`i_in` as the input sample index anymore, we have to multiply it by 16 because we interpolated our input samples by 16.  Recall that :code:`mu` is the variable the feedback loop is adjusting, it represents the delay that leads to us sampling at the right moment.  Also recall that after we calculated the new value of :code:`mu`, we added the integer part to :code:`i_in`.  Well now we are going to use the remainder part, which is a float from 0 to 1, and it represents the fraction of a sample we need to delay by.  Before we weren't able to delay by a fraction of a sample, but now we are, at least in increments of 16ths of a sample.  So what we do is multiply :code:`mu` by 16, to figure out how many samples of our interpolated signal we need to delay by.  And then we have to round that number, since the value in the brackets ultimately is an index and must be an integer.  If this paragraph didn't make sense, try to go back to the initial Mueller and Muller clock recovery code, and also read the comments next to each line of code.
 
