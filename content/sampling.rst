@@ -69,7 +69,7 @@ If we don't sample fast enough we get something called aliasing, which we will l
 Quadrature Sampling
 *************************
 
-The term "quadrature" has many meanings, but in the context of DSP and SDR it refers to two waves that are 90 degrees out of phase.  Why 90 degrees out of phase?  Well we will see first hand, but first consider how two waves that are 180 degrees out of phase are essentially the same wave, with one multiplied by -1. By being 90 degrees out of phase they become orthogonal, and there's a lot of cool stuff you can do with orthogonal functions.  For the sake of simplicity, we use sine and cosine as our two sine waves that are 90 degrees out of phase.
+The term "quadrature" has many meanings, but in the context of DSP and SDR it refers to two waves that are 90 degrees out of phase.  Why 90 degrees out of phase?  Consider how two waves that are 180 degrees out of phase are essentially the same wave with one multiplied by -1. By being 90 degrees out of phase they become orthogonal, and there's a lot of cool stuff you can do with orthogonal functions.  For the sake of simplicity, we use sine and cosine as our two sine waves that are 90 degrees out of phase.
 
 Next let's assign variables to represent the **amplitude** of the sine and cosine.  We will use :math:`I` for the cos() and :math:`Q` for the sin():
 
@@ -87,57 +87,57 @@ We can see this visually by plotting I and Q equal to 1:
 
 We call the cos() the "in phase" component, hence the name I, and the sin() is the 90 degrees out of phase or "quadrature" component, hence Q.  Although if you accidentally mix it up and assign Q to the cos() and I to the sin(), it won't make a difference for most situations. 
 
-IQ sampling is more easily understood by using the transmitter's point of view, i.e. considering the task of transmitting an RF signal through the air.  What we do as the transmitter is add the sin() and cos().  Let's say x(t) is our signal to transmit:
+IQ sampling is more easily understood by using the transmitter's point of view, i.e., considering the task of transmitting a RF signal through the air.  What we do as the transmitter is add the sin() and cos().  Let's say x(t) is our signal to transmit:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
 
-What happens when we add a sin and cosine?  Or rather, what happens when we add two sinusoids that are 90 degrees out of phase?  In the video below, there is a slider for adjusting I and another for adjusting Q.  What is plotted are the cos, sin, and then the sum of the two.  
+What happens when we add a sine and cosine?  Or rather, what happens when we add two sinusoids that are 90 degrees out of phase?  In the video below, there is a slider for adjusting I and another for adjusting Q.  What is plotted are the cosine, sine, and then the sum of the two.
 
 .. image:: ../_static/IQ.gif
    :scale: 100% 
    :align: center 
 
-The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude. Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cos or sin).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this is extremely useful, because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
+The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude. Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cosine or sine).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this ability is extremely useful because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition operation compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
 
 .. image:: ../_static/IQ_diagram.png
    :scale: 80% 
    :align: center 
 
-We only need to generate one sine wave, and then just shift it by 90 degrees to get the Q portion.  
+We only need to generate one sine wave and shift it by 90 degrees to get the Q portion.
 
 *************************
 Complex Numbers
 *************************
 
-Ultimately, the IQ convention is just an alternative way of representing magnitude and phase, which brings us to complex numbers and the complex plane.  You may have seen this before in other classes.  We can represent a single complex number of a complex plane.  Let's take the complex number 0.7-0.4j as an example:
+Ultimately, the IQ convention is an alternative way to represent magnitude and phase, which leads us to complex numbers and the ability to represent them on a complex plane.  You may have seen complex numbers before in other classes. Take the complex number 0.7-0.4j as an example:
 
 .. image:: ../_static/complex_plane_1.png
    :scale: 70% 
    :align: center
 
-A complex number is really just two numbers together, a real and an imaginary portion.  But a complex number also has a magnitude and phase, which makes more sense if you think about it as a vector instead of a point. Magnitude is the length of the line between the origin and the point (i.e. length of the vector), while phase is the angle between the vector and 0 degrees, which we define as the positive real axis:
+A complex number is really just two numbers together, a real and an imaginary portion. A complex number also has a magnitude and phase, which makes more sense if you think about it as a vector instead of a point. Magnitude is the length of the line between the origin and the point (i.e., length of the vector), while phase is the angle between the vector and 0 degrees, which we define as the positive real axis:
 
 .. image:: ../_static/complex_plane_2.png
    :scale: 70% 
    :align: center
 
-This is sometimes called a "phasor diagram" which sounds more complicated than it is.  It's really just plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
+This representation of a sinsoid is known as a "phasor diagram".  It's simply plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
 
 .. math::
   \mathrm{magnitude} = \sqrt{a^2 + b^2} = 0.806
   
   \mathrm{phase} = \tan^{-1} \left( \frac{b}{a} \right) = -29.7^{\circ} = -0.519 \quad \mathrm{radians} 
   
-In Python you can just use np.abs(x) and np.angle(x) for the magnitude and phase, the input can be a single complex number or an array of complex numbers, and the output will be a **real** number(s), i.e. floats. 
+In Python you can use np.abs(x) and np.angle(x) for the magnitude and phase. The input can be a complex number or an array of complex numbers, and the output will be a **real** number(s) (of the data type float).
 
-You may have figured out by now how this related back to IQ convention.  Well it's simple; I is real and Q is imaginary.  From this point on, when we draw the complex plane, we will label it with I and Q instead of real and imaginary.  They are still complex numbers!
+You may have figured out by now how this vector or phasor diagram relates to IQ convention: I is real and Q is imaginary.  From this point on, when we draw the complex plane, we will label it with I and Q instead of real and imaginary.  They are still complex numbers!
 
 .. image:: ../_static/complex_plane_3.png
    :scale: 70% 
    :align: center
 
-Now let's say we want to transmit our example point 0.7-0.4j.  This means we will be transmitting:
+Now let's say we want to transmit our example point 0.7-0.4j.  We will be transmitting:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
@@ -146,29 +146,33 @@ Now let's say we want to transmit our example point 0.7-0.4j.  This means we wil
   
   \quad = 0.806 \cos(2\pi ft - 0.519)
 
-So even though we started with a complex number, what we are actually transmitting is real, which is good because you can't actually transmit something imaginary with electromagnetic waves.  We just use imaginary/complex numbers to represent *what* we are transmitting.  We will talk about the :math:`f` shortly.  
+Even though we started with a complex number, what we are transmitting is real, which is good because you can't actually transmit something imaginary with electromagnetic waves.  We just use imaginary/complex numbers to represent *what* we are transmitting.  We will talk about the :math:`f` shortly.
 
 
 *************************
 Receiver Side
 *************************
 
-Now let's reverse everything and take the perspective of a radio receiver, that is trying to receive a signal (e.g. an FM radio signal).  Using IQ sampling, the diagram now looks like:
+Now let's take the perspective of a radio receiver that is trying to receive a signal (e.g., an FM radio signal).  Using IQ sampling, the diagram now looks like:
 
 .. image:: ../_static/IQ_diagram_rx.png
    :scale: 70% 
    :align: center
 
-What comes in is a real signal that was received by our antenna, and what comes out are IQ values.  What we do is sample the I and Q branch individually, using two analog to digital converters (ADCs), and then we combine the pairs and store them as complex numbers.  In other words, at each time step, you will sample one I value and one Q value, and combine them in the form :math:`I + jQ`, i.e. one complex number per IQ sample.  There will always be a "sample rate", the rate sampling is performed.  For example, someone might say "I have an SDR running at 2 MHz sample rate" which just means it's receiving two million IQ samples per second.  If someone gives you a bunch of IQ samples, it will look like a 1D array/vector of complex numbers.  This is pretty much what this entire chapter has been leading up to, and we finally made it.  Throughout this textbook you will become **very** familiar with how IQ samples work, how to receive and transmit them with an SDR, how to process them in Python, and how to save them to a file for later analysis.  
+What comes in is a real signal received by our antenna, and those are transformed into IQ values.  What we do is sample the I and Q branches individually, using two analog-to-digital converters (ADCs), and then we combine the pairs and store them as complex numbers.  In other words, at each time step, you will sample one I value and one Q value and combine them in the form :math:`I + jQ` (i.e., one complex number per IQ sample).  There will always be a "sample rate", the rate at which sampling is performed.  Someone might say, "I have an SDR running at 2 MHz sample rate." What they mean is that the SDR receives two million IQ samples per second.
 
-One last important note: the figure above shows what's happening **inside** of the SDR, we don't actually have to generate a sine wave, shift by 90, multiply or add, the SDR does that for us.  We tell the SDR what frequency we want to sample at, or what frequency we want to transmit our samples at.  On the receiver side, the SDR will provide us the IQ samples, and then for the transmitting side we have to provide the SDR the IQ samples.  In terms of data type, they will either be complex ints or floats.  
+If someone gives you a bunch of IQ samples, it will look like a 1D array/vector of complex numbers.  This point, complex or not, is what this entire chapter has been building to, and we finally made it.
+
+Throughout this textbook you will become **very** familiar with how IQ samples work, how to receive and transmit them with an SDR, how to process them in Python, and how to save them to a file for later analysis.
+
+One last important note: the figure above shows what's happening **inside** of the SDR. We don't actually have to generate a sine wave, shift by 90, multiply or add--the SDR does that for us.  We tell the SDR what frequency we want to sample at, or what frequency we want to transmit our samples at.  On the receiver side, the SDR will provide us the IQ samples. For the transmitting side, we have to provide the SDR the IQ samples.  In terms of data type, they will either be complex ints or floats.
 
 
 **************************
 Receiver Architectures
 **************************
 
-In the figure above we see how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion" or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to just not downconvert at all, and sample so fast that it captures everything from 0 Hz to 1/2 the sample rate.  This is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne", and it involves downconversion, but not all the way to 0 Hz, it places the signal of interest at an intermediate frequency, known as "IF".  Here are the block diagrams of these three architectures:
+The figure in the above "Receiver Side" section demonstrates how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion", or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to not downconvert at all and sample so fast to capture everything from 0 Hz to 1/2 the sample rate.  This strategy is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC operation.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne". It involves downconversion but not all the way to 0 Hz. It places the signal of interest at an intermediate frequency, known as "IF".  Here are the block diagrams of these three architectures:
 
 .. image:: ../_static/receiver_arch_diagram.svg
    :align: center
@@ -178,34 +182,36 @@ In the figure above we see how the input signal is downconverted and split into 
 Carrier and Downconversion
 **************************
 
-Up until this point we really didn't talk about frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air, so the electromagnetic wave's frequency.  We call this the "carrier", because it carries our information (stored in I and Q) on a certain frequency. 
+Until this point we have not discussed frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air (the electromagnetic wave's frequency).  We refer to it as the "carrier" because it carries our information (stored in I and Q) on a certain frequency.
 
 .. image:: ../_static/carrier.png
    :scale: 70% 
    :align: center
    
-Just for reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc, usually use a frequency (i.e. a carrier) between 100 MHz and 6 GHz.  These frequencies travel really well through the air, but don't require super long antennas or a ton of power.  Your microwave cooks food with electromagnetic waves that are at 2.4 GHz, and if there is a leak in the door then your microwave will jam WiFi signals, and possibly also burn your skin.  Another form of electromagnetic waves is light, and visible light has a frequency of around 500 THz.  It's so high that we don't use traditional antennas to transmit light, we use other methods like LEDs that are semiconductor devices, that create light when electrons jump in between the atomic orbits of the semiconductor material.  Technically, radio frequency (RF) is defined as the range from roughly 20 kHz to 300 GHz, because these are the frequencies at which energy from an oscillating electric current can radiate off a conductor and travel through space.  But the 100 MHz to 6 GHz range are the more useful frequencies, at least for most modern applications.  Frequencies above 6 GHz have been used for radar and satellite communications for decades, but are now also being used in 5G "mmWave" (24 - 29 GHz) to supplement the lower bands.  
+For reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc., usually use a frequency (i.e., a carrier) between 100 MHz and 6 GHz.  These frequencies travel really well through the air, but they don't require super long antennas or a ton of power to transmit or receive.  Your microwave cooks food with electromagnetic waves at 2.4 GHz. If there is a leak in the door then your microwave will jam WiFi signals and possibly also burn your skin.  Another form of electromagnetic waves is light. Visible light has a frequency of around 500 THz.  It's so high that we don't use traditional antennas to transmit light. We use  methods like LEDs that are semiconductor devices. They create light when electrons jump in between the atomic orbits of the semiconductor material.  Technically, radio frequency (RF) is defined as the range from roughly 20 kHz to 300 GHz. These are the frequencies at which energy from an oscillating electric current can radiate off a conductor and travel through space.  The 100 MHz to 6 GHz range are the more useful frequencies, at least for most modern applications.  Frequencies above 6 GHz have been used for radar and satellite communications for decades. Now 5G "mmWave" (24 - 29 GHz) supplements the lower bands.
 
-When we change our IQ values really quickly and transmit our carrier, it's called "modulating" the carrier (with data or whatever we want).  Because when we change I and Q, we are changing the phase and amplitude of the carrier.  A third option is to change the frequency of the carrier, i.e. shift it slightly up or down, which is what FM radio does. 
+When we change our IQ values quickly and transmit our carrier, it's called "modulating" the carrier (with data or whatever we want).  When we change I and Q, we change the phase and amplitude of the carrier.  Another option is to change the frequency of the carrier, i.e., shift it slightly up or down, which is what FM radio does. 
 
-As a simple example, lets say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  I.e. we go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`.  All that happens is our carrier shifts phase by 90 degrees when we switch from one sample to another. 
+As a simple example, let's say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  We go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`.  What happens is our carrier shifts phase by 90 degrees when we switch from one sample to another.
 
-Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin(), then recording I and Q, what if we just fed the signal from the antenna straight into a single analog to digital converter, like in the direct sampling architecture we just discussed?  Well let's say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  Well that's extremely fast, and an ADC that samples that fast costs thousands of dollars.  So what we do instead is "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz, this happens before we do the sampling.  We go from:
+Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin() then recording I and Q, what if we fed the signal from the antenna into a single analog-to-digital converter, like in the direct sampling architecture we just discussed?  Say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  That's extremely fast! An ADC that samples that fast costs thousands of dollars.  Instead, we "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz. This downconversion happens before we sample.  We go from:
 
 .. math::
   I \cos(2\pi ft)
   
   Q \sin(2\pi ft)
   
-to just I and Q.  Let's visualize this in the frequency domain:
+to just I and Q.
+
+Let's visualize downconversion in the frequency domain:
 
 .. image:: ../_static/downconversion.png
    :scale: 60% 
    :align: center
 
-When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz, but is simply based on the signal's characteristics, because we have removed the carrier.  Most signals are around 100 kHz to 20 MHz wide in bandwidth, so we are talking about sampling at a much much lower rate.  The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
+When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 20 MHz wide in bandwidth, so through downconversion we are sampling at a much much lower rate.  The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
 
-Once again, this downconverting process is done by our SDR, as a user of the SDR we don't have to do anything other than tell it what frequency to tune to.  
+The downconversion process is performed by our SDR. As a user of the SDR we don't have to do anything other than tell it which frequency to tune to.
 
 *************************
 Baseband
