@@ -209,67 +209,64 @@ Let's visualize downconversion in the frequency domain:
    :scale: 60% 
    :align: center
 
-When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we are sampling at a much much lower rate.  The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
+When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we are sampling at a much much lower rate. It is like transposing music, where you place a melody in a different key. The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
 
 Just to reiterate, the downconversion process is performed by our SDR; as a user of the SDR we don't have to do anything other than tell it which frequency to tune to.
 
 *************************
-Baseband
+Baseband and Bandpass Transmissions
 *************************
-When we discuss a signal centered around 0 Hz, we refer to this as "baseband". The opposite of baseband is called "bandpass", when a signal exists at some RF frequency, no where near 0 Hz.  A signal at baseband might be perfectly centered around 0 Hz like the right-hand portion of the figure above, or it might just be *near* 0 Hz, like the two signals shown below, which are still considered baseband.   Also shown is an example bandpass signal, centered at some very high frequency, denoted :math:`f_c`.  
+We refer to a signal centered around 0 Hz, i.e., without a shift in its frequency and without modulation, as the "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz that has been shifted.  (You may see bandpass used interchangeably with the term "passband".) A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
 
 .. image:: ../_static/baseband_bandpass.png
    :scale: 50% 
    :align: center
 
-You may also hear the term IF, which stands for intermediate frequency; for now think of this as some point in between baseband and bandpass/RF that the signal is converted to as an intermediate step inside a radio.
+You may also hear the term intermediate frequency (abbreviated as IF); for now, think of IF as an intermediate conversion step within a radio between baseband and bandpass/RF.
 
-When we create, record, or analyze signals, we usually do it at baseband, because we can work at a lower sample rate (for reasons discussed in the previous subsection).  It is also important to note that baseband signals are often complex signals, while signals at bandpass (e.g. signals we actually transmit over RF) are real.  This makes sense, because the signal fed through an antenna must be real, you cannot directly transmit a complex/imaginary signal.  You will know a signal is definitely a complex signal if the negative frequency and positive frequency portions of the signal are not exactly the same, complex numbers are how we represent negative frequencies after all.  In reality there is no negative frequencies, it's just the portion of the signal that happened to be below the carrier frequency. 
+We tend to create, record, or analyze signals at baseband because we can work at a lower sample rate (for reasons discussed in the previous subsection).  It is important to note that baseband signals are often complex signals, while signals at bandpass (e.g., signals we actually transmit over RF) are real.  Think about it: because the signal fed through an antenna must be real, you cannot directly transmit a complex/imaginary signal.  You will know a signal is definitely a complex signal if the negative frequency and positive frequency portions of the signal are not exactly the same. Complex numbers are how we represent negative frequencies after all.  In reality there are no negative frequencies; it's just the portion of the signal below the carrier frequency.
 
 ***************************
 DC Spike and Offset Tuning
 ***************************
 
-Soon after you start playing around with SDRs, you will find that often, there will be a large spike in the center of the FFT.
-This is called a "DC offset" or "DC spike" or sometimes "LO leakage".  Here's an example:
+Once you start working with SDRs, you will often find a large spike in the center of the FFT.
+It is called a "DC offset" or "DC spike" or sometimes "LO leakage".
+
+Here's an example of a DC spike:
 
 .. image:: ../_static/dc_spike.png
    :scale: 50% 
    :align: center
    
-Remember that because the SDR tunes to a center frequency, the 0 Hz portion of the FFT really corresponds to the center frequency.
+Because the SDR tunes to a center frequency, the 0 Hz portion of the FFT corresponds to the center frequency.
 That being said, a DC spike doesn't necessarily mean there is energy at the center frequency.
 If there is only a DC spike, and the rest of the FFT looks like noise, there is most likely not actually a signal present where it is showing you one.
 
-A DC offset is a common artifact in direct conversion receivers, which is the architecture used for SDRs like the PlutoSDR, RTL-SDR, LimeSDR, and many Ettus USRPs.
-In direct conversion receivers, there is an oscillator called the LO, which is used to down-convert the signal from its actual frequency to baseband.
-As a result, leakage from this LO will show up in the center of the observed bandwidth.
-Many RF integrated circuits (RFICs) have built-in automatic DC offset removal, but it typically requires a signal to be present to work.
-That is why the DC spike will be very apparent when no signals are present.
+A DC offset is a common artifact in direct conversion receivers, which is the architecture used for SDRs like the PlutoSDR, RTL-SDR, LimeSDR, and many Ettus USRPs. In direct conversion receivers, an oscillator, the LO, downconverts the signal from its actual frequency to baseband. As a result, leakage from this LO appears in the center of the observed bandwidth. LO leakage is additional energy created through the combination of frequencies. Removing this extra noise is difficult because it is close to the desired output signal. Many RF integrated circuits (RFICs) have built-in automatic DC offset removal, but it typically requires a signal to be present to work. That is why the DC spike will be very apparent when no signals are present.
 
-A quick way around the DC offset issue is to oversample the signal and off-tune. 
-As an example, lets say we want to view 5 MHz of spectrum at 100 MHz. 
-Instead what we can do is sample at 20 MHz, at a center frequency of 95 MHz. 
+A quick way to handle the DC offset is to oversample the signal and off-tune it.
+As an example, let's say we want to view 5 MHz of spectrum at 100 MHz.
+Instead what we can do is sample at 20 MHz at a center frequency of 95 MHz.
 
 .. image:: ../_static/offtuning.png
    :scale: 40 %
    :align: center
    
-The blue box above shows what is actually sampled by the SDR, and then the green box shows the piece of spectrum we want.  Our LO will be set to 95 MHz because that is the frequency we ask the SDR to tune to, which is outside of the green box, so we won't get any DC spike inside our green box.  
+The blue box above shows what is actually sampled by the SDR, and the green box displays the portion of the spectrum we want.  Our LO will be set to 95 MHz because that is the frequency to which we ask the SDR to tune. Since 95 MHz is outside of the green box, we won't get any DC spike.
 
-There is only one problem: if we want our signal to actually be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample ourselves (something we will learn how to do later).
-Fortunately, this process of offtuning, a.k.a applying an LO offset, is often built into the SDRs, where they will automatically do the offtuning and then shift the frequency to your desired center frequency automatically.  It's great when the SDR can do it internally because it means we don't have to send a higher sample rate over our USB or ethernet connection, which is usually the bottleneck for how high a sample rate we can use.  
+There is one problem: if we want our signal to be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample the signal ourselves (something we will learn how to do later). Fortunately, this process of offtuning, a.k.a applying an LO offset, is often built into the SDRs, where they will automatically perform offtuning and then shift the frequency to your desired center frequency.  We benefit when the SDR can do it internally: we don't have to send a higher sample rate over our USB or ethernet connection, which bottleneck sample rates.
 
-This subsection discussing DC offsets is a good example of where this textbook differs from others, your average DSP textbook will discuss sampling, but it would never include such a specific topic as DC offsets, despite how often it causes problems when using SDRs.
+This subsection regarding DC offsets is a good example of where this textbook differs from others. Your average DSP textbook will discuss sampling, but it tends not to include implementation hurdles such as DC offsets despite their prevalence in practice.
    
 
 ****************************
 Sampling Using the PlutoSDR
 ****************************
 
-Sampling using the PlutoSDR's Python API is pretty straightforward.  With any SDR app we know we must tell the SDR the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three are necessary for the SDR to have enough information to do anything.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will just start sampling as soon as you initialize it, and just drop the samples as the buffer fills up. All SDR APIs have some sort of "receive samples" function, for the Pluto it's rx(), and it returns a certain number of samples, defined by the buffer size that was set beforehand.
+Sampling using the PlutoSDR's Python API is straightforward.  With any SDR app we know we must tell it the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three components are necessary for the SDR to have enough information to process any signal.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will start to sample as soon as you initialize it. These samples are dropped as the buffer fills.  All SDR APIs have some sort of "receive samples" function, and for the Pluto it's rx(), which returns a number of samples defined by the buffer size set beforehand.
 
-Refer to the :ref:`pluto-chapter` chapter for installing the software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, center frequency to 100 MHz, and gain to 50 dB, with automatic gain control turned off.  It usually doesn't matter what order you set the center frequency, gain, and sample rate.  We tell the Pluto that we want it to give us 10,000 samples per call to rx().  
+Refer to the :ref:`pluto-chapter` chapter for installing the PlutoSDR software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, sets the center frequency to 100 MHz, and sets the gain to 50 dB with automatic gain control turned off.  Note it usually doesn't matter the order in which you set the center frequency, gain, and sample rate.  In the code snippet below, we tell the Pluto that we want it to give us 10,000 samples per call to rx().
 
 .. code-block:: python
 
@@ -292,7 +289,7 @@ Refer to the :ref:`pluto-chapter` chapter for installing the software.  The code
     print(samples)
 
 
-For now we aren't going to do anything interesting with these samples.  Throughout this whole textbook we will swap between pure-Python examples, and Python examples that include PlutoSDR code.  The PlutoSDR examples are written such that it should be straightforward to substitute in a different SDR's Python API.
+For now we aren't going to do anything interesting with these samples.  This textbook will switch between pure-Python PlutoSDR Python code.  The PlutoSDR examples are written such that it should be straightforward to substitute in a different SDR's Python API. In other words, the code examples are meant to reinforce principles rather than specific techniques.
 
 
 *************************
