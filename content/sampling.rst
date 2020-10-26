@@ -122,7 +122,7 @@ A complex number is really just two numbers together, a real and an imaginary po
    :scale: 70% 
    :align: center
 
-This representation of a sinsoid is known as a "phasor diagram".  It's simply plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
+This representation of a sinusoid is known as a "phasor diagram".  It's simply plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
 
 .. math::
   \mathrm{magnitude} = \sqrt{a^2 + b^2} = 0.806
@@ -209,14 +209,14 @@ Let's visualize downconversion in the frequency domain:
    :scale: 60% 
    :align: center
 
-When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we are sampling at a much much lower rate. It is like transposing music, where you place a melody in a different key. The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
+When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we can sample at a *much* lower rate. The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
 
 Just to reiterate, the downconversion process is performed by our SDR; as a user of the SDR we don't have to do anything other than tell it which frequency to tune to.
 
-*************************
+***********************************
 Baseband and Bandpass Transmissions
-*************************
-We refer to a signal centered around 0 Hz, i.e., without a shift in its frequency and without modulation, as the "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz that has been shifted.  (You may see bandpass used interchangeably with the term "passband".) A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
+***********************************
+We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz, that has been shifted up for the purpose of wireless transmission.  A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
 
 .. image:: ../_static/baseband_bandpass.png
    :scale: 50% 
@@ -255,16 +255,16 @@ Instead what we can do is sample at 20 MHz at a center frequency of 95 MHz.
    
 The blue box above shows what is actually sampled by the SDR, and the green box displays the portion of the spectrum we want.  Our LO will be set to 95 MHz because that is the frequency to which we ask the SDR to tune. Since 95 MHz is outside of the green box, we won't get any DC spike.
 
-There is one problem: if we want our signal to be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample the signal ourselves (something we will learn how to do later). Fortunately, this process of offtuning, a.k.a applying an LO offset, is often built into the SDRs, where they will automatically perform offtuning and then shift the frequency to your desired center frequency.  We benefit when the SDR can do it internally: we don't have to send a higher sample rate over our USB or ethernet connection, which bottleneck sample rates.
+There is one problem: if we want our signal to be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample the signal ourselves (something we will learn how to do later). Fortunately, this process of offtuning, a.k.a applying an LO offset, is often built into the SDRs, where they will automatically perform offtuning and then shift the frequency to your desired center frequency.  We benefit when the SDR can do it internally: we don't have to send a higher sample rate over our USB or ethernet connection, which bottleneck how high a sample rate we can use.
 
 This subsection regarding DC offsets is a good example of where this textbook differs from others. Your average DSP textbook will discuss sampling, but it tends not to include implementation hurdles such as DC offsets despite their prevalence in practice.
-   
+
 
 ****************************
 Sampling Using the PlutoSDR
 ****************************
 
-Sampling using the PlutoSDR's Python API is straightforward.  With any SDR app we know we must tell it the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three components are necessary for the SDR to have enough information to process any signal.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will start to sample as soon as you initialize it. These samples are dropped as the buffer fills.  All SDR APIs have some sort of "receive samples" function, and for the Pluto it's rx(), which returns a number of samples defined by the buffer size set beforehand.
+Sampling using the PlutoSDR's Python API is straightforward.  With any SDR app we know we must tell it the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three parameters are necessary for the SDR to have enough information to receive samples.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will start to sample as soon as you initialize it. Once the SDR's internal buffer fills up, the oldest samples are dropped.  All SDR APIs have some sort of "receive samples" function, and for the Pluto it's rx(), which returns a batch of samples.  The specific number of samples per batch is defined by the buffer size set beforehand.
 
 Refer to the :ref:`pluto-chapter` chapter for installing the PlutoSDR software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, sets the center frequency to 100 MHz, and sets the gain to 50 dB with automatic gain control turned off.  Note it usually doesn't matter the order in which you set the center frequency, gain, and sample rate.  In the code snippet below, we tell the Pluto that we want it to give us 10,000 samples per call to rx().
 
@@ -289,7 +289,7 @@ Refer to the :ref:`pluto-chapter` chapter for installing the PlutoSDR software. 
     print(samples)
 
 
-For now we aren't going to do anything interesting with these samples.  This textbook will switch between pure-Python PlutoSDR Python code.  The PlutoSDR examples are written such that it should be straightforward to substitute in a different SDR's Python API. In other words, the code examples are meant to reinforce principles rather than specific techniques.
+For now we aren't going to do anything interesting with these samples.  Throughout this textbook we will swap between pure-Python examples and Python examples that include PlutoSDR code.  The PlutoSDR examples are written such that it should be straightforward to substitute in a different SDR's Python API. In other words, the code examples are meant to reinforce principles rather than specific techniques.
 
 
 *************************
