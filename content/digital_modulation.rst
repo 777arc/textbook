@@ -4,20 +4,20 @@
 Digital Modulation
 ###################
 
-In this chapter we are going to discuss *actually transmitting data*!  We will design signals that convey "information", i.e. 1's and 0's.  The main goal of modulation is to squeeze as much data into the least amount of spectrum possible.  Technically speaking we want to maximize "spectral efficiency", in units bits/sec/Hz.  Transmitting 1's and 0's faster will increase the bandwidth of our signal (recall Fourier properties), which means more spectrum is used, so we will also look at other techniques besides just transmitting faster.  Because of this, there will be a lot of trade-offs, but there will also be room for creativity.
+In this chapter we will discuss *actually transmitting data*!  We will design signals that convey "information", i.e., 1s and 0s.  The main goal of modulation is to squeeze as much data into the least amount of spectrum possible.  Technically speaking we want to maximize "spectral efficiency" in units bits/sec/Hz.  Transmitting 1s and 0s faster will increase the bandwidth of our signal (recall Fourier properties), which means more spectrum is used. We will also examine other techniques besides transmitting faster.  There will be many trade-offs when deciding how to modulate, but there will also be room for creativity.
 
 *******************
 Symbols
 *******************
-New term alert!  Our transmit signal is going to be made up of "symbols".  Each symbol will carry some number of bits of information, and we will transmit symbols back-to-back, thousands or even millions in a row. 
+Term alert!  Our transmit signal is going to be made up of "symbols".  Each symbol will carry some number of bits of information, and we will transmit symbols back to back, thousands or even millions in a row.
 
-As a simplified example, let's say we have a wire and are sending 1's and 0's using high and low voltage levels.  A symbol is one of those 1's or 0's:
+As a simplified example, let's say we have a wire and are sending 1s and 0s using high and low voltage levels.  A symbol is one of those 1s or 0s:
 
 .. image:: ../_static/symbols.png
    :scale: 60 % 
    :align: center 
 
-In the above example each symbol represents one bit.  How can we convey more than one bit per symbol?  Let's look at the signals that travel down Ethernet cables, which is defined in an IEEE standard called IEEE 802.3 1000BASE-T.  The common operating mode of ethernet uses a 4-level amplitude modulation (2 bits per symbol) with 8 ns symbols.  
+In the above example each symbol represents one bit.  How can we convey more than one bit per symbol?  Let's study the signals that travel down Ethernet cables, which is defined in an IEEE standard called IEEE 802.3 1000BASE-T.  The common operating mode of ethernet uses a 4-level amplitude modulation (2 bits per symbol) with 8 ns symbols.
 
 .. image:: ../_static/ethernet.svg
    :align: center 
@@ -25,9 +25,9 @@ In the above example each symbol represents one bit.  How can we convey more tha
 
 Take a moment to try to answer these questions:
 
-1. How many bits per second are transmitted in the example shown below?
+1. How many bits per second are transmitted in the example shown above?
 2. How many pairs of these data wires would be needed to transmit 1 gigabit/sec?
-3. If a modulation scheme had 16 different levels, how many bits per symbol is that?
+3. If a modulation scheme has 16 different levels, how many bits per symbol is that?
 4. With 16 different levels and 8 ns symbols, how many bits per second is that?
 
 .. raw:: html
@@ -47,18 +47,18 @@ Take a moment to try to answer these questions:
 *******************
 Wireless Symbols
 *******************
-Question- Why can’t we directly transmit the ethernet signal shown in the figure above?  There are many reasons, the biggest two being:
+Question: Why can’t we directly transmit the ethernet signal shown in the figure above?  There are many reasons, the biggest two being:
 
 1. Low frequencies require *huge* antennas
-2. Square waves take an excessive amount of spectrum for the bits per second, recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
+2. Square waves take an excessive amount of spectrum for the bits per second--recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
 
 .. image:: ../_static/square-wave.svg
    :align: center 
    :target: ../_static/square-wave.svg
    
-What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g. FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many ways).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.  
+What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g., FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.
 
-In what ways can we modulation the carrier?  Well what are the different properties of a sinusoid?
+In what ways can we modulate the carrier?  Another way to ask the same question: what are the different properties of a sinusoid?
 
 1. Amplitude
 2. Phase
@@ -70,7 +70,7 @@ We can modulate our data onto a carrier by modifying any one (or more) of these 
 Amplitude Shift Keying (ASK)
 ****************************
 
-Amplitude Shift Keying (ASK) is the first digital modulation scheme we will discuss, because it's the simplest to visualize of the three.  We literally just modulate the **amplitude** of the carrier.  Example of 2-level ASK, called 2-ASK:
+Amplitude Shift Keying (ASK) is the first digital modulation scheme we will discuss because amplitude modulation is the simplest to visualize of the three sinusoid properties.  We literally modulate the **amplitude** of the carrier.  Here is an example of 2-level ASK, called 2-ASK:
 
 .. image:: ../_static/ASK.png
    :scale: 50 % 
@@ -82,7 +82,7 @@ We can use more than two levels, allowing for more bits per symbol.  Below shows
    :scale: 100 % 
    :align: center 
 
-Question- How many symbols are shown in the signal snippet above?  How many bits are represented total?
+Question: How many symbols are shown in the signal snippet above?  How many bits are represented total?
 
 .. raw:: html
 
@@ -95,19 +95,19 @@ Five symbols, 10 bits of information
 
    </details>
 
-So how do we actually create this signal digitally, in code?  All we really have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).  
+How do we actually create this signal digitally, through code?  All we have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).
 
 .. image:: ../_static/ask3.png
    :scale: 80 % 
    :align: center 
 
-The top plot shows the discrete samples represented by dots, and then the bottom plot shows what the resulting signal looks like, which could be represented digitally or even transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there might be thousands, depending on how high in the spectrum the signal is being transmitted.  
+The top plot shows the discrete samples represented by dots, and the bottom plot shows what the resulting signal looks like, which could be represented digitally or even transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there may be thousands, depending on how high in the spectrum the signal is being transmitted.
 
 ************************
 Phase Shift Keying (PSK)
 ************************
 
-Now lets look at modulating the phase in a similar manner as we did with the amplitude.  The simplest form is Binary PSK, a.k.a. BPSK, where there are two levels of phase:
+Now let's consider modulating the phase in a similar manner as we did with the amplitude.  The simplest form is Binary PSK, a.k.a. BPSK, where there are two levels of phase:
 
 1. No phase change
 2. 180 degree phase change
@@ -124,7 +124,7 @@ It’s not very fun to look at plots like this:
    :align: center 
    :target: ../_static/bpsk2.svg
 
-So instead we usually represent the phase in the complex plane.  
+Instead we usually represent the phase in the complex plane.  
 
 ***********************
 IQ Plots/Constellations
