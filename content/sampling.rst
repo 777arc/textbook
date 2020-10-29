@@ -296,46 +296,44 @@ For now we aren't going to do anything interesting with these samples.  Througho
 Calculating Average Power
 *************************
 
-For a discrete complex signal, i.e. one we have sampled, we can find the average power by taking the magnitude of each sample, squaring it, then finding the mean:
+For a discrete complex signal, i.e., one we have sampled, we can find the average power by taking the magnitude of each sample, squaring it, and then finding the mean:
 
 .. math::
    P = \frac{1}{N} \sum_{n=1}^{N} |x[n]|^2
 
-Remember that the absolute value of a complex number is just the magnitude, i.e. :math:`\sqrt{I^2+Q^2}`
+Remember that the absolute value of a complex number is just the magnitude, i.e., :math:`\sqrt{I^2+Q^2}`
 
-In Python this would look like:
+In Python, calculating the average power will look like:
 
 .. code-block:: python
 
  avg_pwr = np.mean(np.abs(x)**2)
 
 Here is a very useful trick for calculating the average power of a sampled signal.
-If your signal has (roughly) zero mean, which is usually the case in SDR (we will see why later), then the signal power can be found by simply taking the variance of the samples, e.g.:
+If your signal has roughly zero mean--which is usually the case in SDR (we will see why later)--then the signal power can be found by taking the variance of the samples. In these circumstances, you can calculate the power this way in Python:
 
 .. code-block:: python
 
  avg_pwr = np.var(x) # (signal should have roughly zero mean)
 
-The reason why is quite simple; the equation for variance is :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2`
-where :math:`\mu` is the signal's mean, so if :math:`\mu` is zero than it becomes equivalent to the equation for power.
-You can also just subtract out the mean from the samples in your window of observation, then take variance.  Just know that if the mean value is not zero, the variance and the power are not equal.
+The reason why the variance of the samples calculates average power is quite simple: the equation for variance is :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2` where :math:`\mu` is the signal's mean. That equation looks familiar! If :math:`\mu` is zero then the equation to determine variance of the samples becomes equivalent to the equation for power.  You can also subtract out the mean from the samples in your window of observation, then take variance.  Just know that if the mean value is not zero, the variance and the power are not equal.
  
 **********************************
 Calculating Power Spectral Density
 **********************************
 
 Last chapter we learned that we can convert a signal to the frequency domain using an FFT, and the result is called the Power Spectral Density (PSD).
-All DSP engineers know this, but when it comes to actually finding the PSD of a batch of samples and plotting it, you need to do more than just take an FFT.
-We must do the following six operations:
+All DSP engineers know the following, but to actually find the PSD of a batch of samples and plot it, you need to do more than just take an FFT.
+We must do the following six operations to calculate PSD:
 
-1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default, so let's only use the first 1024 samples as an example, to create a 1024-size FFT.  The output will be 1024 complex float.
-2. Take the magnitude of the FFT output, which provides us 1024 real floats.
+1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default. Let's use the first 1,024 samples as an example to create a 1,024-size FFT.  The output will be 1,024 complex floats.
+2. Take the magnitude of the FFT output, which provides us 1,024 real floats.
 3. Normalize: divide by our sample rate (:math:`F_s`).
-4. Square the resulting magnitude, to get power.
-5. Convert to dB using :math:`10 \log_{10}()`, we always view PSDs in log scale.
-6. Perform an FFT shift, like we learned about last chapter, to move "0 Hz" in the center and negative frequencies to the left of center.
+4. Square the resulting magnitude to get power.
+5. Convert to dB using :math:`10 \log_{10}()`; we always view PSDs in log scale.
+6. Perform an FFT shift, covered in the previous chapter, to move "0 Hz" in the center and negative frequencies to the left of center.
 
-In Python this looks like:
+Those six steps in Python are:
 
 .. code-block:: python
 
@@ -346,19 +344,19 @@ In Python this looks like:
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
-And optionally we can apply a window, like we learned about in the :ref:`freq-domain-chapter` chapter, windowing would occur right before the line with fft().
+Optionally we can apply a window, like we learned about in the :ref:`freq-domain-chapter` chapter. Windowing would occur right before the line of code with fft().
 
 .. code-block:: python
 
  # add the following line after doing x = x[0:1024]
  x = x * np.hamming(len(x)) # apply a Hamming window
 
-Now to plot this PSD we need to know the values of the x-axis.  
+To plot this PSD we need to know the values of the x-axis.
 As we learned last chapter, when we sample a signal, we only "see" the spectrum between -Fs/2 and Fs/2 where Fs is our sample rate.
-The resolution we achieve in the frequency domain depends on the size of our FFT, which by default is equal to the number of samples we perform the FFT operation on.
-In this case our x-axis is 1024 equally spaced points between -0.5 MHz and 0.5 MHz.  
-If we had tuned our SDR to 2.4 GHz then that means our observation window would be between 2399500000 and 2400500000 Hz.
-In Python this looks like:
+The resolution we achieve in the frequency domain depends on the size of our FFT, which by default is equal to the number of samples on which we perform the FFT operation.
+In this case our x-axis is 1,024 equally spaced points between -0.5 MHz and 0.5 MHz.
+If we had tuned our SDR to 2.4 GHz, our observation window would be between 2,399,500,000 Hz and 2,400,500,000 Hz.
+In Python, shifting the observation window will look like:
 
 .. code-block:: python
  
@@ -367,12 +365,13 @@ In Python this looks like:
  plt.plot(f, PSD_shifted)
  plt.show()
  
-And we should be left with a beautiful PSD.  
-If you want to find the PSD of millions of samples, don't just do a million-point FFT, because it will probably take forever, and it will give you an output of a million "frequency bins" which is too much to show in a plot. 
-Instead I suggest doing multiple smaller PSDs and averaging them together, or displaying them using a spectrogram plot.
-Alternatively, if you know your signal is not changing fast, it's adequate to only use a few thousand samples and just find the PSD of those, because within that time-frame of a few thousand samples you will likely capture enough of the signal to get a nice representation.
+We should be left with a beautiful PSD!
 
-Here is a full example which also includes generating a signal (complex exponential at 50 Hz) and noise.  Note that N, the number of samples to simulate, becomes the FFT length because we take the FFT of the entire simulated signal.
+If you want to find the PSD of millions of samples, don't do a million-point FFT because it will probably take forever. It will give you an output of a million "frequency bins", after all, which is too much to show in a plot.
+Instead I suggest doing multiple smaller PSDs and averaging them together or displaying them using a spectrogram plot.
+Alternatively, if you know your signal is not changing fast, it's adequate to use a few thousand samples and find the PSD of those; within that time-frame of a few thousand samples you will likely capture enough of the signal to get a nice representation.
+
+Here is a full code example that includes generating a signal (complex exponential at 50 Hz) and noise.  Note that N, the number of samples to simulate, becomes the FFT length because we take the FFT of the entire simulated signal.
 
 .. code-block:: python
 
