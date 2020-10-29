@@ -130,7 +130,7 @@ Instead we usually represent the phase in the complex plane.
 IQ Plots/Constellations
 ***********************
 
-You have seen IQ plots before in the complex numbers subsection of the :ref:`sampling-chapter` chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Lets plot those two points on the IQ plot. We will assume a magnitude of 1, in practice it doesn't really matter what magnitude you use, a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
+You have seen IQ plots before in the complex numbers subsection of the :ref:`sampling-chapter` chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Let's plot those two points on the IQ plot. We will assume a magnitude of 1. In practice it doesn't really matter what magnitude you use; a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
 
 .. image:: ../_static/bpsk_iq.png
    :scale: 80 % 
@@ -138,13 +138,13 @@ You have seen IQ plots before in the complex numbers subsection of the :ref:`sam
 
 The above IQ plot shows what we will transmit, or rather the set of symbols we will transmit from.  It does not show the carrier, so you can think about it as representing the symbols at baseband.  When we show the set of possible symbols for a given modulation scheme, we call it the "constellation".  Many modulation schemes can be defined by their constellation.  
 
-To receive and decode BPSK we can use IQ sampling, like we learned about last chapter, and simply look at where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel, since the signal will have some random delay as it passes through the air between antennas.  The random phase rotation can be reversed using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the receiver (this does not include noise): 
+To receive and decode BPSK we can use IQ sampling, like we learned about last chapter, and examine where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel because the signal will have some random delay as it passes through the air between antennas.  The random phase rotation can be reversed using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the receiver (this does not include noise):
 
 .. image:: ../_static/bpsk3.png
    :scale: 60 % 
    :align: center 
 
-Back to PSK.  What if we want four different levels of phase?  I.e. 0, 90, 180, and 270 degrees.  In this case it would be represented like so on the IQ plot, and it forms a modulation scheme we call Quadrature Phase Shift Keying (QPSK):
+Back to PSK.  What if we want four different levels of phase?  I.e., 0, 90, 180, and 270 degrees.  In this case it would be represented like so on the IQ plot, and it forms a modulation scheme we call Quadrature Phase Shift Keying (QPSK):
 
 .. image:: ../_static/qpsk.png
    :scale: 60 % 
@@ -156,7 +156,7 @@ For PSK we always have N different phases, equally spaced around 360 degrees for
    :scale: 60 % 
    :align: center 
 
-Question- What’s wrong with using a PSK scheme like this?  Is this a valid PSK modulation scheme?
+Question: What’s wrong with using a PSK scheme like the one in the below image?  Is it a valid PSK modulation scheme?
 
 .. image:: ../_static/weird_psk.png
    :scale: 60 % 
@@ -167,7 +167,7 @@ Question- What’s wrong with using a PSK scheme like this?  Is this a valid PSK
    <details>
    <summary><a>Answer</a></summary>
 
-There is nothing invalid about this, you could certainly use it, but because the symbols are not uniformly spaced, it means this scheme is not as effective as it could be, something that will become clear once we talk about how noise impacts our symbols.  The short answer is, we want to leave as much room as possible in between the symbols, in case there is noise, so that one symbol does not get interpreted at the receiver as one of the other (incorrect) symbols.  We don't want a 0 being received as a 1.
+There is nothing invalid about this PSK scheme. You can certainly use it, but, because the symbols are not uniformly spaced, this scheme is not as effective as it could be. Scheme efficiency will become clear once we discuss how noise impacts our symbols.  The short answer is that we want to leave as much room as possible in between the symbols, in case there is noise, so that a symbol is not interpreted at the receiver as one of the other (incorrect) symbols.  We don't want a 0 being received as a 1.
 
 .. raw:: html
 
@@ -179,12 +179,12 @@ Let's detour back to ASK for a moment.  Note that we can show ASK on the IQ plot
    :scale: 60 % 
    :align: center 
 
-As you may have noticed, 2-ASK and BPSK are the same thing. A 180 degree phase shift is the same as multiplying the sinusoid by -1.  We call it BPSK, probably because PSK is used way more than ASK.
+As you may have noticed, 2-ASK and BPSK are the same. A 180 degree phase shift is the same as multiplying the sinusoid by -1.  We call it BPSK, probably because PSK is used way more than ASK.
 
 **************************************
 Quadrature Amplitude Modulation (QAM)
 **************************************
-What if we combine ASK and PSK?  We call this Quadrature Amplitude Modulation (QAM) and it usually looks something like this:
+What if we combine ASK and PSK?  We call this modulation scheme Quadrature Amplitude Modulation (QAM). QAM usually looks something like this:
 
 .. image:: ../_static/64qam.png
    :scale: 90 % 
@@ -196,46 +196,46 @@ Here are some other examples of QAM:
    :scale: 50 % 
    :align: center 
 
-For a QAM modulation scheme, we can technically put points wherever we want to on the IQ plot, since QAM means the phase and amplitude are being modulated.  The "parameters" of a given QAM scheme are best defined by simply showing the QAM constellation. Alternatively, you could simply list the I and Q values for each point, like below for QPSK:
+For a QAM modulation scheme, we can technically put points wherever we want to on the IQ plot since the phase *and* amplitude are modulated.  The "parameters" of a given QAM scheme are best defined by showing the QAM constellation. Alternatively, you may list the I and Q values for each point, like below for QPSK:
 
 .. image:: ../_static/qpsk_list.png
    :scale: 80 % 
    :align: center 
 
-Back to the time domain for a second.  Everything except the various ASK's and BPSK are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain, note how it's tough to see the phase of each symbol:
+Note that most modulation schemes, except the various ASKs and BPSK, are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain. Can you distinguish between the phase of each symbole in the below image? It's tough.
 
 .. image:: ../_static/qam_time_domain.png
    :scale: 50 % 
    :align: center 
 
-This is why we usually use IQ plots, instead of showing the time domain signal.  We might show the time domain signal if there's a certain packet structure, or the sequence of symbols matters.
+Given the difficulty discerning modulation schemes in the time domain, we prefer to use IQ plots over displaying the time domain signal.  We might, nonetheless, show the time domain signal if there's a certain packet structure or the sequence of symbols matters.
 
 ****************************
 Frequency Shift Keying (FSK)
 ****************************
 
-Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to understand, we just shift between N frequencies, each frequency is one possible symbol.  However, because we are modulating a carrier, it’s really our carrier frequency +/- these N frequencies. E.g. we might be at a carrier of 1.2 GHz and shift between these four frequencies:
+Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to understand--we just shift between N frequencies where each frequency is one possible symbol.  However, because we are modulating a carrier, it’s really our carrier frequency +/- these N frequencies. E.g.. we might be at a carrier of 1.2 GHz and shift between these four frequencies:
 
 1. 1.2005 GHz
 2. 1.2010 GHz
 3. 1.1995 GHz
 4. 1.1990 GHz
 
-This would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in the frequency domain might look something like this:
+The example above would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in the frequency domain might look something like this:
 
 .. image:: ../_static/fsk.svg
    :align: center 
    :target: ../_static/fsk.svg
 
-If you are going to use FSK, there is one big question to ask: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f`, in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  So the faster we transmit symbols, the wider each carrier will get, and the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
+If you use FSK, you must ask a critical question: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f` in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  The faster we transmit symbols, the wider each carrier will get, and consequently the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
 
-IQ plots can't be used to show different frequencies, they only show magnitude and phase.  While it is possible to show FSK in the time domain, any more than 2 frequencies and it gets hard to see the difference between symbols:
+IQ plots can't be used to show different frequencies. They show magnitude and phase.  While it is possible to show FSK in the time domain, any more than 2 frequencies makes it difficult to distinguish between symbols:
 
 .. image:: ../_static/fsk2.svg
    :align: center
    :target: ../_static/fsk2.svg
 
-As an aside, note that FM radio uses Frequency Modulation (FM) which is like an analog version of FSK.  Instead of having discrete frequencies we jump between, FM radio uses a continuous audio signal to modulate the frequency of the carrier.  Here is an example of FM and AM modulation, the "signal" at the top is the audio signal being modulated onto to the carrier.
+As an aside, note that FM radio uses Frequency Modulation (FM) which is like an analog version of FSK.  Instead of having discrete frequencies we jump between, FM radio uses a continuous audio signal to modulate the frequency of the carrier.  Below is an example of FM and AM modulation where the "signal" at the top is the audio signal being modulated onto to the carrier.
 
 .. image:: https://www.thenakedscientists.com/sites/default/files/media/Amfm3-en-de.gif.pagespeed.ce.0o6A-u33nd.gif
    :width: 400
@@ -247,9 +247,9 @@ In this textbook we are mainly concerned about digital forms of modulation.
 Python Example
 *******************
 
-As a short Python example, let's generate QPSK in Python, at baseband, and plot the constellation.  
+As a short Python example, let's generate QPSK at baseband and plot the constellation.
 
-Even though we could generate the complex symbols directly, let's start from the knowledge that QPSK has four symbols, at 90 degree intervals around the unit circle.  We will use 45, 135, 225, and 315 degrees for our points.  But first we will generate random numbers between 0 and 3, then do some math to get the degrees we want, then convert to radians because that's what the sin() and cos() functions take.
+Even though we could generate the complex symbols directly, let's start from the knowledge that QPSK has four symbols at 90-degree intervals around the unit circle.  We will use 45, 135, 225, and 315 degrees for our points.  First we will generate random numbers between 0 and 3 and perform math to get the degrees we want before converting to radians. That's what the sin() and cos() functions take.
 
 .. code-block:: python
 
@@ -270,7 +270,7 @@ Even though we could generate the complex symbols directly, let's start from the
    :scale: 100 % 
    :align: center 
 
-Note how all the symbols we generated overlap, that's because there's no noise, so they are all the same value.  Let's add some noise:
+Observe how all the symbols we generated overlap. There's no noise so the symbols all have the same value.  Let's add some noise:
 
 .. code-block:: python
 
@@ -285,7 +285,7 @@ Note how all the symbols we generated overlap, that's because there's no noise, 
    :scale: 100 % 
    :align: center 
 
-Note how AWGN noise produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
+Consider how additive white Gaussian noise (AGWN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
 
-We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol), you will learn why once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
+We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate many samples once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 
