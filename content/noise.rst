@@ -105,7 +105,7 @@ Linear   dB
 Noise in Frequency Domain
 *************************
 
-In the :ref:`freq-domain-chapter` chapter we looked at "Fourier pairs", i.e. what a certain time domain signal looks like in the frequency domain.  Well what does Gaussian noise look like in the frequency domain?  Below shows some simulated noise in the time domain, and then a plot of the FFT of that noise (many FFT's were averaged together).
+In the :ref:`freq-domain-chapter` chapter we looked at "Fourier pairs", i.e. what a certain time domain signal looks like in the frequency domain.  Well what does Gaussian noise look like in the frequency domain?  Below shows some simulated noise in the time domain, and then a plot of the Power Spectral Density (PSD) of that noise.  These plots were taken from GNU Radio.
 
 .. image:: ../_static/noise_freq.png
    :scale: 110 % 
@@ -133,7 +133,7 @@ Note that the randn() function uses mean = 0 and variance = 1 by default.  Both 
    :scale: 100 % 
    :align: center 
 
-The signal we generated and took the FFT of was a real signal (versus complex), and the FFT of any real signal will have matching negative and positive portions, so that's why we only saved the positive portion of the FFT output (the 2nd half).  But why did we only generate "real" noise, and how do complex signals work into this?
+You can then produce the flat PSD that we had in GNU Radio by taking the log, and averaging a bunch together.  The signal we generated and took the FFT of was a real signal (versus complex), and the FFT of any real signal will have matching negative and positive portions, so that's why we only saved the positive portion of the FFT output (the 2nd half).  But why did we only generate "real" noise, and how do complex signals work into this?
 
 *************************
 Complex Noise
