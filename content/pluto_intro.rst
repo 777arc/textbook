@@ -17,9 +17,9 @@ Software/Drivers Install
 Setting up VM
 #############
 
-While the Python code provided in this textbook should work under Windows, Mac, and Linux, the install instructions below are specific to Ubuntu 18. If you have trouble installing the software on your OS following [the instructions provided by Analog Devices](https://wiki.analog.com/university/tools/pluto/users/quick_start), I recommend installing an Ubuntu 18 VM and trying the instructions below.
+While the Python code provided in this textbook should work under Windows, Mac, and Linux, the install instructions below are specific to Ubuntu 18. If you have trouble installing the software on your OS following `the instructions provided by Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, I recommend installing an Ubuntu 18 VM and trying the instructions below.
 
-1. Install and open [VirtualBox](https://www.virtualbox.org/wiki/VirtualBox) - https://www.virtualbox.org/wiki/Downloads.
+1. Install and open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
 2. Create a new VM.  For memory size, I recommend using 50% of your computer’s RAM.
 3. Create the virtual hard disk, choose VDI, and dynamically allocate size.  15 GB should be enough. If you want to be really safe you can use more.
 4. Download Ubuntu 18 Desktop .iso- http://releases.ubuntu.com/18.04/
@@ -137,7 +137,7 @@ Exercise 1: Determine Your USB Throughput
 
 Let's try receiving samples from the PlutoSDR, and in the process, see how many samples per second we can push through the USB 2.0 connection.  
 
-**Your task is to create a Python script that determines the rate samples are received in Python, i.e.. count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer_size's to see how it impacts the highest achievable rate.**
+**Your task is to create a Python script that determines the rate samples are received in Python, i.e., count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer_size's to see how it impacts the highest achievable rate.**
 
 Keep in mind, if you receive fewer samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's. The Pluto only uses USB 2.0.
 

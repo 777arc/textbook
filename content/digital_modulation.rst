@@ -249,7 +249,7 @@ Python Example
 
 As a short Python example, let's generate QPSK at baseband and plot the constellation.
 
-Even though we could generate the complex symbols directly, let's start from the knowledge that QPSK has four symbols at 90-degree intervals around the unit circle.  We will use 45, 135, 225, and 315 degrees for our points.  First we will generate random numbers between 0 and 3 and perform math to get the degrees we want before converting to radians. That's what the sin() and cos() functions take.
+Even though we could generate the complex symbols directly, let's start from the knowledge that QPSK has four symbols at 90-degree intervals around the unit circle.  We will use 45, 135, 225, and 315 degrees for our points.  First we will generate random numbers between 0 and 3 and perform math to get the degrees we want before converting to radians.
 
 .. code-block:: python
 
@@ -260,7 +260,7 @@ Even though we could generate the complex symbols directly, let's start from the
  
  x_int = np.random.randint(0, 4, num_symbols) # 0 to 3
  x_degrees = x_int*360/4.0 + 45 # 45, 135, 225, 315 degrees
- x_radians = x_degrees*np.pi/180.0 # np.exp() takes in radians
+ x_radians = x_degrees*np.pi/180.0 # sin() and cos() takes in radians
  x_symbols = np.cos(x_radians) + 1j*np.sin(x_radians) # this produces our QPSK complex symbols
  plt.plot(np.real(x_symbols), np.imag(x_symbols), '.')
  plt.grid(True)
@@ -287,5 +287,5 @@ Observe how all the symbols we generated overlap. There's no noise so the symbol
 
 Consider how additive white Gaussian noise (AGWN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
 
-We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate many samples once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
+We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate multiple samples per symbol once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 

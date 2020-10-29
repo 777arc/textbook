@@ -214,9 +214,9 @@ When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but
 Just to reiterate, the downconversion process is performed by our SDR; as a user of the SDR we don't have to do anything other than tell it which frequency to tune to.
 
 ***********************************
-Baseband and Bandpass Transmissions
+Baseband and Bandpass Signals
 ***********************************
-We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz, that has been shifted up for the purpose of wireless transmission.  A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
+We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz, that has been shifted up for the purpose of wireless transmission.  There is no notion of a "baseband transmission", because you can't transmit something imaginary.  A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
 
 .. image:: ../_static/baseband_bandpass.png
    :scale: 50% 
@@ -323,7 +323,7 @@ Calculating Power Spectral Density
 **********************************
 
 Last chapter we learned that we can convert a signal to the frequency domain using an FFT, and the result is called the Power Spectral Density (PSD).
-All DSP engineers know the following, but to actually find the PSD of a batch of samples and plot it, you need to do more than just take an FFT.
+But to actually find the PSD of a batch of samples and plot it, we do more than just take an FFT.
 We must do the following six operations to calculate PSD:
 
 1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default. Let's use the first 1,024 samples as an example to create a 1,024-size FFT.  The output will be 1,024 complex floats.
@@ -355,7 +355,7 @@ To plot this PSD we need to know the values of the x-axis.
 As we learned last chapter, when we sample a signal, we only "see" the spectrum between -Fs/2 and Fs/2 where Fs is our sample rate.
 The resolution we achieve in the frequency domain depends on the size of our FFT, which by default is equal to the number of samples on which we perform the FFT operation.
 In this case our x-axis is 1,024 equally spaced points between -0.5 MHz and 0.5 MHz.
-If we had tuned our SDR to 2.4 GHz, our observation window would be between 2,399,500,000 Hz and 2,400,500,000 Hz.
+If we had tuned our SDR to 2.4 GHz, our observation window would be between 2.3995 GHz and 2.4005 GHz.
 In Python, shifting the observation window will look like:
 
 .. code-block:: python
