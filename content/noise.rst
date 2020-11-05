@@ -118,13 +118,14 @@ We can see that it looks roughly the same across all frequencies, and is fairly 
  import numpy as np
  import matplotlib.pyplot as plt
  
- x = np.random.randn(1024)
- plt.plot(x[0:512], '.-')
- plt.show() # show first 512 points
+ N = 1024 # number of samples to simulate, choose any number you want
+ x = np.random.randn(N)
+ plt.plot(x, '.-')
+ plt.show()
  
  X = np.fft.fftshift(np.fft.fft(x))
- X = X[512:] # only look at real portion
- plt.plot(X, '.-')
+ X = X[N//2:] # only look at positive frequencies.  remember // is just an integer divide
+ plt.plot(np.real(X), '.-')
  plt.show()
 
 Note that the randn() function uses mean = 0 and variance = 1 by default.  Both of the plots will look something like this:
