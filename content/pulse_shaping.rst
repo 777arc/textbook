@@ -71,14 +71,12 @@ Raised-Cosine Filter
 
 The most popular pulse-shaping filter seems to be the "raised-cosine" filter.  It's a good low-pass filter for limiting the bandwidth our signal will occupy, and it also has the property of summing to zero at intervals of T:
 
-.. image:: ../_static/raised_cosine.png
-   :scale: 70 % 
+.. image:: ../_static/raised_cosine.svg
    :align: center 
 
 Note that the above plot is in the time domain, it shows the impulse response of the filter.  The :math:`\beta` parameter is the only parameter for the raised-cosine filter, and it determines how quickly the filter tapers off in the time domain, which will be inversely proportional with how quickly it tapers off in frequency:
 
-.. image:: ../_static/raised_cosine_freq.png
-   :scale: 50 % 
+.. image:: ../_static/raised_cosine_freq.svg
    :align: center 
 
 And the reason it's called the raised-cosine filter is because the frequency domain when :math:`\beta = 1` is a half-cycle of a cosine wave, raised up to sit on the x-axis. 
@@ -112,8 +110,7 @@ Roll-off Factor
 
 Let's look more into the parameter :math:`\beta`.  It is a number between 0 and 1, and is called the "roll-off" factor, or sometimes "excess bandwidth".  It determines how fast, in the time domain, the filter rolls off to zero.  Remember, to be used as a filter, the impulse response should decay to zero on both sides:
 
-.. image:: ../_static/rrc_rolloff.png
-   :scale: 80 % 
+.. image:: ../_static/rrc_rolloff.svg
    :align: center 
 
 This means more filter taps are required the lower :math:`\beta` gets, and when :math:`\beta = 0` the impulse response never fully hits zero, so we try to get :math:`\beta` as low as possible without causing other issues.  The lower the roll-off, the more compact in frequency we can create our signal for a given symbol rate, which is always important.
