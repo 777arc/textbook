@@ -4,13 +4,13 @@
 Noise and dB
 #############
 
-In this chapter we will discuss noise, including how it is modeled and handled in a communications system. We will also introduce decibels (dB) alongside different types of noise because it is a measure of sound.
+In this chapter we will discuss noise, including how it is modeled and handled in a communications system. We will also introduce decibels (dB) along the way.
 
 ************************
 Gaussian Noise
 ************************
 
-Most people are aware of the concept of noise: unwanted signals, be they errors or distrubance, distorting desired signals. Noise looks something like:
+Most people are aware of the concept of noise: unwanted fluctuations that can obscure our desired signal(s). Noise looks something like:
 
 .. image:: ../_static/noise.png
    :scale: 70 % 
@@ -18,7 +18,7 @@ Most people are aware of the concept of noise: unwanted signals, be they errors 
 
 Note how the average value is zero in the time domain graph.  If the average value wasn't zero, then we could subtract the average value, call it a bias, and we would be left with an average of zero.  Also note that the individual points in the graph are *not* "uniformly random", i.e., larger values are rarer, most of the points are closer to zero.
 
-We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The central limit theorem tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have some other distribution.  In other words, when a lot of random things happen and accumulate, the result appears Gaussian. The result will be Guassian even when individual things are not distributed in this manner.
+We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The central limit theorem tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have some other distribution.  In other words, when a lot of random things happen and accumulate, the result appears Gaussian. The result will be Gaussian even when individual things are not distributed in this manner.
 
 
 .. image:: ../_static/central_limit_theorem.webp
@@ -26,7 +26,7 @@ We call this type of noise "Gaussian noise". It's a good model for the type of n
 
 The Gaussian distribution is also called the "Normal" distribution (recall a bell curve).
 
-The Gaussian distribution has two parameters: mean and variance.  We already discussed how the mean can be considered zero because you can always remove the mean, or bias, if it's not zero.  The variance changes how "strong" the noise is. Variance is positively correlated. A higher variance will result in larger numbers.  It is for this reason that variance defines the noise power.
+The Gaussian distribution has two parameters: mean and variance.  We already discussed how the mean can be considered zero because you can always remove the mean, or bias, if it's not zero.  The variance changes how "strong" the noise is.  A higher variance will result in larger numbers.  It is for this reason that variance defines the noise power.
 
 Variance equals standard deviation squared (:math:`\sigma^2`).
 
@@ -36,13 +36,13 @@ Decibels (dB)
 
 We are going to take a quick tangent to formally introduce dB.  You may have heard of dB, and if you are already familiar with it feel free to skip this section.
 
-Working in dB is extremely useful when we need to deal with small numbers and big numbers at the same time, or just a bunch of really big numbers. It is a measurement that describes the ratio between two quantities. In communications systems, it is used to compare power. Consider how cumbersome it would be to work with numbers of the scale in Example 1 and Example 2.
+Working in dB is extremely useful when we need to deal with small numbers and big numbers at the same time, or just a bunch of really big numbers. Consider how cumbersome it would be to work with numbers of the scale in Example 1 and Example 2.
 
 Example 1: Signal 1 is received at 2 watts and the noise floor is at 0.0000002 watts.
 
 Example 2: A garbage disposal is 100,000 times louder than a quiet rural area, and a chain saw is 10,000 times louder than a garbage disposal (in terms of power of sound waves).
 
-Without dB, meaning working in normal "linear" terms, we need to use a lot of 0s to represent the values in Examples 1 and 2. Frankly, if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor If the scale of the y-axis went from 0 to 3 watts, for example, noise to be too small to show up in the plot. To make these scales representable and comprehensible, we work in a log-scale.
+Without dB, meaning working in normal "linear" terms, we need to use a lot of 0s to represent the values in Examples 1 and 2. Frankly, if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor. If the scale of the y-axis went from 0 to 3 watts, for example, noise to be too small to show up in the plot. To represent these scales simultaneously, we work in a log-scale.
 
 To further illustrate the problems of scale we encounter in signal processing, consider the below waterfalls of three of the same signals. The left-hand side is the original signal in linear scale, and the right-hand side shows the signals converted to a logarithmic scale (dB).  Both representations use the exact same colormap, where blue is lowest value and yellow is highest.  You can barely see the signal on the left in the linear scale.
 
