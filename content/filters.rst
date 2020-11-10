@@ -153,7 +153,7 @@ And even though we haven't gotten into filter design yet, here is the Python cod
 	from scipy import signal
 	import matplotlib.pyplot as plt
 
-	num_taps = 50
+	num_taps = 51 # it helps to use an odd number of taps
 	cut_off = 3000 # Hz
 	sample_rate = 32000 # Hz
 
@@ -161,7 +161,6 @@ And even though we haven't gotten into filter design yet, here is the Python cod
 	h = signal.firwin(num_taps, cut_off, nyq=sample_rate/2)
 
 	# plot the impulse response
-	plt.subplot(121)
 	plt.plot(h, '.-')
 	plt.show()
 
@@ -176,13 +175,11 @@ And here is the code that was used to produce the frequency response, shown earl
 .. code-block:: python
 
 	# plot the frequency response
-	_, H = signal.freqz(h, whole=True)
-	H = np.abs(H)  # take magnitude
-	H = np.fft.fftshift(H)   # make 0 in the center
-	w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
-	plt.subplot(122)
-	plt.plot(w, H, '.-’)
-	plt.show()
+    H = np.abs(np.fft.fft(h, 1024)) # take the 1024-point FFT and magnitude
+    H = np.fft.fftshift(H) # make 0 Hz in the center
+    w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
+    plt.plot(w, H, '.-')
+    plt.show()
 
 Real vs. Complex Filters
 ########################
@@ -209,7 +206,7 @@ One way to design this kind of filter is to make a **low**-pass filter with a cu
 	f0 = 10e3 # amount we will shift
 	Ts = 1.0/sample_rate # sample period
 	t = np.arange(0.0, Ts*len(h), Ts) # time vector. args are (start, stop, step)
-	exponential = np.exp(2.0 * np.pi * 1j * f0 * t) # this is essentially a complex sine wave
+	exponential = np.exp(2j*np.pi*f0*t) # this is essentially a complex sine wave
 	
 	h_band_pass = h * exponential # do the shift
 	
@@ -220,9 +217,8 @@ One way to design this kind of filter is to make a **low**-pass filter with a cu
 	plt.legend(['real', 'imag'], loc=1)
 	
 	# plot the frequency response
-	_, H = signal.freqz(h, whole=True) # shortcut for plotting frequency response
-	H = np.abs(H)  # take magnitude
-	H = np.fft.fftshift(H)   # make 0 in the center
+    H = np.abs(np.fft.fft(h_band_pass, 1024)) # take the 1024-point FFT and magnitude
+    H = np.fft.fftshift(H) # make 0 Hz in the center
 	w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
 	plt.subplot(122)
 	plt.plot(w, H, '.-')
