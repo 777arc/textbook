@@ -4,21 +4,21 @@
 Filters
 #############
 
-In this chapter we get introduced to filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, a topic explored in depth in its own chapter.
+This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, a topic explored in depth in its own chapter.
 
 *************************
 Filter Basics
 *************************
 
-Filters are used in many disciplines, for example image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which filters out solids from liquid.  In DSP, filters are primarily used for:
+Filters are used in many disciplines. For example, image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which strains out solids from liquid.  In DSP, filters are primarily used for:
 
-1. Separation of signals that have been combined (e.g. pulling out the signal you want)
-2. Removing excess noise after receiving a signal
-3. Restoration of signals that have been distorted in some way (e.g. an audio equalizer is a filter)
+1. Separation of signals that have been combined (e.g., extracting the signal you want)
+2. Removal of excess noise after receiving a signal
+3. Restoration of signals that have been distorted in some way (e.g., an audio equalizer is a filter)
 
-There are certainly other uses for filters.  
+There are certainly other uses for filters, but this chapter is meant to introduce the concept rather than explain all the ways filtering can happen.
 
-There are analog filters and digital filters.  You may think we only care about digital filters; this is a DSP based textbook after all, but it's also important to know that a lot of filters will be analog, such as filters in our SDRs that come before the analog-to-digital converter (ADC) on the receive side. 
+You may think we only care about digital filters; this textbook explores DSP, after all. However, it's important to know that a lot of filters will be analog, like those in our SDRs placed before the analog-to-digital converter (ADC) on the receive side. The following image juxtaposes a schematic of an analog filter circuit with a flowchart representation of a digital filtering algorithm. While the analog filter modifies an electrical current as a representation of a signal, the digital algorithm manipulates the data representation of a signal. Despite these differences, the goal of filtering is to remove some aspect of a signal.
 
 .. image:: ../_static/analog_digital_filter.png
    :scale: 70 % 
@@ -30,9 +30,9 @@ In DSP, where the input and output are signals, a filter has one input signal an
    :scale: 70 % 
    :align: center 
 
-You cannot feed two different signals into a single filter, without adding them together first, or doing some other operation.  Likewise, the output will always be one signal, i.e. a 1D array of numbers.  
+You cannot feed two different signals into a single filter without adding them together first or doing some other operation.  Likewise, the output will always be one signal, i.e., a 1D array of numbers.
 
-There are four basic types of filters: 
+There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The graphs below demonstrate how frequencies in signals are filtered for each type. Try to envision what each type is distinguishing among signal frequencies.
 
 .. image:: ../_static/filter_types.png
    :scale: 70 % 
@@ -40,9 +40,9 @@ There are four basic types of filters:
 
 (ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
 
-Each filter lets certain frequencies through, and blocks other frequencies.  The range of frequencies it lets through is known as the "passband", and the "stopband" is what gets blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband. 
+Each filter permits certain frequencies to remain from a signal while blocking other frequencies.  The range of frequencies a filter lets through is known as the "passband", and "stopband" refers to what is blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband.
 
-Do not get this confused with the different types of filter implementation (e.g. IIR vs FIR).  The most common type by far is the low-pass filter (LPF), because we often represent signals at baseband, so the LPF lets us filter out everything "around" our signal, to get rid of excess noise and other signals.  
+Do not confuse these filtering strategies with filter implementation (e.g., IIR vs FIR).  The most common type by far is the low-pass filter (LPF) because we often represent signals at baseband.  LPF allows us to filter out everything "around" our signal, removing excess noise and other signals.
 
 *************************
 Filter Representation
