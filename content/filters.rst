@@ -4,7 +4,7 @@
 Filters
 #############
 
-This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, a topic explored in depth in its own chapter.
+This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which is another strategy for modifying waveform shape.
 
 *************************
 Filter Basics
@@ -377,15 +377,15 @@ In this above expression, :math:`g(t)` is the signal or input that is flipped an
 Filter Design in Python
 *************************
 
-We will now talk about one way to design an FIR filter ourselves, in Python.  Note that there are many approaches to designing filters, in this example we will use the method of starting in the frequency domain and working backwards to find the impulse response, which is ultimately how our filter is represented (by its taps). 
+Now we will consider one way to design an FIR filter ourselves in Python.  While there are many approaches to designing filters, we will use the method of starting in the frequency domain and working backwards to find the impulse response. Ultimately that is how our filter is represented (by its taps).
 
-You start by creating a vector of your desired frequency response.  As an example, let's design an arbitrarily shaped low-pass filter shown below:
+You start by creating a vector of your desired frequency response.  Let's design an arbitrarily shaped low-pass filter shown below:
 
 .. image:: ../_static/filter_design1.png
    :scale: 70 % 
    :align: center 
 
-And the code used to create this is fairly simple:
+The code used to create this filter is fairly simple:
 
 .. code-block:: python
 
@@ -397,20 +397,20 @@ And the code used to create this is fairly simple:
 	plt.show()
 
 
-:code:`hstack()` is just one way to concatenate arrays in numpy.  We know this will lead to a filter with complex taps, why?
+:code:`hstack()` is one way to concatenate arrays in numpy.  We know it will lead to a filter with complex taps. Why?
 
 .. raw:: html
 
    <details>
    <summary><a>Answer</a></summary>
 
-It's not symmetrical around 0 Hz
+It's not symmetrical around 0 Hz.
 
 .. raw:: html
 
    </details>
 
-Our end goal is to find the taps of this filter so we can actually use it.  How do we get the taps, given the frequency response?  Well, how do we convert from the frequency domain back to the time domain?  Inverse FFT (IFFT)!  And recall that the IFFT function is almost exactly the same as the FFT function.  We also need to ifftshift our desired frequency response before the ifft, and then we need yet another iffshift after the ifft (no, they don't cancel themselves out, you can try).  This might seem confusing, but just remember that you always should fftshift after an fft, and iffshift after an ifft.  
+Our end goal is to find the taps of this filter so we can actually use it.  How do we get the taps, given the frequency response?  Well, how do we convert from the frequency domain back to the time domain?  Inverse FFT (IFFT)!  Recall that the IFFT function is almost exactly the same as the FFT function.  We also need to IFFTshift our desired frequency response before the IFFT, and then we need yet another IFFshift after the IFFT (no, they don't cancel themselves out, you can try).  This process might seem confusing. Just remember that you always should FFTshift after an FFT and IFFshift after an IFFT.
 
 .. code-block:: python
 
@@ -424,7 +424,7 @@ Our end goal is to find the taps of this filter so we can actually use it.  How 
    :scale: 90 % 
    :align: center 
 
-Now let's say we use these taps shown above as our filter.  We know that the impulse response is just plotting the taps, so what we see above *is* our impulse response.  Lets take the FFT of our taps to see what the frequency domain actually looks like.  We will do a 1024 point FFT to get a high resolution:
+We will use these taps shown above as our filter.  We know that the impulse response is plotting the taps, so what we see above *is* our impulse response.  Let's take the FFT of our taps to see what the frequency domain actually looks like.  We will do a 1,024 point FFT to get a high resolution:
 
 .. code-block:: python
 
@@ -436,9 +436,9 @@ Now let's say we use these taps shown above as our filter.  We know that the imp
    :scale: 70 % 
    :align: center 
 
-Note that it's not very straight... It doesn't match our original very well, recall the shape that we initially wanted to make a filter for.  A big reason is because our impulse response isn't done decaying, i.e. the left and right sides don't reach zero.  We have two options that will allow it to decay to zero:
+See how the frequency response not very straight... it doesn't match our original very well, if you recall the shape that we initially wanted to make a filter for.  A big reason is because our impulse response isn't done decaying, i.e., the left and right sides don't reach zero.  We have two options that will allow it to decay to zero:
 
-**Option 1:** We "window" our current impulse response so that it decays to 0 on both sides.  This involves multiplying our impulse response with a "windowing function" that starts and ends at zero.
+**Option 1:** We "window" our current impulse response so that it decays to 0 on both sides.  It involves multiplying our impulse response with a "windowing function" that starts and ends at zero.
 
 .. code-block:: python
 
@@ -451,7 +451,7 @@ Note that it's not very straight... It doesn't match our original very well, rec
    :align: center 
 
 
-**Option 2:** We re-generate our impulse response using more points so that it has time to decay.  To do this we need to add resolution to the original frequency domain array we started with (called interpolating).
+**Option 2:** We re-generate our impulse response using more points so that it has time to decay.  We need to add resolution to our original frequency domain array (called interpolating).
 
 .. code-block:: python
 
@@ -469,35 +469,34 @@ Note that it's not very straight... It doesn't match our original very well, rec
    :scale: 70 % 
    :align: center 
 
-|
 
 .. image:: ../_static/filter_design7.png
    :scale: 50 % 
    :align: center 
 
-Both options seemed to work.  Which one would you choose?  The second method resulted in more taps, but the first method resulting in a frequency response that wasn't very sharp, and the falling edge wasn't very steep.  There are many ways to design a filter, and many trade-offs along the way, many consider it an art.
+Both options worked.  Which one would you choose?  The second method resulted in more taps, but the first method resulted in a frequency response that wasn't very sharp and had a falling edge wasn't very steep.  There are numerous ways to design a filter, each with their own trade-offs along the way. Many consider filter design an art.
 
 
 *************************
 Intro to Pulse Shaping
 *************************
 
-We will briefly introduce a very interesting topic within DSP, pulse shaping, a topic we explore in depth in its own chapter.  
+We will briefly introduce a very interesting topic within DSP, pulse shaping. We will consider the topic in depth in its own chapter later. It is worth mentioning alongside filtering because both grapple with honing signals efficiently for transmission and study.
 
-As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc, to modulate a carrier so they can be sent wirelessly.  When we simulated QPSK in the :ref:`modulation-chapter` chapter, we only simulated one sample per symbol, i.e. each complex number we created was one of the points on the constellation, it was one symbol.  In practice we usually generate multiple samples per symbol, and the reason has to do with filtering. 
+As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc., to modulate a carrier so information can be sent wirelessly.  When we simulated QPSK in the :ref:`modulation-chapter` chapter, we only simulated one sample per symbol, i.e., each complex number we created was one of the points on the constellation--it was one symbol.  In practice we normally generate multiple samples per symbol, and the reason has to do with filtering.
 
-We use filters to craft the "shape" of our symbols, since the shape in the time domain will change the shape in the frequency domain.  The frequency domain is what tells us how much spectrum/bandwidth our signal is going to use, and we usually want to minimize it.  Now what's important to understand is that the spectral characteristics (frequency domain) of the baseband symbols doesn't change when we modulate a carrier, it just shifts it up in frequency, the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's kind of like transmitting square pulses, in fact BPSK using 1 sample per symbol *is* just a square wave of random 1's and -1's:
+We use filters to craft the "shape" of our symbols because the shape in the time domain changes the shape in the frequency domain.  The frequency domain informs us how much spectrum/bandwidth our signal will use, and we usually want to minimize it.  What is important to understand is that the spectral characteristics (frequency domain) of the baseband symbols do not change when we modulate a carrier; it just shifts the baseband up in frequency while the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's like transmitting square pulses. In fact BPSK using 1 sample per symbol *is* just a square wave of random 1s and -1s:
 
 .. image:: ../_static/bpsk.svg
    :align: center 
    :target: ../_static/bpsk.svg
 
-And as we have learned, square pulses are not the best, they use an excess amount of spectrum:
+And as we have learned, square pulses are not efficient because they use an excess amount of spectrum:
 
 .. image:: ../_static/square-wave.svg
    :align: center 
 
-So what we do is we "pulse shape" these blocky looking symbols so that they take up less bandwidth in the frequency domain.  We do this using a low-pass filter, because it will filter out the higher frequency components of our symbols.  Below shows an example of symbols in the time (top) and frequency (bottom) domain, before and after a pulse shaping filter has been applied:
+So what we do is we "pulse shape" these blocky-looking symbols so that they take up less bandwidth in the frequency domain.  We "pulse shape" by using a low-pass filter because it discards the higher frequency components of our symbols.  Below shows an example of symbols in the time (top) and frequency (bottom) domain, before and after a pulse-shaping filter has been applied:
 
 .. image:: ../_static/pulse_shaping.png
    :scale: 70 % 
@@ -509,22 +508,22 @@ So what we do is we "pulse shape" these blocky looking symbols so that they take
    :scale: 90 % 
    :align: center 
 
-Note how much quicker the signal drops off in frequency; the sidelobes are around 30 dB lower after pulse shaping, that's 1000x less!  And more importantly, the main lobe is more narrow, so less spectrum is used for the same amount of bits per second.
+Note how much quicker the signal drops off in frequency. The sidelobes are ~30 dB lower after pulse shaping; that's 1,000x less bandwidth!  And more importantly, the main lobe is narrower, so less spectrum is used for the same amount of bits per second.
 
-For now, be aware that common pulse shaping filters include:
+For now, be aware that common pulse-shaping filters include:
 
 1. Raised-cosine filter
 2. Root raised-cosine filter
 3. Sinc filter
 4. Gaussian filter
 
-And these filters usually have some parameter you can adjust to tell it how tight you want the bandwidth.  For example, below shows the time and frequency domain of a raised-cosine filter with different values of :math:`\beta`, the parameter that defines how steep the roll-off is.
+These filters generally have a parameter you can adjust to decrease the bandwidth used.  Below demonstrates the time and frequency domain of a raised-cosine filter with different values of :math:`\beta`, the parameter that defines how steep the roll-off is.
 
 .. image:: ../_static/pulse_shaping_rolloff.png
    :scale: 40 % 
    :align: center 
 
-You can see that a lower value of :math:`\beta` leads to less spectrum being used (for the same amount of data), but if you go too low then the time domain symbols take longer to decay to zero, in fact when :math:`\beta=0` they never fully decay to zero which means we can't actually transmit such symbols in practice.  A :math:`\beta` around 0.35 is common. 
+You can see that a lower value of :math:`\beta` reduces the spectrum used (for the same amount of data). However, if the value is too low then the time domain symbols take longer to decay to zero. Actually when :math:`\beta=0` the symbols never fully decay to zero, which means we can't transmit such symbols in practice.  A :math:`\beta` value around 0.35 is common.
 
 You will learn a lot more about pulse shaping, including some special properties that pulse shaping filters must satisfy, in the :ref:`pulse-shaping-chapter` chapter.
 
