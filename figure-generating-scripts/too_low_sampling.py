@@ -47,4 +47,4 @@ for i in range(4):
 
     # plt.show()
 
-    fig.savefig('sampling_Fs_' + str(round(Fs[i], 2)) + '.svg', bbox_inches='tight')
+    fig.savefig('../_static/sampling_Fs_' + str(round(Fs[i], 2)) + '.svg', bbox_inches='tight')
