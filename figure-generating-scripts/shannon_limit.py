@@ -1,8 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-snr_per_bit_dB = np.linspace(-20, 40, 10000) # dB
-c = np.log2(1+10**(snr_per_bit_dB/10)) # remember to do the foruma in linear
+snr_per_bit_dB = np.linspace(-20, 40, 10000)  # dB
+c = np.log2(1 + 10 ** (snr_per_bit_dB / 10))  # remember to do the foruma in linear
 '''
 # Work backwards
 c = np.linspace(0.1, 10, 1000)
@@ -15,7 +15,7 @@ fig, ax = plt.subplots(figsize=(7, 4))
 ax.plot(snr_per_bit_dB, c, 'r--')
 
 ax.axis([-20, 30, 0, 10])
-#ax.grid(True)
+# ax.grid(True)
 
 ax.set_xlabel('SNR [dB]')
 ax.set_ylabel('Shannon Limit [bits/s/Hz]')
@@ -35,8 +35,8 @@ ax.spines['top'].set_color('none')
 ax.xaxis.tick_bottom()
 
 # Turn off tick numbering/labels
-#ax.set_xticklabels([])
-#ax.set_yticklabels([])
+# ax.set_xticklabels([])
+# ax.set_yticklabels([])
 
 plt.show()
 

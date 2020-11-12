@@ -12,8 +12,7 @@ ax.plot(np.hanning(n))
 ax.plot(np.bartlett(n))
 ax.plot(np.blackman(n))
 ax.plot(np.kaiser(n, 4))
-ax.legend(['Rectangular','Hamming','Hanning','Bartlett','Blackman','Kaiser'],fontsize='large',loc='lower center')
-
+ax.legend(['Rectangular', 'Hamming', 'Hanning', 'Bartlett', 'Blackman', 'Kaiser'], fontsize='large', loc='lower center')
 
 # set the x-spine (see below for more info on `set_position`)
 ax.spines['left'].set_position('zero')
@@ -31,9 +30,8 @@ ax.xaxis.tick_bottom()
 
 # Turn off tick numbering/labels
 ax.set_xticklabels([])
-#ax.set_yticklabels([])
+# ax.set_yticklabels([])
 
 plt.show()
 
 fig.savefig('../_static/windows.svg', bbox_inches='tight')
-
