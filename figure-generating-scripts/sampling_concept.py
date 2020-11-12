@@ -25,7 +25,7 @@ for i in range(10):
 # Labels
 arrowstyle = '<->'
 ax.text(Ts * 4.35, 0.3, 'T', color='r', fontsize=18)
-ax.annotate(s='', xy=(Ts * 4 * 0.98, 0.15), xytext=(Ts * 5 * 1.02, 0.15), arrowprops=dict(color='red', arrowstyle=arrowstyle))  # amplitude
+ax.annotate(text='', xy=(Ts * 4 * 0.98, 0.15), xytext=(Ts * 5 * 1.02, 0.15), arrowprops=dict(color='red', arrowstyle=arrowstyle))  # amplitude
 ax.text(Ts * 1.7, 1.2, 'S(t)', color='g', fontsize=18)
 ax.text(max(t) * 1.07, -0.2, 't', color='black', fontsize=18)
 
