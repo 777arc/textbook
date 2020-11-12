@@ -52,19 +52,19 @@ For most filters we will see (known as FIR type filters), we can represent the f
 
 .. code-block:: python
 
-	h =  [ 9.92977939e-04  1.08410297e-03  8.51595307e-04  1.64604862e-04
-	 -1.01714338e-03 -2.46268845e-03 -3.58236429e-03 -3.55412543e-03
-	 -1.68583512e-03  2.10562324e-03  6.93100252e-03  1.09302641e-02
-	  1.17766532e-02  7.60955496e-03 -1.90555639e-03 -1.48306750e-02
-	 -2.69313236e-02 -3.25659606e-02 -2.63400086e-02 -5.04184562e-03
-	  3.08099470e-02  7.64264738e-02  1.23536693e-01  1.62377258e-01
-	  1.84320776e-01  1.84320776e-01  1.62377258e-01  1.23536693e-01
-	  7.64264738e-02  3.08099470e-02 -5.04184562e-03 -2.63400086e-02
-	 -3.25659606e-02 -2.69313236e-02 -1.48306750e-02 -1.90555639e-03
-	  7.60955496e-03  1.17766532e-02  1.09302641e-02  6.93100252e-03
-	  2.10562324e-03 -1.68583512e-03 -3.55412543e-03 -3.58236429e-03
-	 -2.46268845e-03 -1.01714338e-03  1.64604862e-04  8.51595307e-04
-	  1.08410297e-03  9.92977939e-04]
+    h =  [ 9.92977939e-04  1.08410297e-03  8.51595307e-04  1.64604862e-04
+     -1.01714338e-03 -2.46268845e-03 -3.58236429e-03 -3.55412543e-03
+     -1.68583512e-03  2.10562324e-03  6.93100252e-03  1.09302641e-02
+      1.17766532e-02  7.60955496e-03 -1.90555639e-03 -1.48306750e-02
+     -2.69313236e-02 -3.25659606e-02 -2.63400086e-02 -5.04184562e-03
+      3.08099470e-02  7.64264738e-02  1.23536693e-01  1.62377258e-01
+      1.84320776e-01  1.84320776e-01  1.62377258e-01  1.23536693e-01
+      7.64264738e-02  3.08099470e-02 -5.04184562e-03 -2.63400086e-02
+     -3.25659606e-02 -2.69313236e-02 -1.48306750e-02 -1.90555639e-03
+      7.60955496e-03  1.17766532e-02  1.09302641e-02  6.93100252e-03
+      2.10562324e-03 -1.68583512e-03 -3.55412543e-03 -3.58236429e-03
+     -2.46268845e-03 -1.01714338e-03  1.64604862e-04  8.51595307e-04
+      1.08410297e-03  9.92977939e-04]
 
 Example Use-Case
 ########################
@@ -118,51 +118,51 @@ A given filter also has a time domain representation; it’s called the "impulse
 
 .. code-block:: python
 
-	h =  [-0.00025604525581002235, 0.00013669139298144728, 0.0005385575350373983,
-	0.0008378280326724052, 0.000906112720258534, 0.0006353431381285191,
-	-9.884083502996931e-19, -0.0008822851814329624, -0.0017323142383247614,
-	-0.0021665366366505623, -0.0018335371278226376, -0.0005912294145673513,
-	0.001349081052467227, 0.0033936649560928345, 0.004703888203948736, 
-	0.004488115198910236, 0.0023609865456819534, -0.0013707970501855016,
-	-0.00564080523326993, -0.008859002031385899, -0.009428252466022968, 
-	-0.006394983734935522, 4.76480351940553e-18, 0.008114570751786232, 
-	0.015200719237327576, 0.018197273835539818, 0.01482443418353796, 
-	0.004636279307305813, -0.010356673039495945, -0.025791890919208527,
-	-0.03587324544787407, -0.034922562539577484, -0.019146423786878586,
-	0.011919975280761719, 0.05478153005242348, 0.10243935883045197, 
-	0.1458890736103058, 0.1762896478176117, 0.18720689415931702, 
-	0.1762896478176117, 0.1458890736103058, 0.10243935883045197,
-	0.05478153005242348, 0.011919975280761719, -0.019146423786878586,
-	-0.034922562539577484, -0.03587324544787407, -0.025791890919208527, 
-	-0.010356673039495945, 0.004636279307305813, 0.01482443418353796, 
-	0.018197273835539818, 0.015200719237327576, 0.008114570751786232, 
-	4.76480351940553e-18, -0.006394983734935522, -0.009428252466022968, 
-	-0.008859002031385899, -0.00564080523326993, -0.0013707970501855016,
-	0.0023609865456819534, 0.004488115198910236, 0.004703888203948736, 
-	0.0033936649560928345, 0.001349081052467227, -0.0005912294145673513, 
-	-0.0018335371278226376, -0.0021665366366505623, -0.0017323142383247614, 
-	-0.0008822851814329624, -9.884083502996931e-19, 0.0006353431381285191, 
-	0.000906112720258534, 0.0008378280326724052, 0.0005385575350373983,
-	0.00013669139298144728, -0.00025604525581002235]
+    h =  [-0.00025604525581002235, 0.00013669139298144728, 0.0005385575350373983,
+    0.0008378280326724052, 0.000906112720258534, 0.0006353431381285191,
+    -9.884083502996931e-19, -0.0008822851814329624, -0.0017323142383247614,
+    -0.0021665366366505623, -0.0018335371278226376, -0.0005912294145673513,
+    0.001349081052467227, 0.0033936649560928345, 0.004703888203948736,
+    0.004488115198910236, 0.0023609865456819534, -0.0013707970501855016,
+    -0.00564080523326993, -0.008859002031385899, -0.009428252466022968,
+    -0.006394983734935522, 4.76480351940553e-18, 0.008114570751786232,
+    0.015200719237327576, 0.018197273835539818, 0.01482443418353796,
+    0.004636279307305813, -0.010356673039495945, -0.025791890919208527,
+    -0.03587324544787407, -0.034922562539577484, -0.019146423786878586,
+    0.011919975280761719, 0.05478153005242348, 0.10243935883045197,
+    0.1458890736103058, 0.1762896478176117, 0.18720689415931702,
+    0.1762896478176117, 0.1458890736103058, 0.10243935883045197,
+    0.05478153005242348, 0.011919975280761719, -0.019146423786878586,
+    -0.034922562539577484, -0.03587324544787407, -0.025791890919208527,
+    -0.010356673039495945, 0.004636279307305813, 0.01482443418353796,
+    0.018197273835539818, 0.015200719237327576, 0.008114570751786232,
+    4.76480351940553e-18, -0.006394983734935522, -0.009428252466022968,
+    -0.008859002031385899, -0.00564080523326993, -0.0013707970501855016,
+    0.0023609865456819534, 0.004488115198910236, 0.004703888203948736,
+    0.0033936649560928345, 0.001349081052467227, -0.0005912294145673513,
+    -0.0018335371278226376, -0.0021665366366505623, -0.0017323142383247614,
+    -0.0008822851814329624, -9.884083502996931e-19, 0.0006353431381285191,
+    0.000906112720258534, 0.0008378280326724052, 0.0005385575350373983,
+    0.00013669139298144728, -0.00025604525581002235]
 
 And even though we haven't gotten into filter design yet, here is the Python code that generated that filter:
 
 .. code-block:: python
 
-	import numpy as np
-	from scipy import signal
-	import matplotlib.pyplot as plt
+    import numpy as np
+    from scipy import signal
+    import matplotlib.pyplot as plt
 
-	num_taps = 51 # it helps to use an odd number of taps
-	cut_off = 3000 # Hz
-	sample_rate = 32000 # Hz
+    num_taps = 51 # it helps to use an odd number of taps
+    cut_off = 3000 # Hz
+    sample_rate = 32000 # Hz
 
-	# create our low pass filter
-	h = signal.firwin(num_taps, cut_off, nyq=sample_rate/2)
+    # create our low pass filter
+    h = signal.firwin(num_taps, cut_off, nyq=sample_rate/2)
 
-	# plot the impulse response
-	plt.plot(h, '.-')
-	plt.show()
+    # plot the impulse response
+    plt.plot(h, '.-')
+    plt.show()
 
 Simply plotting this array of floats gives us the filter's impulse response:
 
@@ -174,7 +174,7 @@ And here is the code that was used to produce the frequency response, shown earl
 
 .. code-block:: python
 
-	# plot the frequency response
+    # plot the frequency response
     H = np.abs(np.fft.fft(h, 1024)) # take the 1024-point FFT and magnitude
     H = np.fft.fftshift(H) # make 0 Hz in the center
     w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
@@ -199,31 +199,31 @@ As an example of complex taps, let's go back to the filtering use-case, except t
 One way to design this kind of filter is to make a **low**-pass filter with a cutoff of 3 kHz and then frequency shift it.  Remember that we can frequency shift x(t) (time domain) by multiplying it by :math:`e^{j2\pi f_0t}`.  So in this case :math:`f_0` should be 10 kHz, that way it shifts our filter up by 10 kHz. Recall that in our Python code from above, h was the filter taps of the low-pass filter.  In order to create our band-pass filter we just have to multiply those taps by :math:`e^{j2\pi f_0t}`, although that involves creating a vector to represent time, based on our sample period (inverse of sample rate):
 
 .. code-block:: python
-	
-	# (h was found using the first code snippet)
-	
-	# Shift the filter in frequency by multiplying by exp(j*2*pi*f0*t)
-	f0 = 10e3 # amount we will shift
-	Ts = 1.0/sample_rate # sample period
-	t = np.arange(0.0, Ts*len(h), Ts) # time vector. args are (start, stop, step)
-	exponential = np.exp(2j*np.pi*f0*t) # this is essentially a complex sine wave
-	
-	h_band_pass = h * exponential # do the shift
-	
-	# plot impulse response
-	plt.subplot(121)
-	plt.plot(np.real(h_band_pass), '.-')
-	plt.plot(np.imag(h_band_pass), '.-')
-	plt.legend(['real', 'imag'], loc=1)
-	
-	# plot the frequency response
+
+    # (h was found using the first code snippet)
+
+    # Shift the filter in frequency by multiplying by exp(j*2*pi*f0*t)
+    f0 = 10e3 # amount we will shift
+    Ts = 1.0/sample_rate # sample period
+    t = np.arange(0.0, Ts*len(h), Ts) # time vector. args are (start, stop, step)
+    exponential = np.exp(2j*np.pi*f0*t) # this is essentially a complex sine wave
+
+    h_band_pass = h * exponential # do the shift
+
+    # plot impulse response
+    plt.subplot(121)
+    plt.plot(np.real(h_band_pass), '.-')
+    plt.plot(np.imag(h_band_pass), '.-')
+    plt.legend(['real', 'imag'], loc=1)
+
+    # plot the frequency response
     H = np.abs(np.fft.fft(h_band_pass, 1024)) # take the 1024-point FFT and magnitude
     H = np.fft.fftshift(H) # make 0 Hz in the center
-	w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
-	plt.subplot(122)
-	plt.plot(w, H, '.-')
-	plt.xlabel('Frequency [Hz]')
-	plt.show()
+    w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
+    plt.subplot(122)
+    plt.plot(w, H, '.-')
+    plt.xlabel('Frequency [Hz]')
+    plt.show()
 
 The plot of the impulse response should look like this:
 
@@ -385,12 +385,12 @@ And the code used to create this is fairly simple:
 
 .. code-block:: python
 
-	import numpy as np
-	import matplotlib.pyplot as plt
-	H = np.hstack((np.zeros(20), np.arange(10)/10, np.zeros(20)))
-	w = np.linspace(-0.5, 0.5, 50)
-	plt.plot(w, H, '.-')
-	plt.show()
+    import numpy as np
+    import matplotlib.pyplot as plt
+    H = np.hstack((np.zeros(20), np.arange(10)/10, np.zeros(20)))
+    w = np.linspace(-0.5, 0.5, 50)
+    plt.plot(w, H, '.-')
+    plt.show()
 
 
 :code:`hstack()` is just one way to concatenate arrays in numpy.  We know this will lead to a filter with complex taps, why?
@@ -410,12 +410,12 @@ Our end goal is to find the taps of this filter so we can actually use it.  How 
 
 .. code-block:: python
 
-	h = np.fft.ifftshift(np.fft.ifft(np.fft.ifftshift(H)))
-	plt.plot(np.real(h))
-	plt.plot(np.imag(h))
-	plt.legend(['real','imag'], loc=1)
-	plt.show()
-	
+    h = np.fft.ifftshift(np.fft.ifft(np.fft.ifftshift(H)))
+    plt.plot(np.real(h))
+    plt.plot(np.imag(h))
+    plt.legend(['real','imag'], loc=1)
+    plt.show()
+
 .. image:: ../_static/filter_design2.png
    :scale: 90 % 
    :align: center 
@@ -424,9 +424,9 @@ Now let's say we use these taps shown above as our filter.  We know that the imp
 
 .. code-block:: python
 
-	H_fft = np.fft.fftshift(np.abs(np.fft.fft(h, 1024)))
-	plt.plot(H_fft)
-	plt.show()
+    H_fft = np.fft.fftshift(np.abs(np.fft.fft(h, 1024)))
+    plt.plot(H_fft)
+    plt.show()
 
 .. image:: ../_static/filter_design3.png
    :scale: 70 % 
@@ -438,9 +438,9 @@ Note that it's not very straight... It doesn't match our original very well, rec
 
 .. code-block:: python
 
-	# After creating h using the previous code, create and apply the window
-	window = np.hamming(len(h))
-	h = h * window
+    # After creating h using the previous code, create and apply the window
+    window = np.hamming(len(h))
+    h = h * window
 
 .. image:: ../_static/filter_design4.png
    :scale: 70 % 
@@ -451,11 +451,11 @@ Note that it's not very straight... It doesn't match our original very well, rec
 
 .. code-block:: python
 
-	H = np.hstack((np.zeros(200), np.arange(100)/100, np.zeros(200)))
-	w = np.linspace(-0.5, 0.5, 500)
-	plt.plot(w, H, '.-')
-	plt.show()
-	# (the rest of the code is the same)
+    H = np.hstack((np.zeros(200), np.arange(100)/100, np.zeros(200)))
+    w = np.linspace(-0.5, 0.5, 500)
+    plt.plot(w, H, '.-')
+    plt.show()
+    # (the rest of the code is the same)
 
 .. image:: ../_static/filter_design5.png
    :scale: 60 % 
