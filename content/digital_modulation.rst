@@ -72,15 +72,17 @@ Amplitude Shift Keying (ASK)
 
 Amplitude Shift Keying (ASK) is the first digital modulation scheme we will discuss because amplitude modulation is the simplest to visualize of the three sinusoid properties.  We literally modulate the **amplitude** of the carrier.  Here is an example of 2-level ASK, called 2-ASK:
 
-.. image:: ../_static/ASK.png
-   :scale: 50 % 
-   :align: center 
+.. image:: ../_static/ASK.svg
+   :align: center
+   :target: ../_static/ASK.svg
+
+Note how the average value is zero; we always prefer this whenever possible. 
 
 We can use more than two levels, allowing for more bits per symbol.  Below shows an example of 4-ASK.  In this case each symbol carries 2 bits of information. 
 
-.. image:: ../_static/ask2.png
-   :scale: 100 % 
-   :align: center 
+.. image:: ../_static/ask2.svg
+   :align: center
+   :target: ../_static/ask2.svg
 
 Question: How many symbols are shown in the signal snippet above?  How many bits are represented total?
 
@@ -89,19 +91,19 @@ Question: How many symbols are shown in the signal snippet above?  How many bits
    <details>
    <summary><a>Answers</a></summary>
 
-Five symbols, 10 bits of information
+20 symbols, so 40 bits of information
 
 .. raw:: html
 
    </details>
 
-How do we actually create this signal digitally, through code?  All we have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).
+How do we actually create this signal digitally, through code?  All we have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).  The example below shows 2-ASK with 10 samples per symbol.  
 
-.. image:: ../_static/ask3.png
-   :scale: 80 % 
-   :align: center 
+.. image:: ../_static/ask3.svg
+   :align: center
+   :target: ../_static/ask3.svg
 
-The top plot shows the discrete samples represented by dots, and the bottom plot shows what the resulting signal looks like, which could be represented digitally or even transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there may be thousands, depending on how high in the spectrum the signal is being transmitted.
+The top plot shows the discrete samples represented by red dots, i.e., our digital signal.  The bottom plot shows what the resulting modulated signal looks like, which could be transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there may be thousands, depending on how high in the spectrum the signal is being transmitted.
 
 ************************
 Phase Shift Keying (PSK)
@@ -173,13 +175,13 @@ There is nothing invalid about this PSK scheme. You can certainly use it, but, b
 
    </details>
 
-Let's detour back to ASK for a moment.  Note that we can show ASK on the IQ plot just like PSK.  Here is the IQ plot of 2-ASK, 4-ASK, and 8-ASK:
+Let's detour back to ASK for a moment.  Note that we can show ASK on the IQ plot just like PSK.  Here is the IQ plot of 2-ASK, 4-ASK, and 8-ASK, in the bipolar configuration, as well as 2-ASK and 4-ASK in the unipolar configuration.
 
 .. image:: ../_static/ask_set.png
-   :scale: 60 % 
+   :scale: 50 % 
    :align: center 
 
-As you may have noticed, 2-ASK and BPSK are the same. A 180 degree phase shift is the same as multiplying the sinusoid by -1.  We call it BPSK, probably because PSK is used way more than ASK.
+As you may have noticed, bipolar 2-ASK and BPSK are the same. A 180 degree phase shift is the same as multiplying the sinusoid by -1.  We call it BPSK, probably because PSK is used way more than ASK.
 
 **************************************
 Quadrature Amplitude Modulation (QAM)

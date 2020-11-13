@@ -47,6 +47,16 @@ plt.show()
 
 fig.savefig('../_static/raised_cosine.svg', bbox_inches='tight')
 
+
+
+
+
+
+
+
+
+
+
 fig, (ax1) = plt.subplots(1, 1, figsize=(10, 3))
 plt.subplots_adjust(wspace=0.4)
 
@@ -99,6 +109,16 @@ ax1.set_yticklabels([])
 plt.show()
 
 fig.savefig('../_static/raised_cosine_freq.svg', bbox_inches='tight')
+
+
+
+
+
+
+
+
+
+
 
 fig, (ax1) = plt.subplots(1, 1, figsize=(10, 3))
 plt.subplots_adjust(wspace=0.4)
