@@ -111,7 +111,7 @@ Now let's consider modulating the phase in a similar manner as we did with the a
 
 1. No phase change
 2. 180 degree phase change
-	
+
 Example of BPSK (note the phase changes):
 
 .. image:: ../_static/bpsk.svg

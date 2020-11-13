@@ -118,7 +118,7 @@ This means more filter taps are required the lower :math:`\beta` gets, and when 
 A common equation used to approximate bandwidth, in Hz, used for a given symbol rate and roll-off factor is:
 
 .. math::
-	\mathrm{BW} = R_S(\beta + 1)
+    \mathrm{BW} = R_S(\beta + 1)
 
 where :math:`R_S` is the symbol rate in Hz.  For wireless comms we usually like a roll-off between 0.2 and 0.5.  So as a rule of thumb, a digital signal that uses symbol rate :math:`R_S` is going to occupy a little more than :math:`R_S` worth of spectrum, and this includes both positive and negative portions of spectrum, because once we upconvert and transmit our signal, both sides certainly matter.  So if we transmit QPSK at 1 million symbols per second (MSps), it will occupy around 1.3 MHz.  The data rate will be 2 Mbps (recall that QPSK uses 2 bits per symbol), minus any overhead like channel coding and frame headers.
 
@@ -132,24 +132,24 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
 
 .. code-block:: python
 
-	import numpy as np
-	import matplotlib.pyplot as plt
-	from scipy import signal
-	
-	num_symbols = 10
-	sps = 8
-	
-	bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
-	
-	x = np.array([])
-	for bit in bits:
-	    pulse = np.zeros(sps)
-	    pulse[0] = bit*2-1 # set the first value to either a 1 or -1
-	    x = np.concatenate((x, pulse)) # add the 8 samples to the signal
-	plt.figure(0)
-	plt.plot(x, '.-')
-	plt.grid(True)
-	plt.show()
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from scipy import signal
+
+    num_symbols = 10
+    sps = 8
+
+    bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
+
+    x = np.array([])
+    for bit in bits:
+        pulse = np.zeros(sps)
+        pulse[0] = bit*2-1 # set the first value to either a 1 or -1
+        x = np.concatenate((x, pulse)) # add the 8 samples to the signal
+    plt.figure(0)
+    plt.plot(x, '.-')
+    plt.grid(True)
+    plt.show()
 
 .. image:: ../_static/pulse_shaping_python1.png
    :scale: 80 % 
@@ -167,16 +167,16 @@ We will create a raised-cosine filter, using a beta of 0.35, and make it 101 tap
 
 .. code-block:: python
 
-	# Create our raised-cosine filter
-	num_taps = 101
-	beta = 0.35
-	Ts = sps # Assume sample rate is 1 Hz, so sample period is 1, so *symbol* period is 8
-	t = np.arange(-51, 52) # remember it's not inclusive of final number
-	h = np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
-	plt.figure(1)
-	plt.plot(t, h, '.')
-	plt.grid(True)
-	plt.show()
+    # Create our raised-cosine filter
+    num_taps = 101
+    beta = 0.35
+    Ts = sps # Assume sample rate is 1 Hz, so sample period is 1, so *symbol* period is 8
+    t = np.arange(-51, 52) # remember it's not inclusive of final number
+    h = np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
+    plt.figure(1)
+    plt.plot(t, h, '.')
+    plt.grid(True)
+    plt.show()
 
 
 .. image:: ../_static/pulse_shaping_python2.png
@@ -189,14 +189,14 @@ Lastly, we can filter our signal x and look at the result.  Don't get too caught
 
 .. code-block:: python 
  
-	# Filter our signal, in order to apply the pulse shaping
-	x_shaped = np.convolve(x, h)
-	plt.figure(2)
-	plt.plot(x_shaped, '.-')
-	for i in range(num_symbols):
-	    plt.plot([i*sps+num_taps//2+1,i*sps+num_taps//2+1], [min(x_shaped), max(x_shaped)])
-	plt.grid(True)
-	plt.show()
+    # Filter our signal, in order to apply the pulse shaping
+    x_shaped = np.convolve(x, h)
+    plt.figure(2)
+    plt.plot(x_shaped, '.-')
+    for i in range(num_symbols):
+        plt.plot([i*sps+num_taps//2+1,i*sps+num_taps//2+1], [min(x_shaped), max(x_shaped)])
+    plt.grid(True)
+    plt.show()
 
 .. image:: ../_static/pulse_shaping_python3.png
    :scale: 60 % 

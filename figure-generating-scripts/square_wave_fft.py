@@ -1,24 +1,21 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-
-y = np.repeat(np.arange(10)%2, 20)*2 - 1
+y = np.repeat(np.arange(10) % 2, 20) * 2 - 1
 y = y.astype(float)
 Y = np.abs(np.fft.rfft(y, 10000))
 print(Y)
-fig, (ax1, ax2) = plt.subplots(1,2,figsize=(10, 3))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 3))
 plt.subplots_adjust(wspace=0.4)
-
 
 # Plot stuff
 ax1.plot(y)
-ax1.text(len(y)+10, -0.05, 'Time')
+ax1.text(len(y) + 10, -0.05, 'Time')
 ax1.set_ylabel("Amplitude")
 
 ax2.plot(Y)
 ax2.set_xlabel("Frequency")
 ax2.set_ylabel("Magnitude")
-
 
 # set the x-spine (see below for more info on `set_position`)
 ax1.spines['left'].set_position('zero')

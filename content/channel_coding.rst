@@ -34,7 +34,7 @@ To perform channel coding we use an "error correction code".  This code tells us
 
 .. role::  raw-html(raw)
     :format: html
-	
+
 - 0 :raw-html:`&rarr;` 000
 - 1 :raw-html:`&rarr;` 111
 

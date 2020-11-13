@@ -53,7 +53,7 @@ To further illustrate the problems of scale we encounter in signal processing, c
 For a given value x, we can represent x in dB using the following formula:
 
 .. math::
-	x_{dB} = 10 \log_{10} x
+    x_{dB} = 10 \log_{10} x
 
 In Python:  
 
@@ -67,7 +67,7 @@ We convert from dB back to linear (normal numbers) using:
 
 .. math::
     x = 10^{x_{dB}/10}
-	
+
 In Python: 
 
 .. code-block:: python

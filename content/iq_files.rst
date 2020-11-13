@@ -34,24 +34,24 @@ In Python, and numpy specifically, we use the :code:`tofile()` function to store
 
 .. code-block:: python
 
-	import numpy as np
-	import matplotlib.pyplot as plt
-	
-	num_symbols = 10000
-	
-	x_symbols = np.random.randint(0, 2, num_symbols)*2-1 # -1 and 1's
-	n = (np.random.randn(num_symbols) + 1j*np.random.randn(num_symbols))/np.sqrt(2) # AWGN with unity power
-	r = x_symbols + n * np.sqrt(0.01) # noise power of 0.01
-	print(r)
-	plt.plot(np.real(r), np.imag(r), '.')
-	plt.grid(True)
-	plt.show()
-	
-	# Now save to an IQ file
-	print(type(r[0])) # Check data type.  Ooops it's 128 not 64!
-	r = r.astype(np.complex64) # Convert to 64
-	print(type(r[0])) # Verify it's 64
-	r.tofile('bpsk_in_noise.iq') # Save to file
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    num_symbols = 10000
+
+    x_symbols = np.random.randint(0, 2, num_symbols)*2-1 # -1 and 1's
+    n = (np.random.randn(num_symbols) + 1j*np.random.randn(num_symbols))/np.sqrt(2) # AWGN with unity power
+    r = x_symbols + n * np.sqrt(0.01) # noise power of 0.01
+    print(r)
+    plt.plot(np.real(r), np.imag(r), '.')
+    plt.grid(True)
+    plt.show()
+
+    # Now save to an IQ file
+    print(type(r[0])) # Check data type.  Ooops it's 128 not 64!
+    r = r.astype(np.complex64) # Convert to 64
+    print(type(r[0])) # Verify it's 64
+    r.tofile('bpsk_in_noise.iq') # Save to file
 
 
 Now look at the details of the file that was produced and check how many bytes it is.  It should be num_symbols * 8, because we used np.complex64 which is 8 bytes per sample, 4 bytes per float (2 floats per sample).  
@@ -60,16 +60,16 @@ Using a new Python script, we can read in this file using :code:`np.fromfile()`,
 
 .. code-block:: python
 
-	import numpy as np
-	import matplotlib.pyplot as plt
-	
-	samples = np.fromfile('bpsk_in_noise.iq', np.complex64) # Read in file.  We have to tell it what format it is
-	print(samples)
-	
-	# Plot constellation to make sure it looks right
-	plt.plot(np.real(samples), np.imag(samples), '.')
-	plt.grid(True)
-	plt.show()
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    samples = np.fromfile('bpsk_in_noise.iq', np.complex64) # Read in file.  We have to tell it what format it is
+    print(samples)
+
+    # Plot constellation to make sure it looks right
+    plt.plot(np.real(samples), np.imag(samples), '.')
+    plt.grid(True)
+    plt.show()
 
 A big mistake is to forget to tell np.fromfile() what the file format is, since binary files don't include any information about their format, and by default np.fromfile() assumes an array of float64's.
 
@@ -79,16 +79,16 @@ For those who have a PlutoSDR, the below code will grab a set of samples from th
 
 .. code-block:: python
 
-	import adi
-	import numpy as np
-	sdr = adi.Pluto('ip:192.168.2.1')
-	sdr.sample_rate = int(5e6)
-	sdr.rx_rf_bandwidth = int(5e6)
-	sdr.rx_lo = int(751e6)
-	sdr.gain_control_mode = "slow_attack" # automatic gain control
-	samples = sdr.rx()
-	samples = samples.astype(np.complex64) # by default numpy uses complex128
-	samples.tofile('collect_751MHz.iq')
+    import adi
+    import numpy as np
+    sdr = adi.Pluto('ip:192.168.2.1')
+    sdr.sample_rate = int(5e6)
+    sdr.rx_rf_bandwidth = int(5e6)
+    sdr.rx_lo = int(751e6)
+    sdr.gain_control_mode = "slow_attack" # automatic gain control
+    samples = sdr.rx()
+    samples = samples.astype(np.complex64) # by default numpy uses complex128
+    samples.tofile('collect_751MHz.iq')
 
 
 *************************
