@@ -4,21 +4,21 @@
 Filters
 #############
 
-In this chapter we get introduced to filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, a topic explored in depth in its own chapter.
+This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which is another strategy for modifying waveform shape.
 
 *************************
 Filter Basics
 *************************
 
-Filters are used in many disciplines, for example image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which filters out solids from liquid.  In DSP, filters are primarily used for:
+Filters are used in many disciplines. For example, image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which strains out solids from liquid.  In DSP, filters are primarily used for:
 
-1. Separation of signals that have been combined (e.g. pulling out the signal you want)
-2. Removing excess noise after receiving a signal
-3. Restoration of signals that have been distorted in some way (e.g. an audio equalizer is a filter)
+1. Separation of signals that have been combined (e.g., extracting the signal you want)
+2. Removal of excess noise after receiving a signal
+3. Restoration of signals that have been distorted in some way (e.g., an audio equalizer is a filter)
 
-There are certainly other uses for filters.  
+There are certainly other uses for filters, but this chapter is meant to introduce the concept rather than explain all the ways filtering can happen.
 
-There are analog filters and digital filters.  You may think we only care about digital filters; this is a DSP based textbook after all, but it's also important to know that a lot of filters will be analog, such as filters in our SDRs that come before the analog-to-digital converter (ADC) on the receive side. 
+You may think we only care about digital filters; this textbook explores DSP, after all. However, it's important to know that a lot of filters will be analog, like those in our SDRs placed before the analog-to-digital converter (ADC) on the receive side. The following image juxtaposes a schematic of an analog filter circuit with a flowchart representation of a digital filtering algorithm. While the analog filter modifies an electrical current as a representation of a signal, the digital algorithm manipulates the data representation of a signal. Despite these differences, the goal of filtering is to remove some aspect of a signal.
 
 .. image:: ../_static/analog_digital_filter.png
    :scale: 70 % 
@@ -30,9 +30,9 @@ In DSP, where the input and output are signals, a filter has one input signal an
    :scale: 70 % 
    :align: center 
 
-You cannot feed two different signals into a single filter, without adding them together first, or doing some other operation.  Likewise, the output will always be one signal, i.e. a 1D array of numbers.  
+You cannot feed two different signals into a single filter without adding them together first or doing some other operation.  Likewise, the output will always be one signal, i.e., a 1D array of numbers.
 
-There are four basic types of filters: 
+There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The graphs below demonstrate how frequencies in signals are filtered for each type. Try to envision what each type is distinguishing among signal frequencies.
 
 .. image:: ../_static/filter_types.png
    :scale: 70 % 
@@ -40,15 +40,15 @@ There are four basic types of filters:
 
 (ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
 
-Each filter lets certain frequencies through, and blocks other frequencies.  The range of frequencies it lets through is known as the "passband", and the "stopband" is what gets blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband. 
+Each filter permits certain frequencies to remain from a signal while blocking other frequencies.  The range of frequencies a filter lets through is known as the "passband", and "stopband" refers to what is blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband.
 
-Do not get this confused with the different types of filter implementation (e.g. IIR vs FIR).  The most common type by far is the low-pass filter (LPF), because we often represent signals at baseband, so the LPF lets us filter out everything "around" our signal, to get rid of excess noise and other signals.  
+Do not confuse these filtering types with filter algorithmic implementation (e.g., IIR vs FIR).  The most common type by far is the low-pass filter (LPF) because we often represent signals at baseband.  LPF allows us to filter out everything "around" our signal, removing excess noise and other signals.
 
 *************************
 Filter Representation
 *************************
 
-For most filters we will see (known as FIR type filters), we can represent the filter itself with a single array of floats.  For symmetrical filters, these floats will be real (versus complex), and there will usually be an odd number of floats.  We call this array of floats the "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
+For most filters we will see (known as FIR, or Finite Impulse Response, type filters), we can represent the filter itself with a single array of floats.  For symmetrical filters that shift frequency components in time, these floats will be real (versus complex), and there tends to be an odd number of them.  We call this array of floats "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
 
 .. code-block:: python
 
@@ -69,52 +69,54 @@ For most filters we will see (known as FIR type filters), we can represent the f
 Example Use-Case
 ########################
 
-To learn how filters are actually used, let's look an an example where we tune our SDR to a frequency we know a signal exists, and we want to isolate it from other signals.  Remember that we tell our SDR what frequency to tune to, but the samples it gives us are at baseband, so the signal will show up centered around 0 Hz, we just have to keep track of which frequency we told the SDR to tune to.  Here is what we might receive:
+To learn how filters are used, let's look an an example where we tune our SDR to a frequency of an existing signal, and we want to isolate it from other signals.  Remember that we tell our SDR which frequency to tune to, but the samples that the SDR captures are at baseband, meaning the signal will display as centered around 0 Hz. We will have to keep track of which frequency we told the SDR to tune to.  Here is what we might receive:
 
 .. image:: ../_static/filter_use_case.png
    :scale: 70 % 
    :align: center 
 
-Because our signal is already centered at DC (0 Hz), we know we want a low pass filter.  We must choose a "cutoff frequency" (a.k.a. corner frequency) which will determine when the passband transitions to stopband.  Cutoff frequency will always be in units of Hz.  In this example, 3 kHz seems like a good value:
+Because our signal is already centered at DC (0 Hz), we know we want a low-pass filter.  We must choose a "cutoff frequency" (a.k.a. corner frequency), which will determine when the passband transitions to stopband.  Cutoff frequency will always be in units of Hz.  In this example, 3 kHz seems like a good value:
 
 .. image:: ../_static/filter_use_case2.png
    :scale: 70 % 
    :align: center 
 
-However, the way most low pass filters work, the negative frequency boundary will be -3 kHz as well.  I.e., it’s symmetrical around DC (later on you will see why).  So our cutoff frequencies will look something like this (the passband is the area in between):
+However, the way most low-pass filters work, the negative frequency boundary will be -3 kHz as well.  I.e., it’s symmetrical around DC (later on you will see why).  Our cutoff frequencies will look something like this (the passband is the area in between):
 
 .. image:: ../_static/filter_use_case3.png
    :scale: 70 % 
    :align: center 
 
-After creating and applying the filter with a cutoff freq of 3 kHz, this is what we get:
+After creating and applying the filter with a cutoff freq of 3 kHz, we now have:
 
 .. image:: ../_static/filter_use_case4.png
    :scale: 70 % 
    :align: center 
 
-This filtered signal will look confusing until you recall that our noise floor *was* at the green line, around -65 dB.  So even though we can still see the signal centered at 10 kHz, we have *severely* decreased the power of that signal, to the point where it's now below where the noise floor was.  We also removed most of the noise that existed in the stopband.  
+This filtered signal will look confusing until you recall that our noise floor *was* at the green line around -65 dB.  Even though we can still see the interfering signal centered at 10 kHz, we have *severely* decreased the power of that signal. It's now below where the noise floor was!  We also removed most of the noise that existed in the stopband.
 
-In addition to cutoff frequency, the other main parameter of our low-pass filter is called the "transition width".  Transition width is also in Hz, and it tells the filter how quickly it has to go between the passband and stopband, since an instant transition is impossible.  In the diagram below, :green:`green` is the ideal response, which essentially has a transition width of zero.  :red:`Red` is a realistic filter, which has some ripple and a certain transition width.
+In addition to cutoff frequency, the other main parameter of our low-pass filter is called the "transition width".  Transition width, also measured in Hz, instructs the filter how quickly it has to go between the passband and stopband since an instant transition is impossible.
+
+Let's visualize transiton width.  In the diagram below, the :green:`green` line represents the ideal response for transitioning between a passband and stopband, which essentially has a transition width of zero.  The :red:`Red` line demonstrates the result of a realistic filter, which has some ripple and a certain transition width.
 
 .. image:: ../_static/realistic_filter.png
    :scale: 100 % 
    :align: center 
 
-You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations, we will see why shortly.  A 50 tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
-Typically we use a filter designer tool, then see how many taps it outputs, and if it's way too many (e.g. more than 100) we increase the transition width.  It all depends on the application and hardware running the filter, of course.
+You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations. We will see why shortly.  A 50-tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
+Typically we use a filter designer tool, then see how many taps it outputs, and if it's way too many (e.g., more than 100) we increase the transition width.  It all depends on the application and hardware running the filter, of course.
 
 In the filtering example above, we had used a cutoff of 3 kHz and a transition width of 1 kHz (it's hard to actually see the transition width just looking at these screenshots).  The resulting filter had 77 taps.
 
-Back to filter representation.  Even though we might show the list of taps for a filter, we usually represent filters visually in the frequency domain.  We call this the "frequency response" of the filter, and it shows us the behavior of the filter in frequency..  E.g. this is the frequency response of the filter we were just using:
+Back to filter representation.  Even though we might show the list of taps for a filter, we usually represent filters visually in the frequency domain.  We call this the "frequency response" of the filter, and it shows us the behavior of the filter in frequency. Here is the frequency response of the filter we were just using:
 
 .. image:: ../_static/filter_use_case5.png
    :scale: 100 % 
    :align: center 
 
-Note that what I'm showing here is *not* a signal, it's just the frequency domain representation of the filter.  That can be a little hard to wrap your head around at first, but as we look at examples and code, it will click.
+Note that what I'm showing here is *not* a signal--it's just the frequency domain representation of the filter.  That can be a little hard to wrap your head around at first, but as we look at examples and code, it will click.
 
-A given filter also has a time domain representation; it’s called the "impulse response" of the filter, because it is what you see in the time domain if you take an impulse and put it through the filter (Google "Dirac delta function" for more info about what an impulse is). For an FIR type filter, the impulse response is simply the taps themselves.  For that 77 tap filter we used earlier, the taps are:
+A given filter also has a time domain representation; it’s called the "impulse response" of the filter because it is what you see in the time domain if you take an impulse and put it through the filter. (Google "Dirac delta function" for more info about what an impulse is). For a FIR type filter, the impulse response is simply the taps themselves.  For that 77 tap filter we used earlier, the taps are:
 
 .. code-block:: python
 
@@ -184,19 +186,19 @@ And here is the code that was used to produce the frequency response, shown earl
 Real vs. Complex Filters
 ########################
 
-The filter I showed you had real taps, but taps can also be complex.  Whether the taps are real or complex doesn't have to match the signal you put through it, i.e. you can put a complex signal through a filter with real taps and vise versa.  When the taps are real, the filter's frequency response will be symmetrical around DC (0 Hz).  So typically we use complex taps when we need asymmetry, which does not happen too often.
+The filter I showed you had real taps, but taps can also be complex.  Whether the taps are real or complex doesn't have to match the signal you put through it, i.e., you can put a complex signal through a filter with real taps and vice versa.  When the taps are real, the filter's frequency response will be symmetrical around DC (0 Hz).  Typically we use complex taps when we need asymmetry, which does not happen too often.
 
 .. image:: ../_static/complex_taps.png
    :scale: 80 % 
    :align: center 
 
-As an example of complex taps, let's go back to the filtering use-case, except this time let's say we want to receive the other signal (without having to re-tune the radio).  That means we want a band-pass filter, but not a symmetrical one, because we only want to keep (a.k.a "pass") frequencies between around 7 kHz to 13 kHz (we don't want to also pass -13 kHz to -7 kHz):
+As an example of complex taps, let's go back to the filtering use-case, except this time we want to receive the other interfering signal (without having to re-tune the radio).  That means we want a band-pass filter, but not a symmetrical one. We only want to keep (a.k.a "pass") frequencies between around 7 kHz to 13 kHz (we don't want to also pass -13 kHz to -7 kHz):
 
 .. image:: ../_static/filter_use_case6.png
    :scale: 70 % 
    :align: center 
 
-One way to design this kind of filter is to make a **low**-pass filter with a cutoff of 3 kHz and then frequency shift it.  Remember that we can frequency shift x(t) (time domain) by multiplying it by :math:`e^{j2\pi f_0t}`.  So in this case :math:`f_0` should be 10 kHz, that way it shifts our filter up by 10 kHz. Recall that in our Python code from above, h was the filter taps of the low-pass filter.  In order to create our band-pass filter we just have to multiply those taps by :math:`e^{j2\pi f_0t}`, although that involves creating a vector to represent time, based on our sample period (inverse of sample rate):
+One way to design this kind of filter is to make a low-pass filter with a cutoff of 3 kHz and then frequency shift it.  Remember that we can frequency shift x(t) (time domain) by multiplying it by :math:`e^{j2\pi f_0t}`.  In this case :math:`f_0` should be 10 kHz, which shifts our filter up by 10 kHz. Recall that in our Python code from above, :math:`h` was the filter taps of the low-pass filter.  In order to create our band-pass filter we just have to multiply those taps by :math:`e^{j2\pi f_0t}`, although it involves creating a vector to represent time based on our sample period (inverse of the sample rate):
 
 .. code-block:: python
 	
@@ -225,19 +227,19 @@ One way to design this kind of filter is to make a **low**-pass filter with a cu
 	plt.xlabel('Frequency [Hz]')
 	plt.show()
 
-The plot of the impulse response should look like this:
+The plots of the impulse response and frequency reaponse should look like this:
 
 .. image:: ../_static/shifted_filter.png
    :scale: 60 % 
    :align: center 
 
-Because our filter is not symmetrical around 0 Hz, it has to use complex taps, which means we need two lines to plot those complex taps.  What we see in the left-hand plot is still the impulse response.  Our frequency response plot is what really validates that we created the kind of filter we were hoping for, where it will filter out everything except the signal centered around 0 Hz.  Once again, remember that the plot above is *not* an actual signal, it's just a representation of the filter.  This can be very confusing, because when you apply the filter to the signal and plot the output, in the frequency domain, in many cases it will look roughly the same as the filter's frequency response itself.  
+Because our filter is not symmetrical around 0 Hz, it has to use complex taps. Therefore we need two lines to plot those complex taps.  What we see in the left-hand plot above is still the impulse response.  Our frequency response plot is what really validates that we created the kind of filter we were hoping for, where it will filter out everything except the signal centered around 0 Hz.  Once again, remember that the plot above is *not* an actual signal: it's just a representation of the filter.  It can be very confusing to grasp because when you apply the filter to the signal and plot the output in the frequency domain, in many cases it will look roughly the same as the filter's frequency response itself.
 
 *************************
 Filter Implementation
 *************************
 
-We aren't going to dive too deep into the implementation of filters, I rather focus on design of filters (you can find read-to-use implementations in any programming language anyway).  But for now, here is one take-away:  To filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  So in the discrete world we use a discrete convolution (example below).  The b's are the taps.  :math:`z^{-1}` just means delay by one time step.  
+We aren't going to dive too deeply into the implementation of filters. Rather, I focus on filter design (you can find read-to-use implementations in any programming language anyway).  For now, here is one take-away:  to filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  (Don't worry, a later section explains convolution.) In the discrete world we use a discrete convolution (example below).  The triangles labled as b's are the taps.  In the flowchart, the squares labeled :math:`z^{-1}` quares above the triangles signify to delay by one time step.
 
 .. image:: ../_static/discrete_convolution.png
    :scale: 80 % 
@@ -245,7 +247,7 @@ We aren't going to dive too deep into the implementation of filters, I rather fo
 
 You might be able to see why we call them filter "taps" now, based on the way the filter itself is implemented. 
 
-FIR vs. IIR
+FIR vs IIR
 ##############
 
 There are two main classes of digital filters: FIR and IIR
@@ -253,27 +255,27 @@ There are two main classes of digital filters: FIR and IIR
 1. Finite impulse response (FIR)
 2. Infinite impulse response (IIR)
 
-We won't get too deep into the theory, but for now just remember: FIR filters are easier to design, and can do anything you want if you use enough taps.  IIR filters are more complicated, have potential to be unstable, but are more efficient (use less CPU and memory for the given filter). If someone just gives you a list of taps, it's assumed they are taps for an FIR filter.  If they start mentioning "poles", they are talking about IIR filters.  We will stick with FIR filters in this textbook.
+We won't get too deep into the theory, but for now just remember: FIR filters are easier to design and can do anything you want if you use enough taps.  IIR filters are more complicated with the potential to be unstable, but they are more efficient (use less CPU and memory for the given filter). If someone just gives you a list of taps, it's assumed they are taps for an FIR filter.  If they start mentioning "poles", they are talking about IIR filters.  We will stick with FIR filters in this textbook.
 
-Below is an example frequency response, showing the comparison of an FIR and IIR filter that do almost exactly the same filtering; they have a similar transition-width, which as we learned will determine how many taps are required.  The FIR filter has 50 taps and the IIR filter has 12 poles, which is like having 12 taps in terms of computations required. 
+Below is an example frequency response, comparing an FIR and IIR filter that do almost exactly the same filtering; they have a similar transition-width, which as we learned will determine how many taps are required.  The FIR filter has 50 taps and the IIR filter has 12 poles, which is like having 12 taps in terms of computations required.
 
 .. image:: ../_static/FIR_IIR.png
    :scale: 70 % 
    :align: center 
 
-The main take-away is that the FIR filter requires way more computational resources than the IIR, to perform roughly the same filtering operation. 
+The lesson is that the FIR filter requires vastly more computational resources than the IIR to perform roughly the same filtering operation.
 
 Here are some real-world examples of FIR and IIR filters that you may have used before.
 
-If you do a "moving average" across a list of numbers, that's just an FIR filter with taps of 1's:
-- h = [1 1 1 1 1 1 1 1 1 1] for a moving average filter with window size of 10.  It also happens to be a low pass type filter; why is that?  What's the difference between using 1's and using taps that decay to zero?
+If you perform a "moving average" across a list of numbers, that's just an FIR filter with taps of 1s:
+- h = [1 1 1 1 1 1 1 1 1 1] for a moving average filter with a window size of 10.  It also happens to be a low-pass type filter; why is that?  What's the difference between using 1s and using taps that decay to zero?
 
 .. raw:: html
 
    <details>
    <summary><a>Answers</a></summary>
 
-A moving average filter is a low pass filter because it smooths out "high frequency" changes, which is usually why people will use one.  The reason to use taps that decay to zero on both ends is to avoid a sudden change in the output, like if the signal being filtered was zero for a while and then suddenly jumped up. 
+A moving average filter is a low-pass filter because it smooths out "high frequency" changes, which is usually why people will use one.  The reason to use taps that decay to zero on both ends is to avoid a sudden change in the output, like if the signal being filtered was zero for a while and then suddenly jumped up.
 
 .. raw:: html
 
@@ -283,13 +285,13 @@ Now for an FIR example.  Have any of you ever done this:
 
     x = x*0.99 + new_value*0.01
 
-where the 0.99 and 0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convenient way to slowly update some variable without having to remember the last several values.  This is actually a form of low pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
+where the 0.99 and 0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convenient way to slowly update some variable without having to remember the last several values.  This is actually a form of low-pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
 
 *************************
 Filter Design Tools
 *************************
 
-In practice, most people will use a filter designer tool, or a function in code that designs the filter.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz. 
+In practice, most people will use a filter designer tool or a function in code that designs the filter.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz.
 
 .. image:: ../_static/filter_designer1.png
    :scale: 70 % 
@@ -301,22 +303,22 @@ Click the "Design Filter" button to create the taps and plot the frequency respo
    :scale: 70 % 
    :align: center 
 
-Click "Impulse Response" at the top to see the impulse response, which is just a plot of the taps, since this is an FIR filter.
+Click "Impulse Response" text above the graph to see the impulse response, which is a plot of the taps since this is an FIR filter.
 
 .. image:: ../_static/filter_designer3.png
    :scale: 70 % 
    :align: center 
 
-This app even includes the C++ source code to implement and use this filter.  Note that it does not include any way to design IIR filters, which are in general much more difficult to design.  
+This app even includes the C++ source code to implement and use this filter.  The web app does not include any way to design IIR filters, which are in general much more difficult to design.
 
 
 *************************
 Convolution
 *************************
 
-We will take a brief detour to introduce the convolution operator, feel free to skip this section if you are already familiar with it.
+We will take a brief detour to introduce the convolution operator. Feel free to skip this section if you are already familiar with it.
 
-Adding two signals together is one way of combining two signals into one, in the :ref:`freq-domain-chapter` chapter we talked about how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation, in fact it is equivalent to a cross-correlation in many cases.  
+Adding two signals together is one way of combining two signals into one. In the :ref:`freq-domain-chapter` chapter we explored how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation.  In fact it is equivalent to a cross-correlation in many cases.
 
 I believe the convolution operation is best learned through examples.  In this first example, we convolve two square pulses together:
 
@@ -325,21 +327,23 @@ I believe the convolution operation is best learned through examples.  In this f
    :scale: 100 % 
    :align: center 
    
-Because it's just a sliding integreation, the result is a triangle, with a maximum at the point where both square pulses lined up perfectly.  Let's look at what happens if we convolve a square pulse with a triangular pulse:
+Because it's just a sliding integreation, the result is a triangle with a maximum at the point where both square pulses lined up perfectly.  Let's look at what happens if we convolve a square pulse with a triangular pulse:
 
 .. image:: ../_static/convolution_animation2.gif
    :scale: 150 % 
    :align: center 
 
-In both examples, we have two input signals (one red, one blue), and then the output of the convolution is displayed.  You can see that the output is the integration of the two signals as one slides across the other.  Because of this "sliding" nature, the length of the output is actually longer than the input.  If one signal is :code:`M` samples and the other signal is :code:`N` samples, the convolution of the two can produce :code:`N+M-1` samples.  However, functions such as :code:`numpy.convolve()` have a way to specify whether you want the whole output, or just :code:`max(M, N)` samples, or just the samples where the signals overlapped completely, which is :code:`max(M, N) - min(M, N) + 1` if you were curious.  No need to get caught up in this detail, just know that the length of the output of a convolution is not just the length of the inputs.  
+In both examples, we have two input signals (one red, one blue), and then the output of the convolution is displayed.  You can see that the output is the integration of the two signals as one slides across the other.  Because of this "sliding" nature, the length of the output is actually longer than the input.  If one signal is :code:`M` samples and the other signal is :code:`N` samples, the convolution of the two can produce :code:`N+M-1` samples.  However, functions such as :code:`numpy.convolve()` have a way to specify whether you want the whole output (:code:`max(M, N)` samples) or just the samples where the signals overlapped completely (:code:`max(M, N) - min(M, N) + 1` if you were curious).  No need to get caught up in this detail. Just know that the length of the output of a convolution is not just the length of the inputs.
 
-So why does convolution matter in DSP?  Well for starters, to filter a signal, we can simply take the impulse response of that filter and convolve it with the signal.  It turns out FIR filtering is just a convolution operation.  
+So why does convolution matter in DSP?  Well for starters, to filter a signal, we can simply take the impulse response of that filter and convolve it with the signal.  FIR filtering is simply a convolution operation.
 
 .. image:: ../_static/filter_convolve.png
    :scale: 70 % 
    :align: center 
 
-This might be confusing because earlier we mentioned that convolution takes in two *signals* and outputs one signal.  Well we can treat the impulse response like a signal, convolution is just a math operator after all, which operates on two 1D arrays.  If one of those 1D arrays is the filter's impulse response, the other 1D array can be a piece of the input signal, and the output will be a filtered version of the input.  Let's see another example to help this click.  In the example below, the triangle will represent our filter's impulse response, and the :green:`green` signal is our signal being filtered.  
+It might be confusing because earlier we mentioned that convolution takes in two *signals* and outputs one.  We can treat the impulse response like a signal, and convolution is a math operator after all, which operates on two 1D arrays.  If one of those 1D arrays is the filter's impulse response, the other 1D array can be a piece of the input signal, and the output will be a filtered version of the input.
+
+Let's see another example to help this click.  In the example below, the triangle will represent our filter's impulse response, and the :green:`green` signal is our signal being filtered.
 
 .. image:: ../_static/convolution.gif
    :scale: 70 % 
@@ -347,41 +351,41 @@ This might be confusing because earlier we mentioned that convolution takes in t
 
 The :red:`red` output is the filtered signal.  
 
-Question: What kind of filter was the triangle?  
+Question: What type of filter was the triangle?
 
 .. raw:: html
 
    <details>
    <summary><a>Answers</a></summary>
 
-It smoothed out the high frequency components of the green signal (i.e. the sharp transitions of the square) so it's acting as a low-pass filter.
+It smoothed out the high frequency components of the green signal (i.e., the sharp transitions of the square) so it acts as a low-pass filter.
 
 .. raw:: html
 
    </details>
 
 
-Now that we are starting to understand convolution, I will present to you the mathematical equation for it.  The asterisk is typically used as the symbol for convolution:
+Now that we are starting to understand convolution, I will present the mathematical equation for it.  The asterisk (*) is typically used as the symbol for convolution:
 
 .. math::
 
  (f * g)(t) = \int f(\tau) g(t - \tau) d\tau
  
-In this above expression, :math:`g(t)` is the one that is flipped and slides across :math:`f(t)`, but they can be swapped and it's still the same expression.  Typically, the shorter array will be used as :math:`g(t)`.  Convolution is equal to a cross-correlation, defined as :math:`\int f(\tau) g(t+\tau)`, when :math:`g(t)` is symmetrical, i.e. when it doesn't change when flipped about the origin. 
+In this above expression, :math:`g(t)` is the signal or input that is flipped and slides across :math:`f(t)`, but :math:`g(t)` and :math:`f(t)` can be swapped and it's still the same expression.  Typically, the shorter array will be used as :math:`g(t)`.  Convolution is equal to a cross-correlation, defined as :math:`\int f(\tau) g(t+\tau)`, when :math:`g(t)` is symmetrical, i.e., it doesn't change when flipped about the origin.
 
 *************************
 Filter Design in Python
 *************************
 
-We will now talk about one way to design an FIR filter ourselves, in Python.  Note that there are many approaches to designing filters, in this example we will use the method of starting in the frequency domain and working backwards to find the impulse response, which is ultimately how our filter is represented (by its taps). 
+Now we will consider one way to design an FIR filter ourselves in Python.  While there are many approaches to designing filters, we will use the method of starting in the frequency domain and working backwards to find the impulse response. Ultimately that is how our filter is represented (by its taps).
 
-You start by creating a vector of your desired frequency response.  As an example, let's design an arbitrarily shaped low-pass filter shown below:
+You start by creating a vector of your desired frequency response.  Let's design an arbitrarily shaped low-pass filter shown below:
 
 .. image:: ../_static/filter_design1.png
    :scale: 70 % 
    :align: center 
 
-And the code used to create this is fairly simple:
+The code used to create this filter is fairly simple:
 
 .. code-block:: python
 
@@ -393,20 +397,20 @@ And the code used to create this is fairly simple:
 	plt.show()
 
 
-:code:`hstack()` is just one way to concatenate arrays in numpy.  We know this will lead to a filter with complex taps, why?
+:code:`hstack()` is one way to concatenate arrays in numpy.  We know it will lead to a filter with complex taps. Why?
 
 .. raw:: html
 
    <details>
    <summary><a>Answer</a></summary>
 
-It's not symmetrical around 0 Hz
+It's not symmetrical around 0 Hz.
 
 .. raw:: html
 
    </details>
 
-Our end goal is to find the taps of this filter so we can actually use it.  How do we get the taps, given the frequency response?  Well, how do we convert from the frequency domain back to the time domain?  Inverse FFT (IFFT)!  And recall that the IFFT function is almost exactly the same as the FFT function.  We also need to ifftshift our desired frequency response before the ifft, and then we need yet another iffshift after the ifft (no, they don't cancel themselves out, you can try).  This might seem confusing, but just remember that you always should fftshift after an fft, and iffshift after an ifft.  
+Our end goal is to find the taps of this filter so we can actually use it.  How do we get the taps, given the frequency response?  Well, how do we convert from the frequency domain back to the time domain?  Inverse FFT (IFFT)!  Recall that the IFFT function is almost exactly the same as the FFT function.  We also need to IFFTshift our desired frequency response before the IFFT, and then we need yet another IFFshift after the IFFT (no, they don't cancel themselves out, you can try).  This process might seem confusing. Just remember that you always should FFTshift after an FFT and IFFshift after an IFFT.
 
 .. code-block:: python
 
@@ -420,7 +424,7 @@ Our end goal is to find the taps of this filter so we can actually use it.  How 
    :scale: 90 % 
    :align: center 
 
-Now let's say we use these taps shown above as our filter.  We know that the impulse response is just plotting the taps, so what we see above *is* our impulse response.  Lets take the FFT of our taps to see what the frequency domain actually looks like.  We will do a 1024 point FFT to get a high resolution:
+We will use these taps shown above as our filter.  We know that the impulse response is plotting the taps, so what we see above *is* our impulse response.  Let's take the FFT of our taps to see what the frequency domain actually looks like.  We will do a 1,024 point FFT to get a high resolution:
 
 .. code-block:: python
 
@@ -432,9 +436,9 @@ Now let's say we use these taps shown above as our filter.  We know that the imp
    :scale: 70 % 
    :align: center 
 
-Note that it's not very straight... It doesn't match our original very well, recall the shape that we initially wanted to make a filter for.  A big reason is because our impulse response isn't done decaying, i.e. the left and right sides don't reach zero.  We have two options that will allow it to decay to zero:
+See how the frequency response not very straight... it doesn't match our original very well, if you recall the shape that we initially wanted to make a filter for.  A big reason is because our impulse response isn't done decaying, i.e., the left and right sides don't reach zero.  We have two options that will allow it to decay to zero:
 
-**Option 1:** We "window" our current impulse response so that it decays to 0 on both sides.  This involves multiplying our impulse response with a "windowing function" that starts and ends at zero.
+**Option 1:** We "window" our current impulse response so that it decays to 0 on both sides.  It involves multiplying our impulse response with a "windowing function" that starts and ends at zero.
 
 .. code-block:: python
 
@@ -447,7 +451,7 @@ Note that it's not very straight... It doesn't match our original very well, rec
    :align: center 
 
 
-**Option 2:** We re-generate our impulse response using more points so that it has time to decay.  To do this we need to add resolution to the original frequency domain array we started with (called interpolating).
+**Option 2:** We re-generate our impulse response using more points so that it has time to decay.  We need to add resolution to our original frequency domain array (called interpolating).
 
 .. code-block:: python
 
@@ -465,35 +469,34 @@ Note that it's not very straight... It doesn't match our original very well, rec
    :scale: 70 % 
    :align: center 
 
-|
 
 .. image:: ../_static/filter_design7.png
    :scale: 50 % 
    :align: center 
 
-Both options seemed to work.  Which one would you choose?  The second method resulted in more taps, but the first method resulting in a frequency response that wasn't very sharp, and the falling edge wasn't very steep.  There are many ways to design a filter, and many trade-offs along the way, many consider it an art.
+Both options worked.  Which one would you choose?  The second method resulted in more taps, but the first method resulted in a frequency response that wasn't very sharp and had a falling edge wasn't very steep.  There are numerous ways to design a filter, each with their own trade-offs along the way. Many consider filter design an art.
 
 
 *************************
 Intro to Pulse Shaping
 *************************
 
-We will briefly introduce a very interesting topic within DSP, pulse shaping, a topic we explore in depth in its own chapter.  
+We will briefly introduce a very interesting topic within DSP, pulse shaping. We will consider the topic in depth in its own chapter later. It is worth mentioning alongside filtering because both grapple with honing signals efficiently for transmission and study.
 
-As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc, to modulate a carrier so they can be sent wirelessly.  When we simulated QPSK in the :ref:`modulation-chapter` chapter, we only simulated one sample per symbol, i.e. each complex number we created was one of the points on the constellation, it was one symbol.  In practice we usually generate multiple samples per symbol, and the reason has to do with filtering. 
+As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc., to modulate a carrier so information can be sent wirelessly.  When we simulated QPSK in the :ref:`modulation-chapter` chapter, we only simulated one sample per symbol, i.e., each complex number we created was one of the points on the constellation--it was one symbol.  In practice we normally generate multiple samples per symbol, and the reason has to do with filtering.
 
-We use filters to craft the "shape" of our symbols, since the shape in the time domain will change the shape in the frequency domain.  The frequency domain is what tells us how much spectrum/bandwidth our signal is going to use, and we usually want to minimize it.  Now what's important to understand is that the spectral characteristics (frequency domain) of the baseband symbols doesn't change when we modulate a carrier, it just shifts it up in frequency, the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's kind of like transmitting square pulses, in fact BPSK using 1 sample per symbol *is* just a square wave of random 1's and -1's:
+We use filters to craft the "shape" of our symbols because the shape in the time domain changes the shape in the frequency domain.  The frequency domain informs us how much spectrum/bandwidth our signal will use, and we usually want to minimize it.  What is important to understand is that the spectral characteristics (frequency domain) of the baseband symbols do not change when we modulate a carrier; it just shifts the baseband up in frequency while the shape stays the same, which means the amount of bandwidth it uses stays the same.  When we use 1 sample per symbol, it's like transmitting square pulses. In fact BPSK using 1 sample per symbol *is* just a square wave of random 1s and -1s:
 
 .. image:: ../_static/bpsk.svg
    :align: center 
    :target: ../_static/bpsk.svg
 
-And as we have learned, square pulses are not the best, they use an excess amount of spectrum:
+And as we have learned, square pulses are not efficient because they use an excess amount of spectrum:
 
 .. image:: ../_static/square-wave.svg
    :align: center 
 
-So what we do is we "pulse shape" these blocky looking symbols so that they take up less bandwidth in the frequency domain.  We do this using a low-pass filter, because it will filter out the higher frequency components of our symbols.  Below shows an example of symbols in the time (top) and frequency (bottom) domain, before and after a pulse shaping filter has been applied:
+So what we do is we "pulse shape" these blocky-looking symbols so that they take up less bandwidth in the frequency domain.  We "pulse shape" by using a low-pass filter because it discards the higher frequency components of our symbols.  Below shows an example of symbols in the time (top) and frequency (bottom) domain, before and after a pulse-shaping filter has been applied:
 
 .. image:: ../_static/pulse_shaping.png
    :scale: 70 % 
@@ -505,22 +508,22 @@ So what we do is we "pulse shape" these blocky looking symbols so that they take
    :scale: 90 % 
    :align: center 
 
-Note how much quicker the signal drops off in frequency; the sidelobes are around 30 dB lower after pulse shaping, that's 1000x less!  And more importantly, the main lobe is more narrow, so less spectrum is used for the same amount of bits per second.
+Note how much quicker the signal drops off in frequency. The sidelobes are ~30 dB lower after pulse shaping; that's 1,000x less bandwidth!  And more importantly, the main lobe is narrower, so less spectrum is used for the same amount of bits per second.
 
-For now, be aware that common pulse shaping filters include:
+For now, be aware that common pulse-shaping filters include:
 
 1. Raised-cosine filter
 2. Root raised-cosine filter
 3. Sinc filter
 4. Gaussian filter
 
-And these filters usually have some parameter you can adjust to tell it how tight you want the bandwidth.  For example, below shows the time and frequency domain of a raised-cosine filter with different values of :math:`\beta`, the parameter that defines how steep the roll-off is.
+These filters generally have a parameter you can adjust to decrease the bandwidth used.  Below demonstrates the time and frequency domain of a raised-cosine filter with different values of :math:`\beta`, the parameter that defines how steep the roll-off is.
 
 .. image:: ../_static/pulse_shaping_rolloff.png
    :scale: 40 % 
    :align: center 
 
-You can see that a lower value of :math:`\beta` leads to less spectrum being used (for the same amount of data), but if you go too low then the time domain symbols take longer to decay to zero, in fact when :math:`\beta=0` they never fully decay to zero which means we can't actually transmit such symbols in practice.  A :math:`\beta` around 0.35 is common. 
+You can see that a lower value of :math:`\beta` reduces the spectrum used (for the same amount of data). However, if the value is too low then the time domain symbols take longer to decay to zero. Actually when :math:`\beta=0` the symbols never fully decay to zero, which means we can't transmit such symbols in practice.  A :math:`\beta` value around 0.35 is common.
 
 You will learn a lot more about pulse shaping, including some special properties that pulse shaping filters must satisfy, in the :ref:`pulse-shaping-chapter` chapter.
 
