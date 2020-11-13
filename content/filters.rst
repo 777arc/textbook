@@ -4,13 +4,13 @@
 Filters
 #############
 
-This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which is another strategy for modifying waveform shape.
+This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which we further explore in the :ref:`pulse-shaping-chapter` chapter.
 
 *************************
 Filter Basics
 *************************
 
-Filters are used in many disciplines. For example, image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which strains out solids from liquid.  In DSP, filters are primarily used for:
+Filters are used in many disciplines. For example, image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which filters out solids from liquid.  In DSP, filters are primarily used for:
 
 1. Separation of signals that have been combined (e.g., extracting the signal you want)
 2. Removal of excess noise after receiving a signal
@@ -18,7 +18,7 @@ Filters are used in many disciplines. For example, image processing makes heavy 
 
 There are certainly other uses for filters, but this chapter is meant to introduce the concept rather than explain all the ways filtering can happen.
 
-You may think we only care about digital filters; this textbook explores DSP, after all. However, it's important to know that a lot of filters will be analog, like those in our SDRs placed before the analog-to-digital converter (ADC) on the receive side. The following image juxtaposes a schematic of an analog filter circuit with a flowchart representation of a digital filtering algorithm. While the analog filter modifies an electrical current as a representation of a signal, the digital algorithm manipulates the data representation of a signal. Despite these differences, the goal of filtering is to remove some aspect of a signal.
+You may think we only care about digital filters; this textbook explores DSP, after all. However, it's important to know that a lot of filters will be analog, like those in our SDRs placed before the analog-to-digital converter (ADC) on the receive side. The following image juxtaposes a schematic of an analog filter circuit with a flowchart representation of a digital filtering algorithm.
 
 .. image:: ../_static/analog_digital_filter.png
    :scale: 70 % 
@@ -32,7 +32,7 @@ In DSP, where the input and output are signals, a filter has one input signal an
 
 You cannot feed two different signals into a single filter without adding them together first or doing some other operation.  Likewise, the output will always be one signal, i.e., a 1D array of numbers.
 
-There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The graphs below demonstrate how frequencies in signals are filtered for each type. Try to envision what each type is distinguishing among signal frequencies.
+There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The graphs below demonstrate how frequencies in signals are filtered for each type.
 
 .. image:: ../_static/filter_types.png
    :scale: 70 % 
@@ -48,7 +48,7 @@ Do not confuse these filtering types with filter algorithmic implementation (e.g
 Filter Representation
 *************************
 
-For most filters we will see (known as FIR, or Finite Impulse Response, type filters), we can represent the filter itself with a single array of floats.  For symmetrical filters that shift frequency components in time, these floats will be real (versus complex), and there tends to be an odd number of them.  We call this array of floats "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
+For most filters we will see (known as FIR, or Finite Impulse Response, type filters), we can represent the filter itself with a single array of floats.  For filters symmetrical in the frequency domain, these floats will be real (versus complex), and there tends to be an odd number of them.  We call this array of floats "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
 
 .. code-block:: python
 
@@ -103,7 +103,7 @@ Let's visualize transiton width.  In the diagram below, the :green:`green` line 
    :scale: 100 % 
    :align: center 
 
-You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations. We will see why shortly.  A 50-tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
+You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations--we will see why shortly.  A 50-tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
 Typically we use a filter designer tool, then see how many taps it outputs, and if it's way too many (e.g., more than 100) we increase the transition width.  It all depends on the application and hardware running the filter, of course.
 
 In the filtering example above, we had used a cutoff of 3 kHz and a transition width of 1 kHz (it's hard to actually see the transition width just looking at these screenshots).  The resulting filter had 77 taps.
@@ -227,7 +227,7 @@ One way to design this kind of filter is to make a low-pass filter with a cutoff
 	plt.xlabel('Frequency [Hz]')
 	plt.show()
 
-The plots of the impulse response and frequency reaponse should look like this:
+The plots of the impulse response and frequency response should look like this:
 
 .. image:: ../_static/shifted_filter.png
    :scale: 60 % 
@@ -239,7 +239,7 @@ Because our filter is not symmetrical around 0 Hz, it has to use complex taps. T
 Filter Implementation
 *************************
 
-We aren't going to dive too deeply into the implementation of filters. Rather, I focus on filter design (you can find read-to-use implementations in any programming language anyway).  For now, here is one take-away:  to filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  (Don't worry, a later section explains convolution.) In the discrete world we use a discrete convolution (example below).  The triangles labled as b's are the taps.  In the flowchart, the squares labeled :math:`z^{-1}` quares above the triangles signify to delay by one time step.
+We aren't going to dive too deeply into the implementation of filters. Rather, I focus on filter design (you can find read-to-use implementations in any programming language anyway).  For now, here is one take-away:  to filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  (Don't worry, a later section explains convolution.) In the discrete world we use a discrete convolution (example below).  The triangles labeled as b's are the taps.  In the flowchart, the squares labeled :math:`z^{-1}` above the triangles signify to delay by one time step.
 
 .. image:: ../_static/discrete_convolution.png
    :scale: 80 % 
@@ -327,7 +327,7 @@ I believe the convolution operation is best learned through examples.  In this f
    :scale: 100 % 
    :align: center 
    
-Because it's just a sliding integreation, the result is a triangle with a maximum at the point where both square pulses lined up perfectly.  Let's look at what happens if we convolve a square pulse with a triangular pulse:
+Because it's just a sliding integration, the result is a triangle with a maximum at the point where both square pulses lined up perfectly.  Let's look at what happens if we convolve a square pulse with a triangular pulse:
 
 .. image:: ../_static/convolution_animation2.gif
    :scale: 150 % 
@@ -481,7 +481,7 @@ Both options worked.  Which one would you choose?  The second method resulted in
 Intro to Pulse Shaping
 *************************
 
-We will briefly introduce a very interesting topic within DSP, pulse shaping. We will consider the topic in depth in its own chapter later. It is worth mentioning alongside filtering because both grapple with honing signals efficiently for transmission and study.
+We will briefly introduce a very interesting topic within DSP, pulse shaping. We will consider the topic in depth in its own chapter later, see :ref:`pulse-shaping-chapter`. It is worth mentioning alongside filtering because pulse shaping is ultimately a type of filter, used for a specific purpose, with special properties.
 
 As we learned, digital signals use symbols to represent one or more bits of information.  We use a digital modulation scheme like ASK, PSK, QAM, FSK, etc., to modulate a carrier so information can be sent wirelessly.  When we simulated QPSK in the :ref:`modulation-chapter` chapter, we only simulated one sample per symbol, i.e., each complex number we created was one of the points on the constellation--it was one symbol.  In practice we normally generate multiple samples per symbol, and the reason has to do with filtering.
 
@@ -508,7 +508,7 @@ So what we do is we "pulse shape" these blocky-looking symbols so that they take
    :scale: 90 % 
    :align: center 
 
-Note how much quicker the signal drops off in frequency. The sidelobes are ~30 dB lower after pulse shaping; that's 1,000x less bandwidth!  And more importantly, the main lobe is narrower, so less spectrum is used for the same amount of bits per second.
+Note how much quicker the signal drops off in frequency. The sidelobes are ~30 dB lower after pulse shaping; that's 1,000x less!  And more importantly, the main lobe is narrower, so less spectrum is used for the same amount of bits per second.
 
 For now, be aware that common pulse-shaping filters include:
 
