@@ -18,7 +18,7 @@ We will first cover the received signal power budget, then the noise power budge
 Signal Power Budget
 *************************
 
-Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the transmit power. It is usually a setting in the transmitter, so how do we figure out the received power at the receiver?
+Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the *transmit* power; it is usually a setting in the transmitter.  How do we figure out the *received* power at the receiver?
 
 .. image:: ../_static/tx_rx_system.png
    :scale: 50 % 
@@ -38,7 +38,7 @@ We need four system parameters to determine the received power, which are provid
 Transmit Power
 #####################
 
-Transmit power is fairly straightforward. It will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  An analogy for transmit power would be the wattage of a light bulb: the higher the wattage, the more light transmitted by the bulb.  Here are examples of approximate transmit power for different technologies:
+Transmit power is fairly straightforward; it will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  An analogy for transmit power would be the watt rating (power) of a light bulb: the higher the wattage, the more light transmitted by the bulb.  Here are examples of approximate transmit power for different technologies:
 
 ==================  =====  =======
 \                       Power    
@@ -52,9 +52,9 @@ FM station          10kW   40 dBW
 Antenna Gains
 #####################
 
-Transmit and receive antenna gains are crucial for calculating link budgets. What is the antenna gaining, you might ask? Power! You might see it referred to as antenna power gain, and it is an indication of how strongly an antenna can send or receive a signal.
+Transmit and receive antenna gains are crucial for calculating link budgets. What is the antenna gain, you might ask?  It indicates the directivity of the antenna.  You might see it referred to as antenna power gain, but don't let that mislead you, the only way for an antenna to have a higher gain is to direct energy in a more focused region.
 
-Gains will be depicted in dB (unit-less).  (Feel free to learn or remind yourself why dB is unitless for our scenario in the :ref:`noise-chapter` chapter.)  Typically, antennas are either omnidirectional, meaning their power radiates in all directions, or directional, meaning their power radiates in a specific direction.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna can have a gain anywhere up to 50 dB or so.
+Gains will be depicted in dB (unit-less); feel free to learn or remind yourself why dB is unit-less for our scenario in the :ref:`noise-chapter` chapter.  Typically, antennas are either omnidirectional, meaning their power radiates in all directions, or directional, meaning their power radiates in a specific direction.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna will have a higher gain, usually 5 dB or higher, and anywhere up to 60 dB or so.
 
 .. image:: ../_static/antenna_gain_patterns.png
    :scale: 80 % 
@@ -120,7 +120,7 @@ In our link budget we also want to take into account miscellaneous losses.  We w
 - Antenna pointing imperfections
 - Precipitation
 
-The plot below shows atmospheric loss in dB/km over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis, you'll see that short range communications below 40 GHz-- waveforms less than 1 km--have 1 dB or less of atmospheric loss, and thus we generally ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the air. Satellites are moving, which means the their transmit and/or receive antennas are changing directions.
+The plot below shows atmospheric loss in dB/km over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis, you'll see that short range communications below 40 GHz **and** less than 1 km have 1 dB or less of atmospheric loss, and thus we generally ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the atmosphere. 
 
 .. image:: ../_static/atmospheric_attenuation.png
    :scale: 80 % 
