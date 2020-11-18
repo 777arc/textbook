@@ -57,7 +57,7 @@ At this point you may have realized that a "signal" is essentially just a functi
    
 When we decompose a signal into a summation of sine waves, each one will have a certain **amplitude**, **phase**, and **frequency**.  Each sine wave's **amplitude** will tell us how strong the **frequency** existed in the original signal.  Don't worry too much about **phase** for now, other than realizing that the only difference between sin() and cos() is a phase shift (time shift).
 
-It's more important to understand the underlying concept than the actual equations to solve for a Fourier series, but for those who are interested in the equations I refer you to Wolfram's concise explaination: https://mathworld.wolfram.com/FourierSeries.html.  
+It's more important to understand the underlying concept than the actual equations to solve for a Fourier series, but for those who are interested in the equations I refer you to Wolfram's concise explanation: https://mathworld.wolfram.com/FourierSeries.html.  
 
 ********************
 Time-Frequency Pairs
