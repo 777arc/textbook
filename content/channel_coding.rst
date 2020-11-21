@@ -80,15 +80,15 @@ Let's look at one of the simpler error correcting codes.  Hamming Code was the f
 
 In Hamming Codes, extra bits are added for redundancy, and are called parity bits.  All bit positions that are powers of two are parity bits: 1, 2, 4, 8, etc,  highlighted in green below.  Each parity bit "covers" all bits where the bitwise AND of the parity and the bit position is non-zero, marked with a red X below.  If we want to use a data bit, we need the parity bits that cover it.  E.g. to be able to go up to data bit d9, we need parity bit p8 and all the parity bits that come before it, so this tells us how many parity bits we need for a certain number of bits.  This pattern continues indefinitely.  
 
-.. image:: ../_static/hamming.png
-   :scale: 60 % 
+.. image:: ../_static/hamming.svg
    :align: center 
+   :target: ../_static/hamming.svg
 
 Hamming codes are block codes so they operate on N data bits at a time.  So with 3 parity bits we can operate on blocks of four data bits at a time.  We call it Hamming(7,4), first arg is total bits transmitted, second arg is data bits. 
 
-.. image:: ../_static/hamming2.png
-   :scale: 80 % 
+.. image:: ../_static/hamming2.svg
    :align: center 
+   :target: ../_static/hamming2.svg
 
 The following are three important properties of Hamming codes:
 
