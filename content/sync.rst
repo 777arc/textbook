@@ -70,7 +70,7 @@ In simulation we can easily simulate a delay by just shifting samples, but this 
 
     # Create and apply fractional delay filter
     delay = 0.4 # fractional delay, in samples
-    N = 21     # number of taps
+    N = 21 # number of taps
     n = np.arange(N) # 0,1,2,3...
     h = np.sinc(n - delay) # calc filter taps
     h *= np.hamming(N) # window the filter to make sure it decays to 0 on both sides
@@ -79,7 +79,7 @@ In simulation we can easily simulate a delay by just shifting samples, but this 
 
 As you can see, we are calculating the filter taps using a sinc() function, recall that a sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal, so we are not shaping it, we are just delaying it in time.  In this example we are delaying by 0.3 of a sample, but keep in mind that applying any filter will also delay it by half of the filter taps minus one, just due to the act of convolving the signal through the filter.  
 
-If we plot the "before" and "after" on the same plot we can see the fractional delay.  We must also shift the "after" by (num_taps-1)/2 samples, that's the delay associated with filters in general.  In the plot below, we zoom way in, to only a couple symbols, otherwise the fractional delay is not viewable. 
+If we plot the "before" and "after" on the same plot we can see the fractional delay.  In the plot below, we zoom into only a couple symbols, otherwise the fractional delay is not viewable. 
 
 .. image:: ../_static/fractional-delay-filter.svg
    :align: center
