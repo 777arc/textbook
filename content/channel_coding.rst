@@ -60,9 +60,9 @@ The code-rate will always be less than 1, as there is a trade-off between redund
 Modulation and Coding
 ***************************
 
-In the :ref:`modulation-chapter` chapter we tackled noise in modulation schemes. At a low SNR you need a low-order modulation scheme (e.g., QPSK) to deal with the noise, and at a high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNRs, and at high SNRs you can use a code-rate of almost 1.  Modern communications systems have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme to be used at specific noise levels.
+In the :ref:`modulation-chapter` chapter we tackled noise in modulation schemes. At a low SNR you need a low-order modulation scheme (e.g., QPSK) to deal with the noise, and at a high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNRs, and at high SNRs you can use a code-rate of almost 1.  Modern communications systems have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme to be used at specific SNR levels.
 
-Modern communications adaptively change the MCS in real-time based on the wireless channel conditions.  The receiver sends feedback about channel quality to the transmitter.  Feedback must be shared before the wireless channel quality changes, which could be on the order of ms.  This adaptive process leads to the highest throughput communications possible, and is used by modern technologies like LTE, 5G, and WiFi. Beneath is a visualization of a tower changing modulation schemes and coding rates during transmission.
+Modern communications adaptively change the MCS in real-time based on the wireless channel conditions.  The receiver sends feedback about channel quality to the transmitter.  Feedback must be shared before the wireless channel quality changes, which could be on the order of ms.  This adaptive process leads to the highest throughput communications possible, and is used by modern technologies like LTE, 5G, and WiFi. Beneath is a visualization of a cell tower changing MCS during transmission as a user's distance to the cell changes.
 
 .. image:: ../_static/adaptive_mcs.png
    :scale: 80 % 
@@ -151,7 +151,7 @@ It might help simplify things to realize when the SNR is fairly high (e.g., 10 d
 
 The max throughput of 802.11n WiFi operating in the 2.4 GHz band (which uses 20 MHz wide channels), according to the specs, is 300 Mbps.  Obviously you could sit right next to your router and get an extremely high SNR, maybe 60 dB, but to be reliable/practical the max throughput MCS (recall the staircase curve from above) is unlikely to require an SNR that high.  You can even take a look at the `MCS list for 802.11n <https://en.wikipedia.org/wiki/IEEE_802.11n-2009#Data_rates>`_.  802.11n goes up to 64-QAM, and combined with channel coding, it requires a SNR around 25 dB according to `this table <https://d2cpnw0u24fjm4.cloudfront.net/wp-content/uploads/802.11n-and-802.11ac-MCS-SNR-and-RSSI.pdf>`_.  That means, even at 60 dB SNR your WiFi will still use 64-QAM.  So at 25 dB the Shannon limit is roughly 8.3 bits/sec/Hz, which given 20 MHz of spectrum is 166 Mbps.  However, when you take into account MIMO, which we will cover in a future chapter, you can get four of those streams running in parallel, resulting in 664 Mbps.  Cut that number in half and you get something very close to the advertised max speed of 300 Mbps for 802.11n WiFi in the 2.4 GHz band.
 
-The proof behind the Shannon limit is pretty crazy. It involves math that looks like this:
+The proof behind the Shannon limit is pretty crazy; it involves math that looks like this:
 
 .. image:: ../_static/shannon_limit_proof.png
    :scale: 70 % 
