@@ -63,7 +63,68 @@ Here is an example of a 16 MHz wide signal that is continuously transmitting.  T
    :scale: 60 % 
    :align: center 
    
-   
+**************************
+Simulating Rayleigh Fading
+**************************
+
+Rayleigh fading is used to model fading over time, when there is no significant LOS path.  When there is a dominant LOS path, the Rician fading model becomes more suitable, but we will be focusing on Rayleigh.  Note that Rayleigh and Rician models do not include the primarily path loss between the transmitter and receiver (such as the path loss calculated as part of a link budget), or any shadowing caused by large objects.  Their role is to model the multipath fading that occurs over time, as a result of movement and scatterers in the envrionement. 
+
+There is a lot of theory that comes out of the Rayleigh fading model, such as expressions for level crossing rate and average fade duration.  But the Rayleigh fading model doesn't directly tell us how to actually simulate a channel using the model.  To generate Rayleigh fading in simulation we have to use one of many published methods, and in the following Python example we will be using Clarke's "sum-of-sinusoids" method.
+
+To generate a Rayleigh fading channel in Python we need to first specify the max Doppler shift, in Hz, which is based on how fast the transmitter and/or receiver is moving, denoted :math:`\Delta v`.  When the velocity is small compared to the speed of light, which will always be the case in wireless communications, the Doppler shift can be calculated as:
+
+.. math::
+
+  f_D = \frac{\Delta v f_c}{c} 
+  
+where :math:`c` is the speed of light, roughly 3e8 m/s, and :math:`f_c` is the carrier frequency being transmitted on.  
+
+We also choose how many sinusoids to simulate, and there's no right answer because it's based on the number of scatterers in the environment, which we never actually know.  As part of the calculations we assume the phase of the received signal from each path is uniformly random between 0 and :math:`2\pi`.  The following code simulates a Rayleigh fading channel using Clarke's method:
+
+.. code-block:: python
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # Simulation Params, feel free to tweak these
+    v_mph = 60 # velocity of either TX or RX, in miles per hour
+    center_freq = 200e6 # RF carrier frequency in Hz
+    Fs = 1e5 # sample rate of simulation
+    N = 100 # number of sinusoids to sum
+
+    v = v_mph * 0.44704 # convert to m/s
+    fd = v*center_freq/3e8 # max doppler shift
+    print("max Doppler shift:", fd)
+    t = np.arange(0, 1, 1/Fs) # time vector. (start, stop, step)
+    x = np.zeros(len(t))
+    y = np.zeros(len(t))
+    for i in range(N):
+        alpha = (np.random.rand() - 0.5) * 2 * np.pi
+        phi = (np.random.rand() - 0.5) * 2 * np.pi
+        x = x + np.random.randn() * np.cos(2 * np.pi * fd * t * np.cos(alpha) + phi)
+        y = y + np.random.randn() * np.sin(2 * np.pi * fd * t * np.cos(alpha) + phi)
+
+    # z is the complex coefficient representing channel, you can think of this as a phase shift and magnitude scale
+    z = (1/np.sqrt(N)) * (x + 1j*y) # this is what you would actually use when simulating the channel
+    z_mag = np.abs(z) # take magnitude for the sake of plotting
+    z_mag_dB = 10*np.log10(z_mag) # convert to dB
+
+    # Plot fading over time
+    plt.plot(t, z_mag_dB)
+    plt.plot([0, 1], [0, 0], ':r') # 0 dB
+    plt.legend(['Rayleigh Fading', 'No Fading'])
+    plt.axis([0, 1, -15, 5])
+    plt.show()
+
+If you are intending to use this channel model as part of a larger simulation, you would simply multiply the received signal by the complex number :code:`z`, representing flat fading.   The value :code:`z` would then update every time step.  This means all frequency components of the signal experience the same channel at any given moment in time, so you would **not** be simulating frequency selective fading, that requires a multi-tap channel impulse response which we will not get into in this chapter.  If we look at the magnitude of :code:`z`, we can see the Rayleigh fading over time:
+
+.. image:: ../_static/rayleigh.svg
+   :align: center 
+   :target: ../_static/rayleigh.svg
+
+Note the deep fades that occur breifly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
+
+
 ****************************
 Mitigating Multipath Fading
 ****************************
