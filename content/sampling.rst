@@ -94,9 +94,11 @@ IQ sampling is more easily understood by using the transmitter's point of view, 
 
 What happens when we add a sine and cosine?  Or rather, what happens when we add two sinusoids that are 90 degrees out of phase?  In the video below, there is a slider for adjusting I and another for adjusting Q.  What is plotted are the cosine, sine, and then the sum of the two.
 
-.. image:: ../_static/IQ.gif
+.. image:: ../_static/IQ2.gif
    :scale: 100% 
    :align: center 
+
+(The code used for this pyqtgraph-based Python app can be found `here <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
 
 The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude. Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cosine or sine).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this ability is extremely useful because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition operation compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
 
