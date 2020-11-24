@@ -67,7 +67,7 @@ Here is an example of a 16 MHz wide signal that is continuously transmitting.  T
 Simulating Rayleigh Fading
 **************************
 
-Rayleigh fading is used to model fading over time, when there is no significant LOS path.  When there is a dominant LOS path, the Rician fading model becomes more suitable, but we will be focusing on Rayleigh.  Note that Rayleigh and Rician models do not include the primarily path loss between the transmitter and receiver (such as the path loss calculated as part of a link budget), or any shadowing caused by large objects.  Their role is to model the multipath fading that occurs over time, as a result of movement and scatterers in the envrionement. 
+Rayleigh fading is used to model fading over time, when there is no significant LOS path.  When there is a dominant LOS path, the Rician fading model becomes more suitable, but we will be focusing on Rayleigh.  Note that Rayleigh and Rician models do not include the primarily path loss between the transmitter and receiver (such as the path loss calculated as part of a link budget), or any shadowing caused by large objects.  Their role is to model the multipath fading that occurs over time, as a result of movement and scatterers in the environment. 
 
 There is a lot of theory that comes out of the Rayleigh fading model, such as expressions for level crossing rate and average fade duration.  But the Rayleigh fading model doesn't directly tell us how to actually simulate a channel using the model.  To generate Rayleigh fading in simulation we have to use one of many published methods, and in the following Python example we will be using Clarke's "sum-of-sinusoids" method.
 
@@ -93,7 +93,7 @@ We also choose how many sinusoids to simulate, and there's no right answer becau
     N = 100 # number of sinusoids to sum
 
     v = v_mph * 0.44704 # convert to m/s
-    fd = v*center_freq/3e8 # max doppler shift
+    fd = v*center_freq/3e8 # max Doppler shift
     print("max Doppler shift:", fd)
     t = np.arange(0, 1, 1/Fs) # time vector. (start, stop, step)
     x = np.zeros(len(t))
@@ -122,7 +122,7 @@ If you are intending to use this channel model as part of a larger simulation, y
    :align: center 
    :target: ../_static/rayleigh.svg
 
-Note the deep fades that occur breifly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
+Note the deep fades that occur briefly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
 
 
 ****************************

@@ -16,7 +16,7 @@ Example: [0.123 + j0.512,    0.0312 + j0.4123,    0.1423 + j0.06512, ...]
 
 These numbers correspond to [I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, ...]
 
-When we want to save complex numbers to a file, we save them in the format IQIQIQIQIQIQIQIQ.  We are storing a bunch of floats in a row, and we know that the first one is an I. (Honestly, if you swap every I and Q the signal will look roughly the same. The order isn't crucial as long as it is implemented consistently).
+When we want to save complex numbers to a file, we save them in the format IQIQIQIQIQIQIQIQ.  I.e., we store a bunch of floats in a row, and when we read them back we must separate them back into [I+jQ, I+jQ, ...].
 
 While it's possible to store the complex numbers in a text file or csv file, we prefer to save them in what's called a "binary file" to save space.  At high sample rates your signal recordings could easily be multiple GB, and we want to be as memory efficient as possible.  If you have ever opened a file in a text editor and it looked incomprehensible like the screenshot below, it was probably binary.  Binary files contain a series of bytes, and you have to keep track of the format yourself.  Binary files are the most efficient way to store data, assuming all possible compression has been performed.  Because our signals usually appear like a random sequence of floats, we typically do not attempt to compress the data.  Binary files are used for plenty of other things, e.g., compiled programs (called "binaries").  When used to save signals, we call them binary "IQ files", utilizing the file extension .iq.
 
