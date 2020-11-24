@@ -32,3 +32,11 @@ chapter name refs, for my reference when writing:
 * freq-domain-chapter
 * filters-chapter
 * channel-coding-chapter
+
+Ideas for future chapters:
+
+* Equalization, would be the last step needed to finish the end-to-end comms link
+* "Bringing it all together", discussion and Python+SDR implementation of a full receiver, perhaps ADS-B or RDS
+* Cyclostationary, ask Chad if he wants to co-write it
+* OFDM, simulating OFDM and CP, show via Python how it turns freq selective fading into flat fading
+* How to create real-time SDR apps with GUIs in Python using pyqt and pyqtgraph, or even just matplotlib with updating
