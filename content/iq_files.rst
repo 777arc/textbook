@@ -71,7 +71,7 @@ Using a new Python script, we can read in this file using :code:`np.fromfile()`,
     plt.grid(True)
     plt.show()
 
-A big mistake is to forget to tell np.fromfile() the file format. Binary files don't include any information about their format. By default, np.fromfile() assumes it is reading in an array of float64s.
+A big mistake is to forget to tell np.fromfile() the file format. Binary files don't include any information about their format.  By default, np.fromfile() assumes it is reading in an array of float64s.
 
 Most other languages have methods to read in binary files, e.g., in MATLAB you can use fread().
 

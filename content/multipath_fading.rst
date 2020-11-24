@@ -4,7 +4,7 @@
 Multipath Fading
 #######################
 
-So far we have only discussed the "AWGN Channel", i.e., a model for a wireless channel where the signal is simply added to noise.  In this chapter we introduce multipath, which is a propagation phenomenon that results in signals reaching the receiver by two or more paths, which we experience in real-world wireless systems.
+So far we have only discussed the "AWGN Channel", i.e., a model for a wireless channel where the signal is simply added to noise.  In this chapter we introduce multipath, a propagation phenomenon that results in signals reaching the receiver by two or more paths, which we experience in real-world wireless systems.
 
 *************************
 Multipath
@@ -34,7 +34,7 @@ The first path, the one closest to the y-axis, will always be the LOS path (assu
 Fading
 *************************
 
-What usually happens is we get a mix of constructive and destructive interference, and it changes over time as the Rx, Tx, or environment is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel **changing** over time.  That's why we often refer to it as "multipath fading"; it's really the combination of constructive/destructive interference and a changing environment. What we end up with is a SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the Tx/Rx is moving. Beneath is a plot of SNR over time in milliseconds that demonstrates multipath fading.
+What tends to happen is we get a mix of constructive and destructive interference, and it changes over time as the Rx, Tx, or environment is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel **changing** over time.  That's why we often refer to it as "multipath fading"; it's really the combination of constructive/destructive interference and a changing environment.  What we end up with is a SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the Tx/Rx is moving.  Beneath is a plot of SNR over time in milliseconds that demonstrates multipath fading.
 
 .. image:: ../_static/multipath_fading.png
    :scale: 100 % 
