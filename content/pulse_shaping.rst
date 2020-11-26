@@ -100,10 +100,10 @@ Root Raised-Cosine Filter
 The root raised-cosine (RRC) filter is what we actually implement in our Tx and Rx. Combined they form a normal raised-cosine filter, as we discussed.  Because splitting a filter in half involves a frequency-domain square root, the impulse response gets a bit messy:
 
 .. image:: ../_static/rrc_filter.png
-   :scale: 50 % 
+   :scale: 70 % 
    :align: center 
 
-Luckily it's a heavily used filter and there are plenty of implementations to handle the messiness for us, including in Python.
+Luckily it's a heavily used filter and there are plenty of implementations, including `in Python <https://commpy.readthedocs.io/en/latest/generated/commpy.filters.rrcosfilter.html>`_.
 
 Other Pulse-Shaping Filters
 ###########################
@@ -169,7 +169,7 @@ At this point our symbols are still 1s and -1s.  Don't be caught up in the fact 
  BPSK symbols: [-1, 1, 1, 1, 1, -1, -1, -1, 1, 1]
  Applying 8 samples per symbol: [-1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, ...]
 
-We will create a raised-cosine filter using a :math:`beta` of 0.35, and we will make it 101 taps long to give the signal enough time to decay to zero.  While the raised cosine equation asks for our symbol period and a time vector :math:`(t)`, we can assume a **sample** period of 1 second to "normalize" our simulation.  It means our symbol period :math:`(Ts)` is 8 because we have 8 samples per symbol.  Our time vector then will be a list of integers.  With the way the raised-cosine equation works, we want :math:`t=0` to be in the center.  We will generate the 101-length time vector starting at -51 and ending at +51.
+We will create a raised-cosine filter using a :math:`\beta` of 0.35, and we will make it 101 taps long to give the signal enough time to decay to zero.  While the raised cosine equation asks for our symbol period and a time vector :math:`t`, we can assume a **sample** period of 1 second to "normalize" our simulation.  It means our symbol period :math:`Ts` is 8 because we have 8 samples per symbol.  Our time vector then will be a list of integers.  With the way the raised-cosine equation works, we want :math:`t=0` to be in the center.  We will generate the 101-length time vector starting at -51 and ending at +51.
 
 .. code-block:: python
 
@@ -212,9 +212,9 @@ This resulting signal is summed together from many of our impulse responses, wit
 
 Firstly, there are transient samples before and after the data because of the filter and the way convolution works.  These extra samples get included in our transmission but they don't actually contain "peaks" of pulses.
 
-Secondly, the vertical lines were created in the for loop for visualization's sake.  They are meant to demonstrate where intervals of :math:`Ts` occur.  These intervals represent where this signal will be sampled by the receiver.  Observe that for intervals of :math:`Ts` the curve has the value of exactly 1.0 or -1.0.  The takewaway is this: the signal maps to exact Hz levels at these intervals, making them ideal sample candidates.
+Secondly, the vertical lines were created in the for loop for visualization's sake.  They are meant to demonstrate where intervals of :math:`Ts` occur.  These intervals represent where this signal will be sampled by the receiver.  Observe that for intervals of :math:`Ts` the curve has the value of exactly 1.0 or -1.0, making them the ideal points in time to sample.
 
-If we were to upconvert and transmit this signal, the receiver would have to determine when the boundaries of :math:`Ts` are using a symbol synchronization algorithm.  That way the SDR knows *exactly* when to sample to get the right data.  If the SDR samples a little too early or late, it will see values that are slightly skewed due to ISI, and if it's way off then it will get a bunch of weird numbers.
+If we were to upconvert and transmit this signal, the receiver would have to determine when the boundaries of :math:`Ts` are e.g., using a symbol synchronization algorithm.  That way the receiver knows *exactly* when to sample to get the right data.  If the receiver samples a little too early or late, it will see values that are slightly skewed due to ISI, and if it's way off then it will get a bunch of weird numbers.
 
 Here is an example, created using GNU Radio, that illustrates what the IQ plot (a.k.a. constellation) looks like when we sample at the right and wrong times.  The original pulses have their bit values annotated.
 
