@@ -1,3 +1,5 @@
+.. _author-chapter:
+
 ##################
 About the Author
 ##################

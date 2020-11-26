@@ -32,6 +32,7 @@ chapter name refs, for my reference when writing:
 * freq-domain-chapter
 * filters-chapter
 * channel-coding-chapter
+* author-chapter
 
 Ideas for future chapters:
 

@@ -2,7 +2,7 @@
 PySDR: A Guide to SDR and DSP using Python
 ==========================================
 
-by `Dr. Marc Lichtman <https://www.cs.umd.edu/people/sdr/>`_
+by :ref:`Dr. Marc Lichtman<author-chapter>`
 
 .. toctree::
    :maxdepth: 2
