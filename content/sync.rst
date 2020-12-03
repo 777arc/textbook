@@ -338,15 +338,15 @@ It's up to you if you want to correct it or change the initial frequency offset 
 Fine Frequency Synchronization
 **********************************
 
-Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero, and maintain it at zero, even if the offset is changing over time.  I.e., we have to continuously track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time, at the symbol level, so the code we discuss in this section will come *after* timing sync.
+Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero and maintain it there, even if the offset changes over time.  We have to continuously track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time at the symbol level, so the code we discuss in this section will come *after* timing sync.
 
-We will be using a technique called a Costas Loop, which is a form of PLL that is specifically designed for carrier frequency offset correction, for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950s, and had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset, and it will also fix any phase offset, so that the energy is aligned with the I axis.  Recall that frequency is just a change in phase, so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2's have been left out of the equations because they don't functionally matter).
+We will use a technique called a Costas Loop.  It is a form of PLL that is specifically designed for carrier frequency offset correction for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950s, and it had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset while also fixing any phase offset.  The energy is aligned with the I axis.  Frequency is just a change in phase so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2s have been left out of the equations because they don't functionally matter).
 
 .. image:: ../_static/costas-loop.svg
    :align: center 
    :target: ../_static/costas-loop.svg
 
-The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case this is all digital so it's not actually a voltage, it's just a level represented by a variable, that determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This arrangement looks a lot like how an SDR downconverts and creates the I and Q branches.
+The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case, since we are simulating a wireless channel, it isn't a voltage, but rather a level represented by a variable.  It determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This behavior is similar to how an SDR downconverts and creates the I and Q branches.
 
 
 Below is the Python code that is our Costas Loop:
@@ -380,7 +380,7 @@ Below is the Python code that is our Costas Loop:
     plt.plot(freq_log,'.-')
     plt.show()
 
-There is a lot here so let's step through it; some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code, they contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation, we just multiply the real part of the sample by the imaginary part.  For a 4th order Costas Loop, it's still relatively simple but not quite one line, if you are curious what it looks like click below, but we won't be using it in our code for now.
+There is a lot here so let's step through it.  Some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code.  They contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation.  We multiply the real part of the sample by the imaginary part.  For a 4th order Costas Loop, it's still relatively simple but not quite one line.  If you are curious what it looks like click below, but we won't be using it in our code for now.
 
 .. raw:: html
 
@@ -408,11 +408,11 @@ There is a lot here so let's step through it; some lines are simple and others a
 
    </details>
 
-Alpha and beta define how fast the phase and frequency update, respectively.  There is actually some theory behind why I chose those two values, that we won't go into here, but if you are curious you could try tweaking them to see what happens.
+The :code:`alpha` and :code:`beta` variables define how fast the phase and frequency update, respectively.  There is some theory behind why I chose those two values; however, we won't address it here.  If you are curious you can try tweaking :code:`alpha` and/or :code:`beta` to see what happens.
 
-We log the value of :code:`freq` each iteration so we can plot it at the end, to see how the Costas Loop converges on the correct frequency offset.  We do :code:`freq / 50.0 * fs` for display purposes only, because :code:`freq` in the loop is not in units of Hz, if we didn't care about plotting :code:`freq` we could leave that whole line out.  
+We log the value of :code:`freq` each iteration so we can plot it at the end, to see how the Costas Loop converges on the correct frequency offset.  We implement :code:`freq / 50.0 * fs` for display purposes only.  Because :code:`freq` in the loop is not in units of Hz, if we didn't care about plotting :code:`freq` we could leave that whole line out.
 
-After recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase between 0 and :math:`2 \pi`, recall that's how phase wraps around.  
+After recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase between 0 and :math:`2 \pi`,  which wraps phase around.
 
 Our signal before and after the Costas Loop looks like this:
 
@@ -426,22 +426,22 @@ And the frequency offset estimation over time (y-axis is Hz):
    :align: center
    :target: ../_static/costas-loop-freq-tracking.svg
 
-You can see it takes about 70 samples to fully lock it on the frequency offset.  You can also see that in my simulated example, there were about -300 Hz left over after the coarse frequency sync, yours may vary.  Like I mentioned before, you can disable the coarse frequency sync, and just set the initial frequency offset to whatever value you want, and see if the Costas Loop figures it out.   
+It takes nearly 70 samples for the algorithm to fully lock it on the frequency offset.  You can see that in my simulated example there were about -300 Hz left over after the coarse frequency sync.  Yours may vary.  Like I mentioned before, you can disable the coarse frequency sync and set the initial frequency offset to whatever value you want and see if the Costas Loop figures it out.
 
-Also note how the Costas Loop, in addition to removing the frequency offset, also aligned our BPSK signal to be on the I portion, so Q is now zero again.  This is a convenient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator, because now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1, because there may or may not be an inversion, there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play, it removes the ambiguity because 1's and 0's are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK, we would just be adding a differential coding block right before modulation on the tx side, and right after demodulation on the rx side.  
+The Costas Loop, in addition to removing the frequency offset, aligned our BPSK signal to be on the I portion, making Q zero again.  It is a convenient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator.  Now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1 because there may or may not be an inversion; there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play.  It removes the ambiguity because 1s and 0s are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK.  We would be adding a differential coding block right before modulation on the tx side and right after demodulation on the rx side.
 
 
 ***************************
 Frame Synchronization
 ***************************
 
-We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  So at the receiver we need to be able to identify when a new frame begins.  Usually the frame header (at the MAC layer) contains how many bytes are in the frame, so we can use that info to know how long the frame is, e.g. in units samples or symbols.  But detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure, note how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.  
+We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  At the receiver we need to be able to identify when a new frame begins.  Customarily the frame header (at the MAC layer) contains how many bytes are in the frame.  We can use that information to know how long the frame is, e.g., in units samples or symbols.  Nonetheless, detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure.  Mark how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.
 
 .. image:: ../_static/wifi-frame.png
    :scale: 60 % 
    :align: center 
 
-A common and straightforward method of detecting these sequences at the receiver, is to cross-correlate the received samples with the known sequence.  When the sequence occurs, this cross-correlation resembles an autocorrelation (with noise added).  So typically the sequences chosen for use in preambles will be ones that have nice autocorrelation properties, i.e. the autocorrelation of the sequence creates a single strong spike at 0 and no other spikes.  One example is Barker codes, in 802.11/WiFi, a length-11 Barker sequence is used for the 1 and 2 Mbit/sec rates:
+A common and straightforward method of detecting these sequences at the receiver is to cross-correlate the received samples with the known sequence.  When the sequence occurs, this cross-correlation resembles an autocorrelation (with noise added).  Typically the sequences chosen for preambles will have nice autocorrelation properties, such as the autocorrelation of the sequence creates a single strong spike at 0 and no other spikes.  One example is Barker codes, in 802.11/WiFi a length-11 Barker sequence is used for the 1 and 2 Mbit/sec rates:
 
 .. code-block::
 
@@ -462,9 +462,11 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
    :align: center
    :target: ../_static/barker-code.svg
 
-You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  So it works great for finding the start of a packet, because it's essentially integrating 11 symbols worth of energy, in an attempt to create 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of doing the detection is figuring out a good threshold, because you don't want packets that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't get into here.  In deciding a threshold, you have to make a trade-off between probability of detection, and probability of false alarms.  Remember that the packet header itself will have information, so some false alarms are OK, you will quickly find out its not actually a packet when you go to decode the header and a CRC fails.  But missing a packet detection altogether is bad.
+You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  It works wll for finding the start of a packet because it essentially integrates 11 symbols worth of energy in an attempt to create a 1 bit spike in the output of the cross-correlation.
 
-Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE, and they have the benefit of being in sets, so you can have multiple different sequences that all have good autocorrelation properties, but won't trigger each other (i.e. also good cross-correlation properties, when you cross-correlate different sequences in the set).  Because of that feature, different cell towers will be assigned different sequences, so that a phone can not only find the start of the frame, but also know which tower it is receiving from.
+In fact, the hardest part of performing detection is figuring out a good threshold.  You don't want packets that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't consider here.  In deciding a threshold, you have to make a trade-off between probability of detection and probability of false alarms.  Remember that the packet header itself will have information, so some false alarms are OK.  You will quickly find it is not actually a packet when you go to decode the header and a CRC fails.  Yet missing a packet detection altogether is bad.
+
+Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE.  They have the benefit of being in sets.  You can have multiple different sequences that all have good autocorrelation properties, but they won't trigger each other (i.e., also good cross-correlation properties, when you cross-correlate different sequences in the set).  Thanks to that feature, different cell towers will be assigned different sequences so that a phone can not only find the start of the frame but also know which tower it is receiving from.
 
 
 
