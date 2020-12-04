@@ -18,9 +18,9 @@ We have discussed how to transmit digitally over the air, utilizing a digital mo
 Simulating Wireless Channel
 ***************************
 
-Before we learn how to implement time and frequency synchronization, we need to make our simulated signals more realistic.  Without adding some random time delay, the act of synchronizing in time is trivial.  In fact, you only need to take into account the sample delay of any filters you use.  We also want to simulate a frequency offset because, as we will discuss, oscillators are not perfect.  There will always be some offset between the transmitter and receiver's center frequency.
+Before we learn how to implement time and frequency synchronization, we need to make our simulated signals more realistic.  Without adding some random time delay, the act of synchronizing in time is trivial.  In fact, you only need to take into account the sample delay of any filters you use.  We also want to simulate a frequency offset because, as we will discuss, oscillators are not perfect; there will always be some offset between the transmitter and receiver's center frequency.
 
-Let's examine Python code for simulating a non-integer delay and a frequency offset.  The Python code in this chapter will start from the code we wrote during the pulse shaping Python exercise.  Click below if you need it.  You can consider it the starting point of the code in this chapter.  All new code will come after.
+Let's examine Python code for simulating a non-integer delay and a frequency offset.  The Python code in this chapter will start from the code we wrote during the pulse shaping Python exercise (click below if you need it); you can consider it the starting point of the code in this chapter, and all new code will come after.
 
 .. raw:: html
 
@@ -77,7 +77,7 @@ We can easily simulate a delay by shifting samples, but it only simulates a dela
     h /= np.sum(h) # normalize to get unity gain, we don't want to change the amplitude/power
     samples = np.convolve(samples, h) # apply filter
 
-As you can see, we are calculating the filter taps using a sinc() function.  A sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal.  We are not shaping the signal but delaying it in time.  In our example we are delaying by 0.3 of a sample.  Keep in mind that applying *any* filter delays a signal due to computation time.  It delays the signal by half of the filter taps minus one, due to the act of convolving the signal through the filter.
+As you can see, we are calculating the filter taps using a sinc() function.  A sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal.  This filter does not reshape the signal, it just delays it in time.  In our example we are delaying by 0.3 of a sample.  Keep in mind that applying *any* filter delays a signal by half of the filter taps minus one, due to the act of convolving the signal through the filter.
 
 If we plot the "before" and "after" of filtering a signal, we can observe the fractional delay.  In our plot we zoom into only a couple of symbols.  Otherwise, the fractional delay is not viewable.
 
@@ -107,7 +107,7 @@ Below demonstrates the signal before and after the frequency offset is applied.
    :align: center
    :target: ../_static/sync-freq-offset.svg
 
-We have not graphed the Q portion until since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
+We have not been graphing the Q portion since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
 
 As far as picking an arbitrary sample rate, if you scrutinize the code you will notice what matters is the ratio of :code:`fo` to :code:`fs`.
 
@@ -117,7 +117,7 @@ You can pretend that the two code blocks presented earlier simulate a the wirele
 Time Synchronization
 ***************************
 
-When we transmit a signal wirelessly, it arrives at the receiver with a random phase shift due to time travelled.  We cannot sample the signal at our symbol rate because we are unlikely to sample it at the right spot in the pulse, as discussed at the end of the :ref:`pulse-shaping-chapter` chapter.  Review the three figures at the end of that chapter if you are not following.
+When we transmit a signal wirelessly, it arrives at the receiver with a random phase shift due to time travelled.  We cannot just start sampling the symbols at our symbol rate because we are unlikely to sample it at the right spot in the pulse, as discussed at the end of the :ref:`pulse-shaping-chapter` chapter.  Review the three figures at the end of that chapter if you are not following.
 
 Most timing synchronization techniques take the form of a phase lock loop (PLL); we won't study PLLs here but it's important to know the term, and you can read about them on your own if you are interested.  PLLs are closed-loop systems that use feedback to continuously adjust something; in our case, a time shift permits us to sample at the peak of the digital symbols.
 
@@ -129,7 +129,7 @@ Most timing recovery methods rely on the fact that our digital symbols rise and 
    :scale: 40 % 
    :align: center 
 
-There are many timing recovery methods, most resembling a PLL.  Generally the difference between them is the equation used to perform "correction" on the timing offset, which we denote as :math:`\mu` or :code:`mu` in code.  The value of :code:`mu` gets updated every loop iteration.  It is in units of symbols, and you can think of it as how much we have to shift by to be able to sample at the "perfect" time.  So if :code:`mu = 3.61` then that means we have to shift the input by 3.61 samples to get the SDR to sample at the right spot.  Because we have 8 samples per symbol, if :code`mu` goes over 8 it will just wrap back around to zero.
+There are many timing recovery methods, most resembling a PLL.  Generally the difference between them is the equation used to perform "correction" on the timing offset, which we denote as :math:`\mu` or :code:`mu` in code.  The value of :code:`mu` gets updated every loop iteration.  It is in units of symbols, and you can think of it as how much we have to shift by to be able to sample at the "perfect" time.  So if :code:`mu = 3.61` then that means we have to shift the input by 3.61 samples to sample at the right spot.  Because we have 8 samples per symbol, if :code:`mu` goes over 8 it will just wrap back around to zero.
 
 The following Python code implements the Mueller and Muller clock recovery technique.
 
@@ -175,9 +175,9 @@ Let's focus on the bottom plot, which is the output of the synchronizer.  It too
 Time Synchronization with Interpolation
 ****************************************
 
-Unlike the Python code we have implemented, symbol synchronizers tend to interpolate the input samples by some number, e.g., 16, so that it's able to shift by a *fraction* of a sample.  The random delay caused by the wireless channel will unlikely be an exact multiple of a sample, so the peak of the symbol may not actually happen on a sample.  It is especially true in a case where there might only be 2 or 4 samples per symbol being received.  By interpolating the samples, it gives us the ability to sample "in between" actual samples.  The output of the synchronizer is still only 1 sample per symbol. The input samples themselves are interpolated.
+Symbol synchronizers tend to interpolate the input samples by some number, e.g., 16, so that it's able to shift by a *fraction* of a sample.  The random delay caused by the wireless channel will unlikely be an exact multiple of a sample, so the peak of the symbol may not actually happen on a sample.  It is especially true in a case where there might only be 2 or 4 samples per symbol being received.  By interpolating the samples, it gives us the ability to sample "in between" actual samples, in order to hit the very peak of each symbol.  The output of the synchronizer is still only 1 sample per symbol. The input samples themselves are interpolated.
 
-To expand our code, enable the fractional time delay that we implemented at the beginning of this chapter so our received signal has a more realistic delay.  Leave the frequency offset disabled for now.  If you re-run the simulation, you'll find that the synchronizer fails to fully synchronize to the signal.  That's because we aren't interpolating, so the code has no way to "sample between samples" to compensate for the fractional delay.  Let's add in the interpolation.
+Our time synchronization Python code we have implemented above did not include any interpolation.  To expand our code, enable the fractional time delay that we implemented at the beginning of this chapter so our received signal has a more realistic delay.  Leave the frequency offset disabled for now.  If you re-run the simulation, you'll find that the synchronizer fails to fully synchronize to the signal.  That's because we aren't interpolating, so the code has no way to "sample between samples" to compensate for the fractional delay.  Let's add in the interpolation.
 
 A quick way to interpolate a signal in Python is to use scipy's :code:`signal.resample` or :code:`signal.resample_poly`.  These functions both do the same thing but work differently under the hood.  We will use the latter function because it tends to be faster.  Let's interpolate by 16, i.e., we will be inserting 15 extra samples between each sample.  It can be done in one line of code, and it should happen *before* we go to perform time synchronization (prior to the large code snippet above).  Let's also plot the before and after to see the difference:
 
@@ -198,15 +198,15 @@ If we zoom *way* in, we see that it's the same signal, just with 16x as many poi
    :align: center
    :target: ../_static/time-sync-interpolated-samples.svg
 
-Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  We only have to modify one line of code in our time synchronizer!  We will change the first line inside the while loop to become:
+Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  In addition to calculating :code:`samples_interpolated`, we also have to modify one line of code in our time synchronizer.  We will change the first line inside the while loop to become:
 
 .. code-block:: python
 
  out[i_out] = samples_interpolated[i_in*16 + int(mu*16)]
 
-We did a couple things here.  First, we can't just use :code:`i_in` as the input sample index anymore.  We have to multiply it by 16 because we interpolated our input samples by 16.  Recall that the feedback loop adjusts the :code:`mu` variable.  It represents the delay that leads to us sampling at the right moment.  Also recall that after we calculated the new value of :code:`mu`, we added the integer part to :code:`i_in`.  Now we will use the remainder part, which is a float from 0 to 1, and it represents the fraction of a sample we need to delay by.  Before we weren't able to delay by a fraction of a sample, but now we are at least in increments of 16ths of a sample.  What we do is multiply :code:`mu` by 16 to figure out how many samples of our interpolated signal we need to delay by.  And then we have to round that number, since the value in the brackets ultimately is an index and must be an integer.  If this paragraph didn't make sense, try to go back to the initial Mueller and Muller clock recovery code, and also read the comments next to each line of code.
+We did a couple things here.  First, we can't just use :code:`i_in` as the input sample index anymore.  We have to multiply it by 16 because we interpolated our input samples by 16.  Recall that the feedback loop adjusts the :code:`mu` variable.  It represents the delay that leads to us sampling at the right moment.  Also recall that after we calculated the new value of :code:`mu`, we added the integer part to :code:`i_in`.  Now we will use the remainder part, which is a float from 0 to 1, and it represents the fraction of a sample we need to delay by.  Before we weren't able to delay by a fraction of a sample, but now we are, at least in increments of 16ths of a sample.  What we do is multiply :code:`mu` by 16 to figure out how many samples of our interpolated signal we need to delay by.  And then we have to round that number, since the value in the brackets ultimately is an index and must be an integer.  If this paragraph didn't make sense, try to go back to the initial Mueller and Muller clock recovery code, and also read the comments next to each line of code.
 
-The actual plot output of this new code should look roughly the same as before.  All we really did was make our simulation more realistic by adding a fractional-sample delay, and then we added the interpolator to the synchronizer in order to tcompensate for that fractional sample delay.
+The actual plot output of this new code should look roughly the same as before.  All we really did was make our simulation more realistic by adding a fractional-sample delay, and then we added the interpolator to the synchronizer in order to compensate for that fractional sample delay.
 
 Feel free to play around with different interpolation factors, i.e., change all the 16s to some other value.  You can also try enabling the frequency offset, or adding in white Gaussian noise to the signal before it gets received, to see how that impacts synchronization performance (hint: you might have to adjust that 0.3 multiplier).
 
@@ -218,7 +218,7 @@ If we enable only the frequency offset using a frequency of 1 kHz, we get the fo
 
 It might be hard to see, but the time sync is still working just fine.  It takes about 20 to 30 symbols before it's locked in.  However, there's a sinusoid pattern because we still have a frequency offset, and we will learn how to deal with it in the next section.
 
-Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization.  Remember you can plot samples on an IQ plot using a scatter plot: :code:`ax2.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols.  They occurred before the time sync had finished.  The symbols left are all roughly on the unit circle due to the frequency offset.
+Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization.  Remember you can plot samples on an IQ plot using a scatter plot: :code:`plt.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols.  They occurred before the time sync had finished.  The symbols left are all roughly on the unit circle due to the frequency offset.
 
 .. image:: ../_static/time-sync-constellation.svg
    :align: center
@@ -285,7 +285,7 @@ For our case of BPSK we have an order 2 modulation scheme, so we will use the fo
 
  r^2(t) = s^2(t) e^{j4\pi f_o t}
 
-We discovered what happens to the :math:`s(t)` portion of the equation, but what about the sinusoid part (or the complext exponential)?  As we can see, it is adding the :math:`N` term, which makes it equivalent to a sinusoid at a frequency of :math:`Nf_o` instead of just :math:`f_o`.  A simple method for figuring out :math:`f_o` is to take the FFT of the signal after we square it N times and seeing where the spike occurs.  Let's simulate it in Python.  We will return to generating our BPSK signal, and instead of applying a fractional-delay to it, we will apply a frequency offset by multiplying the signal by :math:`e^{j2\pi f_o t}` just like we did in chapter :ref:`filters-chapter` to convert a low-pass filter to a high-pass filter.
+We discovered what happens to the :math:`s(t)` portion of the equation, but what about the sinusoid part (a.k.a. complex exponential)?  As we can see, it is adding the :math:`N` term, which makes it equivalent to a sinusoid at a frequency of :math:`Nf_o` instead of just :math:`f_o`.  A simple method for figuring out :math:`f_o` is to take the FFT of the signal after we square it N times and seeing where the spike occurs.  Let's simulate it in Python.  We will return to generating our BPSK signal, and instead of applying a fractional-delay to it, we will apply a frequency offset by multiplying the signal by :math:`e^{j2\pi f_o t}` just like we did in chapter :ref:`filters-chapter` to convert a low-pass filter to a high-pass filter.
 
 Using the code from the beginning of this chapter, apply a +13 kHz frequency offset to your digital signal.  It could happen right before or right after the fractional-delay is added; it doesn't matter which. Regardless, it must happen *after* pulse shaping but before we do any receive-side functions such as time sync.
 
@@ -330,6 +330,8 @@ Actually correcting this frequency offset is done exactly how we simulated the o
 .. code-block:: python
 
     max_freq = f[np.argmax(psd)]
+    Ts = 1/fs # calc sample period
+    t = np.arange(0, Ts*len(samples), Ts) # create time vector
     samples = samples * np.exp(-1j*2*np.pi*max_freq*t/2.0)
 
 It's up to you if you want to correct it or change the initial frequency offset we applied at the start to a smaller number (like 500 Hz) to test out the fine frequency sync we will now learn how to do.
@@ -435,7 +437,7 @@ The Costas Loop, in addition to removing the frequency offset, aligned our BPSK 
 Frame Synchronization
 ***************************
 
-We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  At the receiver we need to be able to identify when a new frame begins.  Customarily the frame header (at the MAC layer) contains how many bytes are in the frame.  We can use that information to know how long the frame is, e.g., in units samples or symbols.  Nonetheless, detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure.  Mark how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.
+We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  At the receiver we need to be able to identify when a new frame begins.  Customarily the frame header (at the MAC layer) contains how many bytes are in the frame.  We can use that information to know how long the frame is, e.g., in units samples or symbols.  Nonetheless, detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure.  Note how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.
 
 .. image:: ../_static/wifi-frame.png
    :scale: 60 % 
@@ -462,11 +464,9 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
    :align: center
    :target: ../_static/barker-code.svg
 
-You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  It works wll for finding the start of a packet because it essentially integrates 11 symbols worth of energy in an attempt to create a 1 bit spike in the output of the cross-correlation.
+You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  It works well for finding the start of a frame because it essentially integrates 11 symbols worth of energy in an attempt to create a 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of performing start-of-frame detection is figuring out a good threshold.  You don't want frames that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't consider here.  In deciding a threshold, you have to make a trade-off between probability of detection and probability of false alarms.  Remember that the frame header itself will have information, so some false alarms are OK; you will quickly find it is not actually a frame when you go to decode the header and the CRC inevitably fails (because it wasn't actually a frame).  Yet while some false alarms are OK, missing a frame detection altogether is bad.
 
-In fact, the hardest part of performing detection is figuring out a good threshold.  You don't want packets that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't consider here.  In deciding a threshold, you have to make a trade-off between probability of detection and probability of false alarms.  Remember that the packet header itself will have information, so some false alarms are OK.  You will quickly find it is not actually a packet when you go to decode the header and a CRC fails.  Yet missing a packet detection altogether is bad.
-
-Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE.  They have the benefit of being in sets.  You can have multiple different sequences that all have good autocorrelation properties, but they won't trigger each other (i.e., also good cross-correlation properties, when you cross-correlate different sequences in the set).  Thanks to that feature, different cell towers will be assigned different sequences so that a phone can not only find the start of the frame but also know which tower it is receiving from.
+Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE.  They have the benefit of being in sets; you can have multiple different sequences that all have good autocorrelation properties, but they won't trigger each other (i.e., also good cross-correlation properties, when you cross-correlate different sequences in the set).  Thanks to that feature, different cell towers will be assigned different sequences so that a phone can not only find the start of the frame but also know which tower it is receiving from.
 
 
 
