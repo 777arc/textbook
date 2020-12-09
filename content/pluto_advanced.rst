@@ -38,6 +38,45 @@ And with AGC enabled you don't provide a value to :code:`rx_hardwaregain_chan0`.
 
 For more details about the Pluto's AGC, such as how to change the advanced AGC settings, refer to `the "RX Gain Control" section of this page <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361>`_.
 
+************************
+Transmitting
+************************
+
+Before you transmit any signal with your Pluto, make sure to connect a SMA cable between the Pluto's TX port, and whatever device will be acting as the receiver.  It's important to always start by transmitting over a cable, especially while you are learning *how* to transmit, to make sure the SDR is behaving how you intend.  Always keep your transmit power extremely low, as to not overpower the receiver, since the cable does not attenuate the signal like the wireless channel does.  If you own an attenuator (e.g. 30 dB), now would be a good time to use it.  If you do not have another SDR or a spectrum analyzer to act as the receiver, in theory you can use the RX port on the same Pluto, but it can get complicated.  I would recommend picking up a $10 RTL-SDR to act as the receiving SDR.
+
+Transmitting is very similar to receiving, except instead of telling the SDR to receive a certain number of samples, we will give it a certain number of samples to transmit.  Instead of :code:`rx_lo` we will be setting :code:`tx_lo`, to specify what carrier frequency to transmit on.  The sample rate is shared between the RX and TX, so we will be setting it like normal.  A full example of transmitting is shown below, where we generate a sinusoid at +100 kHz, then transmit the complex signal at a carrier frequency of 915 MHz, causing the receiver to see a carrier at 915.1 MHz.  There is really no practical reason to do this, we could have just set the center_freq to 915.1e6 and transmitted an array of 1's, but we wanted to generate complex samples for demonstration purposes. 
+
+.. code-block:: python
+    
+    import numpy as np
+    import adi
+    
+    sample_rate = 1e6 # Hz
+    center_freq = 915e6 # Hz
+    
+    sdr = adi.Pluto("ip:192.168.2.1")
+    sdr.sample_rate = int(sample_rate)
+    sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
+    sdr.tx_lo = int(center_freq)
+    sdr.tx_hardwaregain = 0 # set the transmit gain to the lowest, for safety sake, you can slowly increase this if need be
+    
+    N = 10000 # number of samples to transmit at once
+    t = np.arange(N)/sample_rate
+    samples = 0.5*np.exp(2.0j*np.pi*100e3*t) # Simulate a sinusoid of 100 kHz, so it should show up at 915.1 MHz at the receiver
+    
+    # Transmit our batch of samples 100 times, so it should be 1 second worth of samples total, if USB can keep up
+    for i in range(100):
+        sdr.tx(samples) # transmit the batch of samples once
+
+If you want to continuously transmit the same set of samples on repeat, instead of using a for/while loop within Python like we did above, you can tell the Pluto to do so using just one line:
+
+.. code-block:: python
+
+ sdr.tx_cyclic_buffer = True # Enable cyclic buffers
+
+You would then transmit your samples like normal: :code:`sdr.tx(samples)` just one time, and the Pluto will keep transmitting the signal indefinitely, until the sdr object destructor is called.  To change the samples that are being continuously transmitted, you cannot simply call :code:`sdr.tx(samples)` again with a new set of samples, you have to first call :code:`sdr.tx_destroy_buffer()`, then call :code:`sdr.tx(samples)`.
+
+
 **********************************
 Transmitting Over the Air Legally
 **********************************
