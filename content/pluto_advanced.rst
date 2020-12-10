@@ -58,15 +58,18 @@ Transmitting is very similar to receiving, except instead of telling the SDR to 
     sdr.sample_rate = int(sample_rate)
     sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain = 0 # set the transmit gain to the lowest, for safety sake, you can slowly increase this if need be
+    sdr.tx_hardwaregain = 0 # set the transmit gain to the lowest transmit power.  LOWER this value to make it transmitter higher, yes it's backwards for some reason, -90 is the lowest you can go
     
     N = 10000 # number of samples to transmit at once
     t = np.arange(N)/sample_rate
     samples = 0.5*np.exp(2.0j*np.pi*100e3*t) # Simulate a sinusoid of 100 kHz, so it should show up at 915.1 MHz at the receiver
+    samples *= 2**14 # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
     
     # Transmit our batch of samples 100 times, so it should be 1 second worth of samples total, if USB can keep up
     for i in range(100):
         sdr.tx(samples) # transmit the batch of samples once
+
+Here are some notes about this code.  First, you want to simulate your IQ samples so that they are between -1 and 1, but then before transmitting them we have to scale by 2^14 due to how Analog Devices implemented the :code:`tx()` function.  If you are not sure what your min/max values are, simply print them out with :code:`print(np.min(samples), np.max(samples))` or write an if statement to make sure they never go above 1 or below -1 (assuming that code comes before the 2^14 scaling).  As far as gain, it's very confusing because Analog Devices calls it a transmit *gain*, but it's really a transmit *attenuation*, both in code and in hardware.  In hardware, adjustable gains are implemented using an adjustable attenuator, but that doesn't explain why Analog Devices is calling it a gain in their API; i.e. they should have applied a negative signal if they wanted to call it a gain.  So that means a higher value is actually less transmit power, and the range is -90 to 0 dB.  We always want to start at the lowest transmit power, and then work our way up if needed, so we have the gain set to 0.  Don't simply set it to -90 just because your signal is not showing up; there might be something else wrong, and you don't want to fry your receiver. 
 
 If you want to continuously transmit the same set of samples on repeat, instead of using a for/while loop within Python like we did above, you can tell the Pluto to do so using just one line:
 
