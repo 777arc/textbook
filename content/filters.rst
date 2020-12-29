@@ -281,7 +281,7 @@ A moving average filter is a low-pass filter because it smooths out "high freque
 
    </details>
 
-Now for an FIR example.  Have any of you ever done this: 
+Now for an IIR example.  Have any of you ever done this: 
 
     x = x*0.99 + new_value*0.01
 
