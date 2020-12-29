@@ -24,7 +24,7 @@ While it's possible to store the complex numbers in a text file or csv file, we 
    :scale: 70 % 
    :align: center 
 
-In Python, the default complex type is np.complex128, which uses two 64-bit floats per sample.  But in DSP/SDR, we tend to use 32-bit floats instead because the ADCs on our SDRs don't have **that** much precision to warrant 64-bit floats.  In Python we will use **np.float64**, which uses two 32-bit floats.  When you are simply processing a signal in Python it doesn't really matter, but when you go to save the 1d array to a file, you want to make sure it's an array of np.float64 first.
+In Python, the default complex type is np.complex128, which uses two 64-bit floats per sample.  But in DSP/SDR, we tend to use 32-bit floats instead because the ADCs on our SDRs don't have **that** much precision to warrant 64-bit floats.  In Python we will use **np.complex64**, which uses two 32-bit floats.  When you are simply processing a signal in Python it doesn't really matter, but when you go to save the 1d array to a file, you want to make sure it's an array of np.complex64 first.
 
 *************************
 Python Examples
