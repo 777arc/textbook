@@ -88,7 +88,7 @@ Some common errors people will run into when new to dB are:
 
 It is also important to understand that dB is not technically a "unit".  A value in dB alone is unit-less, like if something is 2x larger, there are no units until I tell you the units.  dB is a relative thing.  In audio when they say dB, they really mean dBA which is units for sound level (the A is the units). In wireless we typically use watts to refer to an actual power level.  Therefore, you may see dBW as a unit, which is relative to 1 W. You may also see dBmW (often written dBm for short) which is relative to 1 mW.   For example, someone can say "our transmitter is set to 3 dBW" (so 2 watts).  Sometimes we use dB by itself, meaning it is relative and there are no units. One can say, "our signal was received 20 dB above the noise floor".  Here's a little tip: 0 dBm = -30 dBW.
 
-Finally, here are some common conversions that I recommend memorizing:
+Here are some common conversions that I recommend memorizing:
 
 ======  =====
 Linear   dB
@@ -102,6 +102,23 @@ Linear   dB
 1000x   30 dB
 10000x  40 dB
 ======  ===== 
+
+Finally, to put these numbers into perspective, below are some example power levels, in dBm:
+
+=========== ===
+80 dBm      Tx power of rural FM radio station
+62 dBm      Max power of a ham radio transmitter
+60 dBm      Power of typical home microwave
+37 dBm      Max power of typical handheld CB or ham radio
+27 dBm      Typical cell phone transmit power
+15 dBm      Typical WiFi transmit power
+10 dBm      Bluetooth (version 4) max transmit power
+-10 dBm     Max received power for WiFi
+-70 dBm     Example received power for a ham signal
+-100 dBm    Minimum received power for WiFi
+-127 dBm    Typical received power from GPS satellites
+=========== ===
+
 
 *************************
 Noise in Frequency Domain
