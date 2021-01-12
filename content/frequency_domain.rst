@@ -201,7 +201,7 @@ We usually perform DSP operations in the time domain, so let's utilize the convo
    :scale: 100 % 
    :align: center 
    
-When we discuss filtering, the colvolution property will make more sense.
+When we discuss filtering, the convolution property will make more sense.
 
 Lastly, I want to point out that the convolution property works in reverse, although we won't be using it as much as the time domain convolution:
 
