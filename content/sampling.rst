@@ -238,7 +238,7 @@ DC Spike and Offset Tuning
 ***************************
 
 Once you start working with SDRs, you will often find a large spike in the center of the FFT.
-It is called a "DC offset" or "DC spike" or sometimes "LO leakage".
+It is called a "DC offset" or "DC spike" or sometimes "LO leakage", where LO stands for local oscillator.
 
 Here's an example of a DC spike:
 
