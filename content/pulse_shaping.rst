@@ -132,9 +132,9 @@ A common equation used to approximate bandwidth, in Hz, for a given symbol rate 
 Python Exercise
 **********************************
 
-As a Python exercise let's filter and shape some pulses.  We will use BPSK symbols so that it's easier to visualize--prior to the pulse-shaping step, BPSK involves transmitting 1s or -1s with the "Q" portion equal to zero.  With Q equal to zero we can plot the I portion only, and it's easier to look at.
+As a Python exercise let's filter and shape some pulses.  We will use BPSK symbols so that it's easier to visualize--prior to the pulse-shaping step, BPSK involves transmitting 1's or -1's with the "Q" portion equal to zero.  With Q equal to zero we can plot the I portion only, and it's easier to look at.
 
-In this simulation we will use 8 samples per symbol, and instead of using a square-wave looking signal of 1s and -1s, we use a pulse train of impulses.  When you put an impulse through a filter, the output is the impulse response (hence the name).  Therefore if you want a series of pulses, you want to use impulses with zeros in between to avoid square pulses.
+In this simulation we will use 8 samples per symbol, and instead of using a square-wave looking signal of 1's and -1's, we use a pulse train of impulses.  When you put an impulse through a filter, the output is the impulse response (hence the name).  Therefore if you want a series of pulses, you want to use impulses with zeros in between to avoid square pulses.
 
 .. code-block:: python
 
@@ -145,7 +145,7 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
     num_symbols = 10
     sps = 8
 
-    bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1s and 0s
+    bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
 
     x = np.array([])
     for bit in bits:
@@ -161,7 +161,7 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
    :scale: 80 % 
    :align: center 
 
-At this point our symbols are still 1s and -1s.  Don't be caught up in the fact we used impulses.  In fact, it might be easier to *not* visualize the impulses response but rather think of it as an array:
+At this point our symbols are still 1's and -1's.  Don't be caught up in the fact we used impulses.  In fact, it might be easier to *not* visualize the impulses response but rather think of it as an array:
 
 .. code-block:: python
 

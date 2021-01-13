@@ -4,14 +4,14 @@
 Digital Modulation
 ###################
 
-In this chapter we will discuss *actually transmitting data*!  We will design signals that convey "information", i.e., 1s and 0s.  The main goal of modulation is to squeeze as much data into the least amount of spectrum possible.  Technically speaking we want to maximize "spectral efficiency" in units bits/sec/Hz.  Transmitting 1s and 0s faster will increase the bandwidth of our signal (recall Fourier properties), which means more spectrum is used. We will also examine other techniques besides transmitting faster.  There will be many trade-offs when deciding how to modulate, but there will also be room for creativity.
+In this chapter we will discuss *actually transmitting data*!  We will design signals that convey "information", i.e., 1's and 0's.  The main goal of modulation is to squeeze as much data into the least amount of spectrum possible.  Technically speaking we want to maximize "spectral efficiency" in units bits/sec/Hz.  Transmitting 1's and 0's faster will increase the bandwidth of our signal (recall Fourier properties), which means more spectrum is used. We will also examine other techniques besides transmitting faster.  There will be many trade-offs when deciding how to modulate, but there will also be room for creativity.
 
 *******************
 Symbols
 *******************
 Term alert!  Our transmit signal is going to be made up of "symbols".  Each symbol will carry some number of bits of information, and we will transmit symbols back to back, thousands or even millions in a row.
 
-As a simplified example, let's say we have a wire and are sending 1s and 0s using high and low voltage levels.  A symbol is one of those 1s or 0s:
+As a simplified example, let's say we have a wire and are sending 1's and 0's using high and low voltage levels.  A symbol is one of those 1's or 0's:
 
 .. image:: ../_static/symbols.png
    :scale: 60 % 

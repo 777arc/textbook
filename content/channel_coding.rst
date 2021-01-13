@@ -78,7 +78,7 @@ When using adaptive MCS, if you plot throughput over SNR, you get a staircase-sh
 Hamming Code
 ***************************
 
-Let's look at a simple error correcting codes.  Hamming Code was the first non-trivial code developed.  In the late 1940s Richard Hamming worked at Bell Labs, using an electromechanical computer that used punched paper tape.  When errors in the machine were detected, it would stop and operators would have to fix them. Hamming grew frustrated with having to restart his programs from scratch due to detected errors.  He said, "Damn it, if the machine can detect an error, why can't it locate the position of the error and correct it?"  He spent the next few years developing the Hamming Code so the computer could do exactly that.
+Let's look at a simple error correcting codes.  Hamming Code was the first non-trivial code developed.  In the late 1940's Richard Hamming worked at Bell Labs, using an electromechanical computer that used punched paper tape.  When errors in the machine were detected, it would stop and operators would have to fix them. Hamming grew frustrated with having to restart his programs from scratch due to detected errors.  He said, "Damn it, if the machine can detect an error, why can't it locate the position of the error and correct it?"  He spent the next few years developing the Hamming Code so the computer could do exactly that.
 
 In Hamming Codes, extra bits, called parity bits or check bits, are added to information for redundancy.  All bit positions that are powers of two are parity bits: 1, 2, 4, 8, and etc. The other bit positions are for information. The table beneath this paragraph highlighs parity bits in green.  Each parity bit "covers" all bits where the bitwise AND of the parity and the bit position is non-zero, marked with a red X below.  If we want to use a data bit, we need the parity bits that cover it.  To be able to go up to data bit d9, we need parity bit p8 and all the parity bits that come before it, so this table tells us how many parity bits we need for a certain number of bits.  This pattern continues indefinitely.
 
@@ -117,7 +117,7 @@ Soft vs Hard Decoding
 Recall that at the receiver demodulation occurs before decoding.  The demodulator can tell us its best guess as to which symbol was sent, or it can output the "soft" value.  For BPSK, instead of telling us 1 or 0, the demodulator can say 0.3423 or -1.1234, whatever the "soft" value of the symbol was.  Typically the decoding is designed to use hard or soft values.
 
 - **Soft decision decoding** – uses the soft values
-- **Hard decision decoding** – uses only the 1s and 0s
+- **Hard decision decoding** – uses only the 1's and 0's
 
 Soft is more robust because you are using all of the information at your disposal, but soft is also much more complicated to implement.  The Hamming Codes we talked about used hard decisions, while convolutional codes tend to use soft.
 
@@ -170,7 +170,7 @@ Currently, the best channel coding schemes are:
 
 Both of these codes approach the Shannon limit (i.e., almost hit it under certain SNRs).  Hamming codes and other simpler codes get nowhere near the Shannon limit.  From a research point of view, there is not much room left to improve in terms of the codes themselves.  Current research is focusing more on making the decoding more computationally efficient and adaptive to channel feedback.
 
-Low-density parity-check (LDPC) codes are a class of highly efficient linear block codes.  They were first introduced by Robert G. Gallager in his PhD dissertation in 1960 at MIT.  Due to the computational complexity in implementing them, they were ignored until the 1990s!  He is 89 at the time of this writing (2020), is still alive, and has won many prizes for his work (decades after he did it).  LDPC is not patented and therefore free to use (unlike turbo codes), which is why it was used in many open protocols.
+Low-density parity-check (LDPC) codes are a class of highly efficient linear block codes.  They were first introduced by Robert G. Gallager in his PhD dissertation in 1960 at MIT.  Due to the computational complexity in implementing them, they were ignored until the 1990's!  He is 89 at the time of this writing (2020), is still alive, and has won many prizes for his work (decades after he did it).  LDPC is not patented and therefore free to use (unlike turbo codes), which is why it was used in many open protocols.
 
 Turbo codes are based on convolutional codes.  It's a class of code that combines two or more simpler convolutional codes and an interleaver.  The fundamental patent application for turbo codes was filed on April 23, 1991.  The inventors were French, so when Qualcomm wanted to use turbo codes in CDMA for 3G they had to create a fee-bearing patent license agreement with France Telecom.  The primary patent expired August 29, 2013. 
 
