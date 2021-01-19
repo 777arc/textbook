@@ -239,7 +239,7 @@ Because our filter is not symmetrical around 0 Hz, it has to use complex taps. T
 Filter Implementation
 *************************
 
-We aren't going to dive too deeply into the implementation of filters. Rather, I focus on filter design (you can find read-to-use implementations in any programming language anyway).  For now, here is one take-away:  to filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  (Don't worry, a later section explains convolution.) In the discrete world we use a discrete convolution (example below).  The triangles labeled as b's are the taps.  In the flowchart, the squares labeled :math:`z^{-1}` above the triangles signify to delay by one time step.
+We aren't going to dive too deeply into the implementation of filters. Rather, I focus on filter design (you can find ready-to-use implementations in any programming language anyway).  For now, here is one take-away:  to filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  (Don't worry, a later section explains convolution.) In the discrete world we use a discrete convolution (example below).  The triangles labeled as b's are the taps.  In the flowchart, the squares labeled :math:`z^{-1}` above the triangles signify to delay by one time step.
 
 .. image:: ../_static/discrete_convolution.png
    :scale: 80 % 
@@ -273,7 +273,7 @@ If you perform a "moving average" across a list of numbers, that's just an FIR f
 .. raw:: html
 
    <details>
-   <summary><a>Answers</a></summary>
+   <summary>Answers</summary>
 
 A moving average filter is a low-pass filter because it smooths out "high frequency" changes, which is usually why people will use one.  The reason to use taps that decay to zero on both ends is to avoid a sudden change in the output, like if the signal being filtered was zero for a while and then suddenly jumped up.
 
@@ -356,7 +356,7 @@ Question: What type of filter was the triangle?
 .. raw:: html
 
    <details>
-   <summary><a>Answers</a></summary>
+   <summary>Answers</summary>
 
 It smoothed out the high frequency components of the green signal (i.e., the sharp transitions of the square) so it acts as a low-pass filter.
 
@@ -402,7 +402,7 @@ The code used to create this filter is fairly simple:
 .. raw:: html
 
    <details>
-   <summary><a>Answer</a></summary>
+   <summary>Answer</summary>
 
 It's not symmetrical around 0 Hz.
 
