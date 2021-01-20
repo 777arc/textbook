@@ -25,7 +25,7 @@ Let's examine Python code for simulating a non-integer delay and a frequency off
 .. raw:: html
 
    <details>
-   <summary><a>Python Code from Pulse Shaping</a></summary>
+   <summary>Python Code from Pulse Shaping</summary>
 
 .. code-block:: python
 
@@ -387,7 +387,7 @@ There is a lot here so let's step through it.  Some lines are simple and others 
 .. raw:: html
 
    <details>
-   <summary><a>Order 4 Costas Loop Error Equation (for those curious)</a></summary>
+   <summary>Order 4 Costas Loop Error Equation (for those curious)</summary>
 
 .. code-block:: python
 

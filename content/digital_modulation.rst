@@ -33,7 +33,7 @@ Take a moment to try to answer these questions:
 .. raw:: html
 
    <details>
-   <summary><a>Answers</a></summary>
+   <summary>Answers</summary>
 
 1. 250 Mbps - (1/8e-9)*2
 2. Four (which is what ethernet cables have)
@@ -89,7 +89,7 @@ Question: How many symbols are shown in the signal snippet above?  How many bits
 .. raw:: html
 
    <details>
-   <summary><a>Answers</a></summary>
+   <summary>Answers</summary>
 
 20 symbols, so 40 bits of information
 
@@ -167,7 +167,7 @@ Question: What’s wrong with using a PSK scheme like the one in the below image
 .. raw:: html
 
    <details>
-   <summary><a>Answer</a></summary>
+   <summary>Answer</summary>
 
 There is nothing invalid about this PSK scheme. You can certainly use it, but, because the symbols are not uniformly spaced, this scheme is not as effective as it could be. Scheme efficiency will become clear once we discuss how noise impacts our symbols.  The short answer is that we want to leave as much room as possible in between the symbols, in case there is noise, so that a symbol is not interpreted at the receiver as one of the other (incorrect) symbols.  We don't want a 0 being received as a 1.
 
