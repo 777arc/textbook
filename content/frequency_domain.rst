@@ -176,7 +176,7 @@ Scaling in time essentially shrinks or expands the signal in the x-axis.  What t
 
 Those already familiar with this property may notice a scaling factor missing; it is left out for the sake of simplicity. For practical purposes it doesn't make a difference.
 
-4. Convolution Property:
+4. Convolution in Time Property:
 
 .. math::
    \int x(\tau) y(t-\tau) d\tau  \leftrightarrow X(f)Y(f)
@@ -203,12 +203,14 @@ We usually perform DSP operations in the time domain, so let's utilize the convo
    
 When we discuss filtering, the convolution property will make more sense.
 
+5. Convolution in Frequency Property:
+
 Lastly, I want to point out that the convolution property works in reverse, although we won't be using it as much as the time domain convolution:
 
 .. math::
    x(t)y(t)  \leftrightarrow  \int X(g) Y(f-g) dg
 
-There are other properties, but the above four are the most crucial to understand in my opinion.  Even though we didn't step through the proof for each property, the point is we use the mathematical properties to gain insight into what happens to real signals when we do analysis and processing.  Don't get caught up on the equations. Make sure you understand the description of each property.
+There are other properties, but the above five are the most crucial to understand in my opinion.  Even though we didn't step through the proof for each property, the point is we use the mathematical properties to gain insight into what happens to real signals when we do analysis and processing.  Don't get caught up on the equations. Make sure you understand the description of each property.
 
 
 ******************************
