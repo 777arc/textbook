@@ -340,7 +340,7 @@ We must do the following six operations to calculate PSD:
 
 1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default. Let's use the first 1,024 samples as an example to create a 1,024-size FFT.  The output will be 1,024 complex floats.
 2. Take the magnitude of the FFT output, which provides us 1,024 real floats.
-3. Normalize: divide by our sample rate (:math:`F_s`).
+3. Normalize: divide by the FFT size (:math:`N`, or 1,024 in this case).
 4. Square the resulting magnitude to get power.
 5. Convert to dB using :math:`10 \log_{10}()`; we always view PSDs in log scale.
 6. Perform an FFT shift, covered in the previous chapter, to move "0 Hz" in the center and negative frequencies to the left of center.
@@ -351,8 +351,9 @@ Those six steps in Python are:
 
  Fs = 1e6 # lets say we sampled at 1 MHz
  # assume x contains your array of IQ samples
- x = x[0:1024] # we will only take the FFT of the first 1024 samples, see text below
- PSD = np.abs(np.fft.fft(x)/Fs)**2
+ N = 1024
+ x = x[0:N] # we will only take the FFT of the first 1024 samples, see text below
+ PSD = (np.abs(np.fft.fft(x))/N)**2
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
