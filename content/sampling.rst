@@ -100,7 +100,7 @@ What happens when we add a sine and cosine?  Or rather, what happens when we add
 
 (The code used for this pyqtgraph-based Python app can be found `here <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
 
-The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude. Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cosine or sine).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this ability is extremely useful because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition operation compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
+The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude.   Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  This is all a result of the trig identity: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, which we will come back to in a bit.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cosine or sine).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this ability is extremely useful because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave (because physics).  And it's much easier to adjust two amplitudes and perform an addition operation compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
 
 .. image:: ../_static/IQ_diagram.png
    :scale: 80% 
@@ -145,8 +145,11 @@ Now let's say we want to transmit our example point 0.7-0.4j.  We will be transm
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
   
   \quad \quad \quad = 0.7 \cos(2\pi ft) - 0.4 \sin(2\pi ft)
-  
-  \quad = 0.806 \cos(2\pi ft - 0.519)
+
+We can use trig identity :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)` where :math:`A` is our magnitude found with :math:`\sqrt{I^2 + Q^2}` and :math:`\phi` is our phase, equal to :math:`\tan^{-1} \left( Q/I \right)`.  The above equation now becomes:
+
+.. math::
+  x(t) = 0.806 \cos(2\pi ft + 0.519)
 
 Even though we started with a complex number, what we are transmitting is real, which is good because you can't actually transmit something imaginary with electromagnetic waves.  We just use imaginary/complex numbers to represent *what* we are transmitting.  We will talk about the :math:`f` shortly.
 
@@ -232,6 +235,8 @@ We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "
 You may also hear the term intermediate frequency (abbreviated as IF); for now, think of IF as an intermediate conversion step within a radio between baseband and bandpass/RF.
 
 We tend to create, record, or analyze signals at baseband because we can work at a lower sample rate (for reasons discussed in the previous subsection).  It is important to note that baseband signals are often complex signals, while signals at bandpass (e.g., signals we actually transmit over RF) are real.  Think about it: because the signal fed through an antenna must be real, you cannot directly transmit a complex/imaginary signal.  You will know a signal is definitely a complex signal if the negative frequency and positive frequency portions of the signal are not exactly the same. Complex numbers are how we represent negative frequencies after all.  In reality there are no negative frequencies; it's just the portion of the signal below the carrier frequency.
+
+In the earlier section where we played around with the complex point 0.7 - 0.4j, that was essentially one sample in a baseband signal.  Most of the time you see complex samples (IQ samples), you are at baseband.  Signals are rarely represented or stored digitally at RF, because of the amount of data it would take, and the fact we are usually only interested in a small portion of the RF spectrum.  
 
 ***************************
 DC Spike and Offset Tuning
