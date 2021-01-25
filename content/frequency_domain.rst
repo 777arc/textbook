@@ -233,13 +233,13 @@ We will only be dealing with 1 dimension FFTs in this textbook (2D is used for i
 
 Because the output is in the frequency domain, the span of the x-axis is based on the sample rate, which we will cover next chapter.  When we use more samples for the input vector, we get a better resolution in the frequency domain (in addition to processing more samples at once).  We don't actually "see" more frequencies by having a larger input. The only way would be to increase the sample rate (decrease the sample period :math:`\Delta t`).
 
-How do we actually plot this output?  As an example let's say that our sample rate was 1 million samples per second (1 MHz).  As we will learn next chapter, that means we can only see signals up to 0.5 MHz, regardless of how many samples we feed into the FFT.  The way the output of the FFT gets plotted is as follows:
+How do we actually plot this output?  As an example let's say that our sample rate was 1 million samples per second (1 MHz).  As we will learn next chapter, that means we can only see signals up to 0.5 MHz, regardless of how many samples we feed into the FFT.  The way the output of the FFT gets represented is as follows:
 
 .. image:: ../_static/negative-frequencies.svg
    :align: center
    :target: ../_static/negative-frequencies.svg
 
-It is always the case; the output of the FFT will always show :math:`\text{-} f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  The output will always have a negative portion and positive portion, assuming the input was a complex number (which tends to be the case in DSP).
+It is always the case; the output of the FFT will always show :math:`\text{-} f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  I.e., the output will always have a negative portion and positive portion.  If the input is complex, the negative and positive portions will be different, but if it real then they will be identical. 
 
 ********************
 Negative Frequencies
