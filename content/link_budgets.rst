@@ -122,9 +122,9 @@ In our link budget we also want to take into account miscellaneous losses.  We w
 
 The plot below shows atmospheric loss in dB/km over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis, you'll see that short range communications below 40 GHz **and** less than 1 km have 1 dB or less of atmospheric loss, and thus we generally ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the atmosphere. 
 
-.. image:: ../_static/atmospheric_attenuation.png
-   :scale: 80 % 
+.. image:: ../_static/atmospheric_attenuation.svg
    :align: center 
+   :target: ../_static/atmospheric_attenuation.svg
 
 Signal Power Equation
 #####################
