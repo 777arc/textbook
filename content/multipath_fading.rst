@@ -12,21 +12,21 @@ Multipath
 
 All realistic wireless channels include many "reflectors", given that RF signals bounce.  Any object between or near the transmitter (Tx) or receiver (Rx) can cause additional paths the signal travels along.  Each path experiences a different phase shift (delay) and attenuation (amplitude scaling).  At the receiver, all of the paths add up.  They can add up constructively, destructively, or a mix of both.  We call this concept of multiple signal paths "multipath".  There is the Line-of-Sight (LOS) path, and then all other paths.  In the example below, we show the LOS path and a single non-LOS path:
 
-.. image:: ../_static/multipath.png
-   :scale: 80 % 
+.. image:: ../_static/multipath.svg
    :align: center 
+   :target: ../_static/multipath.svg
 
 Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in physics class.  In wireless systems when the paths destructively combine, we call this interference "deep fade" because our signal briefly disappears.
 
-.. image:: ../_static/destructive_interference.png
-   :scale: 70 % 
+.. image:: ../_static/destructive_interference.svg
    :align: center 
+   :target: ../_static/destructive_interference.svg
 
 Paths can also add up constructively, causing a strong signal to be received.  Each path has a different phase shift and amplitude, which we can visualize on a plot in the time domain called a "power delay profile":
 
-.. image:: ../_static/multipath2.png
-   :scale: 70 % 
+.. image:: ../_static/multipath2.svg
    :align: center 
+   :target: ../_static/multipath2.svg
 
 The first path, the one closest to the y-axis, will always be the LOS path (assuming there is one) because there's no way for any other path to reach the receiver faster than the LOS path.  Typically the magnitude will decrease as the delay increases, since a path that took longer to show up at the receiver will have traveled further.
 

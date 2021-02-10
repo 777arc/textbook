@@ -20,9 +20,9 @@ Signal Power Budget
 
 Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the *transmit* power; it is usually a setting in the transmitter.  How do we figure out the *received* power at the receiver?
 
-.. image:: ../_static/tx_rx_system.png
-   :scale: 50 % 
+.. image:: ../_static/tx_rx_system.svg
    :align: center 
+   :target: ../_static/tx_rx_system.svg
 
 We need four system parameters to determine the received power, which are provided below with their common abbreviations. This chapter will delve into each of them.
 
@@ -31,9 +31,9 @@ We need four system parameters to determine the received power, which are provid
 - **Gr** - Gain of receive antenna
 - **Lp** - Distance between Tx and Rx (i.e., how much wireless path loss)
 
-.. image:: ../_static/tx_rx_system_params.png
-   :scale: 80 % 
+.. image:: ../_static/tx_rx_system_params.svg
    :align: center 
+   :target: ../_static/tx_rx_system_params.svg
 
 Transmit Power
 #####################

@@ -20,9 +20,9 @@ A failed CRC usually results in a retransmission, at least when using a protocol
 
 We discussed why we need channel coding, so let's see where it occurs in the transmit-receive chain:
 
-.. image:: ../_static/tx_rx_chain.png
-   :scale: 60 % 
+.. image:: ../_static/tx_rx_chain.svg
    :align: center 
+   :target: ../_static/tx_rx_chain.svg
 
 Observe that there are multiple encoding steps in the transmit-receive chain. Source coding, our first step, is not the same as channel coding; source coding is meant to compress the data to be transmitted as much as possible, just like when you zip files to reduce the space taken.  Namely the output of the source encoding block should be **smaller** than the data input, but the output of channel encoding will be larger than its input because redundancy is added.
 
@@ -64,15 +64,15 @@ In the :ref:`modulation-chapter` chapter we tackled noise in modulation schemes.
 
 Modern communications adaptively change the MCS in real-time based on the wireless channel conditions.  The receiver sends feedback about channel quality to the transmitter.  Feedback must be shared before the wireless channel quality changes, which could be on the order of ms.  This adaptive process leads to the highest throughput communications possible, and is used by modern technologies like LTE, 5G, and WiFi. Beneath is a visualization of a cell tower changing MCS during transmission as a user's distance to the cell changes.
 
-.. image:: ../_static/adaptive_mcs.png
-   :scale: 80 % 
+.. image:: ../_static/adaptive_mcs.svg
    :align: center 
+   :target: ../_static/adaptive_mcs.svg
 
 When using adaptive MCS, if you plot throughput over SNR, you get a staircase-shaped curve like the graph below.  Protocols like LTE often have a table indicating which MCS should be used at what SNR.
 
-.. image:: ../_static/adaptive_mcs2.png
-   :scale: 100 % 
+.. image:: ../_static/adaptive_mcs2.svg
    :align: center 
+   :target: ../_static/adaptive_mcs2.svg
 
 ***************************
 Hamming Code
