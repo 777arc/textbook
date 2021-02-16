@@ -108,7 +108,7 @@ Mathematically, the "transform" we use to go from the time domain to the frequen
 .. math::
    X(f) = \int x(t) e^{-j2\pi ft} dt
 
-For a signal x(t) we can get the frequency domain version, X(f), using this formula.  We will represent the time domain version of a function with x(t) or y(t), and the corresponding frequency domain version with X(f) and Y(f).  Note the "t" for time, and "f" for frequency. The "j" is simply the imaginary number. You may have seen it as "i" in high school math class.  We use "j" in engineering and computer science because "i" is often referring to current, and in programming it's often used as an iterator.
+For a signal x(t) we can get the frequency domain version, X(f), using this formula.  We will represent the time domain version of a function with x(t) or y(t), and the corresponding frequency domain version with X(f) and Y(f).  Note the "t" for time, and "f" for frequency. The "j" is simply the imaginary unit. You may have seen it as "i" in high school math class.  We use "j" in engineering and computer science because "i" is often referring to current, and in programming it's often used as an iterator.
 
 To return to the time domain from frequency is almost the same, aside from a scaling factor and negative sign:
 
