@@ -116,12 +116,19 @@ Time to hack! Open a terminal (either host or VM, doesn't matter):
 The default password is analog.
 
 You should see the PlutoSDR welcome screen. You have now SSHed into the ARM CPU on the Pluto itself!
-Type the following commands in:
+If you have a Pluto with firmware version 0.31 or lower, type the following commands in:
 
 .. code-block:: bash
 
  fw_setenv attr_name compatible
  fw_setenv attr_val ad9364
+ reboot
+
+And for 0.32 and higher use:
+
+.. code-block:: bash
+ 
+ fw_setenv compatible ad9364
  reboot
 
 You should now be able to tune up to 6 GHz and down to 70 MHz, not to mention use a sample rate up to 56 MHz!  Yay!
