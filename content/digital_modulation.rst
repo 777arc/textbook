@@ -204,7 +204,7 @@ For a QAM modulation scheme, we can technically put points wherever we want to o
    :scale: 80 % 
    :align: center 
 
-Note that most modulation schemes, except the various ASKs and BPSK, are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain. Can you distinguish between the phase of each symbole in the below image? It's tough.
+Note that most modulation schemes, except the various ASKs and BPSK, are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain. Can you distinguish between the phase of each symbol in the below image? It's tough.
 
 .. image:: ../_static/qam_time_domain.png
    :scale: 50 % 
@@ -268,9 +268,9 @@ Even though we could generate the complex symbols directly, let's start from the
  plt.grid(True)
  plt.show()
 
-.. image:: ../_static/qpsk_python.png
-   :scale: 100 % 
+.. image:: ../_static/qpsk_python.svg
    :align: center 
+   :target: ../_static/qpsk_python.svg
 
 Observe how all the symbols we generated overlap. There's no noise so the symbols all have the same value.  Let's add some noise:
 
@@ -283,11 +283,28 @@ Observe how all the symbols we generated overlap. There's no noise so the symbol
  plt.grid(True)
  plt.show()
 
-.. image:: ../_static/qpsk_python2.png
-   :scale: 100 % 
-   :align: center 
+.. image:: ../_static/qpsk_python2.svg
+   :align: center
+   :target: ../_static/qpsk_python2.svg
 
 Consider how additive white Gaussian noise (AGWN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
+
+For those interested in simulating phase noise, which could result from phase jitter within the local oscillator (LO), replace the :code:`r` with:
+
+.. code-block:: python
+
+ phase_noise = np.random.randn(len(x_symbols)) * 0.1 # adjust multiplier for "strength" of phase noise
+ r = x_symbols * np.exp(1j*phase_noise)
+
+.. image:: ../_static/phase_jitter.svg
+   :align: center
+   :target: ../_static/phase_jitter.svg
+
+You could even combine phase noise with AWGN to get the full experience:
+
+.. image:: ../_static/phase_jitter_awgn.svg
+   :align: center
+   :target: ../_static/phase_jitter_awgn.svg
 
 We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate multiple samples per symbol once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 
