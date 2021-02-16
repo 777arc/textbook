@@ -16,7 +16,7 @@ First and foremost, a couple important terms:
 **Digital Signal Processing (DSP):**
     The digital processing of signals, in our case RF signals
 
-This textbook acts as a hands-on introduction to the areas of DSP, SDR, and wireless communicoations.  It is designed for someone who is:
+This textbook acts as a hands-on introduction to the areas of DSP, SDR, and wireless communications.  It is designed for someone who is:
 
 #. Interested in *using* SDRs to do cool stuff
 #. Good with Python
