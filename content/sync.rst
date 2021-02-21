@@ -10,9 +10,9 @@ Introduction
 
 We have discussed how to transmit digitally over the air, utilizing a digital modulation scheme like QPSK and by applying pulse shaping to limit the signal bandwidth.  Channel coding can be used to deal with noisy channels, such as when you have low SNR at the receiver.  Filtering out as much as possible before digitally processing the signal always helps.  In this chapter we will investigate how synchronization is performed on the receiving end.  Synchronization is a set of processing that occurs *before* demodulation and channel decoding.  The overall tx-channel-rx chain is shown below, with the blocks discussed in this chapter highlighted in yellow.  (This diagram is not all-encompassing--most systems also include equalization and multiplexing).
 
-.. image:: ../_static/sync-diagram.svg
+.. image:: ../images/sync-diagram.svg
    :align: center 
-   :target: ../_static/sync-diagram.svg
+   :target: ../images/sync-diagram.svg
 
 ***************************
 Simulating Wireless Channel
@@ -81,9 +81,9 @@ As you can see, we are calculating the filter taps using a sinc() function.  A s
 
 If we plot the "before" and "after" of filtering a signal, we can observe the fractional delay.  In our plot we zoom into only a couple of symbols.  Otherwise, the fractional delay is not viewable.
 
-.. image:: ../_static/fractional-delay-filter.svg
+.. image:: ../images/fractional-delay-filter.svg
    :align: center
-   :target: ../_static/fractional-delay-filter.svg
+   :target: ../images/fractional-delay-filter.svg
 
 
 
@@ -103,9 +103,9 @@ To make our simulated signal more realistic, we will apply a frequency offset.  
  
 Below demonstrates the signal before and after the frequency offset is applied.
  
-.. image:: ../_static/sync-freq-offset.svg
+.. image:: ../images/sync-freq-offset.svg
    :align: center
-   :target: ../_static/sync-freq-offset.svg
+   :target: ../images/sync-freq-offset.svg
 
 We have not been graphing the Q portion since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
 
@@ -125,7 +125,7 @@ You can picture timing recovery as a block in the receiver, which accepts a stre
 
 Most timing recovery methods rely on the fact that our digital symbols rise and then fall, and the crest is the point at which we want to sample the symbol. To put it another way, we sample the maximum point after taking the absolute value:
 
-.. image:: ../_static/symbol_sync2.png
+.. image:: ../images/symbol_sync2.png
    :scale: 40 % 
    :align: center 
 
@@ -164,9 +164,9 @@ The next plot shows an example output where we have *disabled* the fractional ti
 **Bottom plot**
     Output of the symbol synchronizer, which provides just 1 sample per symbol.  That is these samples can be fed directly into a demodulator, which for BPSK is checking whether the value is greater than or less than 0.
 
-.. image:: ../_static/time-sync-output.svg
+.. image:: ../images/time-sync-output.svg
    :align: center
-   :target: ../_static/time-sync-output.svg
+   :target: ../images/time-sync-output.svg
 
 Let's focus on the bottom plot, which is the output of the synchronizer.  It took nearly 30 symbols for the synchronization to lock into the right delay.  Due inevitably to the time it takes for synchronizers to lock in, many communications protocols use a preamble that contains a synchronization sequence: it acts as a way to announce that a new packet has arrived, and it gives the receiver time to sync to it.  But after these ~30 samples the synchronizer works perfectly.  We are left with perfect 1's and -1's that match the input data.  It helps that this example didn't have any noise added.  Feel free to add noise or time shifts and see how the synchronizer behaves.  If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.
 
@@ -194,9 +194,9 @@ A quick way to interpolate a signal in Python is to use scipy's :code:`signal.re
 
 If we zoom *way* in, we see that it's the same signal, just with 16x as many points:
 
-.. image:: ../_static/time-sync-interpolated-samples.svg
+.. image:: ../images/time-sync-interpolated-samples.svg
    :align: center
-   :target: ../_static/time-sync-interpolated-samples.svg
+   :target: ../images/time-sync-interpolated-samples.svg
 
 Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  In addition to calculating :code:`samples_interpolated`, we also have to modify one line of code in our time synchronizer.  We will change the first line inside the while loop to become:
 
@@ -212,21 +212,21 @@ Feel free to play around with different interpolation factors, i.e., change all 
 
 If we enable only the frequency offset using a frequency of 1 kHz, we get the following time sync performance.  We have to show both I and Q now that we added a frequency offset:
 
-.. image:: ../_static/time-sync-output2.svg
+.. image:: ../images/time-sync-output2.svg
    :align: center
-   :target: ../_static/time-sync-output2.svg
+   :target: ../images/time-sync-output2.svg
 
 It might be hard to see, but the time sync is still working just fine.  It takes about 20 to 30 symbols before it's locked in.  However, there's a sinusoid pattern because we still have a frequency offset, and we will learn how to deal with it in the next section.
 
 Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization.  Remember you can plot samples on an IQ plot using a scatter plot: :code:`plt.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols.  They occurred before the time sync had finished.  The symbols left are all roughly on the unit circle due to the frequency offset.
 
-.. image:: ../_static/time-sync-constellation.svg
+.. image:: ../images/time-sync-constellation.svg
    :align: center
-   :target: ../_static/time-sync-constellation.svg
+   :target: ../images/time-sync-constellation.svg
     
 To gain even more insight, we can look at the constellation over time to discern what's actually happening to the symbols.  At the very beginning, for a short period of time, the symbols are not 0 or on the unit circle.  That is the period in which time sync is finding the right delay.  It's very quick, watch closely!  The spinning is just the frequency offset.  Frequency is a constant change in phase, so a frequency offset causes spinning of the BPSK (creating a circle in the static/persistent plot above).
 
-.. image:: ../_static/time-sync-constellation-animated.gif
+.. image:: ../images/time-sync-constellation-animated.gif
    :align: center 
 
 Hopefully by seeing an example of time sync actually happening, you have a feel for what it does and a general idea of how it works.  In practice, the while loop we created would only work on a small number of samples at a time (e.g., 1000).  You have to remember the value of :code:`mu` in between calls to the sync function, as well as the last couple values of :code:`out` and :code:`out_rail`.
@@ -241,7 +241,7 @@ Coarse Frequency Synchronization
 
 Even though we tell the transmitter and receiver to operate on the same center frequency, there is going to be a slight frequency offset between the two due to either imperfections in hardware (e.g., the oscillator) or a Doppler shift from movement.  This frequency offset will be tiny relative to the carrier frequency, but even a small offset can throw off a digital signal.  The offset will likely change over time, necessitating an always-running feedback loop to correct the offset.  As an example, the oscillator inside the Pluto has a max offset spec of 25 PPM.  That is 25 parts per million relative to the center frequency.  If you are tuned to 2.4 GHz, it would be +/- 60 kHz max offset.  The samples our SDR provides us are at baseband, making any frequency offset manifest in that baseband signal.  A BPSK signal with a small carrier offset will look something like the below time plot, which is obviously not great for demodulating bits.  We must remove any frequency offsets before demodulation.
 
-.. image:: ../_static/carrier-offset.png
+.. image:: ../images/carrier-offset.png
    :scale: 60 % 
    :align: center 
 
@@ -263,13 +263,13 @@ The first trick we will learn, in order to perform coarse frequency offset estim
 
 Let's see what happens when we take the square of our signal :math:`s(t)` by considering what QPSK would do.  Squaring complex numbers leads to interesting behavior, especially when we are talking about constellations like BPSK and QPSK.  The following animation shows what happens when you square QPSK, then square it again.  I specifically used QPSK instead of BPSK because you can see that when you square QPSK once, you essentially get BPSK.  And then after one more square it becomes one cluster.  (Thank you to http://ventrella.com/ComplexSquaring/ who created this neat webapp.)
 
-.. image:: ../_static/squaring-qpsk.gif
+.. image:: ../images/squaring-qpsk.gif
    :scale: 80 % 
    :align: center 
  
 Let's watch what happens when our QPSK signal has a small phase rotation and magnitude scaling applied to it, which is more realistic:
  
-.. image:: ../_static/squaring-qpsk2.gif
+.. image:: ../images/squaring-qpsk2.gif
    :scale: 80 % 
    :align: center 
 
@@ -300,9 +300,9 @@ First look at the signal before squaring (just a normal FFT):
     plt.plot(f, psd)
     plt.show()
 
-.. image:: ../_static/coarse-freq-sync-before.svg
+.. image:: ../images/coarse-freq-sync-before.svg
    :align: center
-   :target: ../_static/coarse-freq-sync-before.svg
+   :target: ../images/coarse-freq-sync-before.svg
    
 We don't actually see any peak associated with the carrier offset.  It's covered up by our signal.
 
@@ -315,9 +315,9 @@ Now with the squaring added (just a power of 2 because it's BPSK):
 
 We have to zoom way in to see which frequency the spike is on:
 
-.. image:: ../_static/coarse-freq-sync.svg
+.. image:: ../images/coarse-freq-sync.svg
    :align: center
-   :target: ../_static/coarse-freq-sync.svg
+   :target: ../images/coarse-freq-sync.svg
 
 You can try increasing the number of symbols simulated (e.g., 1000 symbols) so that we have enough samples to work with.  The more samples that go into our FFT, the more accurate our estimation of the frequency offset will be.  Just as a reminder, the code above should come *before* the timing synchronizer.
 
@@ -344,9 +344,9 @@ Next we will switch gears to fine frequency sync.  The previous trick is more fo
 
 We will use a technique called a Costas Loop.  It is a form of PLL that is specifically designed for carrier frequency offset correction for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950's, and it had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset while also fixing any phase offset.  The energy is aligned with the I axis.  Frequency is just a change in phase so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2s have been left out of the equations because they don't functionally matter).
 
-.. image:: ../_static/costas-loop.svg
+.. image:: ../images/costas-loop.svg
    :align: center 
-   :target: ../_static/costas-loop.svg
+   :target: ../images/costas-loop.svg
 
 The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case, since we are simulating a wireless channel, it isn't a voltage, but rather a level represented by a variable.  It determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This behavior is similar to how an SDR downconverts and creates the I and Q branches.
 
@@ -418,15 +418,15 @@ After recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase
 
 Our signal before and after the Costas Loop looks like this:
 
-.. image:: ../_static/costas-loop-output.svg
+.. image:: ../images/costas-loop-output.svg
    :align: center
-   :target: ../_static/costas-loop-output.svg
+   :target: ../images/costas-loop-output.svg
 
 And the frequency offset estimation over time (y-axis is Hz):
 
-.. image:: ../_static/costas-loop-freq-tracking.svg
+.. image:: ../images/costas-loop-freq-tracking.svg
    :align: center
-   :target: ../_static/costas-loop-freq-tracking.svg
+   :target: ../images/costas-loop-freq-tracking.svg
 
 It takes nearly 70 samples for the algorithm to fully lock it on the frequency offset.  You can see that in my simulated example there were about -300 Hz left over after the coarse frequency sync.  Yours may vary.  Like I mentioned before, you can disable the coarse frequency sync and set the initial frequency offset to whatever value you want and see if the Costas Loop figures it out.
 
@@ -439,7 +439,7 @@ Frame Synchronization
 
 We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  At the receiver we need to be able to identify when a new frame begins.  Customarily the frame header (at the MAC layer) contains how many bytes are in the frame.  We can use that information to know how long the frame is, e.g., in units samples or symbols.  Nonetheless, detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure.  Note how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.
 
-.. image:: ../_static/wifi-frame.png
+.. image:: ../images/wifi-frame.png
    :scale: 60 % 
    :align: center 
 
@@ -460,9 +460,9 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
     plt.grid()
     plt.show()
     
-.. image:: ../_static/barker-code.svg
+.. image:: ../images/barker-code.svg
    :align: center
-   :target: ../_static/barker-code.svg
+   :target: ../images/barker-code.svg
 
 You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  It works well for finding the start of a frame because it essentially integrates 11 symbols worth of energy in an attempt to create a 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of performing start-of-frame detection is figuring out a good threshold.  You don't want frames that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't consider here.  In deciding a threshold, you have to make a trade-off between probability of detection and probability of false alarms.  Remember that the frame header itself will have information, so some false alarms are OK; you will quickly find it is not actually a frame when you go to decode the header and the CRC inevitably fails (because it wasn't actually a frame).  Yet while some false alarms are OK, missing a frame detection altogether is bad.
 

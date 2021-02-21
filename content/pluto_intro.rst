@@ -4,7 +4,7 @@
 PlutoSDR Basics
 ####################################
 
-.. image:: ../_static/pluto.png
+.. image:: ../images/pluto.png
    :scale: 50 % 
    :align: center 
    

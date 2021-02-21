@@ -14,7 +14,7 @@ Before jumping into IQ sampling, let's discuss what sampling actually means. You
 
 Whether we are dealing with audio or radio frequencies, we must sample if we want to capture, process, or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  A more technical way to think of sampling a signal is grabbing values at moments in time and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
 
-.. image:: ../_static/sampling.svg
+.. image:: ../images/sampling.svg
    :align: center 
 
 We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds, known as the **sample period**.  The frequency at which we sample, i.e., the number of samples taken per second, is simply :math:`\frac{1}{T}`.  We call this the **sample rate**, and its the inverse of the sample period.  For example, if we have a sample rate of 10 Hz, then the sample period is 0.1 seconds; there will be 0.1 seconds between each sample.  In practice our sample rates will be on the order of hundreds of kHz to tens of MHz or even higher.  When we sample signals, we need to be mindful of the sample rate, it's a very important parameter. 
@@ -27,39 +27,39 @@ Nyquist Sampling
 
 For a given signal, the big question often is how fast must we sample?  Let's examine a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs (samples shown in blue).  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
 
-.. image:: ../_static/sampling_Fs_0.3.svg
+.. image:: ../images/sampling_Fs_0.3.svg
    :align: center 
 
 The red dashed line in the above image reconstructs a different (incorrect) function that could have lead to the same samples being recorded. It indicates that our sample rate was too low because the same samples could have come from two different functions, leading to ambiguity. If we want to accurately reconstruct the original signal, we can't have this ambiguity.
 
 Let's try sampling a little faster, at Fs = 1.2f:
 
-.. image:: ../_static/sampling_Fs_0.36.svg
+.. image:: ../images/sampling_Fs_0.36.svg
    :align: center 
 
 Once again, there is a different signal that could fit these samples. This ambiguity means that if someone gave us this list of samples, we could not distinguish which signal was the original one based on our sampling.
 
 How about sampling at Fs = 1.5f:
 
-.. image:: ../_static/sampling_Fs_0.45.svg
+.. image:: ../images/sampling_Fs_0.45.svg
    :align: center 
 
 Still not fast enough!  According to a piece of DSP theory we won't dive into, you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
 
-.. image:: ../_static/sampling_Fs_0.6.svg
+.. image:: ../images/sampling_Fs_0.6.svg
    :align: center 
 
 There's no incorrect signal this time because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
 
 In the above example our signal was just a simple sine wave, most actual signals will have many frequency components to them.  To accurately sample any given signal, the sample rate must be "at least twice the frequency of the maximum frequency component".  Here's a way to visualize that:
 
-.. image:: ../_static/max_freq.png
+.. image:: ../images/max_freq.png
    :scale: 70% 
    :align: center 
    
 We must identify the highest frequency component, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample is known as the Nyquist Rate.  In other words, the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  It is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
 
-.. image:: ../_static/nyquist_rate.png
+.. image:: ../images/nyquist_rate.png
    :scale: 70% 
    :align: center 
 
@@ -81,7 +81,7 @@ Next let's assign variables to represent the **amplitude** of the sine and cosin
 
 We can see this visually by plotting I and Q equal to 1:
 
-.. image:: ../_static/IQ_wave.png
+.. image:: ../images/IQ_wave.png
    :scale: 70% 
    :align: center 
 
@@ -94,7 +94,7 @@ IQ sampling is more easily understood by using the transmitter's point of view, 
 
 What happens when we add a sine and cosine?  Or rather, what happens when we add two sinusoids that are 90 degrees out of phase?  In the video below, there is a slider for adjusting I and another for adjusting Q.  What is plotted are the cosine, sine, and then the sum of the two.
 
-.. image:: ../_static/IQ2.gif
+.. image:: ../images/IQ2.gif
    :scale: 100% 
    :align: center 
 
@@ -102,7 +102,7 @@ What happens when we add a sine and cosine?  Or rather, what happens when we add
 
 The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude.   Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  This is all a result of the trig identity: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, which we will come back to in a bit.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cosine or sine).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this ability is extremely useful because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave.  And it's much easier to adjust two amplitudes and perform an addition operation compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
 
-.. image:: ../_static/IQ_diagram.png
+.. image:: ../images/IQ_diagram.png
    :scale: 80% 
    :align: center 
 
@@ -114,13 +114,13 @@ Complex Numbers
 
 Ultimately, the IQ convention is an alternative way to represent magnitude and phase, which leads us to complex numbers and the ability to represent them on a complex plane.  You may have seen complex numbers before in other classes. Take the complex number 0.7-0.4j as an example:
 
-.. image:: ../_static/complex_plane_1.png
+.. image:: ../images/complex_plane_1.png
    :scale: 70% 
    :align: center
 
 A complex number is really just two numbers together, a real and an imaginary portion. A complex number also has a magnitude and phase, which makes more sense if you think about it as a vector instead of a point. Magnitude is the length of the line between the origin and the point (i.e., length of the vector), while phase is the angle between the vector and 0 degrees, which we define as the positive real axis:
 
-.. image:: ../_static/complex_plane_2.png
+.. image:: ../images/complex_plane_2.png
    :scale: 70% 
    :align: center
 
@@ -135,7 +135,7 @@ In Python you can use np.abs(x) and np.angle(x) for the magnitude and phase. The
 
 You may have figured out by now how this vector or phasor diagram relates to IQ convention: I is real and Q is imaginary.  From this point on, when we draw the complex plane, we will label it with I and Q instead of real and imaginary.  They are still complex numbers!
 
-.. image:: ../_static/complex_plane_3.png
+.. image:: ../images/complex_plane_3.png
    :scale: 70% 
    :align: center
 
@@ -165,7 +165,7 @@ Receiver Side
 
 Now let's take the perspective of a radio receiver that is trying to receive a signal (e.g., an FM radio signal).  Using IQ sampling, the diagram now looks like:
 
-.. image:: ../_static/IQ_diagram_rx.png
+.. image:: ../images/IQ_diagram_rx.png
    :scale: 70% 
    :align: center
 
@@ -184,7 +184,7 @@ Receiver Architectures
 
 The figure in the above "Receiver Side" section demonstrates how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion", or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to not downconvert at all and sample so fast to capture everything from 0 Hz to 1/2 the sample rate.  This strategy is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC chip.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne". It involves downconversion but not all the way to 0 Hz. It places the signal of interest at an intermediate frequency, known as "IF".  Here are the block diagrams of these three architectures:
 
-.. image:: ../_static/receiver_arch_diagram.svg
+.. image:: ../images/receiver_arch_diagram.svg
    :align: center
    
    
@@ -194,7 +194,7 @@ Carrier and Downconversion
 
 Until this point we have not discussed frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air (the electromagnetic wave's frequency).  We refer to it as the "carrier" because it carries our information (stored in I and Q) on a certain frequency.
 
-.. image:: ../_static/carrier.png
+.. image:: ../images/carrier.png
    :scale: 70% 
    :align: center
    
@@ -215,7 +215,7 @@ to just I and Q.
 
 Let's visualize downconversion in the frequency domain:
 
-.. image:: ../_static/downconversion.png
+.. image:: ../images/downconversion.png
    :scale: 60% 
    :align: center
 
@@ -228,7 +228,7 @@ Baseband and Bandpass Signals
 ***********************************
 We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz, that has been shifted up for the purpose of wireless transmission.  There is no notion of a "baseband transmission", because you can't transmit something imaginary.  A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
 
-.. image:: ../_static/baseband_bandpass.png
+.. image:: ../images/baseband_bandpass.png
    :scale: 50% 
    :align: center
 
@@ -247,7 +247,7 @@ It is called a "DC offset" or "DC spike" or sometimes "LO leakage", where LO sta
 
 Here's an example of a DC spike:
 
-.. image:: ../_static/dc_spike.png
+.. image:: ../images/dc_spike.png
    :scale: 50% 
    :align: center
    
@@ -261,7 +261,7 @@ A quick way to handle the DC offset is to oversample the signal and off-tune it.
 As an example, let's say we want to view 5 MHz of spectrum at 100 MHz.
 Instead what we can do is sample at 20 MHz at a center frequency of 95 MHz.
 
-.. image:: ../_static/offtuning.png
+.. image:: ../images/offtuning.png
    :scale: 40 %
    :align: center
    
@@ -416,5 +416,5 @@ Here is a full code example that includes generating a signal (complex exponenti
  
 Output:
 
-.. image:: ../_static/fft_example1.svg
+.. image:: ../images/fft_example1.svg
    :align: center

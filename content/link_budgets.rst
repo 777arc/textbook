@@ -20,9 +20,9 @@ Signal Power Budget
 
 Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the *transmit* power; it is usually a setting in the transmitter.  How do we figure out the *received* power at the receiver?
 
-.. image:: ../_static/tx_rx_system.svg
+.. image:: ../images/tx_rx_system.svg
    :align: center 
-   :target: ../_static/tx_rx_system.svg
+   :target: ../images/tx_rx_system.svg
 
 We need four system parameters to determine the received power, which are provided below with their common abbreviations. This chapter will delve into each of them.
 
@@ -31,9 +31,9 @@ We need four system parameters to determine the received power, which are provid
 - **Gr** - Gain of receive antenna
 - **Lp** - Distance between Tx and Rx (i.e., how much wireless path loss)
 
-.. image:: ../_static/tx_rx_system_params.svg
+.. image:: ../images/tx_rx_system_params.svg
    :align: center 
-   :target: ../_static/tx_rx_system_params.svg
+   :target: ../images/tx_rx_system_params.svg
 
 Transmit Power
 #####################
@@ -56,13 +56,13 @@ Transmit and receive antenna gains are crucial for calculating link budgets. Wha
 
 Gains will be depicted in dB (unit-less); feel free to learn or remind yourself why dB is unit-less for our scenario in the :ref:`noise-chapter` chapter.  Typically, antennas are either omnidirectional, meaning their power radiates in all directions, or directional, meaning their power radiates in a specific direction.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna will have a higher gain, usually 5 dB or higher, and anywhere up to 60 dB or so.
 
-.. image:: ../_static/antenna_gain_patterns.png
+.. image:: ../images/antenna_gain_patterns.png
    :scale: 80 % 
    :align: center 
 
 When a directional antenna is used, it must be either installed facing the correct direction or attached to a mechanical gimbal. It could also be a phased array, which can be electronically steered (i.e., by software).
 
-.. image:: ../_static/antenna_steering.png
+.. image:: ../images/antenna_steering.png
    :scale: 80 % 
    :align: center 
    
@@ -75,7 +75,7 @@ Path Loss
 
 As a signal moves through the air (or vacuum), it reduces in strength.  Imagine holding a small solar panel in front of a light bulb.  The further away the solar panel is, the less energy it will absorb from the light bulb.  **Flux** is a term in physics and mathematics, defined as "how much stuff goes through your thing".  For us, it's the amount of electromagnetic field passing into our receive antenna.  We want to know how much power is lost, for a given distance.
 
-.. image:: ../_static/flux.png
+.. image:: ../images/flux.png
    :scale: 80 % 
    :align: center 
 
@@ -122,9 +122,9 @@ In our link budget we also want to take into account miscellaneous losses.  We w
 
 The plot below shows atmospheric loss in dB/km over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis, you'll see that short range communications below 40 GHz **and** less than 1 km have 1 dB or less of atmospheric loss, and thus we generally ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the atmosphere. 
 
-.. image:: ../_static/atmospheric_attenuation.svg
+.. image:: ../images/atmospheric_attenuation.svg
    :align: center 
-   :target: ../_static/atmospheric_attenuation.svg
+   :target: ../images/atmospheric_attenuation.svg
 
 Signal Power Equation
 #####################
@@ -179,7 +179,7 @@ SNR
 
 Now that we have both numbers, we can take the ratio to find SNR:
 
-.. image:: ../_static/SNR.png
+.. image:: ../images/SNR.png
    :scale: 50 % 
    :align: center 
 
@@ -191,7 +191,7 @@ Example Link Budget: ADS-B
 
 Automatic Dependent Surveillance-Broadcast (ADS-B) is a technology used by aircraft to broadcast signals that share their position and other status with air traffic control ground stations and other aircraft.  ADS–B is automatic in that it requires no pilot or external input; it depends on data from the aircraft's navigation system and other computers.  The messages are not encrypted (yay!).  ADS–B equipment is currently mandatory in portions of Australian airspace, while the United States requires some aircraft to be equipped, depending on the size.
 
-.. image:: ../_static/adsb.jpg
+.. image:: ../images/adsb.jpg
    :scale: 120 % 
    :align: center 
    

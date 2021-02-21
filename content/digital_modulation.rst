@@ -13,15 +13,15 @@ Term alert!  Our transmit signal is going to be made up of "symbols".  Each symb
 
 As a simplified example, let's say we have a wire and are sending 1's and 0's using high and low voltage levels.  A symbol is one of those 1's or 0's:
 
-.. image:: ../_static/symbols.png
+.. image:: ../images/symbols.png
    :scale: 60 % 
    :align: center 
 
 In the above example each symbol represents one bit.  How can we convey more than one bit per symbol?  Let's study the signals that travel down Ethernet cables, which is defined in an IEEE standard called IEEE 802.3 1000BASE-T.  The common operating mode of ethernet uses a 4-level amplitude modulation (2 bits per symbol) with 8 ns symbols.
 
-.. image:: ../_static/ethernet.svg
+.. image:: ../images/ethernet.svg
    :align: center 
-   :target: ../_static/ethernet.svg
+   :target: ../images/ethernet.svg
 
 Take a moment to try to answer these questions:
 
@@ -52,9 +52,9 @@ Question: Why can’t we directly transmit the ethernet signal shown in the figu
 1. Low frequencies require *huge* antennas
 2. Square waves take an excessive amount of spectrum for the bits per second--recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
 
-.. image:: ../_static/square-wave.svg
+.. image:: ../images/square-wave.svg
    :align: center 
-   :target: ../_static/square-wave.svg
+   :target: ../images/square-wave.svg
    
 What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g., FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.
 
@@ -72,17 +72,17 @@ Amplitude Shift Keying (ASK)
 
 Amplitude Shift Keying (ASK) is the first digital modulation scheme we will discuss because amplitude modulation is the simplest to visualize of the three sinusoid properties.  We literally modulate the **amplitude** of the carrier.  Here is an example of 2-level ASK, called 2-ASK:
 
-.. image:: ../_static/ASK.svg
+.. image:: ../images/ASK.svg
    :align: center
-   :target: ../_static/ASK.svg
+   :target: ../images/ASK.svg
 
 Note how the average value is zero; we always prefer this whenever possible. 
 
 We can use more than two levels, allowing for more bits per symbol.  Below shows an example of 4-ASK.  In this case each symbol carries 2 bits of information. 
 
-.. image:: ../_static/ask2.svg
+.. image:: ../images/ask2.svg
    :align: center
-   :target: ../_static/ask2.svg
+   :target: ../images/ask2.svg
 
 Question: How many symbols are shown in the signal snippet above?  How many bits are represented total?
 
@@ -99,9 +99,9 @@ Question: How many symbols are shown in the signal snippet above?  How many bits
 
 How do we actually create this signal digitally, through code?  All we have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).  The example below shows 2-ASK with 10 samples per symbol.  
 
-.. image:: ../_static/ask3.svg
+.. image:: ../images/ask3.svg
    :align: center
-   :target: ../_static/ask3.svg
+   :target: ../images/ask3.svg
 
 The top plot shows the discrete samples represented by red dots, i.e., our digital signal.  The bottom plot shows what the resulting modulated signal looks like, which could be transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there may be thousands, depending on how high in the spectrum the signal is being transmitted.
 
@@ -116,15 +116,15 @@ Now let's consider modulating the phase in a similar manner as we did with the a
 
 Example of BPSK (note the phase changes):
 
-.. image:: ../_static/bpsk.svg
+.. image:: ../images/bpsk.svg
    :align: center 
-   :target: ../_static/bpsk.svg
+   :target: ../images/bpsk.svg
 
 It’s not very fun to look at plots like this:
 
-.. image:: ../_static/bpsk2.svg
+.. image:: ../images/bpsk2.svg
    :align: center 
-   :target: ../_static/bpsk2.svg
+   :target: ../images/bpsk2.svg
 
 Instead we usually represent the phase in the complex plane.  
 
@@ -134,7 +134,7 @@ IQ Plots/Constellations
 
 You have seen IQ plots before in the complex numbers subsection of the :ref:`sampling-chapter` chapter, but now we will use them in a new and fun way.  For a given symbol, we can show the amplitude and phase on an IQ plot.  For the BPSK example we said we had phases of 0 and 180 degrees.  Let's plot those two points on the IQ plot. We will assume a magnitude of 1. In practice it doesn't really matter what magnitude you use; a higher value means a higher power signal, but you can also just increase the amplifier gain instead.
 
-.. image:: ../_static/bpsk_iq.png
+.. image:: ../images/bpsk_iq.png
    :scale: 80 % 
    :align: center 
 
@@ -142,25 +142,25 @@ The above IQ plot shows what we will transmit, or rather the set of symbols we w
 
 To receive and decode BPSK we can use IQ sampling, like we learned about last chapter, and examine where the points end up on the IQ plot.  However, there will be a random phase rotation due to the wireless channel because the signal will have some random delay as it passes through the air between antennas.  The random phase rotation can be reversed using various methods we will learn about later.  Here is an example of a few different ways that BPSK signal might show up at the receiver (this does not include noise):
 
-.. image:: ../_static/bpsk3.png
+.. image:: ../images/bpsk3.png
    :scale: 60 % 
    :align: center 
 
 Back to PSK.  What if we want four different levels of phase?  I.e., 0, 90, 180, and 270 degrees.  In this case it would be represented like so on the IQ plot, and it forms a modulation scheme we call Quadrature Phase Shift Keying (QPSK):
 
-.. image:: ../_static/qpsk.png
+.. image:: ../images/qpsk.png
    :scale: 60 % 
    :align: center 
 
 For PSK we always have N different phases, equally spaced around 360 degrees for best results.  We often show the unit circle to emphasize that all points have the same magnitude:
 
-.. image:: ../_static/psk_set.png
+.. image:: ../images/psk_set.png
    :scale: 60 % 
    :align: center 
 
 Question: What’s wrong with using a PSK scheme like the one in the below image?  Is it a valid PSK modulation scheme?
 
-.. image:: ../_static/weird_psk.png
+.. image:: ../images/weird_psk.png
    :scale: 60 % 
    :align: center 
 
@@ -177,7 +177,7 @@ There is nothing invalid about this PSK scheme. You can certainly use it, but, b
 
 Let's detour back to ASK for a moment.  Note that we can show ASK on the IQ plot just like PSK.  Here is the IQ plot of 2-ASK, 4-ASK, and 8-ASK, in the bipolar configuration, as well as 2-ASK and 4-ASK in the unipolar configuration.
 
-.. image:: ../_static/ask_set.png
+.. image:: ../images/ask_set.png
    :scale: 50 % 
    :align: center 
 
@@ -188,25 +188,25 @@ Quadrature Amplitude Modulation (QAM)
 **************************************
 What if we combine ASK and PSK?  We call this modulation scheme Quadrature Amplitude Modulation (QAM). QAM usually looks something like this:
 
-.. image:: ../_static/64qam.png
+.. image:: ../images/64qam.png
    :scale: 90 % 
    :align: center 
    
 Here are some other examples of QAM:
 
-.. image:: ../_static/qam.png
+.. image:: ../images/qam.png
    :scale: 50 % 
    :align: center 
 
 For a QAM modulation scheme, we can technically put points wherever we want to on the IQ plot since the phase *and* amplitude are modulated.  The "parameters" of a given QAM scheme are best defined by showing the QAM constellation. Alternatively, you may list the I and Q values for each point, like below for QPSK:
 
-.. image:: ../_static/qpsk_list.png
+.. image:: ../images/qpsk_list.png
    :scale: 80 % 
    :align: center 
 
 Note that most modulation schemes, except the various ASKs and BPSK, are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain. Can you distinguish between the phase of each symbol in the below image? It's tough.
 
-.. image:: ../_static/qam_time_domain.png
+.. image:: ../images/qam_time_domain.png
    :scale: 50 % 
    :align: center 
 
@@ -225,17 +225,17 @@ Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to under
 
 The example above would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in the frequency domain might look something like this:
 
-.. image:: ../_static/fsk.svg
+.. image:: ../images/fsk.svg
    :align: center 
-   :target: ../_static/fsk.svg
+   :target: ../images/fsk.svg
 
 If you use FSK, you must ask a critical question: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f` in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  The faster we transmit symbols, the wider each carrier will get, and consequently the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
 
 IQ plots can't be used to show different frequencies. They show magnitude and phase.  While it is possible to show FSK in the time domain, any more than 2 frequencies makes it difficult to distinguish between symbols:
 
-.. image:: ../_static/fsk2.svg
+.. image:: ../images/fsk2.svg
    :align: center
-   :target: ../_static/fsk2.svg
+   :target: ../images/fsk2.svg
 
 As an aside, note that FM radio uses Frequency Modulation (FM) which is like an analog version of FSK.  Instead of having discrete frequencies we jump between, FM radio uses a continuous audio signal to modulate the frequency of the carrier.  Below is an example of FM and AM modulation where the "signal" at the top is the audio signal being modulated onto to the carrier.
 
@@ -268,9 +268,9 @@ Even though we could generate the complex symbols directly, let's start from the
  plt.grid(True)
  plt.show()
 
-.. image:: ../_static/qpsk_python.svg
+.. image:: ../images/qpsk_python.svg
    :align: center 
-   :target: ../_static/qpsk_python.svg
+   :target: ../images/qpsk_python.svg
 
 Observe how all the symbols we generated overlap. There's no noise so the symbols all have the same value.  Let's add some noise:
 
@@ -283,9 +283,9 @@ Observe how all the symbols we generated overlap. There's no noise so the symbol
  plt.grid(True)
  plt.show()
 
-.. image:: ../_static/qpsk_python2.svg
+.. image:: ../images/qpsk_python2.svg
    :align: center
-   :target: ../_static/qpsk_python2.svg
+   :target: ../images/qpsk_python2.svg
 
 Consider how additive white Gaussian noise (AGWN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
 
@@ -296,15 +296,15 @@ For those interested in simulating phase noise, which could result from phase ji
  phase_noise = np.random.randn(len(x_symbols)) * 0.1 # adjust multiplier for "strength" of phase noise
  r = x_symbols * np.exp(1j*phase_noise)
 
-.. image:: ../_static/phase_jitter.svg
+.. image:: ../images/phase_jitter.svg
    :align: center
-   :target: ../_static/phase_jitter.svg
+   :target: ../images/phase_jitter.svg
 
 You could even combine phase noise with AWGN to get the full experience:
 
-.. image:: ../_static/phase_jitter_awgn.svg
+.. image:: ../images/phase_jitter_awgn.svg
    :align: center
-   :target: ../_static/phase_jitter_awgn.svg
+   :target: ../images/phase_jitter_awgn.svg
 
 We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate multiple samples per symbol once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 
