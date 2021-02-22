@@ -12,21 +12,21 @@ Multipath
 
 All realistic wireless channels include many "reflectors", given that RF signals bounce.  Any object between or near the transmitter (Tx) or receiver (Rx) can cause additional paths the signal travels along.  Each path experiences a different phase shift (delay) and attenuation (amplitude scaling).  At the receiver, all of the paths add up.  They can add up constructively, destructively, or a mix of both.  We call this concept of multiple signal paths "multipath".  There is the Line-of-Sight (LOS) path, and then all other paths.  In the example below, we show the LOS path and a single non-LOS path:
 
-.. image:: ../images/multipath.svg
+.. image:: ../_images/multipath.svg
    :align: center 
-   :target: ../images/multipath.svg
+   :target: ../_images/multipath.svg
 
 Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in physics class.  In wireless systems when the paths destructively combine, we call this interference "deep fade" because our signal briefly disappears.
 
-.. image:: ../images/destructive_interference.svg
+.. image:: ../_images/destructive_interference.svg
    :align: center 
-   :target: ../images/destructive_interference.svg
+   :target: ../_images/destructive_interference.svg
 
 Paths can also add up constructively, causing a strong signal to be received.  Each path has a different phase shift and amplitude, which we can visualize on a plot in the time domain called a "power delay profile":
 
-.. image:: ../images/multipath2.svg
+.. image:: ../_images/multipath2.svg
    :align: center 
-   :target: ../images/multipath2.svg
+   :target: ../_images/multipath2.svg
 
 The first path, the one closest to the y-axis, will always be the LOS path (assuming there is one) because there's no way for any other path to reach the receiver faster than the LOS path.  Typically the magnitude will decrease as the delay increases, since a path that took longer to show up at the receiver will have traveled further.
 
@@ -36,7 +36,7 @@ Fading
 
 What tends to happen is we get a mix of constructive and destructive interference, and it changes over time as the Rx, Tx, or environment is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel **changing** over time.  That's why we often refer to it as "multipath fading"; it's really the combination of constructive/destructive interference and a changing environment.  What we end up with is a SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the Tx/Rx is moving.  Beneath is a plot of SNR over time in milliseconds that demonstrates multipath fading.
 
-.. image:: ../images/multipath_fading.png
+.. image:: ../_images/multipath_fading.png
    :scale: 100 % 
    :align: center 
 
@@ -53,13 +53,13 @@ There are also two types of fading from a **frequency** domain perspective:
 
 In the figure below, the :red:`red` shape shows our signal in the frequency domain, and the black curvy line shows the current channel condition over frequency.  Because the narrower signal is experiencing the same channel conditions throughout the whole signal, it's experiencing flat fading.  The wider signal is very much experiencing frequency selective fading.
 
-.. image:: ../images/flat_vs_freq_selective.png
+.. image:: ../_images/flat_vs_freq_selective.png
    :scale: 70 % 
    :align: center 
 
 Here is an example of a 16 MHz wide signal that is continuously transmitting.  There are several moments in the middle where there's a period of time a piece of signal is missing.  This example depicts frequency selective fading, which causes holes in the signal that wipe out some frequencies but not others.
 
-.. image:: ../images/fading_example.png
+.. image:: ../_images/fading_example.png
    :scale: 60 % 
    :align: center 
    
@@ -118,9 +118,9 @@ We also choose how many sinusoids to simulate, and there's no right answer becau
 
 If you are intending to use this channel model as part of a larger simulation, you would simply multiply the received signal by the complex number :code:`z`, representing flat fading.   The value :code:`z` would then update every time step.  This means all frequency components of the signal experience the same channel at any given moment in time, so you would **not** be simulating frequency selective fading, that requires a multi-tap channel impulse response which we will not get into in this chapter.  If we look at the magnitude of :code:`z`, we can see the Rayleigh fading over time:
 
-.. image:: ../images/rayleigh.svg
+.. image:: ../_images/rayleigh.svg
    :align: center 
-   :target: ../images/rayleigh.svg
+   :target: ../_images/rayleigh.svg
 
 Note the deep fades that occur briefly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
 
@@ -136,7 +136,7 @@ CDMA
 
 3G cellular uses a technology called code division multiple access (CDMA).  With CDMA you take a narrowband signal and spread it over a wide bandwidth before transmitting it (using a spread spectrum technique called DSSS).  Under frequency selective fading, it's unlikely that all frequencies will be in a deep null at the same time.  At the receiver the spreading is reversed, and this de-spreading process greatly mitigates a deep null.
 
-.. image:: ../images/cdma.png
+.. image:: ../_images/cdma.png
    :scale: 100 % 
    :align: center 
 

@@ -20,7 +20,7 @@ When we want to save complex numbers to a file, we save them in the format IQIQI
 
 While it's possible to store the complex numbers in a text file or csv file, we prefer to save them in what's called a "binary file" to save space.  At high sample rates your signal recordings could easily be multiple GB, and we want to be as memory efficient as possible.  If you have ever opened a file in a text editor and it looked incomprehensible like the screenshot below, it was probably binary.  Binary files contain a series of bytes, and you have to keep track of the format yourself.  Binary files are the most efficient way to store data, assuming all possible compression has been performed.  Because our signals usually appear like a random sequence of floats, we typically do not attempt to compress the data.  Binary files are used for plenty of other things, e.g., compiled programs (called "binaries").  When used to save signals, we call them binary "IQ files", utilizing the file extension .iq.
 
-.. image:: ../images/binary_file.png
+.. image:: ../_images/binary_file.png
    :scale: 70 % 
    :align: center 
 
@@ -99,7 +99,7 @@ When receiving samples off a SDR it's important to know the maximum sample value
 
 A signal that is saturated will look choppy in the time domain, like this:
 
-.. image:: ../images/saturated_time.png
+.. image:: ../_images/saturated_time.png
    :scale: 30 % 
    :align: center 
 

@@ -4,7 +4,7 @@
 PlutoSDR Advanced Topics
 ####################################
 
-.. image:: ../images/pluto_adv.png
+.. image:: ../_images/pluto_adv.png
    :scale: 50 % 
    :align: center 
    

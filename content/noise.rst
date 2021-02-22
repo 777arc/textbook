@@ -12,7 +12,7 @@ Gaussian Noise
 
 Most people are aware of the concept of noise: unwanted fluctuations that can obscure our desired signal(s). Noise looks something like:
 
-.. image:: ../images/noise.png
+.. image:: ../_images/noise.png
    :scale: 70 % 
    :align: center 
 
@@ -21,7 +21,7 @@ Note how the average value is zero in the time domain graph.  If the average val
 We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The central limit theorem tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have some other distribution.  In other words, when a lot of random things happen and accumulate, the result appears Gaussian. The result will be Gaussian even when individual things are not distributed in this manner.
 
 
-.. image:: ../images/central_limit_theorem.webp
+.. image:: ../_images/central_limit_theorem.webp
    :align: center 
 
 The Gaussian distribution is also called the "Normal" distribution (recall a bell curve).
@@ -46,7 +46,7 @@ Without dB, meaning working in normal "linear" terms, we need to use a lot of 0'
 
 To further illustrate the problems of scale we encounter in signal processing, consider the below waterfalls of three of the same signals. The left-hand side is the original signal in linear scale, and the right-hand side shows the signals converted to a logarithmic scale (dB).  Both representations use the exact same colormap, where blue is lowest value and yellow is highest.  You can barely see the signal on the left in the linear scale.
 
-.. image:: ../images/linear_vs_log.png
+.. image:: ../_images/linear_vs_log.png
    :scale: 70 % 
    :align: center 
 
@@ -82,7 +82,7 @@ Some common errors people will run into when new to dB are:
 2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to identify it somewhere.
 3. When you're in dB you add/subtract values instead of multiplying/dividing, e.g.:
 
-.. image:: ../images/db.png
+.. image:: ../_images/db.png
    :scale: 60 % 
    :align: center 
 
@@ -126,7 +126,7 @@ Noise in Frequency Domain
 
 In the :ref:`freq-domain-chapter` chapter we tackled "Fourier pairs", i.e., what a certain time domain signal looks like in the frequency domain.  Well, what does Gaussian noise look like in the frequency domain?  The following graphs show some simulated noise in the time domain (top) and a plot of the Power Spectral Density (PSD) of that noise (below).  These plots were taken from GNU Radio.
 
-.. image:: ../images/noise_freq.png
+.. image:: ../_images/noise_freq.png
    :scale: 110 % 
    :align: center 
 
@@ -149,7 +149,7 @@ We can see that it looks roughly the same across all frequencies and is fairly f
 
 Take note that the randn() function by default uses mean = 0 and variance = 1.  Both of the plots will look something like this:
 
-.. image:: ../images/noise_python.png
+.. image:: ../_images/noise_python.png
    :scale: 100 % 
    :align: center 
 
@@ -189,7 +189,7 @@ To plot complex noise in the time domain, like any complex signal we need two li
  plt.legend(['real','imag'])
  plt.show()
 
-.. image:: ../images/noise3.png
+.. image:: ../_images/noise3.png
    :scale: 80 % 
    :align: center 
 
@@ -204,19 +204,19 @@ What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot 
  plt.axis([-2, 2, -2, 2])
  plt.show()
 
-.. image:: ../images/noise_iq.png
+.. image:: ../_images/noise_iq.png
    :scale: 60 % 
    :align: center 
 
 It looks how we would expect; a random blob centered around 0 + 0j, or the origin.  Just for fun, let's try adding noise to a QPSK signal to see what the IQ plot looks like:
 
-.. image:: ../images/noisey_qpsk.png
+.. image:: ../_images/noisey_qpsk.png
    :scale: 60 % 
    :align: center 
 
 Now what happens when the noise is stronger?  
 
-.. image:: ../images/noisey_qpsk2.png
+.. image:: ../_images/noisey_qpsk2.png
    :scale: 50 % 
    :align: center 
 
@@ -234,7 +234,7 @@ SNR
 
 Signal-to-Noise Ratio (SNR) is how we will measure the differences in strength between the signal and noise. It's a ratio so it's unit-less.  SNR is almost always in dB, in practice.  Often in simulation we code in a way that our signals are one unit power (power = 1).  That way, we can create a SNR of 10 dB by producing noise that is -10 dB in power by adjusting the variance when we generate the noise.
 
-.. image:: ../images/SNR.png
+.. image:: ../_images/SNR.png
    :scale: 40 % 
    :align: center 
 
@@ -242,7 +242,7 @@ If someone says "SNR = 0 dB" it means the signal and noise power are the same.  
 
 Like we mentioned before, the power in a signal is equal to the variance of the signal.  So we can represent SNR as the ratio of the signal variance to noise variance:
 
-.. image:: ../images/SNR2.png
+.. image:: ../_images/SNR2.png
    :scale: 40 % 
    :align: center 
 
