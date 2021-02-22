@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from PIL import Image
 
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
+
+
 def fig2img(fig):  # from https://stackoverflow.com/a/61754995/3459491
     """Convert a Matplotlib figure to a PIL Image and return it"""
     buf = BytesIO()
@@ -11,7 +15,7 @@ def fig2img(fig):  # from https://stackoverflow.com/a/61754995/3459491
     return Image.open(buf)
 
 def frame(offset=0):
-    plt.figure()
+    plt.figure(figsize=(5,3))
     
     time = np.arange(44100.0) - offset
     time = time / 44100.0
@@ -24,20 +28,20 @@ def frame(offset=0):
 
     plt.subplot(4, 1, 1)
     plt.axis('off')
-    plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-    plt.plot(carrier, 'green')
-    plt.text(45000, -.2, 'Carrier', {'fontsize': 16})
+    plt.plot(modulator, 'black')
+    plt.text(45000, -.6, 'Signal to be\nModulated', {'fontsize': 13})
 
     plt.subplot(4, 1, 2)
     plt.axis('off')
-    plt.plot(modulator, 'black')
-    plt.text(45000, -.2, 'Modulator', {'fontsize': 16})
-
+    plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    plt.plot(carrier, 'green')
+    plt.text(45000, -.2, 'Carrier', {'fontsize': 13})
+    
     plt.subplot(4, 1, 3)
     plt.axis('off')
     signal_am = (modulator * 0.8 * carrier) + carrier
     plt.plot(signal_am, 'red')
-    plt.text(45000, -.2, 'AM', {'fontsize': 16})
+    plt.text(45000, -.2, 'AM', {'fontsize': 13})
 
     plt.subplot(4, 1, 4)
     plt.axis('off')
@@ -45,7 +49,7 @@ def frame(offset=0):
     for i, t in enumerate(time):
         signal_fm[i] = np.sin(2 * np.pi * (carrier_frequency * t + modulator[i]))
     plt.plot(signal_fm, 'blue')
-    plt.text(45000, -.2, 'FM', {'fontsize': 16})
+    plt.text(45000, -.2, 'FM', {'fontsize': 13})
     return plt
 
 frames = []
