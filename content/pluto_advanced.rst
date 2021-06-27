@@ -58,7 +58,7 @@ Transmitting is very similar to receiving, except instead of telling the SDR to 
     sdr.sample_rate = int(sample_rate)
     sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain_chan0 = -30 # Increase to increase tx power, valid range is -90 to 0 dB
+    sdr.tx_hardwaregain_chan0 = -50 # Increase to increase tx power, valid range is -90 to 0 dB
 
     N = 10000 # number of samples to transmit at once
     t = np.arange(N)/sample_rate
@@ -69,7 +69,7 @@ Transmitting is very similar to receiving, except instead of telling the SDR to 
     for i in range(100):
         sdr.tx(samples) # transmit the batch of samples once
 
-Here are some notes about this code.  First, you want to simulate your IQ samples so that they are between -1 and 1, but then before transmitting them we have to scale by 2^14 due to how Analog Devices implemented the :code:`tx()` function.  If you are not sure what your min/max values are, simply print them out with :code:`print(np.min(samples), np.max(samples))` or write an if statement to make sure they never go above 1 or below -1 (assuming that code comes before the 2^14 scaling).  As far as gain, it's very confusing because Analog Devices calls it a transmit *gain*, but it's really a transmit *attenuation*, both in code and in hardware.  In hardware, adjustable gains are implemented using an adjustable attenuator, but that doesn't explain why Analog Devices is calling it a gain in their API; i.e. they should have applied a negative signal if they wanted to call it a gain.  So that means a higher value is actually less transmit power, and the range is -90 to 0 dB.  We always want to start at the lowest transmit power, and then work our way up if needed, so we have the gain set to 0.  Don't simply set it to -90 just because your signal is not showing up; there might be something else wrong, and you don't want to fry your receiver. 
+Here are some notes about this code.  First, you want to simulate your IQ samples so that they are between -1 and 1, but then before transmitting them we have to scale by 2^14 due to how Analog Devices implemented the :code:`tx()` function.  If you are not sure what your min/max values are, simply print them out with :code:`print(np.min(samples), np.max(samples))` or write an if statement to make sure they never go above 1 or below -1 (assuming that code comes before the 2^14 scaling).  As far as transmit gain, the range is -90 to 0 dB, so 0 dB is the highest transmit power.  We always want to start at a low transmit power, and then work our way up if needed, so we have the gain set to -50 dB by default which is towards the low end.  Don't simply set it to 0 dB just because your signal is not showing up; there might be something else wrong, and you don't want to fry your receiver. 
 
 If you want to continuously transmit the same set of samples on repeat, instead of using a for/while loop within Python like we did above, you can tell the Pluto to do so using just one line:
 
@@ -99,17 +99,17 @@ The following code shows a working example of transmitting a QPSK signal in the 
     sdr = adi.Pluto("ip:192.168.2.1")
     sdr.sample_rate = int(sample_rate)
 
-    # Config Rx
+    # Config Tx
     sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain_chan0 = -30 # Increase to increase tx power, valid range is -90 to 0 dB
+    sdr.tx_hardwaregain_chan0 = -50 # Increase to increase tx power, valid range is -90 to 0 dB
 
     # Config Rx
     sdr.rx_lo = int(center_freq)
     sdr.rx_rf_bandwidth = int(sample_rate)
     sdr.rx_buffer_size = num_samps
     sdr.gain_control_mode_chan0 = 'manual'
-    sdr.rx_hardwaregain_chan0 = 0.0 # dB, increase for a stronger signal, but be careful not to saturate
+    sdr.rx_hardwaregain_chan0 = 0.0 # dB, increase to increase the receive gain, but be careful not to saturate the ADC
 
     # Create transmit waveform (QPSK, 16 samples per symbol)
     num_symbols = 1000
@@ -158,7 +158,8 @@ You should see something that looks like this, assuming you have proper antennas
 
 .. image:: ../_images/pluto_tx_rx.svg
    :align: center 
-   
+
+It is a good exercise to slowly adjust :code:`sdr.tx_hardwaregain_chan0` and :code:`sdr.rx_hardwaregain_chan0` to make sure the received signal is getting weaker/stronger as expected.
 
 **********************************
 Transmitting Over the Air Legally
