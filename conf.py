@@ -163,7 +163,7 @@ html_theme_options = {'description':'By <a href="https://pysdr.org/content/about
                       'page_width': '1000px',
                       'sidebar_width': '290px',
                       'show_powered_by': False,
-                      'extra_nav_links':{'Online Python Console':'https://repl.it/languages/python3'},
+                      'extra_nav_links':{'Online Python Console':'https://trinket.io/embed/python3'},
                       'show_relbars': True} # previous and next links at top and bottom (can also use show_relbar_bottom)
 
 
