@@ -38,8 +38,8 @@ Connecting PlutoSDR
 4. Plug Pluto into the host machine over USB. Make sure to use the middle USB port on Pluto because the other is for power only.  Plugging in Pluto should create a virtual network adapter, i.e., the Pluto appears like a USB ethernet adapter.
 5. On the host machine (not VM), open a terminal or your preferred ping tool and ping 192.168.2.1.  If that doesn't work, stop and debug the network interface.
 6. Within the VM, open a new terminal
-7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  If the ping works then you should be good to go, assuming 192.168.2.1 is actually the Pluto and not some random computer on the network (unlikely but possible).  If you want to be 100% sure 192.168.2.1 is your Pluto, try doing “ssh root@192.168.2.1” pass: analog, and it should log into it.
-8. Write down the IP address because you'll need it when we start using the Pluto in Python.
+7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  While pinging, unplug your Pluto and make sure the pinging stalls out, if it keeps pinging then something else at that IP address is on the network, and you'll have to change the IP of the Pluto (or other device) before moving on.
+8. Write down the IP address of the Pluto because you'll need it when we start using the Pluto in Python.
 
 Installing PlutoSDR Driver
 ##########################
@@ -55,7 +55,7 @@ The terminal commands below should build and install the latest version of:
 
  sudo apt-get install git libxml2 libxml2-dev bison flex libcdk5-dev cmake python3-pip 
  cd ~
- git clone https://github.com/analogdevicesinc/libiio.git
+ git clone --branch v0.19 https://github.com/analogdevicesinc/libiio.git
  cd libiio
  cmake ./
  make all -j4
