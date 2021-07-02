@@ -73,7 +73,7 @@ Using a new Python script, we can read in this file using :code:`np.fromfile()`,
 
 A big mistake is to forget to tell np.fromfile() the file format. Binary files don't include any information about their format.  By default, np.fromfile() assumes it is reading in an array of float64s.
 
-Most other languages have methods to read in binary files, e.g., in MATLAB you can use fread().
+Most other languages have methods to read in binary files, e.g., in MATLAB you can use fread().  For visually analyzing an RF file see the section below.
 
 For those who have a PlutoSDR, the below code will grab a set of samples from the Pluto and save them to a file.  It tunes the Pluto to 751 MHz, an LTE signal in the US, and it uses a sample rate of 5 MHz.  For a longer collect you will want to call :code:`sdr.rx()` multiple times and concatenate all the sample batches together.
 
@@ -90,7 +90,28 @@ For those who have a PlutoSDR, the below code will grab a set of samples from th
     samples = samples.astype(np.complex64) # by default numpy uses complex128
     samples.tofile('collect_751MHz.iq')
 
+*****************************
+Visually Analyzing an RF File
+*****************************
 
+Although we learned how to create our own spectrogram plot in the :ref:`freq-domain-chapter` Chapter, nothing beats using an already created piece of software, and when it comes to analyzing a long RF recording, I recommend using `inspectrum <https://github.com/miek/inspectrum>`_.  Inspectrum is a fairly simple but powerful graphical tool for scanning through an RF file visually, with fine control over the colormap range and FFT size (zoom amount).  You can hold alt and use the scrollwheel to shift through time.  It has optional cursors to measure the delta-time between two bursts of energy, and the ability to export a slice of the RF file into a new file.  For installation on Debian-based platforms such as Ubuntu, use the following commands:
+
+.. code-block:: bash
+
+ sudo apt-get install qt5-default libfftw3-dev cmake pkg-config libliquid-dev
+ git clone https://github.com/miek/inspectrum.git
+ cd inspectrum
+ mkdir build
+ cd build
+ cmake ..
+ make
+ sudo make install
+ inspectrum
+
+.. image:: ../_images/inspectrum.png
+   :scale: 30 % 
+   :align: center 
+   
 *************************
 Max Values and Saturation
 *************************
