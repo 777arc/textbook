@@ -108,7 +108,7 @@ Although we learned how to create our own spectrogram plot in the :ref:`freq-dom
  sudo make install
  inspectrum
 
-.. image:: ../_images/inspectrum.png
+.. image:: ../_images/inspectrum.jpg
    :scale: 30 % 
    :align: center 
    

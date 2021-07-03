@@ -59,7 +59,7 @@ In the figure below, the :red:`red` shape shows our signal in the frequency doma
 
 Here is an example of a 16 MHz wide signal that is continuously transmitting.  There are several moments in the middle where there's a period of time a piece of signal is missing.  This example depicts frequency selective fading, which causes holes in the signal that wipe out some frequencies but not others.
 
-.. image:: ../_images/fading_example.png
+.. image:: ../_images/fading_example.jpg
    :scale: 60 % 
    :align: center 
    
