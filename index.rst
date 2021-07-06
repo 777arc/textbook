@@ -12,8 +12,7 @@ by :ref:`Dr. Marc Lichtman<author-chapter>`
    content/frequency_domain
    content/sampling
    content/digital_modulation
-   content/pluto_intro
-   content/pluto_advanced
+   content/pluto
    content/noise
    content/filters
    content/link_budgets

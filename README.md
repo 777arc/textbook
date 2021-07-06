@@ -23,7 +23,6 @@ chapter name refs, for my reference when writing:
 * sampling-chapter
 * pulse-shaping-chapter
 * pluto-chapter
-* pluto-adv-chapter
 * multipath-chapter
 * noise-chapter
 * modulation-chapter

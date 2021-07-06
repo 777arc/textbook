@@ -75,21 +75,6 @@ A big mistake is to forget to tell np.fromfile() the file format. Binary files d
 
 Most other languages have methods to read in binary files, e.g., in MATLAB you can use fread().  For visually analyzing an RF file see the section below.
 
-For those who have a PlutoSDR, the below code will grab a set of samples from the Pluto and save them to a file.  It tunes the Pluto to 751 MHz, an LTE signal in the US, and it uses a sample rate of 5 MHz.  For a longer collect you will want to call :code:`sdr.rx()` multiple times and concatenate all the sample batches together.
-
-.. code-block:: python
-
-    import adi
-    import numpy as np
-    sdr = adi.Pluto('ip:192.168.2.1')
-    sdr.sample_rate = int(5e6)
-    sdr.rx_rf_bandwidth = int(5e6)
-    sdr.rx_lo = int(751e6)
-    sdr.gain_control_mode = "slow_attack" # automatic gain control
-    samples = sdr.rx()
-    samples = samples.astype(np.complex64) # by default numpy uses complex128
-    samples.tofile('collect_751MHz.iq')
-
 *****************************
 Visually Analyzing an RF File
 *****************************
