@@ -219,7 +219,7 @@ Let's visualize downconversion in the frequency domain:
    :scale: 60% 
    :align: center
 
-When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we can sample at a *much* lower rate. The PlutoSDR contains an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
+When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we can sample at a *much* lower rate. Both the B2X0 USRPs and PlutoSDR contain an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
 
 Just to reiterate, the downconversion process is performed by our SDR; as a user of the SDR we don't have to do anything other than tell it which frequency to tune to.
 
@@ -273,36 +273,13 @@ This subsection regarding DC offsets is a good example of where this textbook di
 
 
 ****************************
-Sampling Using the PlutoSDR
+Sampling Using our SDR
 ****************************
 
-Sampling using the PlutoSDR's Python API is straightforward.  With any SDR app we know we must tell it the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three parameters are necessary for the SDR to have enough information to receive samples.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will start to sample as soon as you initialize it. Once the SDR's internal buffer fills up, the oldest samples are dropped.  All SDR APIs have some sort of "receive samples" function, and for the Pluto it's rx(), which returns a batch of samples.  The specific number of samples per batch is defined by the buffer size set beforehand.
+For SDR-specific information about performing sampling, see one of the following chapters:
 
-Refer to the :ref:`pluto-chapter` chapter for installing the PlutoSDR software.  The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, sets the center frequency to 100 MHz, and sets the gain to 70 dB with automatic gain control turned off.  Note it usually doesn't matter the order in which you set the center frequency, gain, and sample rate.  In the code snippet below, we tell the Pluto that we want it to give us 10,000 samples per call to rx().
-
-.. code-block:: python
-
-    import numpy as np
-    import adi
-    
-    sample_rate = 1e6 # Hz
-    center_freq = 100e6 # Hz
-    num_samps = 10000 # per call to rx()
-    
-    sdr = adi.Pluto()
-    sdr.gain_control_mode = 'manual'
-    sdr.rx_hardwaregain = 70.0 # dB
-    sdr.rx_lo = int(center_freq)
-    sdr.sample_rate = int(sample_rate)
-    sdr.rx_rf_bandwidth = int(sample_rate) # filter width, just set it to the same as sample rate for now
-    sdr.rx_buffer_size = num_samps
-    
-    samples = sdr.rx() # receive samples off Pluto
-    print(samples)
-
-
-For now we aren't going to do anything interesting with these samples.  Throughout this textbook we will swap between pure-Python examples and Python examples that include PlutoSDR code.  The PlutoSDR examples are written such that it should be straightforward to substitute in a different SDR's Python API. In other words, the code examples are meant to reinforce principles rather than specific techniques.
-
+* :ref:`pluto-chapter` Chapter
+* :ref:`usrp-chapter` Chapter
 
 *************************
 Calculating Average Power
