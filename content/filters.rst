@@ -235,6 +235,8 @@ The plots of the impulse response and frequency response should look like this:
 
 Because our filter is not symmetrical around 0 Hz, it has to use complex taps. Therefore we need two lines to plot those complex taps.  What we see in the left-hand plot above is still the impulse response.  Our frequency response plot is what really validates that we created the kind of filter we were hoping for, where it will filter out everything except the signal centered around 10 kHz.  Once again, remember that the plot above is *not* an actual signal: it's just a representation of the filter.  It can be very confusing to grasp because when you apply the filter to the signal and plot the output in the frequency domain, in many cases it will look roughly the same as the filter's frequency response itself.
 
+If this subsection added to the confusion, don't worry, 99% of the time you'll be dealing with simple low pass filters with real taps anyway. 
+
 *************************
 Filter Implementation
 *************************
