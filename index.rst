@@ -13,6 +13,7 @@ by :ref:`Dr. Marc Lichtman<author-chapter>`
    content/sampling
    content/digital_modulation
    content/pluto
+   content/usrp
    content/noise
    content/filters
    content/link_budgets

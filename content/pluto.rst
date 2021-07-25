@@ -105,7 +105,7 @@ Note that this procedure is also used to flash a different firmware image onto t
 "Hack" PlutoSDR to Increase RF Range
 ####################################
 
-The PlutoSDR's ship with a limited center frequency range and sampling rate, but the underlying chip is capable of much higher frequencies.  Follow these steps to unlock the full frequency range of the chip.  Plesae bear in mind that this process is provided by Analog Devices, thus it is as low risk as you can get.  The PlutoSDR's frequency limitation has to do with Analog Devices "binning" the AD9364 based on strict performance requirements at the higher frequencies. .... As SDR enthusiasts and experimenters, we're not too concerned about said performance requirements.
+The PlutoSDR's ship with a limited center frequency range and sampling rate, but the underlying chip is capable of much higher frequencies.  Follow these steps to unlock the full frequency range of the chip.  Please bear in mind that this process is provided by Analog Devices, thus it is as low risk as you can get.  The PlutoSDR's frequency limitation has to do with Analog Devices "binning" the AD9364 based on strict performance requirements at the higher frequencies. .... As SDR enthusiasts and experimenters, we're not too concerned about said performance requirements.
 
 Time to hack! Open a terminal (either host or VM, doesn't matter):
 
