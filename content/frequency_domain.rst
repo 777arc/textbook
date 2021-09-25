@@ -127,7 +127,7 @@ The above equation for the Fourier Transform is the continuous form, which you w
 .. math::
    X_k = \sum_{n=0}^{N-1} x_n e^{-\frac{j2\pi}{N}kn}
    
-Note that the main difference is we replaced the integral with a summation.  The index :math:`k` goes from 0 to N-1.  
+Note that the main difference is we replaced the integral with a summation.  The index :math:`n` goes from 0 to N-1.  
 
 It's OK if none of these equations mean much to you. We actually don't need to use them directly to do cool stuff with DSP and SDRs!
 
