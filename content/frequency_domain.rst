@@ -172,7 +172,7 @@ On the left hand side of the equation, we can see that we are scaling our signal
    :align: center
    :target: ../_images/time-scaling.svg
 
-Scaling in time essentially shrinks or expands the signal in the x-axis.  What this property tells us is that scaling in the time domain causes inverse scaling in the the frequency domain.  For example, when we transmit bits faster we have to use more frequencies.  The property helps to explain why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional, cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
+Scaling in time essentially shrinks or expands the signal in the x-axis.  What this property tells us is that scaling in the time domain causes inverse scaling in the frequency domain.  For example, when we transmit bits faster we have to use more frequencies.  The property helps to explain why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional, cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
 
 Those already familiar with this property may notice a scaling factor missing; it is left out for the sake of simplicity. For practical purposes it doesn't make a difference.
 
