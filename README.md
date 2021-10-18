@@ -10,11 +10,15 @@ Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvem
 
 On windows:
 
+```
 sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe" . _build
+```
 
 On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) installed with pip, I had to add ~/.local/bin to PATH, and apt-get install texlive-latex-extra:
 
+```bash
 sphinx-build -b html . _build
+```
 
 ## Misc
 

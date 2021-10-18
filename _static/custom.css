@@ -91,4 +91,9 @@ div.sphinxsidebar {
     color: purple;
 }
 
-
+/* See https://github.com/bitprophet/alabaster/issues/139 */
+div.body {
+    min-width: auto;
+    max-width: auto;
+    overflow: scroll;
+}
