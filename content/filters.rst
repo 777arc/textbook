@@ -97,7 +97,7 @@ This filtered signal will look confusing until you recall that our noise floor *
 
 In addition to cutoff frequency, the other main parameter of our low-pass filter is called the "transition width".  Transition width, also measured in Hz, instructs the filter how quickly it has to go between the passband and stopband since an instant transition is impossible.
 
-Let's visualize transiton width.  In the diagram below, the :green:`green` line represents the ideal response for transitioning between a passband and stopband, which essentially has a transition width of zero.  The :red:`Red` line demonstrates the result of a realistic filter, which has some ripple and a certain transition width.
+Let's visualize transition width.  In the diagram below, the :green:`green` line represents the ideal response for transitioning between a passband and stopband, which essentially has a transition width of zero.  The :red:`Red` line demonstrates the result of a realistic filter, which has some ripple and a certain transition width.
 
 .. image:: ../_images/realistic_filter.png
    :scale: 100 % 

@@ -19,7 +19,7 @@ num_n = 20
 filenames = []
 for n in range(1, num_n):
     # Use FFT instead of actually computing fourier series
-    Y = np.fft.rfft(ydata)  # dont do FFT shift so DC is [0] and first freq is [1] and so on
+    Y = np.fft.rfft(ydata)  # don't do FFT shift so DC is [0] and first freq is [1] and so on
     Y[(n + 1) * multiplier:] = 0  # remember that the lowest freq is a sinusoid that spans the whole range
     ydata_fourier = np.fft.irfft(Y)
 
