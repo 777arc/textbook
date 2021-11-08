@@ -117,7 +117,7 @@ if False:
 
     # Shift by negative of estimated frequency
     samples = samples * np.exp(-1j * 2 * np.pi * max_freq * t / 2.0)  # remember we have to divide max_freq by 2.0 because we had squared
-    # Now all thats left is a small amount of freq shift, which costas loop will fix
+    # Now all that's left is a small amount of freq shift, which costas loop will fix
     plt.show()
     exit()
 
@@ -218,7 +218,7 @@ if False:
     ax2.grid()
     fig.savefig('/tmp/time-sync-constellation.svg', bbox_inches='tight')
 
-if False:  # Animated version of the above REMEBER TO INCREASE NUMBER OF SAMPLES FOR THIS PLOT, I USED 300
+if False:  # Animated version of the above REMEMBER TO INCREASE NUMBER OF SAMPLES FOR THIS PLOT, I USED 300
     from matplotlib.animation import FuncAnimation
 
     fig, ax = plt.subplots()
@@ -241,7 +241,7 @@ if False:  # Animated version of the above REMEBER TO INCREASE NUMBER OF SAMPLES
     anim.save('/tmp/time-sync-constellation-animated.gif', dpi=80, writer='imagemagick')
     exit()
 
-# COSTAS LOOP.  THIS ONE IS FROM GNURADIO's COSTAS LOOP IMPL, AND REMMEBER IT INHERITS CONTROL LOOP WHICH IS IN GR-BLOCKS
+# COSTAS LOOP.  THIS ONE IS FROM GNURADIO's COSTAS LOOP IMPL, AND REMEMBER IT INHERITS CONTROL LOOP WHICH IS IN GR-BLOCKS
 samples = out  # copy samples from output of timing sync
 
 
@@ -297,10 +297,10 @@ for i in range(N):
         phase += 2 * np.pi
 
     # Limit frequency to range -1 to 1
-    # freq = min(freq, 1.0) # didnt get anywhere near 1 or -1 in this example, leaving out for sake of undersatnding code
+    # freq = min(freq, 1.0) # didnt get anywhere near 1 or -1 in this example, leaving out for sake of understanding code
     # freq = max(freq, -1.0)
 
-# Output, energy should be only in real portion, and samples should be ready for demoulator
+# Output, energy should be only in real portion, and samples should be ready for demodulator
 # TO MAKE IT LOOK A LITTLE NICER I CAN COMMENT OUT THE PART WHERE I CORRECT THE FREQ OFFSET
 fig, (ax1, ax2) = plt.subplots(2, figsize=(7, 5))  # 7 is nearly full width
 fig.tight_layout(pad=2.0)  # add space between subplots
@@ -316,7 +316,7 @@ fig.savefig('/tmp/costas-loop-output.svg', bbox_inches='tight')
 fig, ax = plt.subplots(figsize=(7, 3))  # 7 is nearly full width
 # For some reason you have to divide the steady state freq by 50,
 #   to get the fraction of fs that the fo is... 
-#   and changing loop_bw doesnt matter
+#   and changing loop_bw doesn't matter
 ax.plot(freq_log, '.-')
 ax.set_xlabel('Sample')
 ax.set_ylabel('Freq Offset')

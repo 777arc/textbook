@@ -368,7 +368,7 @@ Note that we see our spike at 0.15 Hz, which is the frequency we used when creat
 Windowing
 ******************************
 
-When we use an FFT to measure the frequency components of our signal, the FFT assumes that it's being given a piece of a *periodic* signal.  It behaves as if the piece of signal we provided continues to repeat indefintely. It's as if the last sample of the slice connects back to the first sample.  It stems from the theory behind the Fourier Transform.  It means that we want to avoid sudden transitions between the first and last sample because sudden transitions in the time domain look like many frequencies, and in reality our last sample doesn't actually connect back to our first sample.  To put it simply: if we are doing an FFT of 100 samples, using :code:`np.fft.fft(x)`, we want :code:`x[0]` and :code:`x[99]` to be equal or close in value.
+When we use an FFT to measure the frequency components of our signal, the FFT assumes that it's being given a piece of a *periodic* signal.  It behaves as if the piece of signal we provided continues to repeat indefinitely. It's as if the last sample of the slice connects back to the first sample.  It stems from the theory behind the Fourier Transform.  It means that we want to avoid sudden transitions between the first and last sample because sudden transitions in the time domain look like many frequencies, and in reality our last sample doesn't actually connect back to our first sample.  To put it simply: if we are doing an FFT of 100 samples, using :code:`np.fft.fft(x)`, we want :code:`x[0]` and :code:`x[99]` to be equal or close in value.
 
 The way we make up for this cyclic property is through "windowing".  Right before the FFT, we multiply the slice of signal by a window function, which is just any function that tapers to zero on both ends.  That ensures the slice of signal will begin and end at zero and connect.  Common window functions include Hamming, Hanning, Blackman, and Kaiser.  When you don't apply any windowing, it's called using a "rectangular" window because it's like multiplying by an array of ones.   Here is what several window functions look like:
 
@@ -395,7 +395,7 @@ The last thing to note is FFT sizing.  The best FFT size is always an order of 2
 Spectrogram/Waterfall
 *********************
 
-A spectrogram is the plot that shows frequency over time.  We can also show it in real-time, often refered to as a waterfall.  A spectrum analyzer is the piece of equipment that shows this spectrogram/waterfall.  Here is an example of a spectrogram, with frequency on the horizontal/x-axis and time on the vertical/y-axis.  Blue represents the lowest energy and red is the highest. We can see that there is a strong spike at DC (0 Hz) in the center with a varying signal around it.  Blue represents our noise floor.
+A spectrogram is the plot that shows frequency over time.  We can also show it in real-time, often referred to as a waterfall.  A spectrum analyzer is the piece of equipment that shows this spectrogram/waterfall.  Here is an example of a spectrogram, with frequency on the horizontal/x-axis and time on the vertical/y-axis.  Blue represents the lowest energy and red is the highest. We can see that there is a strong spike at DC (0 Hz) in the center with a varying signal around it.  Blue represents our noise floor.
 
 .. image:: ../_images/waterfall.png
    :scale: 120 % 

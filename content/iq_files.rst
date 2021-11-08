@@ -48,7 +48,7 @@ In Python, and numpy specifically, we use the :code:`tofile()` function to store
     plt.show()
 
     # Now save to an IQ file
-    print(type(r[0])) # Check data type.  Ooops it's 128 not 64!
+    print(type(r[0])) # Check data type.  Oops it's 128 not 64!
     r = r.astype(np.complex64) # Convert to 64
     print(type(r[0])) # Verify it's 64
     r.tofile('bpsk_in_noise.iq') # Save to file

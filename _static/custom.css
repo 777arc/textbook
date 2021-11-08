@@ -1,4 +1,4 @@
-/* Makes sidebar scrollable when the window isnt big enough to show all content*/
+/* Makes sidebar scrollable when the window isn't big enough to show all content*/
 div.sphinxsidebar {
     max-height: 100%;
     overflow-y: auto;

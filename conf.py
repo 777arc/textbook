@@ -159,7 +159,7 @@ html_sidebars = {
 html_theme_options = {'description':'By <a href="https://pysdr.org/content/about_author.html">Dr. Marc Lichtman</a>',
                       'logo': 'logo.svg',
                       'logo_name': True, # used if the logo doesn't contain the project name itself
-                      'fixed_sidebar': True, # on smaller screens you cant see the whole sidebar, and it wont scroll
+                      'fixed_sidebar': True, # on smaller screens you can't see the whole sidebar, and it won't scroll
                       'page_width': '1000px',
                       'sidebar_width': '290px',
                       'show_powered_by': False,

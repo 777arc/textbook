@@ -20,7 +20,7 @@ for i in range(4):
     samples = np.sin(2 * np.pi * f * nT + t_offset)  # simulates sampling
     ax.plot(nT, samples, 'b.', markersize=15)
 
-    # "wrong" signal for demonstration sake
+    # "wrong" signal for demonstration’s sake
     if i < 3:
         x_wrong = np.sin(2 * np.pi * f_wrong[i] * t + t_offset)
         ax.plot(t, x_wrong, 'r--')

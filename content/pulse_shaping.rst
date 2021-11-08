@@ -28,7 +28,7 @@ One trick we use in wireless communications is called matched filtering.  To und
 
 1. The pulses we discussed above only have to be aligned perfectly *at the receiver* prior to sampling.  Until that point it doesn't really matter if there is ISI, i.e., the signals can fly through the air with ISI and it's OK.
 
-2. We want a low-pass filter in our transmitter to reduce the amount of spectrum our signal uses.  But the receiver also needs a low-pass filter to eliminate as much noise/interference next to the signal as possible.  As a result, we have a low-pass filter at the transsmitter (Tx) and another at the receiver (Rx), then sampling occurs after both filters (and the wireless channel's effects).
+2. We want a low-pass filter in our transmitter to reduce the amount of spectrum our signal uses.  But the receiver also needs a low-pass filter to eliminate as much noise/interference next to the signal as possible.  As a result, we have a low-pass filter at the transmitter (Tx) and another at the receiver (Rx), then sampling occurs after both filters (and the wireless channel's effects).
 
 What we do in modern communications is split the pulse shaping filter equally between the Tx and Rx.  They don't *have* to be identical filters, but, theoretically, the optimal linear filter for maximizing the SNR in the presence of AWGN is to use the *same* filter at both the Tx and Rx.  This strategy is called the "matched filter" concept.
 
@@ -108,7 +108,7 @@ Luckily it's a heavily used filter and there are plenty of implementations, incl
 Other Pulse-Shaping Filters
 ###########################
 
-Other filters include the Gaussian filter, which has an impulse response resembling a Gaussian function.  There is also a sinc filter, which is equivalent to the raised-cosine filter when :math:`\beta = 0`.  The sinc filter is more of an ideal filter, meaning it elimates the frequencies necessary without much of a transition region.
+Other filters include the Gaussian filter, which has an impulse response resembling a Gaussian function.  There is also a sinc filter, which is equivalent to the raised-cosine filter when :math:`\beta = 0`.  The sinc filter is more of an ideal filter, meaning it eliminates the frequencies necessary without much of a transition region.
 
 **********************************
 Roll-Off Factor
