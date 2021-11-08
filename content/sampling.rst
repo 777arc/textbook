@@ -351,7 +351,8 @@ In Python, shifting the observation window will look like:
 .. code-block:: python
  
  center_freq = 2.4e9 # frequency we tuned our SDR to
- f = np.linspace(center_freq - Fs/2.0, center_freq + Fs/2.0, 1024) # lazy method
+ f = np.arange(Fs/-2.0, Fs/2.0, Fs/N) # start, stop, step.  centered around 0 Hz
+ f += center_freq # now add center frequency
  plt.plot(f, PSD_shifted)
  plt.show()
  
@@ -383,7 +384,7 @@ Here is a full code example that includes generating a signal (complex exponenti
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
- f = np.linspace(Fs/-2.0, Fs/2.0, N) # lazy method
+ f = np.arange(Fs/-2.0, Fs/2.0, Fs/N) # start, stop, step
  
  plt.plot(f, PSD_shifted)
  plt.xlabel("Frequency [Hz]")
