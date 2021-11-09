@@ -2,7 +2,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/777arc/textbook/master/_images/fft_logo_wide.gif" width="350"/>
 </p>
-This repo contains the source content used to generate my textbook, __PySDR: A Guide to SDR and DSP using Python__, hosted at www.pysdr.org.
+This repo contains the source content used to generate my textbook, __PySDR: A Guide to SDR and DSP using Python__ , hosted at www.pysdr.org.
 
 Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes be permanently added to the acknowledgments section.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
 
