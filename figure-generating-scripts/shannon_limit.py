@@ -40,4 +40,4 @@ ax.xaxis.tick_bottom()
 
 plt.show()
 
-fig.savefig('../_static/shannon_limit.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/shannon_limit.svg', bbox_inches='tight')

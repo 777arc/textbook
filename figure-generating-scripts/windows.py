@@ -54,4 +54,4 @@ ax2.set_ylabel("dB")
 ax2.set_title("Frequency Domain")
 plt.show()
 
-fig.savefig('../_static/windows.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/windows.svg', bbox_inches='tight')

@@ -25,4 +25,4 @@ plt.ylabel("Magnitude [dB]")
 
 # plt.show()
 
-plt.savefig('../_static/fft_example1.svg', bbox_inches='tight')
+plt.savefig('../_images/generated/fft_example1.svg', bbox_inches='tight')

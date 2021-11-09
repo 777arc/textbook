@@ -18,7 +18,7 @@ ax1.set_ylim(bottom=-1, top=1)
 ax1.set_xlim(left=-1, right=1)
 ax1.grid()
 plt.show()
-fig.savefig('../_static/qpsk_python.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/qpsk_python.svg', bbox_inches='tight')
 
 
 
@@ -36,7 +36,7 @@ ax1.set_ylim(bottom=-1, top=1)
 ax1.set_xlim(left=-1, right=1)
 ax1.grid()
 plt.show()
-fig.savefig('../_static/qpsk_python2.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/qpsk_python2.svg', bbox_inches='tight')
 
 
 ### Phase noise
@@ -52,7 +52,7 @@ ax1.set_ylim(bottom=-1, top=1)
 ax1.set_xlim(left=-1, right=1)
 ax1.grid()
 plt.show()
-fig.savefig('../_static/phase_jitter.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/phase_jitter.svg', bbox_inches='tight')
 
 
 
@@ -69,7 +69,7 @@ ax1.set_ylim(bottom=-1.2, top=1.2)
 ax1.set_xlim(left=-1.2, right=1.2)
 ax1.grid()
 plt.show()
-fig.savefig('../_static/phase_jitter_awgn.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/phase_jitter_awgn.svg', bbox_inches='tight')
 
 
 

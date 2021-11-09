@@ -64,4 +64,4 @@ for index, offset in enumerate(np.linspace(0, 44100, frames_tot, endpoint=False)
 # frames[0].save('waves.gif', save_all=True, append_images=frames[:-1], duration=100, loop=0)
 
 # skip frame 0 from append_images, make the loop slightly cleaner
-frames[0].save('../images/Carrier_Mod_AM_FM.webp', save_all=True, append_images=frames[:-1], duration=100)
+frames[0].save('../_images/generated/Carrier_Mod_AM_FM.webp', save_all=True, append_images=frames[:-1], duration=100)

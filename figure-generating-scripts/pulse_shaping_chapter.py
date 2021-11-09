@@ -45,7 +45,7 @@ ax1.set_yticklabels([])
 
 plt.show()
 
-fig.savefig('../_static/raised_cosine.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/raised_cosine.svg', bbox_inches='tight')
 
 
 
@@ -108,7 +108,7 @@ ax1.set_yticklabels([])
 
 plt.show()
 
-fig.savefig('../_static/raised_cosine_freq.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/raised_cosine_freq.svg', bbox_inches='tight')
 
 
 
@@ -158,4 +158,4 @@ ax1.set_yticklabels([])
 
 plt.show()
 
-fig.savefig('../_static/rrc_rolloff.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/rrc_rolloff.svg', bbox_inches='tight')

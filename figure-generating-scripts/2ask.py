@@ -26,4 +26,4 @@ ax2.set_xlim(left=0, right=2)
 
 plt.show()
 
-fig.savefig('../_static/ASK.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/ASK.svg', bbox_inches='tight')

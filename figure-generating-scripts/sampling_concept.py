@@ -53,4 +53,4 @@ ax.set_yticklabels([])
 
 plt.show()
 
-fig.savefig('../_static/sampling.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/sampling.svg', bbox_inches='tight')

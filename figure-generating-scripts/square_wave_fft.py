@@ -45,4 +45,4 @@ ax2.set_yticklabels([])
 
 plt.show()
 
-fig.savefig('../_static/square-wave.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/square-wave.svg', bbox_inches='tight')

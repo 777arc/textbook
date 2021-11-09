@@ -23,4 +23,4 @@ ax1.grid()
 
 plt.show()
 
-fig.savefig('../_static/ask2.svg', bbox_inches='tight')
+fig.savefig('../_images/generated/ask2.svg', bbox_inches='tight')
