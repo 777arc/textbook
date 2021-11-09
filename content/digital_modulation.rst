@@ -52,9 +52,9 @@ Question: Why can’t we directly transmit the ethernet signal shown in the figu
 1. Low frequencies require *huge* antennas
 2. Square waves take an excessive amount of spectrum for the bits per second--recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
 
-.. image:: ../_images/square-wave.svg
+.. image:: ../_images/generated/square-wave.svg
    :align: center 
-   :target: ../_images/square-wave.svg
+   :target: ../_images/generated/square-wave.svg
    
 What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g., FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.
 
@@ -80,9 +80,9 @@ Note how the average value is zero; we always prefer this whenever possible.
 
 We can use more than two levels, allowing for more bits per symbol.  Below shows an example of 4-ASK.  In this case each symbol carries 2 bits of information. 
 
-.. image:: ../_images/ask2.svg
+.. image:: ../_images/generated/ask2.svg
    :align: center
-   :target: ../_images/ask2.svg
+   :target: ../_images/generated/ask2.svg
 
 Question: How many symbols are shown in the signal snippet above?  How many bits are represented total?
 
@@ -99,9 +99,9 @@ Question: How many symbols are shown in the signal snippet above?  How many bits
 
 How do we actually create this signal digitally, through code?  All we have to do is create a vector with N samples per symbol, then multiply that vector by a sinusoid.  This modulates the signal onto a carrier (the sinusoid acts as that carrier).  The example below shows 2-ASK with 10 samples per symbol.  
 
-.. image:: ../_images/ask3.svg
+.. image:: ../_images/generated/ask3.svg
    :align: center
-   :target: ../_images/ask3.svg
+   :target: ../_images/generated/ask3.svg
 
 The top plot shows the discrete samples represented by red dots, i.e., our digital signal.  The bottom plot shows what the resulting modulated signal looks like, which could be transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there may be thousands, depending on how high in the spectrum the signal is being transmitted.
 
@@ -225,9 +225,9 @@ Last on the list is Frequency Shift Keying (FSK).  FSK is fairly simple to under
 
 The example above would be 4-FSK, and there would be two bits per symbol.  A 4-FSK signal in the frequency domain might look something like this:
 
-.. image:: ../_images/fsk.svg
+.. image:: ../_images/generated/fsk.svg
    :align: center 
-   :target: ../_images/fsk.svg
+   :target: ../_images/generated/fsk.svg
 
 If you use FSK, you must ask a critical question: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f` in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  The faster we transmit symbols, the wider each carrier will get, and consequently the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
 
@@ -239,9 +239,9 @@ IQ plots can't be used to show different frequencies. They show magnitude and ph
 
 As an aside, note that FM radio uses Frequency Modulation (FM) which is like an analog version of FSK.  Instead of having discrete frequencies we jump between, FM radio uses a continuous audio signal to modulate the frequency of the carrier.  Below is an example of FM and AM modulation where the "signal" at the top is the audio signal being modulated onto to the carrier.
 
-.. image:: ../_images/Carrier_Mod_AM_FM.webp
+.. image:: ../_images/generated/Carrier_Mod_AM_FM.webp
    :align: center
-   :target: ../_images/Carrier_Mod_AM_FM.webp
+   :target: ../_images/generated/Carrier_Mod_AM_FM.webp
 
 In this textbook we are mainly concerned about digital forms of modulation.
 
@@ -268,9 +268,9 @@ Even though we could generate the complex symbols directly, let's start from the
  plt.grid(True)
  plt.show()
 
-.. image:: ../_images/qpsk_python.svg
+.. image:: ../_images/generated/qpsk_python.svg
    :align: center 
-   :target: ../_images/qpsk_python.svg
+   :target: ../_images/generated/qpsk_python.svg
 
 Observe how all the symbols we generated overlap. There's no noise so the symbols all have the same value.  Let's add some noise:
 
@@ -283,9 +283,9 @@ Observe how all the symbols we generated overlap. There's no noise so the symbol
  plt.grid(True)
  plt.show()
 
-.. image:: ../_images/qpsk_python2.svg
+.. image:: ../_images/generated/qpsk_python2.svg
    :align: center
-   :target: ../_images/qpsk_python2.svg
+   :target: ../_images/generated/qpsk_python2.svg
 
 Consider how additive white Gaussian noise (AGWN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
 
@@ -296,15 +296,15 @@ For those interested in simulating phase noise, which could result from phase ji
  phase_noise = np.random.randn(len(x_symbols)) * 0.1 # adjust multiplier for "strength" of phase noise
  r = x_symbols * np.exp(1j*phase_noise)
 
-.. image:: ../_images/phase_jitter.svg
+.. image:: ../_images/generated/phase_jitter.svg
    :align: center
-   :target: ../_images/phase_jitter.svg
+   :target: ../_images/generated/phase_jitter.svg
 
 You could even combine phase noise with AWGN to get the full experience:
 
-.. image:: ../_images/phase_jitter_awgn.svg
+.. image:: ../_images/generated/phase_jitter_awgn.svg
    :align: center
-   :target: ../_images/phase_jitter_awgn.svg
+   :target: ../_images/generated/phase_jitter_awgn.svg
 
 We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate multiple samples per symbol once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 

@@ -81,9 +81,9 @@ As you can see, we are calculating the filter taps using a sinc() function.  A s
 
 If we plot the "before" and "after" of filtering a signal, we can observe the fractional delay.  In our plot we zoom into only a couple of symbols.  Otherwise, the fractional delay is not viewable.
 
-.. image:: ../_images/fractional-delay-filter.svg
+.. image:: ../_images/generated/fractional-delay-filter.svg
    :align: center
-   :target: ../_images/fractional-delay-filter.svg
+   :target: ../_images/generated/fractional-delay-filter.svg
 
 
 
@@ -103,9 +103,9 @@ To make our simulated signal more realistic, we will apply a frequency offset.  
  
 Below demonstrates the signal before and after the frequency offset is applied.
  
-.. image:: ../_images/sync-freq-offset.svg
+.. image:: ../_images/generated/sync-freq-offset.svg
    :align: center
-   :target: ../_images/sync-freq-offset.svg
+   :target: ../_images/generated/sync-freq-offset.svg
 
 We have not been graphing the Q portion since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
 
@@ -164,9 +164,9 @@ The next plot shows an example output where we have *disabled* the fractional ti
 **Bottom plot**
     Output of the symbol synchronizer, which provides just 1 sample per symbol.  That is these samples can be fed directly into a demodulator, which for BPSK is checking whether the value is greater than or less than 0.
 
-.. image:: ../_images/time-sync-output.svg
+.. image:: ../_images/generated/time-sync-output.svg
    :align: center
-   :target: ../_images/time-sync-output.svg
+   :target: ../_images/generated/time-sync-output.svg
 
 Let's focus on the bottom plot, which is the output of the synchronizer.  It took nearly 30 symbols for the synchronization to lock into the right delay.  Due inevitably to the time it takes for synchronizers to lock in, many communications protocols use a preamble that contains a synchronization sequence: it acts as a way to announce that a new packet has arrived, and it gives the receiver time to sync to it.  But after these ~30 samples the synchronizer works perfectly.  We are left with perfect 1's and -1's that match the input data.  It helps that this example didn't have any noise added.  Feel free to add noise or time shifts and see how the synchronizer behaves.  If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.
 
@@ -194,9 +194,9 @@ A quick way to interpolate a signal in Python is to use scipy's :code:`signal.re
 
 If we zoom *way* in, we see that it's the same signal, just with 16x as many points:
 
-.. image:: ../_images/time-sync-interpolated-samples.svg
+.. image:: ../_images/generated/time-sync-interpolated-samples.svg
    :align: center
-   :target: ../_images/time-sync-interpolated-samples.svg
+   :target: ../_images/generated/time-sync-interpolated-samples.svg
 
 Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  In addition to calculating :code:`samples_interpolated`, we also have to modify one line of code in our time synchronizer.  We will change the first line inside the while loop to become:
 
@@ -212,21 +212,21 @@ Feel free to play around with different interpolation factors, i.e., change all 
 
 If we enable only the frequency offset using a frequency of 1 kHz, we get the following time sync performance.  We have to show both I and Q now that we added a frequency offset:
 
-.. image:: ../_images/time-sync-output2.svg
+.. image:: ../_images/generated/time-sync-output2.svg
    :align: center
-   :target: ../_images/time-sync-output2.svg
+   :target: ../_images/generated/time-sync-output2.svg
 
 It might be hard to see, but the time sync is still working just fine.  It takes about 20 to 30 symbols before it's locked in.  However, there's a sinusoid pattern because we still have a frequency offset, and we will learn how to deal with it in the next section.
 
 Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization.  Remember you can plot samples on an IQ plot using a scatter plot: :code:`plt.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols.  They occurred before the time sync had finished.  The symbols left are all roughly on the unit circle due to the frequency offset.
 
-.. image:: ../_images/time-sync-constellation.svg
+.. image:: ../_images/generated/time-sync-constellation.svg
    :align: center
-   :target: ../_images/time-sync-constellation.svg
+   :target: ../_images/generated/time-sync-constellation.svg
     
 To gain even more insight, we can look at the constellation over time to discern what's actually happening to the symbols.  At the very beginning, for a short period of time, the symbols are not 0 or on the unit circle.  That is the period in which time sync is finding the right delay.  It's very quick, watch closely!  The spinning is just the frequency offset.  Frequency is a constant change in phase, so a frequency offset causes spinning of the BPSK (creating a circle in the static/persistent plot above).
 
-.. image:: ../_images/time-sync-constellation-animated.gif
+.. image:: ../_images/generated/time-sync-constellation-animated.gif
    :align: center 
 
 Hopefully by seeing an example of time sync actually happening, you have a feel for what it does and a general idea of how it works.  In practice, the while loop we created would only work on a small number of samples at a time (e.g., 1000).  You have to remember the value of :code:`mu` in between calls to the sync function, as well as the last couple values of :code:`out` and :code:`out_rail`.
@@ -300,9 +300,9 @@ First look at the signal before squaring (just a normal FFT):
     plt.plot(f, psd)
     plt.show()
 
-.. image:: ../_images/coarse-freq-sync-before.svg
+.. image:: ../_images/generated/coarse-freq-sync-before.svg
    :align: center
-   :target: ../_images/coarse-freq-sync-before.svg
+   :target: ../_images/generated/coarse-freq-sync-before.svg
    
 We don't actually see any peak associated with the carrier offset.  It's covered up by our signal.
 
@@ -315,9 +315,9 @@ Now with the squaring added (just a power of 2 because it's BPSK):
 
 We have to zoom way in to see which frequency the spike is on:
 
-.. image:: ../_images/coarse-freq-sync.svg
+.. image:: ../_images/generated/coarse-freq-sync.svg
    :align: center
-   :target: ../_images/coarse-freq-sync.svg
+   :target: ../_images/generated/coarse-freq-sync.svg
 
 You can try increasing the number of symbols simulated (e.g., 1000 symbols) so that we have enough samples to work with.  The more samples that go into our FFT, the more accurate our estimation of the frequency offset will be.  Just as a reminder, the code above should come *before* the timing synchronizer.
 
@@ -418,15 +418,15 @@ After recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase
 
 Our signal before and after the Costas Loop looks like this:
 
-.. image:: ../_images/costas-loop-output.svg
+.. image:: ../_images/generated/costas-loop-output.svg
    :align: center
-   :target: ../_images/costas-loop-output.svg
+   :target: ../_images/generated/costas-loop-output.svg
 
 And the frequency offset estimation over time (y-axis is Hz):
 
-.. image:: ../_images/costas-loop-freq-tracking.svg
+.. image:: ../_images/generated/costas-loop-freq-tracking.svg
    :align: center
-   :target: ../_images/costas-loop-freq-tracking.svg
+   :target: ../_images/generated/costas-loop-freq-tracking.svg
 
 It takes nearly 70 samples for the algorithm to fully lock it on the frequency offset.  You can see that in my simulated example there were about -300 Hz left over after the coarse frequency sync.  Yours may vary.  Like I mentioned before, you can disable the coarse frequency sync and set the initial frequency offset to whatever value you want and see if the Costas Loop figures it out.
 

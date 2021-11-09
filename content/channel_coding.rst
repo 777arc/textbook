@@ -142,7 +142,7 @@ This equation represents the best any MCS can do when operating at a high enough
 
 When actually plotting it, we usually represent SNR in dB, using a log scale for the x-axis:
 
-.. image:: ../_images/shannon_limit.svg
+.. image:: ../_images/generated/shannon_limit.svg
    :align: center 
 
 If you see Shannon limit plots elsewhere that look a little different, they are probably using an x-axis of "energy per bit" or :math:`E_b/N_0`, which is just an alternative to working in SNR.

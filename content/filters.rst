@@ -495,7 +495,7 @@ We use filters to craft the "shape" of our symbols because the shape in the time
 
 And as we have learned, square pulses are not efficient because they use an excess amount of spectrum:
 
-.. image:: ../_images/square-wave.svg
+.. image:: ../_images/generated/square-wave.svg
    :align: center 
 
 So what we do is we "pulse shape" these blocky-looking symbols so that they take up less bandwidth in the frequency domain.  We "pulse shape" by using a low-pass filter because it discards the higher frequency components of our symbols.  Below shows an example of symbols in the time (top) and frequency (bottom) domain, before and after a pulse-shaping filter has been applied:

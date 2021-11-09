@@ -14,7 +14,7 @@ Before jumping into IQ sampling, let's discuss what sampling actually means. You
 
 Whether we are dealing with audio or radio frequencies, we must sample if we want to capture, process, or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  A more technical way to think of sampling a signal is grabbing values at moments in time and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
 
-.. image:: ../_images/sampling.svg
+.. image:: ../_images/generated/sampling.svg
    :align: center 
 
 We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds, known as the **sample period**.  The frequency at which we sample, i.e., the number of samples taken per second, is simply :math:`\frac{1}{T}`.  We call this the **sample rate**, and its the inverse of the sample period.  For example, if we have a sample rate of 10 Hz, then the sample period is 0.1 seconds; there will be 0.1 seconds between each sample.  In practice our sample rates will be on the order of hundreds of kHz to tens of MHz or even higher.  When we sample signals, we need to be mindful of the sample rate, it's a very important parameter. 
@@ -27,26 +27,26 @@ Nyquist Sampling
 
 For a given signal, the big question often is how fast must we sample?  Let's examine a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs (samples shown in blue).  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
 
-.. image:: ../_images/sampling_Fs_0.3.svg
+.. image:: ../_images/generated/sampling_Fs_0.3.svg
    :align: center 
 
 The red dashed line in the above image reconstructs a different (incorrect) function that could have lead to the same samples being recorded. It indicates that our sample rate was too low because the same samples could have come from two different functions, leading to ambiguity. If we want to accurately reconstruct the original signal, we can't have this ambiguity.
 
 Let's try sampling a little faster, at Fs = 1.2f:
 
-.. image:: ../_images/sampling_Fs_0.36.svg
+.. image:: ../_images/generated/sampling_Fs_0.36.svg
    :align: center 
 
 Once again, there is a different signal that could fit these samples. This ambiguity means that if someone gave us this list of samples, we could not distinguish which signal was the original one based on our sampling.
 
 How about sampling at Fs = 1.5f:
 
-.. image:: ../_images/sampling_Fs_0.45.svg
+.. image:: ../_images/generated/sampling_Fs_0.45.svg
    :align: center 
 
 Still not fast enough!  According to a piece of DSP theory we won't dive into, you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
 
-.. image:: ../_images/sampling_Fs_0.6.svg
+.. image:: ../_images/generated/sampling_Fs_0.6.svg
    :align: center 
 
 There's no incorrect signal this time because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
@@ -394,5 +394,5 @@ Here is a full code example that includes generating a signal (complex exponenti
  
 Output:
 
-.. image:: ../_images/fft_example1.svg
+.. image:: ../_images/generated/fft_example1.svg
    :align: center

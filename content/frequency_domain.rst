@@ -13,7 +13,7 @@ In this chapter we cover what the frequency domain means, how to convert between
 
 First, why do we like to look at signals in the frequency domain?  Well here are two example signals, shown in both the time and frequency domain.
 
-.. image:: ../_images/time_and_freq_domain_example_signals.png
+.. image:: ../_images/generated/time_and_freq_domain_example_signals.png
    :scale: 40 %
    :align: center   
 
@@ -49,9 +49,9 @@ To understand how we can break down a signal into sine waves, or sinusoids, we n
 
 **Amplitude** indicates the "strength" of the wave, while **phase** is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  **Frequency** is the number of waves per second.
 
-.. image:: ../_images/amplitude_phase_period.svg
+.. image:: ../_images/generated/amplitude_phase_period.svg
    :align: center
-   :target: ../_images/amplitude_phase_period.svg
+   :target: ../_images/generated/amplitude_phase_period.svg
    
 At this point you may have realized that a "signal" is essentially just a function, usually represented "over time" (i.e., the x-axis). Another attribute that is easy to remember is **period**, which is the inverse of **frequency**. The **period** of a sinusoid is the amount of time, in seconds, for the wave to finish one cycle.  Thus, the unit of frequency is 1/seconds, or Hz.
    
@@ -83,9 +83,9 @@ As we can see, a spike/impulse in the time domain is flat in the frequency domai
 
 Next let's look at the time and frequency domain plots of a square wave:
 
-.. image:: ../_images/square-wave.svg
+.. image:: ../_images/generated/square-wave.svg
    :align: center 
-   :target: ../_images/square-wave.svg
+   :target: ../_images/generated/square-wave.svg
    
 This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  It is due to the quick change in time domain, just like in the previous example.  But it's not flat in frequency. It has spikes at intervals, and the level slowly decays (although it will continue forever).  A square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).
 
@@ -372,9 +372,9 @@ When we use an FFT to measure the frequency components of our signal, the FFT as
 
 The way we make up for this cyclic property is through "windowing".  Right before the FFT, we multiply the slice of signal by a window function, which is just any function that tapers to zero on both ends.  That ensures the slice of signal will begin and end at zero and connect.  Common window functions include Hamming, Hanning, Blackman, and Kaiser.  When you don't apply any windowing, it's called using a "rectangular" window because it's like multiplying by an array of ones.   Here is what several window functions look like:
 
-.. image:: ../_images/windows.svg
+.. image:: ../_images/generated/windows.svg
    :align: center
-   :target: ../_images/windows.svg
+   :target: ../_images/generated/windows.svg
 
 A simple approach for beginners is to just stick with a Hamming window, which can be created in Python with :code:`np.hamming(N)` where N is the number of elements in the array, which is your FFT size.  In the above exercise, we would apply the window right before the FFT. After the 2nd line of code we would insert:
 
