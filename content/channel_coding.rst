@@ -106,8 +106,7 @@ Algorithmically, the coding process can be done using a simple matrix multiply, 
 
 The point of diving into Hamming codes was to give a taste of how error coding works.  Block codes tend to follow this type of pattern.  Convolutional codes work differently, but we won't get into it here; they often use Trellis-style decoding, which can be displayed in a diagram that looks like this:
 
-.. image:: ../_images/trellis.png
-   :scale: 100 % 
+.. image:: ../_images/trellis.svg
    :align: center 
 
 ***************************
