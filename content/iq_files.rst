@@ -1,8 +1,8 @@
 .. _iq-files-chapter:
 
-#############
-IQ Files
-#############
+##################
+IQ Files and SigMF
+##################
 
 In our Python examples we have stored signals as 1d numpy arrays of type "complex float".  In this chapter we learn how signals can be stored to a file and then read back into Python.  Storing signal data in a file is useful.  You may want to record a signal to a file in order to manually analyze it offline or share it with a colleague.
 
@@ -75,6 +75,20 @@ A big mistake is to forget to tell np.fromfile() the file format. Binary files d
 
 Most other languages have methods to read in binary files, e.g., in MATLAB you can use fread().  For visually analyzing an RF file see the section below.
 
+If you ever find yourself dealing with int16's (a.k.a. short ints), or any other datatype that numpy doesn't have a complex equivalent for, you will be forced to read the samples in as real, even if they are actually complex.  The trick is to read them as real, but then interleave them back into the IQIQIQ... format yourself, a couple different ways of doing this are shown below:
+
+.. code-block:: python
+
+ samples = np.fromfile('iq_samples_as_int16.iq', np.int16).astype(np.float32).view(np.complex64)
+
+or
+
+.. code-block:: python
+
+ samples = np.fromfile('iq_samples_as_int16.iq', np.int16)
+ samples /= 32768 # convert to -1 to +1 (optional)
+ samples = samples[::2] + 1j*samples[1::2] # convert to IQIQIQ...
+
 *****************************
 Visually Analyzing an RF File
 *****************************
@@ -111,8 +125,151 @@ A signal that is saturated will look choppy in the time domain, like this:
 
 Because of the sudden changes in time domain, due to the truncation, the frequency domain might look smeared.  In other words, the frequency domain will include false features; features that resulted from the saturation and are not actually part of the signal, which can throw people off when analyzing a signal. 
 
-*************************
-Annotating IQ Files
-*************************
+*****************************
+SigMF and Annotating IQ Files 
+*****************************
 
 Since the IQ file itself doesn't have any metadata associated with it, it's common to have a 2nd file, containing information about the signal, with the same filename but a .txt or other file extension.  This should at a minimum include the sample rate used to collect the signal, and the frequency to which the SDR was tuned.  After analyzing the signal, the metadata file could include information about sample ranges of interesting features, such as bursts of energy.  The sample index is simply an integer that starts at 0 and increments every complex sample.  If you knew that there was energy from sample 492342 to 528492, then you could read in the file and pull out that portion of the array: :code:`samples[492342:528493]`.
+
+Luckily, there is now an open standard that specifies a metadata format used to describe signal recordings, known as `SigMF <https://github.com/gnuradio/SigMF>`_.  By using an open standard like SigMF, multiple parties can share RF recordings more easily, and use different tools to operate on the same datasets.  It also prevents "bitrot" of RF datasets where details of the capture are lost over time due to details of the recording not being collocated with the recording itself.  
+
+The most simple (and minimal) way to use the SigMF standard to describe an IQ file you have created is to rename the .iq file to .sigmf-data and create a new file with the same name but .sigmf-meta extension.  This meta file is a plaintext file filled with json, so you can simply open it with a text editor and fill it out manually (later we will discuss doing this programmatically).  Here is an example .sigmf-meta file you can use as a template:
+
+.. code-block::
+
+ {
+     "global": {
+         "core:datatype": "cf32_le"
+         "core:sample_rate": 8000000,
+         "core:hw": "PlutoSDR with 915 MHz whip antenna",
+         "core:author": "Your name",
+         "core:description": "Enter info about your signal recording here",
+         "core:version": "0.0.2",
+     },
+     "captures": [
+         {
+             "core:sample_start": 0
+             "core:frequency": 915000000,
+         }
+     ],
+     "annotations": []
+ }
+
+Note the :code:`core:cf32_le` indicates your .sigmf-data is of type IQIQIQIQ... with 32-bit floats, i.e., np.complex64 like we used previously.  Reference the specifications for other available datatypes, such as if you have real data instead of complex, or are using 16-bit integers instead of floats to save space.
+
+Aside from datatype, the most important lines to fill out are :code:`core:sample_rate` and :code:`core:frequency`.  It is good practice to also enter information about the hardware (:code:`core:hw`) used to capture the recording, such as the SDR type and antenna, as well as a description of what is known about the signal(s) in the recording in :code:`core:description`.  The :code:`core:version` is simply the version of the SigMF standard being used at the time the metadata file was created.
+
+If you are capturing your RF recording from within Python, e.g., using the Python API for your SDR, then you can avoid having to manually create these metadata files by using the SigMF Python package.  This can be installed on an Ubuntu/Debian based OS as follows:
+
+.. code-block:: bash
+
+ cd ~
+ git clone https://github.com/gnuradio/SigMF.git
+ cd SigMF
+ sudo pip install .
+
+The Python code to write the .sigmf-meta file for the example towards the beginning of this chapter, where we saved bpsk_in_noise.iq, is shown below:
+
+.. code-block:: python
+
+ import numpy as np
+ import datetime as dt
+ from sigmf import SigMFFile
+ 
+ # <code from example>
+ 
+ # r.tofile('bpsk_in_noise.iq')
+ r.tofile('bpsk_in_noise.sigmf-data') # replace line above with this one
+ 
+ # create the metadata
+ meta = SigMFFile(
+     data_file='example.sigmf-data', # extension is optional
+     global_info = {
+         SigMFFile.DATATYPE_KEY: 'cf32_le',
+         SigMFFile.SAMPLE_RATE_KEY: 8000000,
+         SigMFFile.AUTHOR_KEY: 'Your name and/or email',
+         SigMFFile.DESCRIPTION_KEY: 'Simulation of BPSK with noise',
+         SigMFFile.VERSION_KEY: sigmf.__version__,
+     }
+ )
+ 
+ # create a capture key at time index 0
+ meta.add_capture(0, metadata={
+     SigMFFile.FREQUENCY_KEY: 915000000,
+     SigMFFile.DATETIME_KEY: dt.datetime.utcnow().isoformat()+'Z',
+ })
+ 
+ # check for mistakes and write to disk
+ assert meta.validate()
+ meta.tofile('bpsk_in_noise.sigmf-meta') # extension is optional
+
+Simply replace :code:`8000000` and :code:`915000000` with the variables you used to store sample rate and center frequency respectively. 
+
+To read in a SigMF recording into Python, use the following code.  In this example the two SigMF files should be named :code:`bpsk_in_noise.sigmf-meta` and :code:`bpsk_in_noise.sigmf-data`.
+
+.. code-block:: python
+
+ from sigmf import SigMFFile, sigmffile
+ 
+ # Load a dataset
+ filename = 'bpsk_in_noise'
+ signal = sigmffile.fromfile(filename)
+ samples = signal.read_samples().view(np.complex64).flatten()
+ print(samples[0:10]) # lets look at the first 10 samples
+ 
+ # Get some metadata and all annotations
+ sample_rate = signal.get_global_field(SigMFFile.SAMPLE_RATE_KEY)
+ sample_count = signal.sample_count
+ signal_duration = sample_count / sample_rate
+
+For more details reference `the SigMF documentation <https://github.com/gnuradio/SigMF>`_.
+
+A little bonus for those who read this far; the SigMF logo is actually stored as a SigMF recording itself, and when the signal is plotted as a constellation (IQ plot) over time, it produces the following animation:
+
+.. image:: ../_images/sigmf_logo.gif
+   :scale: 100 %   
+   :align: center
+
+The Python code used to read in the logo file (located `here <https://github.com/gnuradio/SigMF/tree/master/logo>`_) and produce the animated gif above is shown below, for those curious:
+
+.. code-block:: python
+
+ import numpy as np
+ import matplotlib.pyplot as plt
+ import imageio
+ from sigmf import SigMFFile, sigmffile
+ 
+ # Load a dataset
+ filename = 'sigmf_logo' # assume its in the same directory as this script
+ signal = sigmffile.fromfile(filename)
+ samples = signal.read_samples().view(np.complex64).flatten()
+ 
+ # Add zeros to the end so its clear when the animation repeats
+ samples = np.concatenate((samples, np.zeros(50000)))
+ 
+ sample_count = len(samples)
+ samples_per_frame = 5000
+ num_frames = int(sample_count/samples_per_frame)
+ filenames = []
+ for i in range(num_frames):
+     print("frame", i, "out of", num_frames)
+     # Plot the frame
+     fig, ax = plt.subplots(figsize=(5, 5))
+     samples_frame = samples[i*samples_per_frame:(i+1)*samples_per_frame]
+     ax.plot(np.real(samples_frame), np.imag(samples_frame), color="cyan", marker=".", linestyle="None", markersize=1)
+     ax.axis([-0.35,0.35,-0.35,0.35]) # keep axis constant
+     ax.set_facecolor('black') # background color
+     
+     # Save the plot to a file
+     filename = '/tmp/sigmf_logo_' + str(i) + '.png'
+     fig.savefig(filename, bbox_inches='tight')
+     filenames.append(filename)
+ 
+ # Create animated gif
+ images = []
+ for filename in filenames:
+     images.append(imageio.imread(filename))
+ imageio.mimsave('/tmp/sigmf_logo.gif', images, fps=20)
+
+
+
