@@ -4,7 +4,7 @@
 Multipath Fading
 #######################
 
-So far we have only discussed the "AWGN Channel", i.e., a model for a wireless channel where the signal is simply added to noise.  In this chapter we introduce multipath, a propagation phenomenon that results in signals reaching the receiver by two or more paths, which we experience in real-world wireless systems.
+In this chapter we introduce multipath, a propagation phenomenon that results in signals reaching the receiver by two or more paths, which we experience in real-world wireless systems.  So far we have only discussed the "AWGN Channel", i.e., a model for a wireless channel where the signal is simply added to noise, which really only applies to signals over a cable and some satellite communications systems. 
 
 *************************
 Multipath

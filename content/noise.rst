@@ -4,7 +4,7 @@
 Noise and dB
 #############
 
-In this chapter we will discuss noise, including how it is modeled and handled in a communications system. We will also introduce decibels (dB) along the way.
+In this chapter we will discuss noise, including how it is modeled and handled in a wireless communications system.  Concepts include AWGN, complex noise, and SNR/SINR.  We will also introduce decibels (dB) along the way, as it is widely within wireless comms and SDR.
 
 ************************
 Gaussian Noise
@@ -229,22 +229,30 @@ AWGN
 Additive White Gaussian Noise (AWGN) is an abbreviation you will hear a lot in the DSP and SDR world.  The GN, Gaussian Noise, we already discussed.  Additive just means the noise is being added to our received signal.  White, in the frequency domain, means the spectrum is flat across our entire observation band.  It will almost always be white in practice,or approximately white.  In this textbook we will use AWGN as the only form of noise when dealing with communications links and link budgets and such.  Non-AWGN noise tends to be a niche topic.
 
 *************************
-SNR
+SNR and SINR
 *************************
 
 Signal-to-Noise Ratio (SNR) is how we will measure the differences in strength between the signal and noise. It's a ratio so it's unit-less.  SNR is almost always in dB, in practice.  Often in simulation we code in a way that our signals are one unit power (power = 1).  That way, we can create a SNR of 10 dB by producing noise that is -10 dB in power by adjusting the variance when we generate the noise.
 
-.. image:: ../_images/SNR.png
-   :scale: 40 % 
-   :align: center 
+.. math::
+   \mathrm{SNR} = \frac{P_{signal}}{P_{noise}}
+
+.. math::
+   \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{noise\_dB}
 
 If someone says "SNR = 0 dB" it means the signal and noise power are the same.  A positive SNR means our signal is higher power than the noise, while a negative SNR means the noise is higher power.  Detecting signals at negative SNR is usually pretty tough.  
 
 Like we mentioned before, the power in a signal is equal to the variance of the signal.  So we can represent SNR as the ratio of the signal variance to noise variance:
 
-.. image:: ../_images/SNR2.png
-   :scale: 40 % 
-   :align: center 
+.. math::
+   \mathrm{SNR} = \frac{P_{signal}}{P_{noise}} = \frac{\sigma^2_{signal}}{\sigma^2_{noise}}
+
+Signal-to-Interference-plus-Noise Ratio (SINR) is essentially the same as SNR except you include interference along with the noise, in the denominator.  
+
+.. math::
+   \mathrm{SINR} = \frac{P_{signal}}{P_{interference} + P_{noise}}
+
+What constitutes interference is based on the application/situation, but typically it is another signal that is interfering with the signal of interest (SOI), and is either overlapping with the SOI in frequency, and/or cannot be filtered out for some reason.  
 
 *************************
 External Resources

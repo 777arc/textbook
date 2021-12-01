@@ -4,7 +4,7 @@
 IQ Sampling
 ##################
 
-In this chapter we introduce a concept called IQ Sampling, a.k.a. complex sampling or quadrature sampling.  It is the form of sampling that an SDR performs, as well as many digital receivers (and transmitters).  It's just a slightly more complex version of regular digital sampling (pun intended).
+In this chapter we introduce a concept called IQ sampling, a.k.a. complex sampling or quadrature sampling.  We also cover Nyquist sampling, complex numbers, RF carriers, downconversion, and power spectral density.  IQ sampling is the form of sampling that an SDR performs, as well as many digital receivers (and transmitters).  It's a slightly more complex version of regular digital sampling (pun intended), so we will take it slow and with some practice the concept is sure to click!
 
 *************************
 Sampling Basics

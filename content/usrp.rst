@@ -8,7 +8,7 @@ USRP in Python
    :scale: 50 % 
    :align: center 
    
-In this chapter we learn how to use the UHD Python API to control and receive/transmit signals with a USRP.  
+In this chapter we learn how to use the UHD Python API to control and receive/transmit signals with a `USRP <https://www.ettus.com/>`_ which is a series of SDRs made by Ettus Research (now part of NI).  We will discuss transmitting and receiving on the USRP in Python, and dive into USRP-specific topics including stream args, subdevices, channels, 10 MHz and PPS synchronization.  
 
 ************************
 Software/Drivers Install

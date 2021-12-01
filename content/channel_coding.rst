@@ -4,7 +4,7 @@
 Channel Coding
 #####################
 
-In this chapter we introduce the basics of channel coding, a.k.a. forward error correction (FEC).  Channel coding is an enormous area within wireless communications.  It is a branch of "information theory", which is the study of the quantification, storage, and communication of information.
+In this chapter we introduce the basics of channel coding, a.k.a. forward error correction (FEC), the Shannon Limit, Hamming codes, Turbo codes, and LDPC codes.  Channel coding is an enormous area within wireless communications, and is a branch of "information theory", which is the study of the quantification, storage, and communication of information.
 
 ***************************
 Why We Need Channel Coding

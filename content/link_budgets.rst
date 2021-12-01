@@ -4,8 +4,10 @@
 Link Budgets
 ##################
 
+This chapter covers link budgets, a big portion of which is understanding transmit/receive power, path loss, antenna gain, noise, and SNR.  We finish by constructing an example link budget for ADS-B, which are signals transmitted by commercial aircraft to share their position and other information.  
+
 *************************
-Intro
+Introduction
 *************************
 
 A link budget is an accounting of all of the gains and losses from the transmitter to the receiver in a communication system.  Link budgets describe one direction of the wireless link.  Most communications systems are bidirectional, so there must be a separate uplink and downlink budget.  The "result" of the link budget will tell you roughly how much signal-to-noise ratio (abbreviated as SNR, which this textbook uses, or S/N) you should expect to have at your receiver.  Further analysis would be needed to check if that SNR is high enough for your application.

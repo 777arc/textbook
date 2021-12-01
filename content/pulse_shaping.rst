@@ -4,7 +4,7 @@
 Pulse Shaping
 #######################
 
-You can consider this section Part II of the Filters chapter, where we take a deeper dive into pulse shaping.
+This chapter covers pulse shaping, inter-symbol-interference, matched filtering, and raised-cosine filters.  At the end we use Python to add pulse shaping to BPSK symbols.  You can consider this section Part II of the Filters chapter, where we take a deeper dive into pulse shaping.
 
 **********************************
 Inter-Symbol-Interference (ISI)

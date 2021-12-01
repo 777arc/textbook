@@ -4,7 +4,7 @@
 IQ Files and SigMF
 ##################
 
-In our Python examples we have stored signals as 1d numpy arrays of type "complex float".  In this chapter we learn how signals can be stored to a file and then read back into Python.  Storing signal data in a file is useful.  You may want to record a signal to a file in order to manually analyze it offline or share it with a colleague.
+In all our previous Python examples we stored signals as 1D NumPy arrays of type "complex float".  In this chapter we learn how signals can be stored to a file and then read back into Python, as well as introduce the SigMF standard.  Storing signal data in a file is extremeley useful; you may want to record a signal to a file in order to manually analyze it offline, or share it with a colleague, or build a whole dataset.
 
 *************************
 Binary Files

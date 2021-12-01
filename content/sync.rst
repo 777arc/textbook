@@ -4,6 +4,8 @@
 Synchronization
 ################
 
+This chapter covers wireless signal synchronization in both time and frequency, to correct for carrier frequency offsets and perform timing alignment at the symbol and frame level.  We will utilize the Mueller and Muller clock recovery technique, and the Costas Loop, in Python. 
+
 ***************************
 Introduction
 ***************************

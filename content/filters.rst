@@ -4,7 +4,7 @@
 Filters
 #############
 
-This chapter introduces filters.  We learn about the types of filters, how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which we further explore in the :ref:`pulse-shaping-chapter` chapter.
+In this chapter we learn about digital filters using Python.  We cover types of filters (FIR/IIR and low-pass/high-pass/band-pass/band-stop), how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which we further explore in the :ref:`pulse-shaping-chapter` chapter.
 
 *************************
 Filter Basics

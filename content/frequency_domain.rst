@@ -4,12 +4,14 @@
 Frequency Domain
 #####################
 
+This chapter introduces the frequency domain and covers Fourier series, Fourier transform, Fourier properties, FFT, windowing, and spectrograms, using Python examples.  
+
 One of the coolest side effects of learning about DSP and wireless communications is that you will also learn to think in the frequency domain.  Most people's experience with *working* in the frequency domain is limited to adjusting the bass/mid/treble knobs on a car's audio system.  Most people's experience with *viewing* something in the frequency domain is limited to seeing an audio equalizer, such as this clip:
 
 .. image:: ../_images/audio_equalizer.webp
    :align: center
    
-In this chapter we cover what the frequency domain means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use later on.  By the end of this textbook, you will be a master at working in the frequency domain, guaranteed!
+By the end of this chapter you will understand what the frequency domain really means, how to convert between time and frequency (plus what happens when we do so), and some interesting principles we will use throughout our studies of DSP and SDR.  By the end of this textbook, you will be a master at working in the frequency domain, guaranteed!
 
 First, why do we like to look at signals in the frequency domain?  Well here are two example signals, shown in both the time and frequency domain.
 
