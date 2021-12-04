@@ -153,7 +153,7 @@ The following Python code implements the Mueller and Muller clock recovery techn
         mu = mu - np.floor(mu) # remove the integer part of mu
         i_out += 1 # increment output index
     out = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
-
+    samples = out # only include this line if you want to connect this code snippet with the Costas Loop later on
 
 The timing recovery block is fed "received" samples, and it produces an output sample one at a time (note the :code:`i_out` being incremented by 1 each iteration of the loop).  The recovery block doesn't just use the "received" samples one after another because of the way the loop adjusts :code:`i_in`.  It will skip some samples in an attempt to pull the "correct" sample, which would be the one at the peak of the pulse.  As the loop processes samples it slowly synchronizes to the symbol, or at least it attempts to by adjusting :code:`mu`.  Given the code's structure, the integer part of :code:`mu` gets added to :code:`i_in`, and then removed from :code:`mu` (keep in mind that :code:`mm_val` can be negative or positive each loop).  Once it is fully synchronized, the loop should only pull the center sample from each symbol/pulse.  You can adjust the constant 0.3, which will change how fast the feedback loop reacts; a higher value will make it react faster, but with higher risk of stability issues.
 
@@ -371,7 +371,7 @@ Below is the Python code that is our Costas Loop:
         
         # Advance the loop (recalc phase and freq offset)
         freq += (beta * error)
-        freq_log.append(freq / 50.0 * fs)
+        freq_log.append(freq * fs / (2*np.pi)) # convert from angular velocity to Hz for logging
         phase += freq + (alpha * error)
         
         # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
@@ -414,9 +414,9 @@ There is a lot here so let's step through it.  Some lines are simple and others 
 
 The :code:`alpha` and :code:`beta` variables define how fast the phase and frequency update, respectively.  There is some theory behind why I chose those two values; however, we won't address it here.  If you are curious you can try tweaking :code:`alpha` and/or :code:`beta` to see what happens.
 
-We log the value of :code:`freq` each iteration so we can plot it at the end, to see how the Costas Loop converges on the correct frequency offset.  We implement :code:`freq / 50.0 * fs` for display purposes only.  Because :code:`freq` in the loop is not in units of Hz, if we didn't care about plotting :code:`freq` we could leave that whole line out.
+We log the value of :code:`freq` each iteration so we can plot it at the end, to see how the Costas Loop converges on the correct frequency offset.  We have to multiply :code:`freq` by the sample rate and convert from angular frequency to Hz, by dividing by :math:`2\pi`.  Note that if you performed time sync prior to the Costas Loop, you will have to also divide by your :code:`sps` (e.g., 8), because the samples coming out of the time sync are at a rate equal to your original sample rate divided by :code:`sps`. 
 
-After recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase between 0 and :math:`2 \pi`,  which wraps phase around.
+Lastly, after recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase between 0 and :math:`2 \pi`,  which wraps phase around.
 
 Our signal before and after the Costas Loop looks like this:
 
@@ -424,7 +424,7 @@ Our signal before and after the Costas Loop looks like this:
    :align: center
    :target: ../_images/costas-loop-output.svg
 
-And the frequency offset estimation over time (y-axis is Hz):
+And the frequency offset estimation over time, settling on the correct offset (a -300 Hz offset was used in this example signal):
 
 .. image:: ../_images/costas-loop-freq-tracking.svg
    :align: center
@@ -434,6 +434,10 @@ It takes nearly 70 samples for the algorithm to fully lock it on the frequency o
 
 The Costas Loop, in addition to removing the frequency offset, aligned our BPSK signal to be on the I portion, making Q zero again.  It is a convenient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator.  Now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1 because there may or may not be an inversion; there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play.  It removes the ambiguity because 1's and 0's are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK.  We would be adding a differential coding block right before modulation on the tx side and right after demodulation on the rx side.
 
+Below is an animation of the time sync plus frequency sync running, the time sync actually happens almost immediately but the frequency sync takes nearly the entire animation to fully settle, and this was because :code:`alpha` and :code:`beta` were set too low, to 0.005 and 0.001 respectively.  The code used to generate this animation can be found `here <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/costas_loop_animation.py>`_. 
+
+.. image:: ../_images/costas_animation.gif
+   :align: center 
 
 ***************************
 Frame Synchronization
