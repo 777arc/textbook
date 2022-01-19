@@ -53,27 +53,31 @@ The terminal commands below should build and install the latest version of:
 
 .. code-block:: bash
 
- sudo apt-get install git libxml2 libxml2-dev bison flex libcdk5-dev cmake python3-pip 
+ sudo apt-get install build-essential git libxml2-dev bison flex libcdk5-dev cmake python3-pip libusb-1.0-0-dev libavahi-client-dev libavahi-common-dev libaio-dev
  cd ~
- git clone --branch v0.19 https://github.com/analogdevicesinc/libiio.git
+ git clone --branch v0.23 https://github.com/analogdevicesinc/libiio.git
  cd libiio
- cmake ./
- make all -j4
+ mkdir build
+ cd build
+ cmake -DPYTHON_BINDINGS=ON ..
+ make -j$(nproc)
  sudo make install
  sudo ldconfig
- cd bindings/python/
- sudo python3 setup.py.cmakein install
  
  cd ~
  git clone https://github.com/analogdevicesinc/libad9361-iio.git
  cd libad9361-iio
- cmake ./
- make -j3
+ mkdir build
+ cd build
+ cmake ..
+ make -j$(nproc)
  sudo make install
  
  cd ~
  git clone https://github.com/analogdevicesinc/pyadi-iio.git
  cd pyadi-iio
+ pip3 install --upgrade pip
+ pip3 install -r requirements.txt
  sudo python3 setup.py install
 
 Testing PlutoSDR Drivers
