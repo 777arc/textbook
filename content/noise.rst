@@ -18,11 +18,12 @@ Most people are aware of the concept of noise: unwanted fluctuations that can ob
 
 Note how the average value is zero in the time domain graph.  If the average value wasn't zero, then we could subtract the average value, call it a bias, and we would be left with an average of zero.  Also note that the individual points in the graph are *not* "uniformly random", i.e., larger values are rarer, most of the points are closer to zero.
 
-We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The central limit theorem tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have some other distribution.  In other words, when a lot of random things happen and accumulate, the result appears Gaussian. The result will be Gaussian even when individual things are not distributed in this manner.
+We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The **central limit theorem** tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have other distributions.  In other words, when a lot of random things happen and accumulate, the result appears approximately Gaussian, even when the individual things are not Gaussian distributed.
 
 
-.. image:: ../_images/central_limit_theorem.webp
+.. image:: ../_images/central_limit_theorem.svg
    :align: center 
+   :target: ../_images/central_limit_theorem.svg
 
 The Gaussian distribution is also called the "Normal" distribution (recall a bell curve).
 
