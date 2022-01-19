@@ -1,7 +1,7 @@
 import sys
-import pyqtgraph as pg # sudo pip3 install pyqtgraph
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QSizePolicy, QSlider, QSpacerItem, QVBoxLayout, QWidget, QGridLayout
+import pyqtgraph as pg # sudo pip3 install pyqtgraph
 import numpy as np
 
 class Slider(QWidget):
