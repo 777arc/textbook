@@ -94,7 +94,7 @@ IQ sampling is more easily understood by using the transmitter's point of view, 
 
 What happens when we add a sine and cosine?  Or rather, what happens when we add two sinusoids that are 90 degrees out of phase?  In the video below, there is a slider for adjusting I and another for adjusting Q.  What is plotted are the cosine, sine, and then the sum of the two.
 
-.. image:: ../_images/IQ2.gif
+.. image:: ../_images/IQ3.gif
    :scale: 100% 
    :align: center 
 
