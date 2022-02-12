@@ -397,8 +397,62 @@ The last thing to note is FFT sizing.  The best FFT size is always an order of 2
 Spectrogram/Waterfall
 *********************
 
-A spectrogram is the plot that shows frequency over time.  We can also show it in real-time, often referred to as a waterfall.  A spectrum analyzer is the piece of equipment that shows this spectrogram/waterfall.  Here is an example of a spectrogram, with frequency on the horizontal/x-axis and time on the vertical/y-axis.  Blue represents the lowest energy and red is the highest. We can see that there is a strong spike at DC (0 Hz) in the center with a varying signal around it.  Blue represents our noise floor.
+A spectrogram is the plot that shows frequency over time.  It is simply a bunch of FFTs stacked together (vertically, if you want frequency on the horizontal axis).  We can also show it in real-time, often referred to as a waterfall.  A spectrum analyzer is the piece of equipment that shows this spectrogram/waterfall.  Here is an example of a spectrogram, with frequency on the horizontal/x-axis and time on the vertical/y-axis.  Blue represents the lowest energy and red is the highest. We can see that there is a strong spike at DC (0 Hz) in the center with a varying signal around it.  Blue represents our noise floor.
 
 .. image:: ../_images/waterfall.png
    :scale: 120 % 
    :align: center 
+
+As an exercise, try to write the Python code needed to produce a spectrogram.  Remember, it's just rows of FFTs stacked on top of each other, each row is 1 FFT.  Be sure to time-slice your input signal in slices of your FFT size (e.g., 1024 samples per slice).  To keep things simple, you can input a real signal, and simply throw away the negative half of frequencies before plotting the spectrogram.  Here is an example signal you can use, it is simply a tone in white noise:
+
+.. code-block:: python
+
+ import numpy as np
+ import matplotlib.pyplot as plt
+ 
+ sample_rate = 1e6
+ 
+ # Generate tone plus noise
+ t = np.arange(1024*1000)/sample_rate # time vector
+ f = 50e3 # freq of tone
+ x = np.sin(2*np.pi*f*t) + 0.2*np.random.randn(len(t))
+
+Here is what it looks like in the time domain (first 200 samples):
+
+.. image:: ../_images/spectrogram_time.svg
+   :align: center
+   :target: ../_images/spectrogram_time.svg
+
+.. raw:: html
+
+   <details>
+   <summary>Example spectrogram code (try to write it yourself first!)</summary>
+
+.. code-block:: python
+
+ # simulate the signal above, or use your own signal
+  
+ fft_size = 1024
+ num_rows = int(np.floor(len(x)/fft_size))
+ spectrogram = np.zeros((num_rows, fft_size))
+ for i in range(num_rows):
+     spectrogram[i,:] = np.log10(np.abs(np.fft.fftshift(np.fft.fft(x[i*fft_size:(i+1)*fft_size])))**2)
+ spectrogram = (spectrogram - np.min(spectrogram)) / (np.max(spectrogram) - np.min(spectrogram)) # normalize 0 to 1
+ spectrogram = spectrogram[:,fft_size//2:] # get rid of negative freqs because we simulated a real signal
+ 
+ plt.imshow(spectrogram, aspect='auto', extent = [0, sample_rate/2/1e6, 0, len(x)/sample_rate])
+ plt.xlabel("Frequency [MHz]")
+ plt.ylabel("Time [s]")
+ plt.show()
+
+Which should produce the following, which is not the most interesting spectrogram because there is no time-varying behavior.  As an additional exercise, try to add time-varying behavior, e.g., see if you can make the tone start and stop.
+
+.. image:: ../_images/spectrogram.svg
+   :align: center
+   :target: ../_images/spectrogram.svg
+   
+.. raw:: html
+
+   </details>
+
+
