@@ -20,12 +20,11 @@ num_rows = int(np.floor(len(x)/fft_size))
 spectrogram = np.zeros((num_rows, fft_size))
 for i in range(num_rows):
     spectrogram[i,:] = np.log10(np.abs(np.fft.fftshift(np.fft.fft(x[i*fft_size:(i+1)*fft_size])))**2)
-spectrogram = (spectrogram - np.min(spectrogram)) / (np.max(spectrogram) - np.min(spectrogram)) # normalize 0 to 1
 spectrogram = spectrogram[:,fft_size//2:] # get rid of negative freqs because we simulated a real signal
 
 
 plt.imshow(spectrogram, aspect='auto', extent = [0, sample_rate/2/1e6, 0, len(x)/sample_rate])
 plt.xlabel("Frequency [MHz]")
 plt.ylabel("Time [s]")
-#plt.show()
-plt.savefig('../_images/spectrogram.svg', bbox_inches='tight')
+plt.show()
+#plt.savefig('../_images/spectrogram.svg', bbox_inches='tight')
