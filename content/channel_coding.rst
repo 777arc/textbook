@@ -134,19 +134,19 @@ The Shannon limit or Shannon capacity is an incredible piece of theory that tell
 - S – Average received signal power [watts]
 - N – Average noise power [watts]
 
-This equation represents the best any MCS can do when operating at a high enough SNR to be error-free.  It makes more sense to plot the limits in bits/sec/Hz, i.e., bits/sec per amount of spectrum:
+This equation represents the best any MCS can do when operating at a high enough SNR to be error-free.  It makes more sense to plot the limit in bits/sec/Hz, i.e., bits/sec per amount of spectrum:
 
 .. math::
  \frac{C}{B} = log_2 \left( 1 + \mathrm{SNR}   \right)
 
-When actually plotting it, we usually represent SNR in dB, using a log scale for the x-axis:
+with SNR in linear terms (not dB).  However, when plotting it, we usually represent SNR in dB for convenience:
 
 .. image:: ../_images/shannon_limit.svg
    :align: center 
 
 If you see Shannon limit plots elsewhere that look a little different, they are probably using an x-axis of "energy per bit" or :math:`E_b/N_0`, which is just an alternative to working in SNR.
 
-It might help simplify things to realize when the SNR is fairly high (e.g., 10 dB or higher), the Shannon limit can be approximated as :math:`log_2 \left( \mathrm{SNR_{dB}} \right)`, which is roughly :math:`(\mathrm{SNR_{dB}})/3`.  For example, at 24 dB SNR you're looking at 8 bits/sec/Hz, so if you have 1 MHz to use, that's 8 Mbps.  You might be thinking, "well that's just the theoretical limit", but modern communications get fairly close to that limit, so at a minimum it gives you a rough ballpark.  You can always cut that number in half to take into account packet/frame overhead and non-ideal MCS.
+It might help simplify things to realize when the SNR is fairly high (e.g., 10 dB or higher), the Shannon limit can be approximated as :math:`log_2 \left( \mathrm{SNR} \right)`, which is roughly :math:`\mathrm{SNR_{dB}}/3` (`explained here <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem#Bandwidth-limited_case>`_).  For example, at 24 dB SNR you're looking at 8 bits/sec/Hz, so if you have 1 MHz to use, that's 8 Mbps.  You might be thinking, "well that's just the theoretical limit", but modern communications get fairly close to that limit, so at a minimum it gives you a rough ballpark.  You can always cut that number in half to take into account packet/frame overhead and non-ideal MCS.
 
 The max throughput of 802.11n WiFi operating in the 2.4 GHz band (which uses 20 MHz wide channels), according to the specs, is 300 Mbps.  Obviously you could sit right next to your router and get an extremely high SNR, maybe 60 dB, but to be reliable/practical the max throughput MCS (recall the staircase curve from above) is unlikely to require an SNR that high.  You can even take a look at the `MCS list for 802.11n <https://en.wikipedia.org/wiki/IEEE_802.11n-2009#Data_rates>`_.  802.11n goes up to 64-QAM, and combined with channel coding, it requires a SNR around 25 dB according to `this table <https://d2cpnw0u24fjm4.cloudfront.net/wp-content/uploads/802.11n-and-802.11ac-MCS-SNR-and-RSSI.pdf>`_.  That means, even at 60 dB SNR your WiFi will still use 64-QAM.  So at 25 dB the Shannon limit is roughly 8.3 bits/sec/Hz, which given 20 MHz of spectrum is 166 Mbps.  However, when you take into account MIMO, which we will cover in a future chapter, you can get four of those streams running in parallel, resulting in 664 Mbps.  Cut that number in half and you get something very close to the advertised max speed of 300 Mbps for 802.11n WiFi in the 2.4 GHz band.
 
