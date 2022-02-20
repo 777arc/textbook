@@ -38,7 +38,7 @@ if False:
 # Freq shift
 N = len(x)
 samp_rate = 250e3 # sample rate of file
-f_o = -57e3 # amount we need to shift by
+f_o = -57e3 # amount we need to shift by, because it's a real signal being fed it, in doesn't matter if this is - or +
 t = np.arange(N)/sample_rate
 x = x * np.exp(2j*np.pi*f_o*t) # down shift
 
@@ -207,7 +207,8 @@ if False:
 # Writing notes
 # Remember to give credit to the GR block
 # 1187.5 bps / 104 bits = 11.4 groups/sec, or 45.7 blocks/sec */
-            
+# Point out how the bad blocks towards the beginning are probably due to the time it takes to sync
+
 # Constants
 syndrome = [383, 14, 303, 663, 748]
 offset_pos = [0, 1, 2, 3, 2]
@@ -314,9 +315,9 @@ for i in range(len(bits)):
                     bytes[block_number*2] = (dataword >> 8) & 255
                     bytes[block_number*2+1] = dataword & 255
                     group_good_blocks_counter += 1
-                    print('group_good_blocks_counter:', group_good_blocks_counter)
+                    #print('group_good_blocks_counter:', group_good_blocks_counter)
                 if group_good_blocks_counter == 5:
-                    print(bytes)
+                    #print(bytes)
                     bytes_out.append(bytes) # list of len-12 lists of bytes
             block_bit_counter = 0
             block_number = (block_number + 1) % 4
