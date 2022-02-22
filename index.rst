@@ -22,4 +22,5 @@ by :ref:`Dr. Marc Lichtman<author-chapter>`
    content/multipath_fading
    content/pulse_shaping
    content/sync
+   content/rds
    content/about_author

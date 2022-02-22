@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from gnuradio.filter import firdes
-from scipy.signal import resample_poly
+from scipy.signal import resample_poly, firwin
 from matplotlib.animation import FuncAnimation
 
 #samples = np.fromfile('/home/marc/Downloads/fm_clip_for_rds.iq', dtype=np.complex64) # med SNR
@@ -17,9 +17,34 @@ if False:
     plt.plot(samples)
     plt.show()
 
+# PSD
+if False:
+    PSD = np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples)))**2)
+    PSD = PSD[::100]
+    PSD = PSD - np.max(PSD)
+    f = np.linspace(sample_rate/-2, sample_rate/2, len(PSD))/1e3
+    plt.plot(f, PSD)
+    plt.axis([-125, 125, -5.5, 1])
+    plt.xlabel("Frequency [kHz]")
+    plt.ylabel("PSD Before FM Demod [dB]")
+    plt.show()
+    
+    
 # Quadrature Demod
 x = 0.5 * np.angle(samples[0:-1] * np.conj(samples[1:])) # see https://wiki.gnuradio.org/index.php/Quadrature_Demod
 
+# PSD
+if False:
+    PSD = np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
+    PSD = PSD[::100]
+    PSD = PSD[len(PSD)//2:]
+    PSD = PSD - np.max(PSD)
+    f = np.linspace(0, sample_rate/2, len(PSD))/1e3
+    plt.plot(f, PSD)
+    plt.axis([0, 125, -5.5, 1])
+    plt.xlabel("Frequency [kHz]")
+    plt.ylabel("PSD After FM Demod [dB]")
+    plt.show()
 
 # Spectrogram (once i get a higher SNR better looking recording I can include spectrogram towards the start
 if False:
@@ -37,13 +62,13 @@ if False:
     
 # Freq shift
 N = len(x)
-samp_rate = 250e3 # sample rate of file
 f_o = -57e3 # amount we need to shift by, because it's a real signal being fed it, in doesn't matter if this is - or +
 t = np.arange(N)/sample_rate
 x = x * np.exp(2j*np.pi*f_o*t) # down shift
 
 # Low Pass Filter
-taps = firdes.low_pass(1.0, sample_rate, 7.5e3, 5e3) # same as original flowgraph
+#taps = firdes.low_pass(1.0, sample_rate, 7.5e3, 5e3) # same as original flowgraph
+taps = firwin(numtaps=101, cutoff=7.5e3, fs=sample_rate)
 x = np.convolve(x, taps, 'valid')
 
 # Decimate by 10, now that we filtered and there wont be aliasing
@@ -57,9 +82,36 @@ x = resample_poly(x, 19, 25)
 sample_rate = 19e3
 
 # Matched Filter?  rrc_taps_manchester, no decimation
-rrc_taps = firdes.root_raised_cosine(1, 19e3, 19e3/8, 1, 151) # gain, samp_rate, symbol_rate, alpha, n_taps
-taps = [rrc_taps[n] - rrc_taps[n+8] for n in range(len(rrc_taps)-8)]
+#rrc_taps = firdes.root_raised_cosine(1, 19e3, 19e3/8, 1, 151) # gain, samp_rate, symbol_rate, alpha, n_taps
+#taps = [rrc_taps[n] - rrc_taps[n+8] for n in range(len(rrc_taps)-8)] # make it a bandpass filter because of RDS having redundant BPSKs
+taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
 x = np.convolve(x, taps, 'valid')
+
+# Filters time/freq response
+if False:
+    plt.plot(taps,'.-')
+    plt.show()
+if False:
+    print(taps)
+    fft = np.abs(np.fft.fftshift(np.fft.fft(taps)))**2
+    fft = fft[len(fft)//2:]
+    f = np.linspace(0, sample_rate/2, len(fft))/1e3
+    plt.plot(f,fft)
+    plt.grid()
+    plt.xlabel('Frequency [kHz]')
+    plt.ylabel('Frequency Response of Filter')
+    plt.show()
+
+
+
+# TODO use https://github.com/wavewalkerdsp/blogDownloads/blob/main/srrcDesign.py or another to make RRC filter and freq shift it like in filters chapter
+
+
+
+# TODO At this point shouldn't there be a freq shift of like 1 kHz to center the RDS BPSK we isolated with the bandpass filter?
+
+
+
 
 # Normalize signal, to emulate AGC, this isn't actually required for any future step, they all scale to amplitude just fine
 #x /= np.mean(np.abs(x)) # take magnitude, find mean, normalize to that
@@ -130,8 +182,8 @@ N = len(samples)
 phase = 0
 freq = 0
 # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
-alpha = 8.0 
-beta = 0.002
+alpha = 100.0
+beta = 0.5
 out = np.zeros(N, dtype=np.complex64)
 freq_log = []
 for i in range(N):
@@ -172,6 +224,8 @@ if False:
 # Plot freq over time to see how long it takes to hit the right offset, this is what we look at to tweak alpha and beta
 if False:
     plt.plot(freq_log,'.-')
+    plt.xlabel('Sample')
+    plt.ylabel('Frequency [Hz]')
     plt.show()
 
 # Plot time
@@ -184,8 +238,11 @@ if False:
 bits = (np.real(x) > 0).astype(int) # 1's and 0's
 
 # Differential decoding, so that it doesn't matter whether our BPSK was 180 degrees rotated without us realizing it
+print(bits[0:10])
 bits = (bits[1:] - bits[0:-1]) % 2
 bits = bits.astype(np.uint8) # for decoder
+print(bits[0:10])
+
 
 
 if False:
@@ -304,7 +361,7 @@ for i in range(len(bits)):
             if block_number == 0 and good_block:
                 group_assembly_started = True
                 group_good_blocks_counter = 1
-                bytes = bytearray(8) # 12 bytes filled with 0s
+                bytes = bytearray(8) # 8 bytes filled with 0s
             if group_assembly_started:
                 if not good_block:
                     group_assembly_started = False
@@ -318,7 +375,7 @@ for i in range(len(bits)):
                     #print('group_good_blocks_counter:', group_good_blocks_counter)
                 if group_good_blocks_counter == 5:
                     #print(bytes)
-                    bytes_out.append(bytes) # list of len-12 lists of bytes
+                    bytes_out.append(bytes) # list of len-8 lists of bytes
             block_bit_counter = 0
             block_number = (block_number + 1) % 4
             blocks_counter += 1
