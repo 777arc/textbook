@@ -3,7 +3,6 @@
 div.body {
     min-width: auto;
     max-width: auto;
-    overflow: scroll;
 }
 
 /* Makes sidebar scrollable when the window isn't big enough to show all content*/
