@@ -160,8 +160,8 @@ html_theme_options = {'description':'By <a href="https://pysdr.org/content/about
                       'logo': 'logo.svg',
                       'logo_name': True, # used if the logo doesn't contain the project name itself
                       'fixed_sidebar': True, # on smaller screens you can't see the whole sidebar, and it won't scroll
-                      'page_width': '1000px',
-                      'sidebar_width': '290px',
+                      'page_width': 'auto', # makes body width fill the window nicely, but for some reason there's a max around 1000px
+                      'sidebar_width': '290px', # width of sidebar
                       'show_powered_by': False,
                       'extra_nav_links':{'Online Python Console':'https://trinket.io/embed/python3'},
                       'show_relbars': True} # previous and next links at top and bottom (can also use show_relbar_bottom)

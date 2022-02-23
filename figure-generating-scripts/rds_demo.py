@@ -5,7 +5,8 @@ from scipy.signal import resample_poly, firwin
 from matplotlib.animation import FuncAnimation
 
 #samples = np.fromfile('/home/marc/Downloads/fm_clip_for_rds.iq', dtype=np.complex64) # med SNR
-samples = np.fromfile('/home/marc/Downloads/fm_rds_250k_from_sdrplay.iq', dtype=np.complex64) # high SNR
+#samples = np.fromfile('/home/marc/Downloads/fm_rds_250k.iq', dtype=np.complex64) # high SNR
+samples = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64) # high SNR, shorter
 
 # MAKE MY OWN RECORDING OF A COOLER STATION, JUST MAKE SURE ITS HIGH SNR AND SCALE IT TO THE SAME SIGNAL LEVEL AS THIS WORKING ONE
 
@@ -19,7 +20,7 @@ if False:
 
 # PSD
 if False:
-    PSD = np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples)))**2)
+    PSD = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples)))**2)
     PSD = PSD[::100]
     PSD = PSD - np.max(PSD)
     f = np.linspace(sample_rate/-2, sample_rate/2, len(PSD))/1e3
@@ -35,7 +36,7 @@ x = 0.5 * np.angle(samples[0:-1] * np.conj(samples[1:])) # see https://wiki.gnur
 
 # PSD
 if False:
-    PSD = np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
+    PSD = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
     PSD = PSD[::100]
     PSD = PSD[len(PSD)//2:]
     PSD = PSD - np.max(PSD)
@@ -185,14 +186,14 @@ freq = 0
 alpha = 100.0
 beta = 0.5
 out = np.zeros(N, dtype=np.complex64)
-freq_log = []
+#freq_log = []
 for i in range(N):
     out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
     error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
 
     # Advance the loop (recalc phase and freq offset)
     freq += (beta * error)
-    freq_log.append(freq * sample_rate / (2*np.pi)) # convert from angular velocity to Hz for logging
+    #freq_log.append(freq * sample_rate / (2*np.pi)) # convert from angular velocity to Hz for logging
     phase += freq + (alpha * error)
 
     # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
@@ -223,7 +224,7 @@ if False:
     
 # Plot freq over time to see how long it takes to hit the right offset, this is what we look at to tweak alpha and beta
 if False:
-    plt.plot(freq_log,'.-')
+    plt.plot(freq_log[::100],'.-')
     plt.xlabel('Sample')
     plt.ylabel('Frequency [Hz]')
     plt.show()
