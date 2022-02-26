@@ -977,7 +977,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
 
 Once again, the example FM recording known to work with this code `can be found here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.
 
-For those interested in demodulating the actual audio signal, just add the following lines right after the "Acquiring a Signal" section:
+For those interested in demodulating the actual audio signal, just add the following lines right after the "Acquiring a Signal" section (special thanks to `Joel Cordeiro <http://github.com/joeugenio>`_ for the code):
 
 .. code-block:: python
 
