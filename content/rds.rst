@@ -991,7 +991,7 @@ Most of the steps above used to receive RDS were adapted from the GNU Radio impl
 Further Reading
 ********************************
 
-#. https://en.Wikipedia.org/wiki/Radio_Data_System
-#. https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS)
+#. https://en.wikipedia.org/wiki/Radio_Data_System
+#. `https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS) <https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS)>`_
 #. https://github.com/bastibl/gr-rds
 #. https://www.gnuradio.org/
