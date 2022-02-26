@@ -213,7 +213,7 @@ One way to design this kind of filter is to make a low-pass filter with a cutoff
     h_band_pass = h * exponential # do the shift
 
     # plot impulse response
-    plt.subplot(121)
+    plt.figure('impulse')
     plt.plot(np.real(h_band_pass), '.-')
     plt.plot(np.imag(h_band_pass), '.-')
     plt.legend(['real', 'imag'], loc=1)
@@ -222,12 +222,12 @@ One way to design this kind of filter is to make a low-pass filter with a cutoff
     H = np.abs(np.fft.fft(h_band_pass, 1024)) # take the 1024-point FFT and magnitude
     H = np.fft.fftshift(H) # make 0 Hz in the center
     w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
-    plt.subplot(122)
+    plt.figure('freq')
     plt.plot(w, H, '.-')
     plt.xlabel('Frequency [Hz]')
     plt.show()
 
-The plots of the impulse response and frequency response should look like this:
+The plots of the impulse response and frequency response are shown below:
 
 .. image:: ../_images/shifted_filter.png
    :scale: 60 % 

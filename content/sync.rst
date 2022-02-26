@@ -187,9 +187,9 @@ A quick way to interpolate a signal in Python is to use scipy's :code:`signal.re
  samples_interpolated = signal.resample_poly(samples, 16, 1)
  
  # Plot the old vs new
- plt.subplot(211)
+ plt.figure('before interp')
  plt.plot(samples,'.-')
- plt.subplot(212)
+ plt.figure('after interp')
  plt.plot(samples_interpolated,'.-')
  plt.show()
 

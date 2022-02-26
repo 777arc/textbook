@@ -402,3 +402,9 @@ Output:
 
 .. image:: ../_images/fft_example1.svg
    :align: center
+
+******************
+Further Reading
+******************
+
+#. http://rfic.eecs.berkeley.edu/~niknejad/ee242/pdf/eecs242_lect3_rxarch.pdf
