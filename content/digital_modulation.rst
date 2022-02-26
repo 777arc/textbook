@@ -248,6 +248,16 @@ As an aside, note that FM radio uses Frequency Modulation (FM) which is like an 
 In this textbook we are mainly concerned about digital forms of modulation.
 
 *******************
+Differential Coding
+*******************
+
+In many wireless (and wired) communications protocols you are likely to run into something called differential coding.  To demonstrate its utility consider receiving a BPSK signal.  As the signal flies through the air it experiences some random delay between the transmitter and receiver, causing a random rotation in the constellation, as we mentioned earlier.  When the receiver synchronizes to it, and aligns the BPSK to the "I" axis, it has no way of knowing if it is 180 degrees out of phase or not, because the constellation looks the same.  So instead of having to send pilot symbols to let it know which cluster represents 1 and which is 0, it can choose to use differential coding and not even worry about it.  
+
+In its most basic form, which is what is used for BPSK, differential coding involves transmitting a 1 when the input bit changes from a 1 to 0 or 0 to 1, and a 0 when it doesn't change.  So it still transmits the same number of bits (except you lose 1 extra bit at the beginning), but now you don't have to worry about the 180 degree phase ambiguity.  To demonstrate how this works, consider transmitting the bit sequence [1, 1, 0, 0, 0, 1, 0] using BPSK.  Instead of transmitting those bits directly, mapped to the positive and negative symbols we showed earlier, you would transmit [-, 0, 1, 0, 0, 1, 1], each 1 represents a change in the data bits.  
+
+The big downside to using differential coding is that if you have a bit error, it will lead to two bit errors.  The alternative to using differential coding for BPSK is to add pilot symbols periodically, which are symbols already known by the receiver, and it can use the known values to not know figure out which cluster is 1 and which is 0, but also reverse multipath caused by the channel.  One problem with pilot symbols is that the wireless channel can change very quickly, on the order of tens or hundreds of symbols if it's a moving receiver and/or transmitter, so you would need pilot symbols often enough to reflect the changing channel.  So if a wireless protocol is putting high emphasis on reducing the complexity of the receiver, such as RDS, it may choose to use differential coding.
+
+*******************
 Python Example
 *******************
 
@@ -309,4 +319,10 @@ You could even combine phase noise with AWGN to get the full experience:
    :target: ../_images/phase_jitter_awgn.svg
 
 We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate multiple samples per symbol once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
+
+*******************
+Further Reading
+*******************
+
+#. https://en.wikipedia.org/wiki/Differential_coding
 
