@@ -142,7 +142,7 @@ The following Python code implements the Mueller and Muller clock recovery techn
     out_rail = np.zeros(len(samples) + 10, dtype=np.complex) # stores values, each iteration we need the previous 2 values plus current value
     i_in = 0 # input samples index
     i_out = 2 # output index (let first two outputs be 0)
-    while i_out < len(samples) and i_in < len(samples):
+    while i_out < len(samples) and i_in*16 < len(samples):
         out[i_out] = samples[i_in + int(mu)] # grab what we think is the "best" sample
         out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
         x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
