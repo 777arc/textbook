@@ -103,7 +103,7 @@ Acquiring a Signal
 .. code-block:: python
 
  import numpy as np
- from scipy.signal import resample_poly, firwin
+ from scipy.signal import resample_poly, firwin, bilinear, lfilter
  import matplotlib.pyplot as plt
  
  # Read in signal
@@ -977,10 +977,37 @@ You did it!  Below is all of the code above, concatenated, it should work with t
 
 Once again, the example FM recording known to work with this code `can be found here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.
 
-For those interested in demodulating the actual audio signal, it's actually not that difficult, I plan to add it to the bottom of this chapter in the near future.  If anyone wants to beat me to it, and figure out a concise set of Python code to play the audio (even if it's just mono), please reach out, pysdr@vt.edu.
+For those interested in demodulating the actual audio signal, just add the following lines right after the "Acquiring a Signal" section:
 
+.. code-block:: python
 
+ # Add the following code right after the "Acquiring a Signal" section
+ 
+ from scipy.io import wavfile
+ 
+ # Demodulation
+ x = np.diff(np.unwrap(np.angle(x)))
+ 
+ # De-emphasis filter, H(s) = 1/(RC*s + 1), implemented as IIR via bilinear transform
+ bz, az = bilinear(1, [75e-6, 1], fs=sample_rate)
+ x = lfilter(bz, az, x)
+ 
+ # decimate filter to get mono audio
+ x = x[::6]
+ sample_rate = sample_rate/6
+ 
+ # normalizes volume
+ x /= x.std() 
+ 
+ # Save to wav file, you can open this in Audacity for example
+ wavfile.write('fm.wav', int(sample_rate), x)
 
+The most complicated part is the de-emphasis filter, `which you can learn about here <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, although it's actually an optional step if you are OK with audio that has a poor bass/treble balance.  For those curious, here is what the frequency response of the `IIR <https://en.wikipedia.org/wiki/Infinite_impulse_response>`_ de-emphasis filter looks like, it doesn't fully filter out any frequencies, it's more of a "shaping" filter.
+
+.. image:: ../_images/fm_demph_filter_freq_response.svg
+   :align: center 
+   :target: ../_images/fm_demph_filter_freq_response.svg
+   
 ********************************
 Acknowledgments
 ********************************
