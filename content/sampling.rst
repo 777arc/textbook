@@ -51,10 +51,9 @@ Still not fast enough!  According to a piece of DSP theory we won't dive into, y
 
 There's no incorrect signal this time because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
 
-In the above example our signal was just a simple sine wave, most actual signals will have many frequency components to them.  To accurately sample any given signal, the sample rate must be "at least twice the frequency of the maximum frequency component".  Here's a way to visualize that:
+In the above example our signal was just a simple sine wave, most actual signals will have many frequency components to them.  To accurately sample any given signal, the sample rate must be "at least twice the frequency of the maximum frequency component".  Here's a visualization using an example frequency domain plot, note that there will always be a noise floor so the highest frequency is usually an approximation:
 
-.. image:: ../_images/max_freq.png
-   :scale: 70% 
+.. image:: ../_images/max_freq.svg
    :align: center 
    
 We must identify the highest frequency component, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample is known as the Nyquist Rate.  In other words, the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  It is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
