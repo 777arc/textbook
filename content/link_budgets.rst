@@ -179,11 +179,13 @@ Multiplying out (or adding in dB) kTB gives our noise power, i.e., the bottom te
 SNR
 *************************
 
-Now that we have both numbers, we can take the ratio to find SNR:
+Now that we have both numbers, we can take the ratio to find SNR, (see the :ref:`noise-chapter` chapter for more information about SNR):
 
-.. image:: ../_images/SNR.png
-   :scale: 50 % 
-   :align: center 
+.. math::
+   \mathrm{SNR} = \frac{P_{signal}}{P_{noise}}
+
+.. math::
+   \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{noise\_dB}
 
 We typically shoot for an SNR > 10 dB, although it really depends on the application.  In practice, SNR can be verified by looking at the FFT of the received signal or by calculating the power with and without the signal present (recall variance = power).  The higher the SNR, the more bits per symbol you can manage without too many errors.
 
