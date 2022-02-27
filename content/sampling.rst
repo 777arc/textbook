@@ -175,16 +175,6 @@ If someone gives you a bunch of IQ samples, it will look like a 1D array/vector 
 Throughout this textbook you will become **very** familiar with how IQ samples work, how to receive and transmit them with an SDR, how to process them in Python, and how to save them to a file for later analysis.
 
 One last important note: the figure above shows what's happening **inside** of the SDR. We don't actually have to generate a sine wave, shift by 90, multiply or add--the SDR does that for us.  We tell the SDR what frequency we want to sample at, or what frequency we want to transmit our samples at.  On the receiver side, the SDR will provide us the IQ samples. For the transmitting side, we have to provide the SDR the IQ samples.  In terms of data type, they will either be complex ints or floats.
-
-
-**************************
-Receiver Architectures
-**************************
-
-The figure in the above "Receiver Side" section demonstrates how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion", or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to not downconvert at all and sample so fast to capture everything from 0 Hz to 1/2 the sample rate.  This strategy is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC chip.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne". It involves downconversion but not all the way to 0 Hz. It places the signal of interest at an intermediate frequency, known as "IF".  Here are the block diagrams of these three architectures:
-
-.. image:: ../_images/receiver_arch_diagram.svg
-   :align: center
    
    
 **************************
@@ -228,6 +218,15 @@ Lastly, you may be curious how fast signals travel through the air.  Recall from
  f = \frac{c}{\lambda}
 
 where :math:`c` is the speed of light, typically set to 3e8 when :math:`f` is in Hz and :math:`\lambda` is in meters.  In wireless communications this relationship becomes important when we get to antennas, because to receive a signal at a certain carrier frequency, :math:`f`, you need an antenna that matches its wavelength, :math:`\lambda`, usually the antenna is :math:`\lambda/2` or :math:`\lambda/4` in length.  However, regardless of the frequency/wavelength, information carried in that signal will always travel at the speed of light, from the transmitter to the receiver.  When calculating this delay through the air, a rule of thumb is that light travels approximately one foot in one nanosecond.  Another rule of thumb: a signal traveling to a satellite in geostationary orbit and back will take roughly 0.25 seconds for the entire trip.
+
+**************************
+Receiver Architectures
+**************************
+
+The figure in the "Receiver Side" section demonstrates how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion", or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to not downconvert at all and sample so fast to capture everything from 0 Hz to 1/2 the sample rate.  This strategy is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC chip.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne". It involves downconversion but not all the way to 0 Hz. It places the signal of interest at an intermediate frequency, known as "IF".  A low-noise amplifier (LNA) is simply an amplifier designed for extremely low power signals at the input.  Here are the block diagrams of these three architectures, note that variations and hybrids of these architectures also exist:
+
+.. image:: ../_images/receiver_arch_diagram.svg
+   :align: center
 
 ***********************************
 Baseband and Bandpass Signals
