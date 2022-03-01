@@ -16,6 +16,7 @@ When we transmit digital symbols, we transmit them back-to-back (as opposed to w
 
 .. image:: ../_images/pulse_train.svg
    :align: center 
+   :target: ../_images/pulse_train.svg
 
 As you can see at every interval of :math:`T`, there is one peak of a pulse while rest of the pulses are at 0 (they cross the x-axis).  When the receiver samples the signal, it does so at the perfect time (at the peak of the pulses), meaning that is the only point in time which matters.  Usually there is a symbol synchronization block at the receiver that ensures the symbols are sampled at the peaks.
 
@@ -78,11 +79,13 @@ The most popular pulse-shaping filter seems to be the "raised-cosine" filter.  I
 
 .. image:: ../_images/raised_cosine.svg
    :align: center 
+   :target: ../_images/raised_cosine.svg
 
 Note that the above plot is in the time domain. It depicts the impulse response of the filter.  The :math:`\beta` parameter is the only parameter for the raised-cosine filter, and it determines how quickly the filter tapers off in the time domain, which will be inversely proportional with how quickly it tapers off in frequency:
 
 .. image:: ../_images/raised_cosine_freq.svg
    :align: center 
+   :target: ../_images/raised_cosine_freq.svg
 
 The reason it's called the raised-cosine filter is because the frequency domain when :math:`\beta = 1` is a half-cycle of a cosine wave, raised up to sit on the x-axis.
 
@@ -117,6 +120,7 @@ Let's scrutinize the parameter :math:`\beta`.  It is a number between 0 and 1, a
 
 .. image:: ../_images/rrc_rolloff.svg
    :align: center 
+   :target: ../_images/rrc_rolloff.svg
 
 More filter taps are required the lower :math:`\beta` gets.  When :math:`\beta = 0` the impulse response never fully hits zero, so we try to get :math:`\beta` as low as possible without causing other issues.  The lower the roll-off, the more compact in frequency we can create our signal for a given symbol rate, which is always important.
 
@@ -203,10 +207,10 @@ Lastly, we can filter our signal :math:`x` and examine the result.  Don't focus 
     plt.grid(True)
     plt.show()
 
-.. image:: ../_images/pulse_shaping_python3.png
-   :scale: 60 % 
+.. image:: ../_images/pulse_shaping_python3.svg
    :align: center 
-  
+   :target: ../_images/pulse_shaping_python3.svg
+
 This resulting signal is summed together from many of our impulse responses, with approximately half of them first multiplied by -1.  It might look complicated, but we will step through it together.
 
 Firstly, there are transient samples before and after the data because of the filter and the way convolution works.  These extra samples get included in our transmission but they don't actually contain "peaks" of pulses.
