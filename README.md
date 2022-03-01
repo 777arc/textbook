@@ -22,30 +22,13 @@ sphinx-build -b html . _build
 
 ## Misc
 
-chapter name refs, for my reference when writing:
-
-* sampling-chapter
-* pulse-shaping-chapter
-* pluto-chapter
-* multipath-chapter
-* noise-chapter
-* modulation-chapter
-* link-budgets-chapter
-* iq-files-chapter
-* noise-chapter
-* intro-chapter
-* freq-domain-chapter
-* filters-chapter
-* channel-coding-chapter
-* author-chapter
-
 Ideas for future chapters:
 
 * Equalization, would be the last step needed to finish the end-to-end comms link
-* "Bringing it all together", discussion and Python+SDR implementation of a full receiver, perhaps ADS-B or RDS
-* Cyclostationary, ask Chad if he wants to co-write it
+* Cyclostationary analysis
 * OFDM, simulating OFDM and CP, show via Python how it turns freq selective fading into flat fading
 * How to create real-time SDR apps with GUIs in Python using pyqt and pyqtgraph, or even just matplotlib with updating
 * Python code that lets the Pluto (or RTL-SDR) act as an FM receiver, like with sound output
+* End to end example that shows how to detect start of packet and other concepts not covered in RDS chapter
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.
