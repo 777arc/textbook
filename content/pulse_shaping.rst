@@ -94,6 +94,8 @@ The equation that defines the impulse response of the raised-cosine filter is:
 .. math::
  h(t) = \frac{1}{T} \mathrm{sinc}\left( \frac{t}{T} \right) \frac{\cos\left(\frac{\pi\beta t}{T}\right)}{1 - \left( \frac{2 \beta t}{T}   \right)^2}
 
+More information about the :math:`\mathrm{sinc}()` function can be found `here <https://en.wikipedia.org/wiki/Sinc_function>`_.
+
 Remember: we split this filter between the Tx and Rx equally.  Enter the Root Raised Cosine (RRC) Filter!
 
 Root Raised-Cosine Filter
