@@ -119,7 +119,7 @@ You can pretend that the two code blocks presented earlier simulate a the wirele
 Time Synchronization
 ***************************
 
-When we transmit a signal wirelessly, it arrives at the receiver with a random phase shift due to time travelled.  We cannot just start sampling the symbols at our symbol rate because we are unlikely to sample it at the right spot in the pulse, as discussed at the end of the :ref:`pulse-shaping-chapter` chapter.  Review the three figures at the end of that chapter if you are not following.
+When we transmit a signal wirelessly, it arrives at the receiver with a random phase shift due to time traveled.  We cannot just start sampling the symbols at our symbol rate because we are unlikely to sample it at the right spot in the pulse, as discussed at the end of the :ref:`pulse-shaping-chapter` chapter.  Review the three figures at the end of that chapter if you are not following.
 
 Most timing synchronization techniques take the form of a phase lock loop (PLL); we won't study PLLs here but it's important to know the term, and you can read about them on your own if you are interested.  PLLs are closed-loop systems that use feedback to continuously adjust something; in our case, a time shift permits us to sample at the peak of the digital symbols.
 
@@ -383,7 +383,7 @@ Below is the Python code that is our Costas Loop:
     plt.plot(freq_log,'.-')
     plt.show()
 
-There is a lot here so let's step through it.  Some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code.  They contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation.  We multiply the real part of the sample by the imaginary part.  For a 4th order Costas Loop, it's still relatively simple but not quite one line.  If you are curious what it looks like click below, but we won't be using it in our code for now.
+There is a lot here so let's step through it.  Some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code.  They contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation.  We multiply the real part of the sample (I) by the imaginary part (Q), and because Q should be equal to zero for BPSK, the error function is minimized when there is no phase or frequency offset that causes energy to shift from I to Q.  For a 4th order Costas Loop, it's still relatively simple but not quite one line, as both I and Q will have energy even when there is no phase or frequency offset, for QPSK.  If you are curious what it looks like click below, but we won't be using it in our code for now.  The reason this works for QPSK is because when you take the absolute value of I and Q, you will get +1+1j, and if there is no phase or frequency offset then the difference between the absolute value of I and Q should be close to zero.
 
 .. raw:: html
 
