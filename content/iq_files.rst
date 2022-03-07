@@ -133,7 +133,7 @@ Since the IQ file itself doesn't have any metadata associated with it, it's comm
 
 Luckily, there is now an open standard that specifies a metadata format used to describe signal recordings, known as `SigMF <https://github.com/gnuradio/SigMF>`_.  By using an open standard like SigMF, multiple parties can share RF recordings more easily, and use different tools to operate on the same datasets.  It also prevents "bitrot" of RF datasets where details of the capture are lost over time due to details of the recording not being collocated with the recording itself.  
 
-The most simple (and minimal) way to use the SigMF standard to describe an IQ file you have created is to rename the .iq file to .sigmf-data and create a new file with the same name but .sigmf-meta extension.  This meta file is a plaintext file filled with json, so you can simply open it with a text editor and fill it out manually (later we will discuss doing this programmatically).  Here is an example .sigmf-meta file you can use as a template:
+The most simple (and minimal) way to use the SigMF standard to describe a binary IQ file you have created is to rename the .iq file to .sigmf-data and create a new file with the same name but .sigmf-meta extension, and make sure the datatype field in the meta file matches the binary format of your data file.  This meta file is a plaintext file filled with json, so you can simply open it with a text editor and fill it out manually (later we will discuss doing this programmatically).  Here is an example .sigmf-meta file you can use as a template:
 
 .. code-block::
 
