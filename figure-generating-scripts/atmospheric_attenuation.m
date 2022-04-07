@@ -1,7 +1,9 @@
 % requires comms system toolbox
 clear all;
 close all;
-semilogx([1:400], 10*log10(gaspl(1e3, [1:400]*1e9, 20, 101300, 10)));
+
+% NOTE I HAD AN EXTRA LOG HERE WHEN I FIRST MADE THE SCRIPT (NOW REMOVED) SO THE ANNOTATIONS WILL NEED UPDATING IF THIS IS RUN AGAIN
+semilogx([1:400], gaspl(1e3, [1:400]*1e9, 20, 101300, 10));
 xlabel('Frequency [GHz]');
 ylabel('Attenuation [dB/km]');
 grid;

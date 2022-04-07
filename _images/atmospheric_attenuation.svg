@@ -39,8 +39,8 @@
      id="namedview470"
      showgrid="false"
      inkscape:zoom="1.8074847"
-     inkscape:cx="445.18196"
-     inkscape:cy="188.20729"
+     inkscape:cx="328.72178"
+     inkscape:cy="187.10078"
      inkscape:window-x="72"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -970,51 +970,51 @@
   <g
      id="g312"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,341.35937)">
+     transform="translate(36.923574,341.91263)">
     <text
        id="text310"
        style="stroke:none"
        y="6"
        xml:space="preserve"
-       x="-30">-30</text>
+       x="-30">0.001</text>
   </g>
   <g
      id="g316"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,285.69267)">
+     transform="translate(48.375722,286.24593)">
     <text
        id="text314"
        style="stroke:none"
        y="6"
        xml:space="preserve"
-       x="-30">-20</text>
+       x="-30">0.01</text>
   </g>
   <g
      id="g320"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,230.02607)">
+     transform="translate(59.827871,230.57933)">
     <text
        id="text318"
        style="stroke:none"
        y="6"
        xml:space="preserve"
-       x="-30">-10</text>
+       x="-30">0.1</text>
   </g>
   <g
      id="g324"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,174.35937)">
+     transform="translate(59.001699,174.91263)">
     <text
        id="text322"
        style="stroke:none"
        y="6"
        xml:space="preserve"
-       x="-12">0</text>
+       x="-12">1</text>
   </g>
   <g
      id="g328"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,118.69268)">
+     transform="translate(58.08373,119.24594)">
     <text
        id="text326"
        style="stroke:none"
@@ -1025,24 +1025,24 @@
   <g
      id="g332"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,63.026075)">
+     transform="translate(46.631581,63.57933)">
     <text
        id="text330"
        style="stroke:none"
        y="6"
        xml:space="preserve"
-       x="-23">20</text>
+       x="-23">100</text>
   </g>
   <g
      id="g336"
      style="font-size:18px;font-family:SansSerif;color-interpolation:linearRGB;fill:#262626;stroke:#262626;color-rendering:optimizeQuality;image-rendering:optimizeQuality;text-rendering:geometricPrecision"
-     transform="translate(54.543359,7.359375)">
+     transform="translate(35.179433,7.91263)">
     <text
        id="text334"
        style="stroke:none"
        y="6"
        xml:space="preserve"
-       x="-23">30</text>
+       x="-23">1000</text>
   </g>
   <g
      id="g340"
