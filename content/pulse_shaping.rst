@@ -57,7 +57,7 @@ Also, recall that convolution in time domain is multiplication in frequency doma
 To split a filter in half you can take the square root of the frequency response.
 
 .. math::
- X(f) = X_H(f) X_H(f) \quad \mathrm{where} \quad X_H(f) = \sqrt{X(F)}
+ X(f) = X_H(f) X_H(f) \quad \mathrm{where} \quad X_H(f) = \sqrt{X(f)}
 
 
 **********************************
