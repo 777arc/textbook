@@ -205,7 +205,7 @@ Lastly, we can filter our signal :math:`x` and examine the result.  Don't focus 
     plt.figure(2)
     plt.plot(x_shaped, '.-')
     for i in range(num_symbols):
-        plt.plot([i*sps+num_taps//2+1,i*sps+num_taps//2+1], [min(x_shaped), max(x_shaped)])
+        plt.plot([i*sps+num_taps//2+1,i*sps+num_taps//2+1], [0, x_shaped[i*sps+num_taps//2+1]])
     plt.grid(True)
     plt.show()
 
