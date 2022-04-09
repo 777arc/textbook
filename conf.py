@@ -208,9 +208,8 @@ def setup(app):
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 
-# The name for this set of Sphinx documents.  If None, it defaults to
-# "<project> v<release> documentation".
-#html_title = None
+# The name for this set of Sphinx documents which ends up being the browser tab names.  If None, it defaults to "<project> v<release> documentation".
+html_title = project # so it leaves out version and "documentation", didn't want to make it any shorter and risk SEO issues
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
