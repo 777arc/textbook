@@ -131,7 +131,7 @@ A common equation used to approximate bandwidth, in Hz, for a given symbol rate 
 .. math::
     \mathrm{BW} = R_S(\beta + 1)
 
-:math:`R_S` is the symbol rate in Hz.  For wireless communications we usually like a roll-off between 0.2 and 0.5.  As a rule of thumb, a digital signal that uses symbol rate :math:`R_S` is going to occupy a little more than :math:`R_S` worth of spectrum, including both positive and negative portions of spectrum.  Once we upconvert and transmit our signal, both sides certainly matter.  If we transmit QPSK at 1 million symbols per second (MSps), it will occupy around 1.3 MHz.  The data rate will be 2 Mbps (recall that QPSK uses 2 bits per symbol), minus any overhead like channel coding and frame headers.
+:math:`R_S` is the symbol rate in Hz.  For wireless communications we usually like a roll-off between 0.2 and 0.5.  As a rule of thumb, a digital signal that uses symbol rate :math:`R_S` is going to occupy a little more than :math:`R_S` worth of spectrum, including both positive and negative portions of spectrum.  Once we upconvert and transmit our signal, both sides certainly matter.  If we transmit QPSK at 1 million symbols per second (MSps), it will occupy around 1.3 MHz.  The data rate will be 2 Mbps (recall that QPSK uses 2 bits per symbol), including any overhead like channel coding and frame headers.
 
 **********************************
 Python Exercise
