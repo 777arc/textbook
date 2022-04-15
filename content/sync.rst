@@ -79,7 +79,7 @@ We can easily simulate a delay by shifting samples, but it only simulates a dela
     h /= np.sum(h) # normalize to get unity gain, we don't want to change the amplitude/power
     samples = np.convolve(samples, h) # apply filter
 
-As you can see, we are calculating the filter taps using a sinc() function.  A sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal.  This filter does not reshape the signal, it just delays it in time.  In our example we are delaying by 0.3 of a sample.  Keep in mind that applying *any* filter delays a signal by half of the filter taps minus one, due to the act of convolving the signal through the filter.
+As you can see, we are calculating the filter taps using a sinc() function.  A sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal.  This filter does not reshape the signal, it just delays it in time.  In our example we are delaying by 0.4 of a sample.  Keep in mind that applying *any* filter delays a signal by half of the filter taps minus one, due to the act of convolving the signal through the filter.
 
 If we plot the "before" and "after" of filtering a signal, we can observe the fractional delay.  In our plot we zoom into only a couple of symbols.  Otherwise, the fractional delay is not viewable.
 
