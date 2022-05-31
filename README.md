@@ -8,7 +8,7 @@ Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvem
 
 ## Building:
 
-On windows:
+On windows (this wont include the French version):
 
 ```
 sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe" . _build
@@ -18,7 +18,17 @@ On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) i
 
 ```bash
 sphinx-build -b html . _build
+sphinx-build -b html -D exclude_patterns=_build,index.rst,content/* -D master_doc=index-fr . _build/fr/
 ```
+
+## Getting pdf created (not working yet due to gifs)
+
+```
+sudo apt-get install -y latexmk
+sphinx-build -b latex . _build/latex
+make latexpdf
+NEED TO REMOVE ALL GIFS FOR IT TO NOT ERROR OUT
+``
 
 ## Misc
 

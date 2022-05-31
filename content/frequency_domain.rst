@@ -288,7 +288,7 @@ First we need to create a signal in the time domain.  Feel free to follow along 
  t = np.arange(100)
  s = np.sin(0.15*2*np.pi*t)
 
-If we plot s it looks like:
+If we plot :code:`s` it looks like:
 
 .. image:: ../_images/fft-python1.png
    :scale: 70 % 
@@ -300,7 +300,7 @@ Next let's use Numpy's FFT function:
 
  S = np.fft.fft(s)
 
-If we look at S we see it's an array of complex numbers:
+If we look at :code:`S` we see it's an array of complex numbers:
 
 .. code-block:: python
 
