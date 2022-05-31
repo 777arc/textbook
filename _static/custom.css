@@ -5,10 +5,15 @@ div.body {
     max-width: auto;
 }
 
-/* Makes sidebar scrollable when the window isn't big enough to show all content*/
+/* Makes sidebar scrollable when the window isn't big enough to show all content */
 div.sphinxsidebar {
     max-height: 100%;
     overflow-y: auto;
+}
+
+/* Remove the extra 30 pixels of margin at the top of the page */
+div.document {
+    margin-top: 0px;
 }
 
 /* Colors and text decoration.
@@ -97,5 +102,3 @@ div.sphinxsidebar {
 .purple {
     color: purple;
 }
-
-
