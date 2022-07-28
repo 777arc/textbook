@@ -43,7 +43,7 @@ Example 1: Signal 1 is received at 2 watts and the noise floor is at 0.0000002 w
 
 Example 2: A garbage disposal is 100,000 times louder than a quiet rural area, and a chain saw is 10,000 times louder than a garbage disposal (in terms of power of sound waves).
 
-Without dB, meaning working in normal "linear" terms, we need to use a lot of 0's to represent the values in Examples 1 and 2. Frankly, if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor. If the scale of the y-axis went from 0 to 3 watts, for example, noise to be too small to show up in the plot. To represent these scales simultaneously, we work in a log-scale.
+Without dB, meaning working in normal "linear" terms, we need to use a lot of 0's to represent the values in Examples 1 and 2. Frankly, if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor. If the scale of the y-axis went from 0 to 3 watts, for example, the noise would be too small to show up in the plot. To represent these scales simultaneously, we work in a log-scale.
 
 To further illustrate the problems of scale we encounter in signal processing, consider the below waterfalls of three of the same signals. The left-hand side is the original signal in linear scale, and the right-hand side shows the signals converted to a logarithmic scale (dB).  Both representations use the exact same colormap, where blue is lowest value and yellow is highest.  You can barely see the signal on the left in the linear scale.
 
