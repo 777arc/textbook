@@ -652,6 +652,10 @@ You did it!  Below is all of the code above, concatenated, it should work with t
    
 .. code-block:: python
 
+ import numpy as np
+ from scipy.signal import resample_poly, firwin, bilinear, lfilter
+ import matplotlib.pyplot as plt
+
  # Read in signal
  x = np.fromfile('/home/marc/Downloads/fm_rds_250k_from_sdrplay.iq', dtype=np.complex64)
  sample_rate = 250e3
