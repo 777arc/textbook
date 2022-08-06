@@ -218,15 +218,15 @@ Time Synchronization (Symbol-Level)
 
  # Symbol sync, using what we did in sync chapter
  samples = x # for the sake of matching the sync chapter
- samples_interpolated = resample_poly(samples, 16, 1)
+ samples_interpolated = resample_poly(samples, 32, 1) # we'll use 32 as the interpolation factor, arbitrarily chosen
  sps = 16
  mu = 0.01 # initial estimate of phase of sample
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
  out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stores values, each iteration we need the previous 2 values plus current value
  i_in = 0 # input samples index
  i_out = 2 # output index (let first two outputs be 0)
- while i_out < len(samples) and i_in+16 < len(samples):
-     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # grab what we think is the "best" sample
+ while i_out < len(samples) and i_in+32 < len(samples):
+     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] # grab what we think is the "best" sample
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
@@ -688,15 +688,15 @@ You did it!  Below is all of the code above, concatenated, it should work with t
 
  # Symbol sync, using what we did in sync chapter
  samples = x # for the sake of matching the sync chapter
- samples_interpolated = resample_poly(samples, 16, 1)
+ samples_interpolated = resample_poly(samples, 32, 1) # we'll use 32 as the interpolation factor, arbitrarily chosen
  sps = 16
  mu = 0.01 # initial estimate of phase of sample
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
  out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stores values, each iteration we need the previous 2 values plus current value
  i_in = 0 # input samples index
  i_out = 2 # output index (let first two outputs be 0)
- while i_out < len(samples) and i_in+16 < len(samples):
-     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # grab what we think is the "best" sample
+ while i_out < len(samples) and i_in+32 < len(samples):
+     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] # grab what we think is the "best" sample
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
