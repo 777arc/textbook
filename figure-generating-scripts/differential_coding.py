@@ -102,4 +102,4 @@ for i, symbol in enumerate(encode):
 
 plt.show()
 
-fig.savefig('../_static/differential_coding.svg', bbox_inches='tight')
+fig.savefig('../_images/differential_coding.svg', bbox_inches='tight')
