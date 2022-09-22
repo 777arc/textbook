@@ -23,8 +23,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="1.1458333"
-     inkscape:cx="445.52727"
-     inkscape:cy="144"
+     inkscape:cx="362.61819"
+     inkscape:cy="144.87273"
      inkscape:window-width="2560"
      inkscape:window-height="1369"
      inkscape:window-x="-8"
@@ -406,14 +406,6 @@
       </g>
     </clipPath>
   </defs>
-  <rect
-     x="0"
-     y="0"
-     width="1056"
-     height="288"
-     fill="#ffffff"
-     id="rect26"
-     clip-path="url(#clipPath569)" />
   <path
      d="m 778.5,84.5 14.75,-58.9999 h 34.5 L 842.5,84.5 Z"
      stroke="#507e32"
