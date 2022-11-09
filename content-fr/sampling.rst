@@ -1,76 +1,79 @@
 .. _sampling-chapter:
 
 ##################
-IQ Sampling
+échantillonnage IQ
 ##################
 
-In this chapter we introduce a concept called IQ sampling, a.k.a. complex sampling or quadrature sampling.  We also cover Nyquist sampling, complex numbers, RF carriers, downconversion, and power spectral density.  IQ sampling is the form of sampling that an SDR performs, as well as many digital receivers (and transmitters).  It's a slightly more complex version of regular digital sampling (pun intended), so we will take it slow and with some practice the concept is sure to click!
+Dans ce chapitre, nous présentons un concept appelé échantillonnage IQ, ou échantillonnage complexe ou échantillonnage en quadrature.  Nous abordons également l'échantillonnage de Nyquist, les nombres complexes, les porteuses RF, les fréquences intermédiaires, et la densité spectrale de puissance.  L'échantillonnage IQ est la forme d'échantillonnage utilisée par la radio logicielle, ainsi que par de nombreux récepteurs (et émetteurs) numériques.  Il s'agit d'une version légèrement plus complexe de l'échantillonnage numérique ordinaire (jeu de mots), nous allons donc y aller doucement et, avec un peu de pratique, le concept va certainement faire tilt!
+
 
 *************************
-Sampling Basics
+Les bases de l'échantillonnage
 *************************
 
-Before jumping into IQ sampling, let's discuss what sampling actually means. You may have encountered sampling without realizing it by recording audio with a microphone. The microphone is a transducer that converts sound waves into an electric signal (a voltage level). That electric signal is transformed by an analog-to-digital converter (ADC), producing a digital representation of the sound wave. To simplify, the microphone captures sound waves that are converted into electricity, and that electricity in turn is converted into numbers.  The ADC acts as the bridge between the analog and digital domains.  SDRs are surprisingly similar. Instead of a microphone, however, they utilize an antenna, although they also use ADCs. In both cases, the voltage level is sampled with an ADC. For SDRs, think radio waves in then numbers out.
+Avant d'aborder l'échantillonnage QI, voyons d'abord ce que signifie l'échantillonnage. Vous avez peut-être déjà rencontré l'échantillonnage sans vous en rendre compte en enregistrant des données audio avec un microphone. Le microphone est un transducteur qui convertit les ondes sonores en un signal électrique (un niveau de tension). Ce signal électrique est transformé par un convertisseur analogique-numérique (CAN), produisant une représentation numérique de l'onde sonore. Pour simplifier, le microphone capte les ondes sonores qui sont converties en électricité, et cette électricité est à son tour convertie en nombres. Le CAN fait le lien entre les domaines analogique et numérique. Les SDR sont étonnamment similaires. Au lieu d'un microphone, ils utilisent une antenne, et utilisent également des ADC. Dans les deux cas, le niveau de tension est échantillonné par un CAN. Pour les SDR, il s'agit d'ondes radio en entrée et de nombres en sortie.
 
-Whether we are dealing with audio or radio frequencies, we must sample if we want to capture, process, or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  A more technical way to think of sampling a signal is grabbing values at moments in time and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
+
+Qu'il s'agisse d'audio ou de radiofréquences, nous devons échantillonner si nous voulons capturer, traiter ou enregistrer un signal numériquement.  L'échantillonnage peut sembler simple, mais il est très complexe.  Une façon plus technique d'envisager l'échantillonnage d'un signal est de saisir des valeurs à des moments précis et de les sauvegarder numériquement. Disons que nous avons une fonction aléatoire, :math:`S(t)`, qui peut représenter n'importe quoi, et que c'est une fonction continue que nous voulons échantillonner :
+
 
 .. image:: ../_images/sampling.svg
    :align: center 
 
-We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds, known as the **sample period**.  The frequency at which we sample, i.e., the number of samples taken per second, is simply :math:`\frac{1}{T}`.  We call this the **sample rate**, and its the inverse of the sample period.  For example, if we have a sample rate of 10 Hz, then the sample period is 0.1 seconds; there will be 0.1 seconds between each sample.  In practice our sample rates will be on the order of hundreds of kHz to tens of MHz or even higher.  When we sample signals, we need to be mindful of the sample rate, it's a very important parameter. 
+Nous enregistrons la valeur de :math:`S(t)` à intervalles réguliers de :math:`T` secondes, appelés **période d'échantillonnage**.  La fréquence à laquelle nous échantillonnons, c'est-à-dire le nombre d'échantillons prélevés par seconde, est simplement :math:`\frac{1}{T}`.  Nous l'appelons le **taux d'échantillonnage**, et c'est l'inverse de la période d'échantillonnage. Par exemple, si nous avons une fréquence d'échantillonnage de 10 Hz, la période d'échantillonnage est de 0.1 seconde; il y aura 0.1 seconde entre chaque échantillon.  Dans la pratique, nos fréquences d'échantillonnage seront de l'ordre de centaines de kHz à des dizaines de MHz, voire plus. Lorsque nous échantillonnons des signaux, nous devons être attentifs à la fréquence d'échantillonnage, c'est un paramètre très important. 
 
-For those who prefer to see the math; let :math:`S_n` represent sample :math:`n`, usually an integer starting at 0. Using this convention, the sampling process can be represented mathematically as :math:`S_n = S(nT)` for integer values of :math:`n`.  I.e., we evaluate the analog signal :math:`S(t)` at these intervals of :math:`nT`.
+Pour ceux qui préfèrent les mathématiques, soit :math:`S_n` l'échantillon :math:`n`, généralement un nombre entier commençant à 0. En utilisant cette convention, le processus d'échantillonnage peut être représenté mathématiquement comme :math:`S_n = S(nT)` pour des valeurs entières de :math:`n`.  C'est-à-dire que nous évaluons le signal analogique :math:`S(t)` à ces intervalles de :math:`nT`.
 
 *************************
-Nyquist Sampling
+Echantillonnage de Nyquist
 *************************
 
-For a given signal, the big question often is how fast must we sample?  Let's examine a signal that is just a sine wave, of frequency f, shown in green below.  Let's say we sample at a rate Fs (samples shown in blue).  If we sample that signal at a rate equal to f (i.e., Fs = f), we will get something that looks like:
+Pour un signal donné, la grande question est souvent de savoir à quelle vitesse nous devons échantillonner. Examinons un signal qui est juste une onde sinusoïdale, de fréquence f, représentée en vert ci-dessous. Disons que nous échantillonnons à une fréquence Fs (échantillons représentés en bleu).  Si nous échantillonnons ce signal à une fréquence égale à f (c'est-à-dire Fs = f), nous obtiendrons quelque chose qui ressemble à ceci:
 
 .. image:: ../_images/sampling_Fs_0.3.svg
    :align: center 
 
-The red dashed line in the above image reconstructs a different (incorrect) function that could have lead to the same samples being recorded. It indicates that our sample rate was too low because the same samples could have come from two different functions, leading to ambiguity. If we want to accurately reconstruct the original signal, we can't have this ambiguity.
+La ligne pointillée rouge dans l'image ci-dessus reconstruit une fonction différente (incorrecte) qui aurait pu conduire à l'enregistrement des mêmes échantillons. Elle indique que notre taux d'échantillonnage était trop faible car les mêmes échantillons auraient pu provenir de deux fonctions différentes, entraînant une ambiguïté. Si nous voulons reconstruire avec précision le signal original, nous ne pouvons pas tolérer cette ambiguïté.
 
-Let's try sampling a little faster, at Fs = 1.2f:
+Essayons d'échantillonner un peu plus rapidement, à Fs = 1.2f:
 
 .. image:: ../_images/sampling_Fs_0.36.svg
    :align: center 
 
-Once again, there is a different signal that could fit these samples. This ambiguity means that if someone gave us this list of samples, we could not distinguish which signal was the original one based on our sampling.
+Là encore, il existe un signal différent qui pourrait correspondre à ces échantillons. Cette ambiguïté signifie que si quelqu'un nous donnait cette liste d'échantillons, nous ne pourrions pas distinguer quel signal est le signal original sur la base de notre échantillonnage.
 
-How about sampling at Fs = 1.5f:
+Que diriez-vous d'un échantillonnage à Fs = 1.5f:
 
 .. image:: ../_images/sampling_Fs_0.45.svg
    :align: center 
 
-Still not fast enough!  According to a piece of DSP theory we won't dive into, you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
+Toujours pas assez rapide! Selon une partie de la théorie du DSP dans laquelle nous ne nous plongerons pas, vous devez échantillonner à **deux fois** la fréquence du signal afin de lever l'ambiguïté que nous rencontrons:
 
 .. image:: ../_images/sampling_Fs_0.6.svg
    :align: center 
 
-There's no incorrect signal this time because we sampled fast enough that no signal exists that fits these samples other than the one you see (unless you go *higher* in frequency, but we will discuss that later).
+Il n'y a pas de signal erroné cette fois-ci, car nous avons échantillonné suffisamment rapidement pour qu'il n'existe aucun signal correspondant à ces échantillons autre que celui que vous voyez (à moins que vous n'alliez *plus haut* en fréquence, mais nous en discuterons plus tard).
 
-In the above example our signal was just a simple sine wave, most actual signals will have many frequency components to them.  To accurately sample any given signal, the sample rate must be "at least twice the frequency of the maximum frequency component".  Here's a visualization using an example frequency domain plot, note that there will always be a noise floor so the highest frequency is usually an approximation:
+Dans l'exemple ci-dessus, notre signal était une simple onde sinusoïdale. La plupart des signaux réels comportent de nombreuses composantes de fréquence. Pour échantillonner avec précision un signal donné, la fréquence d'échantillonnage doit être "au moins deux fois la fréquence de la composante de fréquence maximale". Voici une visualisation à l'aide d'un exemple de tracé dans le domaine fréquentiel. Notez qu'il y aura toujours un plancher de bruit et que la fréquence la plus élevée est généralement une approximation:
 
 .. image:: ../_images/max_freq.svg
    :align: center 
    
-We must identify the highest frequency component, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample is known as the Nyquist Rate.  In other words, the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  It is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
+Nous devons identifier la composante de fréquence la plus élevée, puis la doubler, et nous assurer que nous échantillonnons à cette fréquence ou plus rapidement. La fréquence minimale à laquelle nous pouvons échantillonner est connue sous le nom de taux de Nyquist. En d'autres termes, le taux de Nyquist est le taux minimum auquel un signal (à bande passante finie) doit être échantillonné pour conserver toutes ses informations. Il s'agit d'un élément théorique extrêmement important dans le domaine du DSP et de la SDR, qui sert de pont entre les signaux continus et discrets.
 
 .. image:: ../_images/nyquist_rate.png
    :scale: 70% 
    :align: center 
 
-If we don't sample fast enough we get something called aliasing, which we will learn about later, but we try to avoid it at all costs.  What our SDRs do (and most receivers in general) is filter out everything above Fs/2 right before the sampling is performed. If we attempt to receive a signal with too low a sample rate, that filter will chop off part of the signal.  Our SDRs go to great lengths to provide us with samples free of aliasing and other imperfections.
+Si l'échantillonnage n'est pas assez rapide, nous obtenons ce que l'on appelle le repliement ou l'alaising, dont nous parlerons plus tard, et que nous essayons d'éviter à tout prix. Ce que font nos SDR (et la plupart des récepteurs en général), c'est filtrer tout ce qui est au-dessus de Fs/2 juste avant l'échantillonnage. Si nous essayons de recevoir un signal avec une fréquence d'échantillonnage trop faible, ce filtre coupera une partie du signal. Nos récepteurs SDR se donnent beaucoup de mal pour nous fournir des échantillons exempts de repliement ainsi que d'autres imperfections.
 
 *************************
-Quadrature Sampling
+Échantillonnage en quadrature
 *************************
 
-The term "quadrature" has many meanings, but in the context of DSP and SDR it refers to two waves that are 90 degrees out of phase.  Why 90 degrees out of phase?  Consider how two waves that are 180 degrees out of phase are essentially the same wave with one multiplied by -1. By being 90 degrees out of phase they become orthogonal, and there's a lot of cool stuff you can do with orthogonal functions.  For the sake of simplicity, we use sine and cosine as our two sine waves that are 90 degrees out of phase.
+Le terme "quadrature" a de nombreuses significations, mais dans le contexte du DSP et de la SDR, il désigne deux ondes déphasées de 90 degrés. Pourquoi un déphasage de 90 degrés? Observez que deux ondes qui sont déphasées de 180 degrés sont essentiellement la même onde avec une multipliée par -1. En étant déphasées de 90 degrés, elles deviennent orthogonales, et il y a beaucoup de choses intéressantes à faire avec les fonctions orthogonales. Par souci de simplicité, nous utilisons le sinus et le cosinus comme nos deux ondes sinusoïdales déphasées de 90 degrés.
 
-Next let's assign variables to represent the **amplitude** of the sine and cosine.  We will use :math:`I` for the cos() and :math:`Q` for the sin():
+Ensuite, attribuons des variables pour représenter la **amplitude** du sinus et du cosinus.  Nous utiliserons :math:`I` pour le cos() et :math:`Q` pour le sin():
 
 .. math::
   I \cos(2\pi ft)
@@ -78,310 +81,304 @@ Next let's assign variables to represent the **amplitude** of the sine and cosin
   Q \sin(2\pi ft)
 
 
-We can see this visually by plotting I and Q equal to 1:
+Nous pouvons le constater visuellement en traçant I et Q égaux à 1 :
 
 .. image:: ../_images/IQ_wave.png
    :scale: 70% 
    :align: center 
 
-We call the cos() the "in phase" component, hence the name I, and the sin() is the 90 degrees out of phase or "quadrature" component, hence Q.  Although if you accidentally mix it up and assign Q to the cos() and I to the sin(), it won't make a difference for most situations. 
+Nous appelons le fonction cos() la composante "en phase", noté par la lettre I (pour *in-phase* en anglais), et le sin() la composante "en quadrature", d'où Q. Toutefois, si vous mélangez accidentellement les deux et attribuez Q au cos() et I au sin(), cela ne fera pas de différence dans la plupart des situations. 
 
-IQ sampling is more easily understood by using the transmitter's point of view, i.e., considering the task of transmitting a RF signal through the air.  What we do as the transmitter is add the sin() and cos().  Let's say x(t) is our signal to transmit:
+L'échantillonnage IQ est plus facile à comprendre en se plaçant du point de vue de l'émetteur, c'est-à-dire en considérant la tâche consistant à transmettre un signal RF dans l'air. Ce que nous faisons, en tant qu'émetteur, c'est additionner la composante sin() et la composante cos(). Disons que x(t) est notre signal à transmettre:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
 
-What happens when we add a sine and cosine?  Or rather, what happens when we add two sinusoids that are 90 degrees out of phase?  In the video below, there is a slider for adjusting I and another for adjusting Q.  What is plotted are the cosine, sine, and then the sum of the two.
+Que se passe-t-il lorsque l'on additionne un sinus et un cosinus? Ou plutôt, que se passe-t-il lorsque nous additionnons deux sinusoïdes déphasées de 90 degrés? Dans l'animation ci-dessous, il y a un curseur pour ajuster I et un autre pour ajuster Q. Ce qui est tracé est le cosinus, le sinus, et ensuite la somme des deux.
 
 .. image:: ../_images/IQ3.gif
    :scale: 100% 
    :align: center 
 
-(The code used for this pyqtgraph-based Python app can be found `here <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
+(Le code utilisé pour cette application Python pyqtgraph se trouve à l'adresse suivante `ici <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
 
-The important take-aways are that when we add the cos() and sin(), we get another pure sine wave with a different phase and amplitude.   Also, the phase shifts as we slowly remove or add one of the two parts.  The amplitude also changes.  This is all a result of the trig identity: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, which we will come back to in a bit.  The "utility" of this behavior is that we can control the phase and amplitude of a resulting sine wave by adjusting the amplitudes I and Q (we don't have to adjust the phase of the cosine or sine).  For example, we could adjust I and Q in a way that keeps the amplitude constant and makes the phase whatever we want.  As a transmitter this ability is extremely useful because we know that we need to transmit a sinusoidal signal in order for it to fly through the air as an electromagnetic wave.  And it's much easier to adjust two amplitudes and perform an addition operation compared to adjusting an amplitude and a phase.  The result is that our transmitter will look something like this:
+Ce qu'il faut retenir, c'est que lorsque nous additionnons le cos() et le sin(), nous obtenons une autre onde sinusoïdale pure avec une phase et une amplitude différentes. De plus, la phase se décale lorsque nous retirons ou ajoutons lentement l'une des deux parties. L'amplitude change également. Tout ceci est le résultat de l'identité trigonométrique : :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, sur laquelle nous reviendrons plus tard. "L'utilité" de ce résultat est que nous pouvons contrôler la phase et l'amplitude d'une onde sinusoïdale résultante en ajustant les amplitudes I et Q (nous n'avons pas besoin d'ajuster la phase du cosinus ou du sinus). Par exemple, nous pouvons ajuster I et Q de manière à ce que l'amplitude reste constante et que la phase soit celle que nous voulons. En tant qu'émetteur, cette approche est extrêmement utile car nous savons que nous devons transmettre un signal sinusoïdal pour qu'il se propage dans l'air comme une onde électromagnétique. Et il est beaucoup plus facile de régler deux amplitudes et d'effectuer une opération d'addition que de régler une amplitude et une phase. Le résultat est que notre émetteur ressemblera à quelque chose comme ceci:
 
 .. image:: ../_images/IQ_diagram.png
    :scale: 80% 
    :align: center 
 
-We only need to generate one sine wave and shift it by 90 degrees to get the Q portion.
+Il nous suffit de générer une onde sinusoïdale et de la décaler de 90 degrés pour obtenir la partie Q.
 
 *************************
-Complex Numbers
+Les nombres complexes
 *************************
 
-Ultimately, the IQ convention is an alternative way to represent magnitude and phase, which leads us to complex numbers and the ability to represent them on a complex plane.  You may have seen complex numbers before in other classes. Take the complex number 0.7-0.4j as an example:
+En fin de compte, la convention IQ est un moyen alternatif de représenter la magnitude et la phase, ce qui nous amène aux nombres complexes et à la possibilité de les représenter sur un plan complexe. Vous avez peut-être déjà vu des nombres complexes dans d'autres cours. Prenons par exemple le nombre complexe 0.7-0.4j:
 
 .. image:: ../_images/complex_plane_1.png
    :scale: 70% 
    :align: center
 
-A complex number is really just two numbers together, a real and an imaginary portion. A complex number also has a magnitude and phase, which makes more sense if you think about it as a vector instead of a point. Magnitude is the length of the line between the origin and the point (i.e., length of the vector), while phase is the angle between the vector and 0 degrees, which we define as the positive real axis:
+Un nombre complexe n'est en fait que deux nombres réunis, une partie réelle et une partie imaginaire. Un nombre complexe a également une magnitude et une phase, ce qui est plus logique si vous le considérez comme un vecteur plutôt que comme un point. La magnitude est la longueur de la ligne entre l'origine et le point (c'est-à-dire la longueur du vecteur), tandis que la phase est l'angle entre ce vecteur et la ligne à 0 degré, que nous définissons comme l'axe réel positif:
 
 .. image:: ../_images/complex_plane_2.png
    :scale: 70% 
    :align: center
 
-This representation of a sinusoid is known as a "phasor diagram".  It's simply plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
+Cette représentation d'une sinusoïde est connue sous le nom de "diagramme de phase". Il s'agit simplement de tracer des nombres complexes et de les traiter comme des vecteurs. Maintenant, quelles sont la magnitude et la phase de notre exemple de nombre complexe 0.7-0.4j?  Pour un nombre complexe donné où :math:`a` est la partie réelle et :math:`b` la partie imaginaire :
 
 .. math::
   \mathrm{magnitude} = \sqrt{a^2 + b^2} = 0.806
   
   \mathrm{phase} = \tan^{-1} \left( \frac{b}{a} \right) = -29.7^{\circ} = -0.519 \quad \mathrm{radians} 
   
-In Python you can use np.abs(x) and np.angle(x) for the magnitude and phase. The input can be a complex number or an array of complex numbers, and the output will be a **real** number(s) (of the data type float).
+En Python, vous pouvez utiliser np.abs(x) et np.angle(x) pour la magnitude et la phase. L'entrée peut être un nombre complexe ou un tableau de nombres complexes, et la sortie sera un ou plusieurs nombres **réels** (du type float).
 
-You may have figured out by now how this vector or phasor diagram relates to IQ convention: I is real and Q is imaginary.  From this point on, when we draw the complex plane, we will label it with I and Q instead of real and imaginary.  They are still complex numbers!
+Vous avez peut-être déjà compris comment ce diagramme vectoriel est lié à la convention IQ: I est réel et Q est imaginaire. À partir de maintenant, lorsque nous dessinerons le plan complexe, nous l'étiquetterons avec I et Q au lieu de réel et imaginaire. Mais il s'agira toujours des mmême nombres complexes!
 
 .. image:: ../_images/complex_plane_3.png
    :scale: 70% 
    :align: center
 
-Now let's say we want to transmit our example point 0.7-0.4j.  We will be transmitting:
+Disons maintenant que nous voulons transmettre notre point d'exemple 0.7-0.4j. Nous allons transmettre:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
   
   \quad \quad \quad = 0.7 \cos(2\pi ft) - 0.4 \sin(2\pi ft)
 
-We can use trig identity :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)` where :math:`A` is our magnitude found with :math:`\sqrt{I^2 + Q^2}` and :math:`\phi` is our phase, equal to :math:`\tan^{-1} \left( Q/I \right)`.  The above equation now becomes:
+Nous pouvons utiliser l'identité trigonométrique :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)` où :math:`A` est notre magnitude trouvée avec :math:`\sqrt{I^2 + Q^2}` et :math:`\phi` est notre phase, égale à :math:`\tan^{-1} \left( Q/I \right)`. L'équation ci-dessus devient alors:
 
 .. math::
   x(t) = 0.806 \cos(2\pi ft + 0.519)
 
-Even though we started with a complex number, what we are transmitting is real, which is good because you can't actually transmit something imaginary with electromagnetic waves.  We just use imaginary/complex numbers to represent *what* we are transmitting.  We will talk about the :math:`f` shortly.
+Même si nous avons commencé avec un nombre complexe, ce que nous transmettons est réel, ce qui est une bonne chose car vous ne pouvez pas réellement transmettre quelque chose d'imaginaire avec des ondes électromagnétiques. Nous utilisons simplement des nombres imaginaires/complexes pour représenter *ce que* nous transmettons. Nous parlerons bientôt de la fonction :math:`f`.
 
 *************************
-Complex Numbers in FFTs
+Les nombres complexes dans les FFT
 *************************
 
-The above complex numbers were assumed to be time domain samples, but you will also run into complex numbers when you take an FFT.  When we covered Fourier series and FFTs last chapter, we had not dived into complex numbers yet.  When you take the FFT of a series of samples, it finds the frequency domain representation.  We talked about how the FFT figures out which frequencies exist in that set of samples (the magnitude of the FFT indicates the strength of each frequency).  But what the FFT also does is figure out the delay (time shift) needed to apply to each of those frequencies, so that the set of sinusoids can be added up to reconstruct the time-domain signal.  That delay is simply the phase of the FFT.  The output of an FFT is an array of complex numbers, and each complex number gives you the magnitude and phase, and the index of that number gives you the frequency.  If you generate sinusoids at those frequencies/magnitudes/phases and sum them together, you'll get your original time domain signal (or something very close to it, and that's where the Nyquist sampling theorem comes into play).
+Les nombres complexes ci-dessus ont été supposés être des échantillons du domaine temporel, mais vous rencontrerez également des nombres complexes lorsque vous effectuerez une FFT. Lorsque nous avons abordé les séries de Fourier et les FFT au chapitre précédent, nous n'avions pas encore plongé dans les nombres complexes. Lorsque vous effectuez la FFT d'une série d'échantillons, vous obtenez la représentation dans le domaine fréquentiel. Nous avons parlé de la façon dont la FFT détermine quelles fréquences existent dans cet ensemble d'échantillons (l'amplitude de la FFT indique la "puissance" de chaque fréquence). Mais la FFT détermine également le retard (décalage temporel) nécessaire à appliquer à chacune de ces fréquences, afin que l'ensemble des sinusoïdes puisse être additionné pour reconstruire le signal dans le domaine temporel. Ce retard est simplement la phase de la FFT. La sortie d'une FFT est un tableau de nombres complexes, et chaque nombre complexe vous donne la magnitude et la phase, et l'indice de ce nombre vous donne la fréquence. Si vous générez des sinusoïdes à ces fréquences/amplitudes/phases et que vous les additionnez, vous obtiendrez votre signal original dans le domaine temporel (ou quelque chose de très proche, et c'est là que le théorème d'échantillonnage de Nyquist entre en jeu).
 
 *************************
-Receiver Side
+Côté récepteur
 *************************
 
-Now let's take the perspective of a radio receiver that is trying to receive a signal (e.g., an FM radio signal).  Using IQ sampling, the diagram now looks like:
+Prenons maintenant la perspective d'un récepteur radio qui essaie de recevoir un signal (par exemple, un signal radio FM). En utilisant l'échantillonnage IQ, le diagramme se présente maintenant comme suit:
 
 .. image:: ../_images/IQ_diagram_rx.png
    :scale: 70% 
    :align: center
 
-What comes in is a real signal received by our antenna, and those are transformed into IQ values.  What we do is sample the I and Q branches individually, using two ADCs, and then we combine the pairs and store them as complex numbers.  In other words, at each time step, you will sample one I value and one Q value and combine them in the form :math:`I + jQ` (i.e., one complex number per IQ sample).  There will always be a "sample rate", the rate at which sampling is performed.  Someone might say, "I have an SDR running at 2 MHz sample rate." What they mean is that the SDR receives two million IQ samples per second.
+Ce qui entre est un signal réel reçu par notre antenne, et ceux-ci sont transformés en valeurs IQ.  Ce que nous faisons, c'est échantillonner les branches I et Q individuellement, en utilisant deux ADC, puis nous combinons les paires et les stockons sous forme de nombres complexes. En d'autres termes, à chaque pas de temps, on échantillonne une valeur I et une valeur Q et on les combine sous la forme :math:`I + jQ` (c'est-à-dire un nombre complexe par échantillon IQ).  Il y aura toujours une "fréquence d'échantillonnage", c'est-à-dire la vitesse à laquelle l'échantillonnage est effectué. Quelqu'un pourrait dire : "J'ai une radio logicielle qui fonctionne à une fréquence d'échantillonnage de 2 MHz". Ce qu'il veut dire, c'est que la radio logicielle génère deux millions d'échantillons IQ par seconde.
 
-If someone gives you a bunch of IQ samples, it will look like a 1D array/vector of complex numbers.  This point, complex or not, is what this entire chapter has been building to, and we finally made it.
+Si quelqu'un vous donne un fichier d'échantillons QI, cela ressemblera à un tableau/vecteur 1D de nombres complexes. Ce point, complexe ou non, est le but de départ de tout ce chapitre, et nous l'avons finalement atteint.
 
-Throughout this textbook you will become **very** familiar with how IQ samples work, how to receive and transmit them with an SDR, how to process them in Python, and how to save them to a file for later analysis.
+Tout au long de ce manuel, vous deviendrez **très** familier avec le fonctionnement des échantillons IQ, comment les recevoir et les transmettre avec un SDR, comment les traiter dans Python et comment les enregistrer dans un fichier pour une analyse ultérieure.
 
-One last important note: the figure above shows what's happening **inside** of the SDR. We don't actually have to generate a sine wave, shift by 90, multiply or add--the SDR does that for us.  We tell the SDR what frequency we want to sample at, or what frequency we want to transmit our samples at.  On the receiver side, the SDR will provide us the IQ samples. For the transmitting side, we have to provide the SDR the IQ samples.  In terms of data type, they will either be complex ints or floats.
+Une dernière remarque importante: la figure ci-dessus montre ce qui se passe **à l'intérieur** de la SDR. Nous n'avons pas besoin de générer une onde sinusoïdale, de la décaler de 90, de la multiplier ou de l'additionner - la SDR le fait pour nous. Nous indiquons à la SDR la fréquence à laquelle nous voulons échantillonner, ou la fréquence à laquelle nous voulons transmettre nos échantillons. Du côté du récepteur, le SDR nous fournira les échantillons IQ. Du côté de l'émetteur, nous devons fournir au SDR les échantillons IQ. En termes de type de données, il s'agira soit d'entiers complexes, soit de flottants.
    
    
 **************************
-Carrier and Downconversion
+Porteurse et Descente en Fréquence
 **************************
 
-Until this point we have not discussed frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air (the electromagnetic wave's frequency).  We refer to it as the "carrier" because it carries our information on a certain frequency.  When we tune to a frequency with our SDR and receive samples, our information is stored in I and Q; this carrier does not show up in I and Q, assuming we tuned to the carrier.
+Jusqu'à présent, nous n'avons pas parlé de la fréquence, mais nous avons vu qu'il y avait un :math:`f` dans les équations impliquant le cos() et le sin(). Cette fréquence est la fréquence de l'onde sinusoïdale que nous envoyons réellement dans l'air (la fréquence de l'onde électromagnétique). Nous l'appelons la "porteuse" car elle transporte nos informations sur une certaine fréquence. Lorsque nous nous accordons sur une fréquence avec notre SDR et recevons des échantillons, nos informations sont stockées dans I et Q; cette porteuse n'apparaît pas dans I et Q, en supposant que nous nous sommes réglés sur la porteuse.
 
 .. image:: ../_images/carrier.png
    :scale: 70% 
    :align: center
    
-For reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc., usually use a frequency (i.e., a carrier) between 100 MHz and 6 GHz.  These frequencies travel really well through the air, but they don't require super long antennas or a ton of power to transmit or receive.  Your microwave cooks food with electromagnetic waves at 2.4 GHz. If there is a leak in the door then your microwave will jam WiFi signals and possibly also burn your skin.  Another form of electromagnetic waves is light. Visible light has a frequency of around 500 THz.  It's so high that we don't use traditional antennas to transmit light. We use  methods like LEDs that are semiconductor devices. They create light when electrons jump in between the atomic orbits of the semiconductor material, and the color depends on how far they jump.  Technically, radio frequency (RF) is defined as the range from roughly 20 kHz to 300 GHz. These are the frequencies at which energy from an oscillating electric current can radiate off a conductor (an antenna) and travel through space.  The 100 MHz to 6 GHz range are the more useful frequencies, at least for most modern applications.  Frequencies above 6 GHz have been used for radar and satellite communications for decades, and are now being used in 5G "mmWave" (24 - 29 GHz) to supplement the lower bands and increase speeds. 
+Pour référence, les signaux radio tels que la radio FM, le WiFi, le Bluetooth, le LTE, le GPS, etc., utilisent généralement une fréquence (c'est-à-dire une porteuse) comprise entre 100 MHz et 6 GHz. Ces fréquences se déplacent vraiment bien dans l'air, mais elles ne nécessitent pas de super longues antennes ou une grande puissance pour transmettre ou recevoir. Votre micro-ondes cuit les aliments avec des ondes électromagnétiques à 2.4 GHz. S'il y a une fuite dans la porte, votre micro-ondes brouillera les signaux WiFi et pourra peut-être aussi vous brûler la peau. La lumière est une autre forme d'ondes électromagnétiques. La lumière visible a une fréquence d'environ 500 THz. Cette fréquence est si élevée que nous n'utilisons pas d'antennes traditionnelles pour transmettre la lumière. Nous utilisons des méthodes comme les LED, qui sont des dispositifs semi-conducteurs. Elles créent de la lumière lorsque les électrons sautent entre les orbites atomiques du matériau semi-conducteur, et la couleur dépend de la distance à laquelle ils sautent. Techniquement, la radiofréquence (RF) est définie comme la plage comprise entre 20 kHz et 300 GHz environ. Il s'agit des fréquences auxquelles l'énergie d'un courant électrique oscillant peut rayonner à partir d'un conducteur (une antenne) et voyager dans l'espace. Les fréquences comprises entre 100 MHz et 6 GHz sont les plus utiles, du moins pour la plupart des applications modernes. Les fréquences supérieures à 6 GHz ont été utilisées pour les radars et les communications par satellite pendant des décennies, et sont maintenant utilisées dans la 5G "mmWave" (24 - 29 GHz) pour compléter les bandes inférieures et augmenter les débits. 
 
-When we change our IQ values quickly and transmit our carrier, it's called "modulating" the carrier (with data or whatever we want).  When we change I and Q, we change the phase and amplitude of the carrier.  Another option is to change the frequency of the carrier, i.e., shift it slightly up or down, which is what FM radio does. 
+Lorsque nous changeons rapidement nos valeurs IQ et que nous transmettons notre porteuse, cela s'appelle "moduler" la porteuse (avec des données ou ce que nous voulons).  Lorsque nous changeons I et Q, nous modifions la phase et l'amplitude de la porteuse.  Une autre option consiste à modifier la fréquence de la porteuse, c'est-à-dire à la décaler légèrement vers le haut ou vers le bas, ce que fait la radio FM.
 
-As a simple example, let's say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  We go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`, meaning our carrier shifts phase by 90 degrees when we switch from one sample to another. 
+Pour prendre un exemple simple, disons que nous transmettons l'échantillon IQ 1+0j, puis que nous passons à la transmission de 0+1j.  Nous passons de :math:`\cos(2\pi ft)` à :math:`\sin(2\pi ft)`, ce qui signifie que notre porteuse se déphase de 90 degrés lorsque nous passons d'un échantillon à un autre. 
 
-Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin() then recording I and Q, what if we fed the signal from the antenna into a single ADC, like in the direct sampling architecture we just discussed?  Say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  That's extremely fast! An ADC that samples that fast costs thousands of dollars.  Instead, we "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz. This downconversion happens before we sample.  We go from:
+Revenons maintenant à l'échantillonnage pour une seconde.  Au lieu de recevoir des échantillons en multipliant ce qui provient de l'antenne par un cos() et un sin() puis en enregistrant I et Q, que se passerait-il si nous envoyions le signal de l'antenne dans un seul CAN, comme dans l'architecture d'échantillonnage direct dont nous venons de parler?  Supposons que la fréquence porteuse soit de 2.4 GHz, comme le WiFi ou le Bluetooth. Cela signifie que nous devrions échantillonner à 4.8 GHz, comme nous l'avons appris. C'est extrêmement rapide! Un CAN qui échantillonne aussi rapidement coûte des milliers de dollars. Au lieu de cela, nous "descendant en fréquence" (*downconversion* en anglais) le signal pour que le signal que nous voulons échantillonner soit centré sur le courant continu ou 0 Hz. Cette descente en fréquence a lieu avant l'échantillonnage. Nous passons de:
 
 .. math::
   I \cos(2\pi ft)
   
   Q \sin(2\pi ft)
   
-to just I and Q.
+à juste I et Q.
 
-Let's visualize downconversion in the frequency domain:
-
+Visualisons la conversion de fréquence dans le domaine des fréquences:
 .. image:: ../_images/downconversion.png
    :scale: 60% 
    :align: center
 
-When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we can sample at a *much* lower rate. Both the B2X0 USRPs and PlutoSDR contain an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
+Lorsque nous sommes centrés autour de 0 Hz, la fréquence maximale n'est plus de 2,4 GHz mais est basée sur les caractéristiques du signal car nous avons supprimé la porteuse. La plupart des signaux ont une largeur de bande d'environ 100 kHz à 40 MHz, de sorte que, grâce à la conversion de fréquence, nous pouvons échantillonner à un taux *beaucoup* plus faible. Les USRP B2X0 et PlutoSDR contiennent un circuit intégré RF (RFIC) qui peut échantillonner jusqu'à 56 MHz, ce qui est suffisamment élevé pour la plupart des signaux que nous rencontrerons dans la vie de tous les jours.
 
-Just to reiterate, the downconversion process is performed by our SDR; as a user of the SDR we don't have to do anything other than tell it which frequency to tune to.  Downconversion (and upconversion) is done by a component called a mixer, usually represented in diagrams as a multiplication symbol inside a circle.  The mixer takes in a signal, outputs the down/up-converted signal, and has a third port which is used to feed in an oscillator.  The frequency of the oscillator determines the frequency shift applied to the signal, and the mixer is essentially just a multiplication function (recall that multiplying by a sinusoid causes a frequency shift).
+Pour rappel, le processus de conversion de fréquence est effectué par notre SDR; en tant qu'utilisateur de la SDR, nous n'avons rien à faire autre que de lui indiquer sur quelle fréquence s'accorder. La conversion de fréquence est effectuée par un composant appelé mélangeur, généralement représenté dans les diagrammes par un symbole de multiplication à l'intérieur d'un cercle.  Le mélangeur reçoit un signal, émet le signal converti en fréquence et possède un troisième port d'entrée pour un oscillateur. La fréquence de l'oscillateur détermine le décalage de fréquence appliqué au signal, et le mélangeur est essentiellement une fonction de multiplication (rappelons que la multiplication par une sinusoïde entraîne justement un décalage de fréquence).
 
-Lastly, you may be curious how fast signals travel through the air.  Recall from high school physics class that radio waves are just electromagnetic waves at low frequencies (between roughly 3 kHz to 80 GHz).  Visible light is also electromagnetic waves, at much higher frequencies (400 THz to 700 THz).  All electromagnetic waves travel at the speed of light, which is about 3e8 m/s, at least when traveling through air or a vacuum.  Now because they always travel at the same speed, the distance the wave travels in one full oscillation (one full cycle of the sine wave) depends on its frequency.  We call this distance the wavelength, denoted as :math:`\lambda`.  You have probably seen this relationship before:
+Enfin, vous êtes peut-être curieux de savoir à quelle vitesse les signaux se déplacent dans l'air.  Rappelez-vous que les ondes radio ne sont que des ondes électromagnétiques à basse fréquence (entre 3 kHz et 80 GHz environ). La lumière visible est également constituée d'ondes électromagnétiques, à des fréquences beaucoup plus élevées (400 THz à 700 THz). Toutes les ondes électromagnétiques se déplacent à la vitesse de la lumière, qui est d'environ 3e8 m/s, du moins lorsqu'elles se déplacent dans le vide. Comme elles se déplacent toujours à la même vitesse, la distance parcourue par l'onde en une oscillation complète (une période complète de l'onde sinusoïdale) dépend de sa fréquence.  Nous appelons cette distance la longueur d'onde, désignée par :math:`\lambda`.  Vous avez probablement déjà vu cette relation :
 
 .. math::
  f = \frac{c}{\lambda}
 
-where :math:`c` is the speed of light, typically set to 3e8 when :math:`f` is in Hz and :math:`\lambda` is in meters.  In wireless communications this relationship becomes important when we get to antennas, because to receive a signal at a certain carrier frequency, :math:`f`, you need an antenna that matches its wavelength, :math:`\lambda`, usually the antenna is :math:`\lambda/2` or :math:`\lambda/4` in length.  However, regardless of the frequency/wavelength, information carried in that signal will always travel at the speed of light, from the transmitter to the receiver.  When calculating this delay through the air, a rule of thumb is that light travels approximately one foot in one nanosecond.  Another rule of thumb: a signal traveling to a satellite in geostationary orbit and back will take roughly 0.25 seconds for the entire trip.
+où :math:`c` est la vitesse de la lumière, généralement fixée à 3e8 lorsque :math:`f` est en Hz et :math:``lambda` en mètre.  Dans le domaine des communications sans fil, cette relation devient importante lorsqu'il s'agit d'antennes, car pour recevoir un signal à une certaine fréquence porteuse, :math:`f`, vous avez besoin d'une antenne qui correspond à sa longueur d'onde, :math:`\lambda`, généralement l'antenne a une longueur de :math:`\lambda/2` ou :math:`\lambda/4`.  Cependant, quelle que soit la fréquence/longueur d'onde, l'information transportée par ce signal se déplace toujours à la vitesse de la lumière, de l'émetteur au récepteur.  Pour calculer ce délai dans l'air, une règle empirique est que la lumière parcourt environ un 30 cm en une nanoseconde. Autre règle empirique : un signal se rendant à un satellite en orbite géostationnaire et en revenant prendra environ 0.25 seconde pour l'ensemble du trajet.
 
 **************************
-Receiver Architectures
+Architectures des récepteurs
 **************************
 
-The figure in the "Receiver Side" section demonstrates how the input signal is downconverted and split into I and Q.  This arrangement is called "direct conversion", or "zero IF", because the RF frequencies are being directly converted down to baseband.  Another option is to not downconvert at all and sample so fast to capture everything from 0 Hz to 1/2 the sample rate.  This strategy is called "direct sampling" or "direct RF", and it requires an extremely expensive ADC chip.  A third architecture, one that is popular because it's how old radios worked, is known as "superheterodyne". It involves downconversion but not all the way to 0 Hz. It places the signal of interest at an intermediate frequency, known as "IF".  A low-noise amplifier (LNA) is simply an amplifier designed for extremely low power signals at the input.  Here are the block diagrams of these three architectures, note that variations and hybrids of these architectures also exist:
+La figure de la section "Côté récepteur" montre comment le signal d'entrée est converti et divisé en I et Q. Cet arrangement est appelé "conversion directe", car les fréquences RF sont directement converties en bande de base. Une autre option consiste à ne pas effectuer de conversion de fréquence du tout et à échantillonner très rapidement pour tout capturer de 0 Hz à la moitié de la fréquence d'échantillonnage. Cette stratégie est appelée "échantillonnage direct", et elle nécessite une puce CAN extrêmement coûteuse.  Une troisième architecture, populaire car c'est ainsi que fonctionnaient les anciennes radios, est connue sous le nom de "superhétérodyne". Elle implique une conversion vers le bas, mais pas jusqu'à 0 Hz. Elle place le signal d'intérêt à une fréquence intermédiaire, appelée "FI".  Un amplificateur à faible bruit (LNA pour *Low Noise Amplifier* en anglais) est simplement un amplificateur conçu pour des signaux de très faible puissance à l'entrée.  Voici les schémas fonctionnels de ces trois architectures, notez que des variations et des hybrides de ces architectures existent également :
 
 .. image:: ../_images/receiver_arch_diagram.svg
    :align: center
 
 ***********************************
-Baseband and Bandpass Signals
+Signaux en Bande de Base et Passe-Bande
 ***********************************
-We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "bandpass" refers to when a signal exists at some RF frequency nowhere near 0 Hz, that has been shifted up for the purpose of wireless transmission.  There is no notion of a "baseband transmission", because you can't transmit something imaginary.  A signal at baseband may be perfectly centered at 0 Hz like the right-hand portion of the figure in the previous section. It might be *near* 0 Hz, like the two signals shown below. Those two signals are still considered baseband.   Also shown is an example bandpass signal, centered at a very high frequency denoted :math:`f_c`.
+On dit d'un signal centré autour de 0 Hz qu'il est en "bande de base".  À l'inverse, on parle de "bande passante" lorsqu'un signal existe à une fréquence RF qui n'est pas proche de 0 Hz, mais qui a été décalée vers le haut dans le but d'une transmission sans fil.  Il n'y a pas de notion de "transmission en bande de base", car on ne peut pas transmettre quelque chose d'imaginaire.  Un signal en bande de base peut être parfaitement centré à 0 Hz, comme la partie droite de la figure de la section précédente. Il peut être *proche* de 0 Hz, comme les deux signaux illustrés ci-dessous. Ces deux signaux sont toujours considérés comme étant en bande de base. Vous trouverez également un exemple de signal passe-bande, centré sur une fréquence très élevée notée :math:`f_c`.
 
 .. image:: ../_images/baseband_bandpass.png
    :scale: 50% 
    :align: center
 
-You may also hear the term intermediate frequency (abbreviated as IF); for now, think of IF as an intermediate conversion step within a radio between baseband and bandpass/RF.
+Vous pouvez également entendre le terme de fréquence intermédiaire (abrégé en FI); pour l'instant, considérez la FI comme une étape de conversion intermédiaire dans une radio entre la bande de base et la bande passante RF.
 
-We tend to create, record, or analyze signals at baseband because we can work at a lower sample rate (for reasons discussed in the previous subsection).  It is important to note that baseband signals are often complex signals, while signals at bandpass (e.g., signals we actually transmit over RF) are real.  Think about it: because the signal fed through an antenna must be real, you cannot directly transmit a complex/imaginary signal.  You will know a signal is definitely a complex signal if the negative frequency and positive frequency portions of the signal are not exactly the same. Complex numbers are how we represent negative frequencies after all.  In reality there are no negative frequencies; it's just the portion of the signal below the carrier frequency.
+Nous avons tendance à créer, enregistrer ou analyser des signaux en bande de base parce que nous pouvons travailler à une fréquence d'échantillonnage inférieure (pour les raisons évoquées dans la sous-section précédente).  Il est important de noter que les signaux en bande de base sont souvent des signaux complexes, tandis que les signaux en bande passante (par exemple, les signaux que nous transmettons réellement par RF) sont réels.  Comme le signal transmis par une antenne doit être réel, vous ne pouvez pas transmettre directement un signal complexe/imaginaire.  Vous saurez qu'un signal est définitivement un signal complexe si les parties de fréquence négative et de fréquence positive du signal ne sont pas exactement les mêmes. Après tout, les nombres complexes sont la façon dont nous représentons les fréquences négatives. En réalité, il n'y a pas de fréquences négatives; il s'agit simplement de la partie du signal située en dessous de la fréquence porteuse.
 
-In the earlier section where we played around with the complex point 0.7 - 0.4j, that was essentially one sample in a baseband signal.  Most of the time you see complex samples (IQ samples), you are at baseband.  Signals are rarely represented or stored digitally at RF, because of the amount of data it would take, and the fact we are usually only interested in a small portion of the RF spectrum.  
+Dans la section précédente où nous avons joué avec le point complexe 0.7-0.4j, il s'agissait essentiellement d'un échantillon dans un signal en bande de base.  La plupart du temps, lorsque vous voyez des échantillons complexes (échantillons IQ), vous êtes en bande de base.  Les signaux sont rarement représentés ou stockés numériquement en RF, en raison de la quantité de données que cela prendrait, et du fait que nous ne sommes généralement intéressés que par une petite partie du spectre RF. 
 
 ***************************
-DC Spike and Offset Tuning
+Le Pic DC et le décalage DC
 ***************************
 
-Once you start working with SDRs, you will often find a large spike in the center of the FFT.
-It is called a "DC offset" or "DC spike" or sometimes "LO leakage", where LO stands for local oscillator.
+Lorsque vous commencez à travailler avec les SDR, vous trouvez souvent un pic important au centre de la FFT. On l'appelle "offset DC" ou "pic DC" ou parfois "fuite LO", où LO signifie *Local oscilator* pour *oscillateur local* en français.
 
-Here's an example of a DC spike:
+Voici un exemple d'un pic de courant continu:
 
 .. image:: ../_images/dc_spike.png
    :scale: 50% 
    :align: center
    
-Because the SDR tunes to a center frequency, the 0 Hz portion of the FFT corresponds to the center frequency.
-That being said, a DC spike doesn't necessarily mean there is energy at the center frequency.
-If there is only a DC spike, and the rest of the FFT looks like noise, there is most likely not actually a signal present where it is showing you one.
+Because the SDR tunes to a center frequency, the 0 Hz portion of the FFT corresponds to the center frequency.  Ceci étant dit, un pic de courant continu ne signifie pas nécessairement qu'il y a de l'énergie à la fréquence centrale. S'il n'y a qu'un pic de courant continu et que le reste de la FFT ressemble à du bruit, il est fort probable qu'il n'y a pas de signal présent à l'endroit où elle vous le montre.
 
-A DC offset is a common artifact in direct conversion receivers, which is the architecture used for SDRs like the PlutoSDR, RTL-SDR, LimeSDR, and many Ettus USRPs. In direct conversion receivers, an oscillator, the LO, downconverts the signal from its actual frequency to baseband. As a result, leakage from this LO appears in the center of the observed bandwidth. LO leakage is additional energy created through the combination of frequencies. Removing this extra noise is difficult because it is close to the desired output signal. Many RF integrated circuits (RFICs) have built-in automatic DC offset removal, but it typically requires a signal to be present to work. That is why the DC spike will be very apparent when no signals are present.
+Un décalage DC est un artefact commun dans les récepteurs à conversion directe, qui est l'architecture utilisée pour les SDRs comme le PlutoSDR, RTL-SDR, LimeSDR, et de nombreux USRPs Ettus. Dans les récepteurs à conversion directe, un oscillateur local convertit le signal de sa fréquence réelle en bande de base. Par conséquent, les fuites de cet oscillateur apparaissent au centre de la bande passante observée. La fuite du LO est une énergie supplémentaire créée à cause de la combinaison des fréquences. L'élimination de ce bruit supplémentaire est difficile car il est proche du signal de sortie souhaité. De nombreux circuits intégrés RF (RFIC) intègrent une fonction automatique d'élimination du décalage continu, mais elle nécessite généralement la présence d'un signal pour fonctionner. C'est pourquoi le pic de courant continu est très apparent lorsqu'aucun signal n'est présent.
 
-A quick way to handle the DC offset is to oversample the signal and off-tune it.
-As an example, let's say we want to view 5 MHz of spectrum at 100 MHz.
-Instead what we can do is sample at 20 MHz at a center frequency of 95 MHz.
+Un moyen rapide de gérer le décalage en courant continu consiste à suréchantillonner le signal et à le désaccorder (ou *detune* en anglais). Par exemple, disons que nous voulons visualiser 5 MHz de spectre à 100 MHz. Ce que nous pouvons faire, c'est échantillonner à 20 MHz à une fréquence centrale de 95 MHz.
 
 .. image:: ../_images/offtuning.png
    :scale: 40 %
    :align: center
    
-The blue box above shows what is actually sampled by the SDR, and the green box displays the portion of the spectrum we want.  Our LO will be set to 95 MHz because that is the frequency to which we ask the SDR to tune. Since 95 MHz is outside of the green box, we won't get any DC spike.
+La boîte bleue ci-dessus montre ce qui est effectivement échantillonné par la radio SDR, et la boîte verte affiche la partie du spectre que nous voulons.  Notre LO sera réglé sur 95 MHz car c'est la fréquence sur laquelle nous demandons au SDR de s'accorder. Comme 95 MHz est en dehors de la boîte verte, nous n'aurons pas de pic de courant continu.
 
-There is one problem: if we want our signal to be centered at 100 MHz and only contain 5 MHz, we will have to perform a frequency shift, filter, and downsample the signal ourselves (something we will learn how to do later). Fortunately, this process of offtuning, a.k.a applying an LO offset, is often built into the SDRs, where they will automatically perform offtuning and then shift the frequency to your desired center frequency.  We benefit when the SDR can do it internally: we don't have to send a higher sample rate over our USB or ethernet connection, which bottleneck how high a sample rate we can use.
+Il y a un problème: si nous voulons que notre signal soit centré à 100 MHz et ne contienne que 5 MHz, nous devrons effectuer nous-mêmes un décalage de fréquence, un filtrage et un sous-échantillonnage du signal (ce que nous apprendrons à faire plus tard). Heureusement, ce processus de désaccordage, c'est-à-dire l'application d'un décalage du LO, est souvent intégré aux SDR, qui effectuent automatiquement le désaccordage et décalent ensuite la fréquence vers la fréquence centrale souhaitée. L'avantage est que la SDR peut le faire en interne: nous n'avons pas besoin d'envoyer une fréquence d'échantillonnage plus élevée sur notre connexion USB ou Ethernet, chose qui limitera la fréquence d'échantillonnage que nous pouvons utiliser.
 
-This subsection regarding DC offsets is a good example of where this textbook differs from others. Your average DSP textbook will discuss sampling, but it tends not to include implementation hurdles such as DC offsets despite their prevalence in practice.
+Cette sous-section concernant les décalages DC est un bon exemple de ce qui différencie ce manuel des autres. Votre manuel DSP moyen abordera l'échantillonnage, mais il a tendance à ne pas inclure les obstacles à la mise en œuvre tels que les décalages DC, malgré leur importance dans la pratique.
 
 
 ****************************
-Sampling Using our SDR
+Echantillonnage à l'aide de notre SDR
 ****************************
 
-For SDR-specific information about performing sampling, see one of the following chapters:
+Pour obtenir des informations spécifiques à la SDR sur l'exécution de l'échantillonnage, consultez l'un des chapitres suivants :
 
-* :ref:`pluto-chapter` Chapter
-* :ref:`usrp-chapter` Chapter
+* Chapitre :ref:`pluto-chapter`
+* Chapitre :ref:`usrp-chapter`
 
 *************************
-Calculating Average Power
+Calcul de la puissance moyenne
 *************************
 
-For a discrete complex signal, i.e., one we have sampled, we can find the average power by taking the magnitude of each sample, squaring it, and then finding the mean:
+Pour un signal complexe discret, c'est-à-dire un signal que nous avons échantillonné, nous pouvons trouver la puissance moyenne en prenant la module de chaque échantillon, en l'élevant au carré, puis en calculant la moyenne :
 
 .. math::
    P = \frac{1}{N} \sum_{n=1}^{N} |x[n]|^2
 
-Remember that the absolute value of a complex number is just the magnitude, i.e., :math:`\sqrt{I^2+Q^2}`
+Rappelez-vous que la valeur absolue d'un nombre complexe est juste le module, c'est-à-dire, :math:`\sqrt{I^2+Q^2}`
 
-In Python, calculating the average power will look like:
+En Python, le calcul de la puissance moyenne ressemblera à ceci :
 
 .. code-block:: python
 
  avg_pwr = np.mean(np.abs(x)**2)
 
-Here is a very useful trick for calculating the average power of a sampled signal.
-If your signal has roughly zero mean--which is usually the case in SDR (we will see why later)--then the signal power can be found by taking the variance of the samples. In these circumstances, you can calculate the power this way in Python:
+Voici une astuce très utile pour calculer la puissance moyenne d'un signal échantillonné.
+Si votre signal a une moyenne approximativement nulle - ce qui est généralement le cas dans la SDR (nous verrons pourquoi plus tard) - alors la puissance du signal peut être trouvée en prenant la variance des échantillons. Dans ces circonstances, vous pouvez calculer la puissance de cette façon en Python:
 
 .. code-block:: python
 
  avg_pwr = np.var(x) # (signal should have roughly zero mean)
 
-The reason why the variance of the samples calculates average power is quite simple: the equation for variance is :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2` where :math:`\mu` is the signal's mean. That equation looks familiar! If :math:`\mu` is zero then the equation to determine variance of the samples becomes equivalent to the equation for power.  You can also subtract out the mean from the samples in your window of observation, then take variance.  Just know that if the mean value is not zero, the variance and the power are not equal.
+La raison pour laquelle la variance des échantillons calcule la puissance moyenne est assez simple: l'équation de la variance est :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2` où :math:`\mu` est la moyenne du signal. Cette équation semble familière! Si :math:`\mu` est égal à zéro, l'équation permettant de déterminer la variance des échantillons devient équivalente à l'équation de la puissance.  Vous pouvez également soustraire la moyenne des échantillons de votre fenêtre d'observation, puis calculer la variance. Sachez simplement que si la valeur moyenne n'est pas nulle, la variance et la puissance ne sont pas égales.
  
 **********************************
-Calculating Power Spectral Density
+Calcul de la densité spectrale de puissance
 **********************************
 
-Last chapter we learned that we can convert a signal to the frequency domain using an FFT, and the result is called the Power Spectral Density (PSD).
-But to actually find the PSD of a batch of samples and plot it, we do more than just take an FFT.
-We must do the following six operations to calculate PSD:
+Dans le chapitre précédent, nous avons appris que nous pouvions convertir un signal dans le domaine des fréquences à l'aide d'une FFT, et que le résultat était appelé densité spectrale de puissance (DSP), qu'on notera par la suite PSD (pour *Power Spectral Density*) et eviter ainsi toute confusion avec DSP de *Digitl Signal Processing*.
 
-1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default. Let's use the first 1,024 samples as an example to create a 1,024-size FFT.  The output will be 1,024 complex floats.
-2. Take the magnitude of the FFT output, which provides us 1,024 real floats.
-3. Normalize: divide by the FFT size (:math:`N`, or 1,024 in this case).
-4. Square the resulting magnitude to get power.
-5. Convert to dB using :math:`10 \log_{10}()`; we always view PSDs in log scale.
-6. Perform an FFT shift, covered in the previous chapter, to move "0 Hz" in the center and negative frequencies to the left of center.
+Mais pour trouver réellement la PSD d'un lot d'échantillons et la tracer, nous ne nous contentons pas d'effectuer une FFT. Nous devons effectuer les six opérations suivantes:
 
-Those six steps in Python are:
+1. Prenez la FFT de nos échantillons.  Si nous avons x échantillons, la taille de la FFT sera la longueur de x par défaut. Utilisons les 1024 premiers échantillons comme exemple pour créer une FFT de taille 1024. La sortie sera de 1024 flottants complexes.
+2. Prenez le module de la sortie de la FFT, ce qui nous donne 1024 flottants réels.
+3. Normalisez: divisez par la taille de la FFT (:math:`N`, ou 1024 dans ce cas).
+4. Elevez au carré le module résultante pour obtenir la puissance.
+5. Convertissez en dB en utilisant :math:`10 \log_{10}()` ; nous considérons toujours les PSD en échelle logarithmique.
+6. Effectuez un décalage FFT, abordé dans le chapitre précédent, pour déplacer " 0 Hz " au centre et les fréquences négatives à gauche du centre.
+
+Ces six étapes en Python sont:
 
 .. code-block:: python
 
- Fs = 1e6 # lets say we sampled at 1 MHz
- # assume x contains your array of IQ samples
+ Fs = 1e6 # Disons que nous échantillonnons à 1 MHz
+ # supposez que x contient votre tableau d'échantillons de QI
  N = 1024
- x = x[0:N] # we will only take the FFT of the first 1024 samples, see text below
+ x = x[0:N] # nous ne prendrons que la FFT des 1024 premiers échantillons, voir le texte ci-dessous
  PSD = (np.abs(np.fft.fft(x))/N)**2
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
-Optionally we can apply a window, like we learned about in the :ref:`freq-domain-chapter` chapter. Windowing would occur right before the line of code with fft().
+En option, nous pouvons appliquer une fenêtre, comme nous l'avons appris dans le chapitre :ref:`freq-domain-chapter`. Le fenêtrage aura lieu juste avant la ligne de code avec fft().
 
 .. code-block:: python
 
- # add the following line after doing x = x[0:1024]
- x = x * np.hamming(len(x)) # apply a Hamming window
+ # ajouter la ligne suivante après avoir fait x = x[0:1024]
+ x = x * np.hamming(len(x)) # appliquer une fenêtre de Hamming
 
-To plot this PSD we need to know the values of the x-axis.
-As we learned last chapter, when we sample a signal, we only "see" the spectrum between -Fs/2 and Fs/2 where Fs is our sample rate.
-The resolution we achieve in the frequency domain depends on the size of our FFT, which by default is equal to the number of samples on which we perform the FFT operation.
-In this case our x-axis is 1,024 equally spaced points between -0.5 MHz and 0.5 MHz.
-If we had tuned our SDR to 2.4 GHz, our observation window would be between 2.3995 GHz and 2.4005 GHz.
-In Python, shifting the observation window will look like:
+Pour tracer cette PSD, nous devons connaître les valeurs de l'axe des abscisses.
+Comme nous l'avons appris au chapitre précédent, lorsque nous échantillonnons un signal, nous ne "voyons" que le spectre compris entre -Fs/2 et Fs/2, Fs étant notre fréquence d'échantillonnage.
+La résolution que nous obtenons dans le domaine fréquentiel dépend de la taille de notre FFT, qui par défaut est égale au nombre d'échantillons sur lesquels nous effectuons l'opération de FFT.
+Dans ce cas, notre axe des x est constitué de 1024 points équidistants entre -0,5 MHz et 0,5 MHz.
+Si nous avions réglé notre SDR sur 2.4 GHz, notre fenêtre d'observation serait comprise entre 2.3995 GHz et 2.4005 GHz.
+En Python, le déplacement de la fenêtre d'observation ressemblera à ceci :
 
 .. code-block:: python
  
- center_freq = 2.4e9 # frequency we tuned our SDR to
- f = np.arange(Fs/-2.0, Fs/2.0, Fs/N) # start, stop, step.  centered around 0 Hz
- f += center_freq # now add center frequency
+ center_freq = 2.4e9 # fréquence sur laquelle nous avons réglé notre SDR.
+ f = np.arange(Fs/-2.0, Fs/2.0, Fs/N) # début, fin, pas, centré autour de 0 Hz
+ f += center_freq # ajoutez maintenant la fréquence centrale
  plt.plot(f, PSD_shifted)
  plt.show()
  
-We should be left with a beautiful PSD!
+Nous devrions nous retrouver avec un magnifique PSD!
 
-If you want to find the PSD of millions of samples, don't do a million-point FFT because it will probably take forever. It will give you an output of a million "frequency bins", after all, which is too much to show in a plot.
-Instead I suggest doing multiple smaller PSDs and averaging them together or displaying them using a spectrogram plot.
-Alternatively, if you know your signal is not changing fast, it's adequate to use a few thousand samples and find the PSD of those; within that time-frame of a few thousand samples you will likely capture enough of the signal to get a nice representation.
+Si vous voulez trouver la DSP de millions d'échantillons, ne faites pas une FFT d'un million de points car cela prendra probablement une éternité. Cela vous donnera une sortie d'un million de "bins de fréquence", après tout, ce qui est trop pour être affiché dans un graphique.
+Je vous suggère plutôt de faire plusieurs DSP plus petites et d'en faire la moyenne ou de les afficher à l'aide d'un spectrogramme.
+Alternativement, si vous savez que votre signal ne change pas rapidement, il est adéquat d'utiliser quelques milliers d'échantillons et de trouver la DSP de ceux-ci; dans ce laps de temps de quelques milliers d'échantillons, vous aurez probablement capturé assez du signal pour obtenir une bonne représentation.
 
-Here is a full code example that includes generating a signal (complex exponential at 50 Hz) and noise.  Note that N, the number of samples to simulate, becomes the FFT length because we take the FFT of the entire simulated signal.
+Voici un exemple de code complet qui inclut la génération d'un signal (exponentielle complexe à 50 Hz) et de bruit.  Notez que N, le nombre d'échantillons à simuler, devient la longueur de la FFT car nous prenons la FFT de tout le signal simulé.
 
 .. code-block:: python
 
  import numpy as np
  import matplotlib.pyplot as plt
  
- Fs = 300 # sample rate
- Ts = 1/Fs # sample period
- N = 2048 # number of samples to simulate
+ Fs = 300 # taux d'échantillonnage
+ Ts = 1/Fs # période d'échantillonnage
+ N = 2048 # nombre d'échantillons à simuler
  
  t = Ts*np.arange(N)
- x = np.exp(1j*2*np.pi*50*t) # simulates sinusoid at 50 Hz
+ x = np.exp(1j*2*np.pi*50*t) # simule une sinusoïde à 50 Hz
  
- n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # complex noise with unity power
+ n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # bruit complexe à puissance unitaire
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
@@ -389,21 +386,21 @@ Here is a full code example that includes generating a signal (complex exponenti
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
- f = np.arange(Fs/-2.0, Fs/2.0, Fs/N) # start, stop, step
+ f = np.arange(Fs/-2.0, Fs/2.0, Fs/N) # début, fin, pas
  
  plt.plot(f, PSD_shifted)
- plt.xlabel("Frequency [Hz]")
- plt.ylabel("Magnitude [dB]")
+ plt.xlabel("Fréquence [Hz]")
+ plt.ylabel("Amplitude [dB]")
  plt.grid(True)
  plt.show()
  
-Output:
+sortie:
 
 .. image:: ../_images/fft_example1.svg
    :align: center
 
 ******************
-Further Reading
+Aller plus loin (anglais)
 ******************
 
 #. http://rfic.eecs.berkeley.edu/~niknejad/ee242/pdf/eecs242_lect3_rxarch.pdf

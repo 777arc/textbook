@@ -1,186 +1,189 @@
 .. _noise-chapter:
 
 #############
-Noise and dB
+le Bruit et les dB
 #############
 
-In this chapter we will discuss noise, including how it is modeled and handled in a wireless communications system.  Concepts include AWGN, complex noise, and SNR/SINR.  We will also introduce decibels (dB) along the way, as it is widely within wireless comms and SDR.
+Dans ce chapitre, nous aborderons le bruit, notamment la façon dont il est modélisé et traité dans un système de communication sans fil.  Les concepts comprennent l'AWGN, le bruit complexe et le SNR/SINR.  Nous introduirons également les décibels (dB) en cours de route, car ils sont largement utilisés dans les communications sans fil et la radio logicielle.
 
 ************************
-Gaussian Noise
+Le Bruit Gaussien
 ************************
 
-Most people are aware of the concept of noise: unwanted fluctuations that can obscure our desired signal(s). Noise looks something like:
+La plupart des gens connaissent le concept de bruit: des fluctuations indésirables qui peuvent masquer le ou les signaux souhaités. Le bruit ressemble à quelque chose comme:
 
 .. image:: ../_images/noise.png
    :scale: 70 % 
    :align: center 
 
-Note how the average value is zero in the time domain graph.  If the average value wasn't zero, then we could subtract the average value, call it a bias, and we would be left with an average of zero.  Also note that the individual points in the graph are *not* "uniformly random", i.e., larger values are rarer, most of the points are closer to zero.
+Notez que la valeur moyenne est égale à zéro dans le graphique temporel.  Si la valeur moyenne n'était pas nulle, nous pourrions soustraire la valeur moyenne, l'appeler un biais, et il nous resterait une moyenne de zéro.  Notez également que les points individuels du graphique ne sont *pas* "uniformément aléatoires", c'est-à-dire que les grandes valeurs sont plus rares et la plupart des points sont plus proches de zéro.
 
-We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The **central limit theorem** tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have other distributions.  In other words, when a lot of random things happen and accumulate, the result appears approximately Gaussian, even when the individual things are not Gaussian distributed.
+
+Nous appelons ce type de bruit "bruit gaussien". C'est un bon modèle pour le type de bruit provenant de nombreuses sources naturelles, comme les vibrations thermiques des atomes dans le silicium des composants RF de notre récepteur.  Le **théorème de la limite centrale** nous dit que la somme de nombreux processus aléatoires aura tendance à avoir une distribution gaussienne, même si les processus individuels ont d'autres distributions. En d'autres termes, lorsqu'un grand nombre d'événements aléatoires se produisent et s'accumulent, le résultat semble approximativement gaussien, même si les événements individuels n'ont pas une distribution gaussienne.
+
 
 
 .. image:: ../_images/central_limit_theorem.svg
    :align: center 
    :target: ../_images/central_limit_theorem.svg
 
-The Gaussian distribution is also called the "Normal" distribution (recall a bell curve).
+La distribution gaussienne est également appelée distribution "normale" (rappelons une courbe en cloche).
 
-The Gaussian distribution has two parameters: mean and variance.  We already discussed how the mean can be considered zero because you can always remove the mean, or bias, if it's not zero.  The variance changes how "strong" the noise is.  A higher variance will result in larger numbers.  It is for this reason that variance defines the noise power.
+La distribution gaussienne possède deux paramètres: la moyenne et la variance.  Nous avons déjà discuté de la façon dont la moyenne peut être considérée comme nulle, car vous pouvez toujours supprimer la moyenne, ou le biais, si elle n'est pas nulle.  La variance modifie la "puissance" du bruit.  Une variance plus élevée se traduira par des nombres plus importants. C'est pour cette raison que la variance définit la puissance du bruit.
 
-Variance equals standard deviation squared (:math:`\sigma^2`).
+
+La variance est égale à l'écart-type au carré (:math:`sigma^2`).
 
 ************************
 Decibels (dB)
 ************************
 
-We are going to take a quick tangent to formally introduce dB.  You may have heard of dB, and if you are already familiar with it feel free to skip this section.
+Nous allons prendre une brève pause pour présenter officiellement les dB. Vous avez peut-être déjà entendu parler de dB, et si vous êtes déjà familier avec cette technologie, vous pouvez sauter cette section.
 
-Working in dB is extremely useful when we need to deal with small numbers and big numbers at the same time, or just a bunch of really big numbers. Consider how cumbersome it would be to work with numbers of the scale in Example 1 and Example 2.
+Le travail en dB est extrêmement utile lorsque nous devons traiter simultanément des petits et des grands nombres, ou simplement un ensemble de très grands nombres. Considérez combien il serait fastidieux de travailler avec des nombres de l'échelle de l'exemple 1 et de l'exemple 2.
 
-Example 1: Signal 1 is received at 2 watts and the noise floor is at 0.0000002 watts.
+Exemple 1: Le signal 1 est reçu à 2 watts et le plancher de bruit est à 0.0000002 watts.
 
-Example 2: A garbage disposal is 100,000 times louder than a quiet rural area, and a chain saw is 10,000 times louder than a garbage disposal (in terms of power of sound waves).
+Exemple 2: un broyeur d'ordures est 100 000 fois plus bruyant qu'une zone rurale calme, et une tronçonneuse est 10 000 fois plus bruyante qu'un broyeur d'ordures (en termes de puissance des ondes sonores).
 
-Without dB, meaning working in normal "linear" terms, we need to use a lot of 0's to represent the values in Examples 1 and 2. Frankly, if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor. If the scale of the y-axis went from 0 to 3 watts, for example, noise to be too small to show up in the plot. To represent these scales simultaneously, we work in a log-scale.
+Sans dB, c'est-à-dire en travaillant en termes "linéaires" normaux, nous devons utiliser beaucoup de 0 pour représenter les valeurs des exemples 1 et 2. Franchement, si nous devions représenter quelque chose comme le signal 1 en fonction du temps, nous ne verrions même pas le plancher de bruit. Si l'échelle de l'axe des y allait de 0 à 3 watts, par exemple, le bruit serait trop faible pour apparaître sur le graphique. Pour représenter ces échelles simultanément, nous travaillons avec une échelle logarithmique.
 
-To further illustrate the problems of scale we encounter in signal processing, consider the below waterfalls of three of the same signals. The left-hand side is the original signal in linear scale, and the right-hand side shows the signals converted to a logarithmic scale (dB).  Both representations use the exact same colormap, where blue is lowest value and yellow is highest.  You can barely see the signal on the left in the linear scale.
+Pour illustrer davantage les problèmes d'échelle que nous rencontrons dans le traitement du signal, considérons les cascades ci-dessous de trois des mêmes signaux. La partie gauche représente le signal original en échelle linéaire, et la partie droite montre les signaux convertis en échelle logarithmique (dB).  Les deux représentations utilisent exactement la même carte de couleurs, où le bleu est la valeur la plus basse et le jaune la plus haute.  Vous pouvez à peine voir le signal de gauche dans l'échelle linéaire.
 
 .. image:: ../_images/linear_vs_log.png
    :scale: 70 % 
    :align: center 
 
-For a given value x, we can represent x in dB using the following formula:
+Pour une valeur x donnée, on peut représenter x en dB à l'aide de la formule suivante :
 
 .. math::
     x_{dB} = 10 \log_{10} x
 
-In Python:  
+En Python:  
 
 .. code-block:: python
 
  x_db = 10.0 * np.log10(x)
 
-You may have seen that :code:`10 *` be a :code:`20 *` in other domains.  Whenever you are dealing with a power of some sort, you use 10, and you use 20 if you are dealing with a non-power value like voltage or current.  In DSP we tend to deal with a power. In fact there is not a single time in this whole textbook we need to use 20 instead of 10.
+Vous avez peut-être vu que :code:`10 *` est un :code:`20 *` dans d'autres domaines.  Chaque fois que vous avez affaire à une puissance quelconque, vous utilisez 10, et vous utilisez 20 si vous avez affaire à une valeur qui n'est pas une puissance, comme la tension ou le courant. En DSP, nous avons tendance à traiter avec une puissance. En fait, il n'y a pas une seule fois dans ce manuel où nous devons utiliser 20 au lieu de 10.
 
-We convert from dB back to linear (normal numbers) using:
+Nous convertissons les dB en linéaires (nombres normaux) en utilisant:
 
 .. math::
     x = 10^{x_{dB}/10}
 
-In Python: 
+En Python: 
 
 .. code-block:: python
 
  x = 10.0 ** (x_db / 10.0)
 
-Don't get caught up in the formula, as there is a key concept to take away here.  In DSP we deal with really big numbers and really small numbers together (e.g., the strength of a signal compared to the strength of the noise). The logarithmic scale of dB lets us have more dynamic range when we express numbers or plot them.  It also provides some conveniences like being able to add when we would normally multiply (as we will see in the :ref:`link-budgets-chapter` chapter).
+Ne vous laissez pas prendre par la formule, car il y a un concept clé à retenir ici. En DSP, nous traitons à la fois de très grands et de très petits nombres (par exemple, la force d'un signal par rapport à la force du bruit). L'échelle logarithmique en dB nous permet d'avoir une plus grande plage dynamique lorsque nous exprimons des nombres ou les traçons. Elle offre également certaines commodités, comme la possibilité d'additionner alors qu'on multiplierait normalement (comme nous le verrons dans le chapitre :ref:`link-budgets-chapter`).
 
-Some common errors people will run into when new to dB are:
+Les erreurs les plus courantes que les gens rencontrent lorsqu'ils sont novices en matière de dB sont les suivantes :
 
-1. Using natural log instead of log base 10 because most programming language's log() function is actually the natural log.
-2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to identify it somewhere.
-3. When you're in dB you add/subtract values instead of multiplying/dividing, e.g.:
+1. Utiliser le log naturel au lieu du log base 10 car la fonction log() de la plupart des langages de programmation est en fait le log naturel.
+2. Oublier d'inclure le dB lors de l'expression d'un nombre ou de l'étiquetage d'un axe.  Si nous sommes en dB, nous devons l'identifier quelque part.
+3. Lorsque vous êtes en dB, vous additionnez/soustrayez des valeurs au lieu de multiplier/diviser, par ex:
 
 .. image:: ../_images/db.png
    :scale: 80 % 
    :align: center 
 
-It is also important to understand that dB is not technically a "unit".  A value in dB alone is unit-less, like if something is 2x larger, there are no units until I tell you the units.  dB is a relative thing.  In audio when they say dB, they really mean dBA which is units for sound level (the A is the units). In wireless we typically use watts to refer to an actual power level.  Therefore, you may see dBW as a unit, which is relative to 1 W. You may also see dBmW (often written dBm for short) which is relative to 1 mW.   For example, someone can say "our transmitter is set to 3 dBW" (so 2 watts).  Sometimes we use dB by itself, meaning it is relative and there are no units. One can say, "our signal was received 20 dB above the noise floor".  Here's a little tip: 0 dBm = -30 dBW.
+Il est également important de comprendre que le dB n'est pas techniquement une "unité".  Une valeur en dB seule est sans unité, comme si quelque chose était 2x plus grand, il n'y a pas d'unités jusqu'à ce que je vous dise les unités. dB est une chose relative.  En audio, quand on dit dB, on veut dire dBA, qui est l'unité du niveau sonore (le A est l'unité). Dans le domaine du sans fil, nous utilisons généralement les watts pour faire référence à un niveau de puissance réel. Par conséquent, vous pouvez voir l'unité dBW, qui est relative à 1 W. Vous pouvez également voir l'unité dBmW (souvent écrite dBm pour faire court) qui est relative à 1 mW.  Par exemple, quelqu'un peut dire "notre émetteur est réglé sur 3 dBW" (donc 2 watts).  Parfois, nous utilisons le terme dB seul, ce qui signifie qu'il est relatif et qu'il n'y a pas d'unité. On peut dire "notre signal a été reçu 20 dB au-dessus du bruit de fond".  Voici une petite astuces: 0 dBm = -30 dBW.
 
-Here are some common conversions that I recommend memorizing:
+Voici quelques conversions courantes que je vous recommande de mémoriser :
 
-======  =====
-Linear   dB
-======  ===== 
-1x      0 dB 
-2x      3 dB 
-10x     10 dB 
-0.5x    -3 dB  
-0.1x    -10 dB
-100x    20 dB
-1000x   30 dB
-10000x  40 dB
-======  ===== 
+======   =====
+Linéaire dB
+======   ===== 
+1x       0 dB 
+2x       3 dB 
+10x      10 dB 
+0.5x     -3 dB  
+0.1x     -10 dB
+100x     20 dB
+1000x    30 dB
+10000x   40 dB
+======   ===== 
 
-Finally, to put these numbers into perspective, below are some example power levels, in dBm:
+Enfin, pour mettre ces chiffres en perspective, voici quelques exemples de niveaux de puissance, en dBm :
 
 =========== ===
-80 dBm      Tx power of rural FM radio station
-62 dBm      Max power of a ham radio transmitter
-60 dBm      Power of typical home microwave
-37 dBm      Max power of typical handheld CB or ham radio
-27 dBm      Typical cell phone transmit power
-15 dBm      Typical WiFi transmit power
-10 dBm      Bluetooth (version 4) max transmit power
--10 dBm     Max received power for WiFi
--70 dBm     Example received power for a ham signal
--100 dBm    Minimum received power for WiFi
--127 dBm    Typical received power from GPS satellites
+80 dBm      Puissance d'émission d'une station de radio FM rurale
+62 dBm      Puissance maximale d'un émetteur radio amateur
+60 dBm      Puissance d'un micro-ondes domestique typique
+37 dBm      Puissance maximale d'une radio CB ou d'une radio amateur portative typique
+27 dBm      Puissance d'émission typique d'un téléphone cellulaire
+15 dBm      Puissance d'émission typique du WiFi
+10 dBm      Puissance d'émission maximale du Bluetooth (version 4)
+-10 dBm     Puissance de réception maximale du WiFi
+-70 dBm     Exemple de puissance reçue pour un signal radio amateur
+-100 dBm    Puissance minimale reçue pour le WiFi
+-127 dBm    Puissance reçue typique des satellites GPS
 =========== ===
 
 
 *************************
-Noise in Frequency Domain
+Bruit dans le Domaine Fréquentiel
 *************************
 
-In the :ref:`freq-domain-chapter` chapter we tackled "Fourier pairs", i.e., what a certain time domain signal looks like in the frequency domain.  Well, what does Gaussian noise look like in the frequency domain?  The following graphs show some simulated noise in the time domain (top) and a plot of the Power Spectral Density (PSD) of that noise (below).  These plots were taken from GNU Radio.
+Dans le chapitre :ref:`freq-domain-chapter`, nous avons abordé la correspondance temps-fréquence de la transformée de Fourier, c'est-à-dire ce à quoi ressemble un certain signal dans le domaine temporel dans le domaine fréquentiel. Et bien, à quoi ressemble un bruit gaussien dans le domaine des fréquences?  Les graphiques suivants montrent un certain bruit simulé dans le domaine temporel (en haut) et un tracé de la densité spectrale de puissance (DSP) de ce bruit (en bas).  Ces graphiques sont tirés de GNU Radio.
 
 .. image:: ../_images/noise_freq.png
    :scale: 110 % 
    :align: center 
 
-We can see that it looks roughly the same across all frequencies and is fairly flat.  It turns out that Gaussian noise in the time domain is also Gaussian noise in the frequency domain.  So why don't the two plots above look the same?  It's because the frequency domain plot is showing the magnitude of the FFT, so there will only be positive numbers. Importantly, it's using a log scale, or showing the magnitude in dB.  Otherwise these graphs would look the same.  We can prove this to ourselves by generating some noise (in the time domain) in Python and then taking the FFT.
+Nous pouvons voir qu'il a à peu près la même apparence sur toutes les fréquences et qu'il est assez plat.  Il s'avère que le bruit gaussien dans le domaine temporel est également un bruit gaussien dans le domaine fréquentiel.  Alors pourquoi les deux graphiques ci-dessus ne sont-ils pas identiques?  C'est parce que le graphique du domaine fréquentiel montre l'amplitude de la FFT, donc il n'y aura que des nombres positifs. Il est important de noter qu'il utilise une échelle logarithmique, c'est-à-dire qu'il indique l'amplitude en dB.  Sinon, ces graphiques se ressembleraient.  Nous pouvons le prouver par nous-mêmes en générant un peu de bruit (dans le domaine temporel) dans Python, puis en prenant la FFT.
 
 .. code-block:: python
 
  import numpy as np
  import matplotlib.pyplot as plt
  
- N = 1024 # number of samples to simulate, choose any number you want
+ N = 1024 # nombre d'échantillons à simuler, choisissez le nombre que vous voulez
  x = np.random.randn(N)
  plt.plot(x, '.-')
  plt.show()
  
  X = np.fft.fftshift(np.fft.fft(x))
- X = X[N//2:] # only look at positive frequencies.  remember // is just an integer divide
+ X = X[N//2:] # ne regardez que les fréquences positives. rappelez-vous que // est juste un diviseur d'entier
  plt.plot(np.real(X), '.-')
  plt.show()
 
-Take note that the randn() function by default uses mean = 0 and variance = 1.  Both of the plots will look something like this:
+Notez que la fonction randn() utilise par défaut la moyenne = 0 et la variance = 1.  Les deux graphiques ressembleront à ceci :
 
 .. image:: ../_images/noise_python.png
    :scale: 100 % 
    :align: center 
 
-You can then produce the flat PSD that we had in GNU Radio by taking the log and averaging a bunch together.  The signal we generated and took the FFT of was a real signal (versus complex), and the FFT of any real signal will have matching negative and positive portions, so that's why we only saved the positive portion of the FFT output (the 2nd half).  But why did we only generate "real" noise, and how do complex signals work into this?
+Vous pouvez alors produire le DSP plate que nous avions dans GNU Radio en prenant le log et en faisant la moyenne de plusieurs d'entre eux. Le signal que nous avons généré et dont nous avons fait la FFT était un signal réel (par opposition à un signal complexe), et la FFT de tout signal réel aura des parties négatives et positives correspondantes, c'est pourquoi nous n'avons sauvegardé que la partie positive de la sortie FFT (la seconde moitié). Mais pourquoi n'avons-nous généré que du bruit "réel", et comment les signaux complexes entrent-ils en jeu ?
 
 *************************
-Complex Noise
+Bruit Complexe
 *************************
 
-"Complex Gaussian" noise is what we will experience when we have a signal at baseband; the noise power is split between the real and imaginary portions equally.  And most importantly, the real and imaginary parts are independent of each other; knowing the values of one doesn't give you the values of the other.
+Le bruit "gaussien complexe" est celui que nous rencontrons lorsque nous avons un signal en bande de base; la puissance du bruit est répartie de manière égale entre les parties réelles et imaginaires.  Et surtout, les parties réelle et imaginaire sont indépendantes l'une de l'autre; connaître les valeurs de l'une ne vous donne pas les valeurs de l'autre.
 
-We can generate complex Gaussian noise in Python using:
+Nous pouvons générer un bruit gaussien complexe en Python en utilisant :
 
 .. code-block:: python
 
  n = np.random.randn() + 1j * np.random.randn()
 
-But wait!  The equation above doesn't generate the same "amount" of noise as :code:`np.random.randn()`, in terms of power (known as noise power).  We can find the average power of a zero-mean signal (or noise) using:
+Mais attendez! L'équation ci-dessus ne génère pas la même "quantité" de bruit que :code:`np.random.randn()`, en termes de puissance (appelée puissance du bruit).  Nous pouvons trouver la puissance moyenne d'un signal (ou d'un bruit) de moyenne nulle en utilisant :
 
 .. code-block:: python
 
  power = np.var(x)
 
-where np.var() is the function for variance.  Here the power of our signal n is 2.  In order to generate complex noise with "unit power", i.e., a power of 1 (which makes things convenient), we have to use:
+où np.var() est la fonction de variance. Ici, la puissance de notre signal n est 2. Afin de générer un bruit complexe avec une "puissance unitaire", c'est-à-dire une puissance de 1 (ce qui rend les choses plus pratiques), nous devons utiliser:
 
 .. code-block:: python
 
- n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # AWGN with unity power
+ n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # AWGN de puissance unitaire
 
-To plot complex noise in the time domain, like any complex signal we need two lines:
+Pour tracer un bruit complexe dans le domaine temporel, comme tout signal complexe, nous avons besoin de deux lignes:
 
 .. code-block:: python
 
@@ -194,9 +197,9 @@ To plot complex noise in the time domain, like any complex signal we need two li
    :scale: 80 % 
    :align: center 
 
-You can see that the real and imaginary portions are completely independent.
+Vous pouvez voir que les parties réelles et imaginaires sont complètement indépendantes.
 
-What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot shows the real portion (horizontal axis) and the imaginary portion (vertical axis), both of which are independent random Gaussians.
+À quoi ressemble un bruit gaussien complexe sur un graphique IQ? Rappelez-vous que le graphique IQ montre la partie réelle (axe horizontal) et la partie imaginaire (axe vertical), qui sont toutes deux des gaussiennes aléatoires indépendantes.
 
 .. code-block:: python
 
@@ -209,31 +212,31 @@ What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot 
    :scale: 60 % 
    :align: center 
 
-It looks how we would expect; a random blob centered around 0 + 0j, or the origin.  Just for fun, let's try adding noise to a QPSK signal to see what the IQ plot looks like:
+Il ressemble à ce que l'on pourrait attendre: une tache aléatoire centrée sur 0 + 0j, ou l'origine. Juste pour le plaisir, essayons d'ajouter du bruit à un signal QPSK pour voir à quoi ressemble le graphique IQ :
 
 .. image:: ../_images/noisey_qpsk.png
    :scale: 60 % 
    :align: center 
 
-Now what happens when the noise is stronger?  
+Maintenant, que se passe-t-il quand le bruit est plus fort ?  
 
 .. image:: ../_images/noisey_qpsk2.png
    :scale: 50 % 
    :align: center 
 
-We are starting to get a feel for why transmitting data wirelessly isn't that simple. We want to send as many bits per symbol as we can, but if the noise is too high then we will get erroneous bits on the receiving end.
+Nous commençons à comprendre pourquoi la transmission de données sans fil n'est pas si simple. Nous voulons envoyer autant de bits par symbole que possible, mais si le bruit est trop élevé, nous aurons des bits erronés à la réception.
 
 *************************
 AWGN
 *************************
 
-Additive White Gaussian Noise (AWGN) is an abbreviation you will hear a lot in the DSP and SDR world.  The GN, Gaussian Noise, we already discussed.  Additive just means the noise is being added to our received signal.  White, in the frequency domain, means the spectrum is flat across our entire observation band.  It will almost always be white in practice,or approximately white.  In this textbook we will use AWGN as the only form of noise when dealing with communications links and link budgets and such.  Non-AWGN noise tends to be a niche topic.
+Le bruit blanc additif gaussien ou AWGN (pour Additive White Gaussian Noise en anglais) est une abréviation que vous entendrez souvent dans le monde du DSP et de la SDR. Le GN, qui veut dire bruit gaussien, nous en avons déjà parlé. Additif signifie simplement que le bruit est ajouté à notre signal reçu.  Blanc, dans le domaine des fréquences, signifie que le spectre est plat sur toute la bande d'observation.  En pratique, il sera presque toujours blanc, ou approximativement blanc.  Dans ce manuel, nous utiliserons le bruit AWGN comme seule forme de bruit lorsque nous traiterons des liaisons de communication, des budgets de liaison, etc.  Le bruit non-AWGN tend à être un sujet de niche.
 
 *************************
-SNR and SINR
+SNR et SINR
 *************************
 
-Signal-to-Noise Ratio (SNR) is how we will measure the differences in strength between the signal and noise. It's a ratio so it's unit-less.  SNR is almost always in dB, in practice.  Often in simulation we code in a way that our signals are one unit power (power = 1).  That way, we can create a SNR of 10 dB by producing noise that is -10 dB in power by adjusting the variance when we generate the noise.
+Le rapport signal à bruit (RSB) ou (SNR) (pour *signal to noise ratio* en anglais) est la façon dont nous allons mesurer les différences d'intensité entre le signal et le bruit. Il s'agit d'un rapport, donc sans unité. Le SNR est presque toujours exprimé en dB dans la pratique. Souvent, en simulation, nous codons de manière à ce que nos signaux soient d'une puissance unitaire (puissance = 1).  Ainsi, nous pouvons créer un rapport signal à bruit de 10 dB en produisant un bruit d'une puissance de -10 dB en ajustant la variance lorsque nous générons le bruit.
 
 .. math::
    \mathrm{SNR} = \frac{P_{signal}}{P_{noise}}
@@ -241,25 +244,25 @@ Signal-to-Noise Ratio (SNR) is how we will measure the differences in strength b
 .. math::
    \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{noise\_dB}
 
-If someone says "SNR = 0 dB" it means the signal and noise power are the same.  A positive SNR means our signal is higher power than the noise, while a negative SNR means the noise is higher power.  Detecting signals at negative SNR is usually pretty tough.  
+Si quelqu'un dit "SNR = 0 dB", cela signifie que la puissance du signal et du bruit est la même. Un SNR positif signifie que notre signal est plus puissant que le bruit, tandis qu'un SNR négatif signifie que le bruit est plus puissant. La détection de signaux à un SNR négatif est généralement assez difficile.  
 
-Like we mentioned before, the power in a signal is equal to the variance of the signal.  So we can represent SNR as the ratio of the signal variance to noise variance:
+Comme nous l'avons mentionné précédemment, la puissance d'un signal est égale à la variance du signal.  Nous pouvons donc représenter le SNR comme le rapport entre la variance du signal et la variance du bruit:
 
 .. math::
    \mathrm{SNR} = \frac{P_{signal}}{P_{noise}} = \frac{\sigma^2_{signal}}{\sigma^2_{noise}}
 
-Signal-to-Interference-plus-Noise Ratio (SINR) is essentially the same as SNR except you include interference along with the noise, in the denominator.  
+Le rapport signal à interférence plus bruit (SINR pour *signal to interference and noise ration* en anglais) est essentiellement le même que le SNR, sauf que vous incluez l'interférence avec le bruit dans le dénominateur.  
 
 .. math::
    \mathrm{SINR} = \frac{P_{signal}}{P_{interference} + P_{noise}}
 
-What constitutes interference is based on the application/situation, but typically it is another signal that is interfering with the signal of interest (SOI), and is either overlapping with the SOI in frequency, and/or cannot be filtered out for some reason.  
+La définition de l'interférence dépend de l'application/de la situation, mais il s'agit généralement d'un autre signal qui interfère avec le signal d'intérêt, qui le empiète sur lui dans le domaine fréquentiel, et/ou qui ne peut pas être filtré pour une raison quelconque.  
 
 *************************
-External Resources
+Ressources Externes (en anglais)
 *************************
 
-Further resources about AWGN, SNR, and variance:
+Autres ressources sur l'AWGN, le SNR et la variance:
 
 1. https://en.wikipedia.org/wiki/Additive_white_Gaussian_noise
 2. https://en.wikipedia.org/wiki/Signal-to-noise_ratio

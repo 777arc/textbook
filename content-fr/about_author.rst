@@ -1,18 +1,18 @@
 .. _author-chapter:
 
 ##################
-About the Author
+A propos de l'auteur
 ##################
 
-FRENCH Dr. Marc Lichtman is a wireless communications researcher who specializes in SDR, machine learning, LTE/5G-NR, and spectrum sensing.  He is an Adjunct Professor at the University of Maryland, where he created and taught a course that served as the basis of this textbook.  His course was a senior-year elective targeted towards CS undergrads interested in SDR/DSP.  This course lead him to better understand how to make incredibly heavy material accessible and engaging to students who were great programmers but had little-to-no PHY layer knowledge.  It was not uncommon to begin class with a mini-hackathon, where students had to find or decode hidden signals (transmitted by Marc) using what they had recently learned.
+Marc Lichtman est un chercheur en communications sans fil spécialisé dans la radio logicielle, l'apprentissage automatique, le LTE/5G-NR et la détection du spectre. Il est professeur adjoint à l'Université du Maryland, où il a créé et enseigné un cours qui a servi de base à ce manuel. Il s'agissait d'un cours facultatif de dernière année destiné aux étudiants de premier cycle en informatique intéressés par la SDR/DSP.  Ce cours l'a amené à mieux comprendre comment rendre un matériel incroyablement lourd accessible et attrayant pour des étudiants qui étaient de grands programmeurs mais qui avaient peu ou pas de connaissances de la couche PHY.  Il n'était pas rare de commencer le cours par un mini-hackathon, où les étudiants devaient trouver ou décoder des signaux cachés (transmis par Marc) en utilisant ce qu'ils venaient d'apprendre.
 
-Marc is also one of the leads for the `GNU Radio project <https://www.gnuradio.org/>`_ , an open source SDR framework widely used in academia and defense related research.  While Python is great for learning, rapid experimentation, and development, it does not lend itself well to large and computationally complex apps.  GNU Radio can implement more advanced DSP apps, and a GNU Radio app or individual block is very easy to share with others.
+Marc est également l'un des responsables du projet `GNU Radio <https://www.gnuradio.org/>`_ , un framework SDR open source largement utilisé dans le milieu universitaire et la recherche liée à la défense.  Bien que Python soit idéal pour l'apprentissage, l'expérimentation rapide et le développement, il ne se prête pas bien aux applications volumineuses et complexes sur le plan informatique.  GNU Radio peut mettre en œuvre des applications DSP plus avancées, et une application GNU Radio ou un bloc individuel est très facile à partager avec d'autres.
 
-Marc currently lives in the DC area with his wife Lindsey and their many cats and dogs.  His hobbies include woodworking, lasercutting, playing clarinet/sax, sailing, gardening, building/flying drones, building/riding electric skateboards, and advanced yo-yoing.
+Marc vit actuellement dans la région de Washington avec sa femme Lindsey et leurs nombreux chats et chiens.  Ses loisirs incluent le travail du bois, la découpe au laser, la clarinette et le saxophone, la voile, le jardinage, la construction et le pilotage de drones, la construction et la conduite de skateboards électriques, et le yo-yo avancé.
 
 Email: pysdr@vt.edu
 
-University of Maryland faculty page: `cs.umd.edu/people/sdr <https://www.cs.umd.edu/people/sdr>`_
+Page des professeurs de l'Université du Maryland: `cs.umd.edu/people/sdr <https://www.cs.umd.edu/people/sdr>`_
 
 .. image:: ../_images/silly_marc.jpg
    :scale: 100 % 

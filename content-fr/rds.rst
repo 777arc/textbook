@@ -1,103 +1,105 @@
 .. _rds-chapter:
 
 ##################
-End-to-End Example
+Exemple bout en bout
 ##################
 
-In this chapter we bring together many of the concepts we previously learned about, and walk through a full example of receiving and decoding a real digital signal.  We will be looking at Radio Data System (RDS), which is a communications protocol for embedding small amounts of information in FM radio broadcasts, such as station and song name.  We will have to demodulate FM, frequency shift, filter, decimate, resample, synchronize, decode, and parse the bytes.  An example IQ file is provided for testing purposes or if you don't have an SDR handy.
+Dans ce chapitre, nous regroupons un grand nombre des concepts que nous avons appris précédemment et nous présentons un exemple complet de réception et de décodage d'un signal numérique réel.  Nous allons étudier le système de données radio (RDS pour *Radio Data System* en anglais), qui est un protocole de communication permettant d'intégrer de petites quantités d'informations dans les émissions de radio FM, comme le nom de la station et de la chanson.  Nous devrons démoduler la FM, décaler la fréquence, filtrer, décimer, rééchantillonner, synchroniser, décoder et analyser les octets.  Un exemple de fichier IQ est fourni à des fins de test ou si vous n'avez pas de SDR sous la main.
+
 
 ********************************
-Introduction to FM Radio and RDS
+Introduction à la radio FM et au RDS
 ********************************
 
-To understand RDS we must first review FM radio broadcasts and how their signals are structured.  You are probably familiar with the audio portion of FM signals, which are simply audio signals frequency modulated and transmitted at center frequencies corresponding to the station's name, e.g., "WPGC 95.5 FM" is centered at exactly 95.5 MHz.  In addition to the audio portion, each FM broadcast contains some other components that are frequency modulated along with the audio.  Instead of just Googling the signal structure, let's take a look at the power spectral density (PSD) of an example FM signal, *after* the FM demodulation. We only view the positive portion because the output of FM demodulation is a real signal, even though the input was complex (we will view the code to perform this demodulation shortly). 
+Pour comprendre le RDS, nous devons d'abord examiner les émissions de radio FM et la façon dont leurs signaux sont structurés.  Vous connaissez probablement la partie audio des signaux FM, qui sont simplement des signaux audio modulés en fréquence et transmis à des fréquences centrales correspondant au nom de la station, par exemple, "Sud Radio" est centré à exactement 101.8 MHz à Toulouse.  En plus de la partie audio, chaque émission FM contient d'autres composants qui sont modulés en fréquence en même temps que l'audio.  Au lieu de rechercher la structure du signal sur Google, examinons la densité spectrale de puissance (DSP) d'un exemple de signal FM, *après* la démodulation FM. Nous ne voyons que la partie positive car la sortie de la démodulation FM est un signal réel, même si l'entrée est complexe (nous verrons bientôt le code pour effectuer cette démodulation). 
 
 .. image:: ../_images/fm_psd.svg
    :align: center 
    :target: ../_images/fm_psd.svg
 
-By looking at the signal in the frequency domain, we notice the following individual signals:
+En regardant le signal dans le domaine de la fréquence, nous remarquons les signaux individuels suivants :
 
-#. A high power signal between 0 - 17 kHz
-#. A tone at 19 kHz
-#. Centered at 38 kHz and roughly 30 kHz wide we see an interesting looking symmetric signal
-#. Double-lobe shaped signal centered at 57 kHz
-#. Single-lobe shaped signal centered at 67 kHz
+#. Un signal de forte puissance entre 0 - 17 kHz
+#. Un signal sonore à 19 kHz
+#. Centré à 38 kHz et d'une largeur d'environ 30 kHz, nous voyons un signal symétrique intéressant.
+#. Signal en forme de double lobe centré à 57 kHz.
+#. Signal en forme de lobe unique centré à 67 kHz.
 
-This is essentially all we are able to determine by just looking at the PSD, and remember that this is *after* the FM demodulation.  The PSD before the FM demodulation looks like the following, which doesn't really tell us much.
+C'est essentiellement tout ce que nous sommes en mesure de déterminer en regardant la DSP, et rappelez-vous que c'est *après* la démodulation FM.  La DSP avant la démodulation FM ressemble à ce qui suit, ce qui ne nous dit pas grand-chose.
+
 
 .. image:: ../_images/fm_before_demod.svg
    :align: center 
    :target: ../_images/fm_before_demod.svg
    
-That being said, it's important to understand that when you FM modulate a signal, a higher frequency in the data signal will lead to a higher frequency in the resulting FM signal.  So that signal centered at 67 kHz being present is increasing the total bandwidth occupied by the transmitted FM signal, as the maximum frequency component is now around 75 kHz as shown in the first PSD above.  `Carson's bandwidth rule <https://en.wikipedia.org/wiki/Carson_bandwidth_rule>`_ applied to FM tells us that FM stations occupy roughly 250 kHz of spectrum, which is why we usually sample at 250 kHz (recall that when using quadrature/IQ sampling, your received bandwidth equals your sampling rate).
+Ceci étant dit, il est important de comprendre que lorsque vous modulez un signal en FM, une fréquence plus élevée dans le signal de données entraînera une fréquence plus élevée dans le signal FM résultant.  Donc, ce signal centré à 67 kHz qui est présent augmente la largeur de bande totale occupée par le signal FM transmis, car la composante de fréquence maximale est maintenant autour de 75 kHz comme le montre le premier PSD ci-dessus.  La règle de la largeur de bande de `Carson <https://fr.wikipedia.org/wiki/Règle_de_Carson>`_ appliquée à la FM nous indique que les stations FM occupent environ 250 kHz du spectre, ce qui explique pourquoi nous échantillonnons généralement à 250 kHz (rappelez-vous que lorsque vous utilisez un échantillonnage en quadrature/IQ, votre largeur de bande reçue est égale à votre taux d'échantillonnage).
 
-As a quick aside, some readers may be familiar with looking at the FM band using an SDR or spectrum analyzer and seeing the following spectrogram, and thinking that the block-y signals adjacent to some of the FM stations are RDS.  
+En guise d'aparté, certains lecteurs ont peut-être l'habitude d'observer la bande FM à l'aide d'une SDR ou d'un analyseur de spectre et de voir le spectrogramme suivant, et de penser que les signaux en forme de blocs adjacents à certaines des stations FM sont des données RDS.  
 
 .. image:: ../_images/fm_band_psd.png
    :scale: 80 % 
    :align: center 
 
-It turns out that those block-y signals are actually HD Radio, a digital version of the same FM radio signal (same audio content).  This digital version leads to a higher quality audio signal at the receiver because analog FM will always include some noise after demodulation, since it's an analog scheme, but the digital signal can be demodulated/decoded with zero noise, assuming there are zero bit errors.  
+Il s'avère que ces signaux en forme de blocs sont en fait la Radio HD, une version numérique du même signal radio FM (même contenu audio).  Cette version numérique permet d'obtenir un signal audio de meilleure qualité au niveau du récepteur car la FM analogique comprendra toujours un certain bruit après démodulation, puisqu'il s'agit d'un schéma analogique, mais le signal numérique peut être démodulé/décodé avec un bruit nul, en supposant qu'il n'y ait aucune erreur de bit.  
 
-Back to the five signals we discovered in our PSD; the following diagram labels what each signal is used for.  
+Revenons aux cinq signaux que nous avons découverts dans notre DSP; le diagramme suivant indique à quoi sert chaque signal.  
 
 .. image:: ../_images/fm_components.png
    :scale: 80 % 
    :align: center 
 
-Going through each of these signals in no particular order:
+Je passe en revue chacun de ces signaux sans ordre particulier:
 
-The mono and stereo audio signals simply carry the audio signal, in a pattern where adding and subtracting them gives you the left and right channels.
+Les signaux audio mono et stéréo transportent simplement le signal audio, dans un schéma où leur addition et leur soustraction vous donnent les canaux gauche et droit.
 
-The 19 kHz pilot tone is used to demodulate the stereo audio.  If you double the tone it acts as a frequency and phase reference, since the stereo audio signal is centered at 38 kHz.  Doubling the tone can be done by simply squaring the samples, recall the frequency shift Fourier property we learned about in the :ref:`freq-domain-chapter` chapter.
+La tonalité pilote de 19 kHz est utilisée pour démoduler le signal audio stéréo.  Si vous doublez la tonalité, elle sert de référence de fréquence et de phase, puisque le signal audio stéréo est centré à 38 kHz.  Doubler la tonalité peut être fait en élevant simplement les échantillons au carré, en se rappelant la propriété de Fourier de décalage de fréquence que nous avons apprise dans le chapitre :ref:`freq-domain-chapter`.
 
-DirectBand was a North America wireless datacast network owned and operated by Microsoft, also called "MSN Direct" within consumer markets. DirectBand transmitted information to devices like portable GPS receivers, wristwatches, and home weather stations.  It even allowed users to receive short messages from Windows Live Messenger.  One of the most successful applications of DirectBand was realtime local traffic data displayed on Garmin GPS receivers, which were used by millions of people before smartphones became ubiquitous.  The DirectBand service was shut down on January 2012, which raises the question, why do we see it in our FM signal that was recorded after 2012?  My only guess is that most FM transmitters were designed and built way before 2012, and even without any DirectBand "feed" active, it still transmits something, perhaps pilot symbols.
+DirectBand était un réseau de diffusion de données sans fil en Amérique du Nord, détenu et exploité par Microsoft, également appelé "MSN Direct" sur les marchés grand public. DirectBand transmettait des informations à des appareils tels que des récepteurs GPS portables, des montres-bracelets et des stations météorologiques domestiques.  Il permettait même aux utilisateurs de recevoir des messages courts de Windows Live Messenger.  L'une des applications les plus réussies de DirectBand était l'affichage en temps réel de données sur le trafic local sur les récepteurs GPS Garmin, qui étaient utilisés par des millions de personnes avant que les smartphones ne deviennent omniprésents.  Le service DirectBand a été fermé en janvier 2012, ce qui soulève la question suivante: pourquoi le voit-on dans nos signaux FM enregistrés après 2012?  Ma seule hypothèse est que la plupart des émetteurs FM ont été conçus et construits bien avant 2012, et que même sans "alimentation" DirectBand active, ils transmettent toujours quelque chose, peut-être des symboles de pilotage.
 
-Lastly, we come to RDS, which is the focus of the rest of this chapter.  As we can see in our first PSD, RDS is roughly 4 kHz in bandwidth (before it gets FM modulated), and sits in between the stereo audio and DirectBand signal.  It is a low data rate digital communications protocol that allows FM stations to include station identification, program information, time, and other miscellaneous information alongside the audio.  The RDS standard is published as IEC standard 62106 and can be `found here <http://www.interactive-radio-system.com/docs/EN50067_RDS_Standard.pdf>`_.
+Enfin, nous en arrivons au RDS, qui est l'objet du reste de ce chapitre.  Comme nous pouvons le voir dans notre premier PSD, le RDS a une largeur de bande d'environ 4 kHz (avant d'être modulé en FM), et se situe entre le signal audio stéréo et le signal DirectBand.  Il s'agit d'un protocole de communication numérique à faible débit de données qui permet aux stations FM d'inclure l'identification de la station, des informations sur le programme, l'heure et d'autres informations diverses à côté du signal audio.  La norme RDS est publiée sous le nom de norme IEC 62106 et peut être trouvée `ici <http://www.interactive-radio-system.com/docs/EN50067_RDS_Standard.pdf>`_.
 
 ********************************
-The RDS Signal
+Le signal RDS
 ********************************
 
-In this chapter we will use Python to receive RDS, but in order to best understand how to receive it, we must first learn about how the signal is formed and transmitted.  
+Dans ce chapitre, nous allons utiliser Python pour recevoir RDS, mais pour mieux comprendre comment le recevoir, nous devons d'abord apprendre comment le signal est formé et transmis.  
 
-Transmit Side
+Côté émission
 #############
 
-The RDS information to be transmitted by the FM station (e.g., track name, etc.) is encoded into sets of 8 bytes.  Each set of 8 bytes, which corresponds to 64 bits, is combined with 40 "check bits" to make a single "group".  These 104 bits are transmitted together, although there is no gap of time between groups, so from the receiver's perspective it receives these bits nonstop and must determine the boundary between the groups of 104 bits.   We will see more details on the encoding and message structure once we dive into the receive side.
+Les informations RDS à transmettre par la station FM (par exemple, le nom de la piste, etc.) sont codées en jeux de 8 octets.  Chaque ensemble de 8 octets, qui correspond à 64 bits, est combiné à 40 "bits de contrôle" pour former un seul "groupe".  Ces 104 bits sont transmis ensemble, mais il n'y a pas d'intervalle de temps entre les groupes. Ainsi, du point de vue du récepteur, il reçoit ces bits sans interruption et doit déterminer la limite entre les groupes de 104 bits. Nous verrons plus de détails sur le codage et la structure du message lorsque nous nous plongerons dans la partie réception.
 
-To transmit these bits wirelessly, RDS uses BPSK, which as we learned in the :ref:`modulation-chapter` chapter is a simple digital modulation scheme used to map 1's and 0's to the phase of a carrier.  Like many BPSK-based protocols, RDS uses differential coding, which simply means the 1's and 0's of data are encoded in changes of 1's and 0's instead, which lets you no longer care whether you are 180 degrees out of phase (more on this later).  The BPSK symbols are transmitted at 1187.5 symbols per second, and because BPSK carries one bit per symbol, that means RDS has a raw data rate of roughly 1.2 kbps (including overhead).  RDS does not contain any channel coding (a.k.a. forward error correction), although the data packets do contain a cyclic redundancy check (CRC) to know when an error occurred.   The experienced BPSK-er may be wondering why we saw a double-lobe shaped signal in the first PSD; BPSK usually has one main lobe.  It turns out RDS takes the BPSK signal and duplicates/mirrors it across the 57 kHz center frequency, for robustness through redundancy.  When we dive into the Python code used to receive RDS, one of our steps will involve filtering to isolate just one of these BPSK signals.
+Pour transmettre ces bits sans fil, le RDS utilise la modulation par déplacement de phase (BPSK), qui, comme nous l'avons appris dans le chapitre :ref:`modulation-chapiter`, est un schéma de modulation numérique simple utilisé pour associer des 1 et des 0 à la phase d'une porteuse.  Comme de nombreux protocoles basés sur la BPSK, le RDS utilise le codage différentiel, ce qui signifie simplement que les 1 et les 0 des données sont codés dans les changements de 1 et de 0, ce qui vous permet de ne plus vous soucier de savoir si vous êtes déphasé de 180 degrés (nous y reviendrons plus tard).  Les symboles BPSK sont transmis à 1187,5 symboles par seconde, et comme la BPSK transporte un bit par symbole, cela signifie que le RDS a un débit de données brut d'environ 1,2 kbps (y compris l'overhead). Le RDS ne contient aucun codage de canal (ou correction d'erreur), bien que les paquets de données contiennent un contrôle de redondance cyclique (CRC) pour savoir si une erreur s'est produite. L'utilisateur expérimenté de la BPSK peut se demander pourquoi nous avons vu un signal en forme de double lobe dans la première DSP; la BPSK a généralement un lobe principal.  Il s'avère que RDS prend le signal BPSK et le duplique sur la fréquence centrale de 57 kHz, pour plus de robustesse.  Lorsque nous nous plongerons dans le code Python utilisé pour recevoir le RDS, l'une de nos étapes consistera à filtrer pour isoler un seul de ces signaux BPSK.
 
-The final "double BPSK" signal is then frequency shifted up to 57 kHz and added to all the other components of the FM signal, before being FM modulated and transmitted over the air at the station's frequency.  FM radio signals are transmitted at an extremely high power compared to most other wireless communications, up to 80 kW!  This is why many SDR users have an FM-reject filter (i.e., a band-stop filter) in-line with their antenna; so FM does not add interference to what they are trying to receive.
+Le signal final "double BPSK" est ensuite décalé en fréquence jusqu'à 57 kHz et ajouté à toutes les autres composantes du signal FM, avant d'être modulé en FM et transmis sur les ondes à la fréquence de la station.  Les signaux radio FM sont transmis à une puissance extrêmement élevée par rapport à la plupart des autres communications sans fil, jusqu'à 80 kW!  C'est pourquoi de nombreux utilisateurs de la radio logicielle ont un filtre de rejet de la FM (c'est-à-dire un filtre coupe-bande) avec leur antenne, afin que la FM n'ajoute pas d'interférences à ce qu'ils essaient de recevoir.
 
-While this was only a brief overview of the transmit side, we will be diving into more details when we discuss receiving RDS.
+Il ne s'agissait là que d'un bref aperçu de l'aspect transmission, mais nous entrerons dans les détails lorsque nous aborderons la réception du RDS.
 
-Receive Side
+Côté récepteur
 ############
 
-In order to demodulate and decode RDS, we will perform the following steps, many of which are transmit-side steps in reverse (no need to memorize this list, we will walk through each step individually below):
+Afin de démoduler et de décoder le RDS, nous allons effectuer les étapes suivantes, dont beaucoup sont des étapes de transmission en sens inverse (pas besoin de mémoriser cette liste, nous allons parcourir chaque étape individuellement ci-dessous):
 
-#. Receive an FM radio signal centered at the station's frequency (or read in an IQ recording), usually at a sample rate of 250 kHz
-#. Demodulate the FM using what is called "quadrature demodulation"
-#. Frequency shift by 57 kHz so the RDS signal is centered at 0 Hz
-#. Low-pass filter, to filter out everything besides RDS
-#. Decimate by 10 so that we can work at a lower sample rate, since we filtered out the higher frequencies anyway
-#. Resample to 19 kHz which will give us an integer number of samples per symbol
-#. Isolate one of the two RDS BPSK signals with a band-pass filter
-#. Symbol-level time synchronization, using Mueller and Muller in this example
-#. Fine frequency synchronization using a Costas loop
-#. Demodulate the BPSK to 1's and 0's
-#. Differential decoding, to undo the differential encoding that was applied
-#. Decoding of the 1's and 0's into groups of bytes
-#. Parsing of the groups of bytes into our final output
+#. Recevoir un signal radio FM centré sur la fréquence de la station (ou lu dans un enregistrement IQ), généralement à une fréquence d'échantillonnage de 250 kHz
+#. Démodulez la FM en utilisant ce qu'on appelle la "démodulation en quadrature".
+#. Décalage de fréquence de 57 kHz pour que le signal RDS soit centré à 0 Hz.
+#. Filtre passe-bas, pour filtrer tout ce qui n'est pas RDS.
+#. Décimation par 10 pour pouvoir travailler à un taux d'échantillonnage plus faible, puisque nous avons de toute façon filtré les hautes fréquences.
+#. Rééchantillonnage à 19 kHz, ce qui nous donnera un nombre entier d'échantillons par symbole.
+#. Isolez l'un des deux signaux RDS BPSK avec un filtre passe-bande.
+#. Synchronisation temporelle au niveau du symbole, en utilisant Mueller et Muller dans cet exemple.
+#. Synchronisation fine de la fréquence en utilisant une boucle de Costas
+#. Démodulation du BPSK en 1 et 0.
+#. Décodage différentiel, pour annuler l'encodage différentiel qui a été appliqué.
+#. Décodage des 1 et 0 en groupes d'octets.
+#. Analyse des groupes d'octets dans notre sortie finale.
 
-While this may seem like a lot of steps, RDS is actually one of the simplest wireless digital communications protocols out there.  A modern wireless protocol like WiFi or 5G requires a whole textbook to cover just the high-level PHY/MAC layer information.
+Bien que cela puisse sembler beaucoup d'étapes, RDS est en fait l'un des protocoles de communication numérique sans fil les plus simples qui soient. Un protocole sans fil moderne comme le WiFi ou la 5G nécessite un manuel entier pour couvrir uniquement les informations de haut niveau de la couche PHY/MAC.
 
-We will now dive into the Python code used to receive RDS.  This code has been tested to work using an `FM radio recording you can find here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, although you should be able to feed in your own signal as long as its received at a high enough SNR, simply tune to the station's center frequency and sample at a rate of 250 kHz.  In this section we will present small portions of the code individually, with discussion, but the same code is provided at the end of this chapter in one large block.  Each section will present a block of code, and then explain what it is doing.
+Nous allons maintenant nous plonger dans le code Python utilisé pour recevoir le RDS.  Ce code a été testé pour fonctionner en utilisant un enregistrement radio FM que vous pouvez trouver `ici <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, bien que vous devriez être en mesure d'introduire votre propre signal tant qu'il est reçu à un SNR assez élevé, il suffit de régler la fréquence centrale de la station et d'échantillonner à un taux de 250 kHz.  Dans cette section, nous présenterons de petites portions du code individuellement, avec une discussion, mais le même code est fourni à la fin de ce chapitre en un grand bloc. Chaque section présentera un bloc de code, puis expliquera ce qu'il fait.
 
 ********************************
-Acquiring a Signal
+Acquisition d'un signal
 ********************************
 
 .. code-block:: python
@@ -106,99 +108,99 @@ Acquiring a Signal
  from scipy.signal import resample_poly, firwin, bilinear, lfilter
  import matplotlib.pyplot as plt
  
- # Read in signal
+ # Lire le signal
  x = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64)
  sample_rate = 250e3
  center_freq = 99.5e6
 
-We read in our test recording, which was sampled at 250 kHz and centered on an FM station received at a high SNR.  Make sure to update the file path to reflect your system and where you saved the recording.  If you have an SDR already set up and working from within Python, feel free to receive a live signal, although it helps to have first tested the entire code with a `known-to-work IQ recording <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Throughout this code we will use :code:`x` to store the current signal being manipulated. 
+Nous avons lu notre enregistrement de test, qui a été échantillonné à 250 kHz et centré sur une station FM reçue à un SNR élevé.  Veillez à mettre à jour le chemin du fichier pour refléter votre système et l'endroit où vous avez sauvegardé l'enregistrement.  Si vous avez un SDR déjà configuré et fonctionnant depuis Python, n'hésitez pas à recevoir un signal en direct, bien qu'il soit utile d'avoir d'abord testé l'ensemble du code avec un `enregistrement de QI connu pour fonctionner<https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Tout au long de ce code, nous utiliserons :code:`x` pour stocker le signal à manipuler. 
 
 ********************************
-FM Demodulation
+Démodulation FM
 ********************************
 
 .. code-block:: python
 
- # Quadrature Demod
+ # Démodulation en quadrature
  x = 0.5 * np.angle(x[0:-1] * np.conj(x[1:])) # see https://wiki.gnuradio.org/index.php/Quadrature_Demod
 
-As discussed at the beginning of this chapter, several individual signals are combined in frequency and FM modulated to create what is actually transmitted through the air.  So the first step is to undo that FM modulation.  Another way to think about it is the information is stored in the frequency variation of the signal we receive, and we want to demodulate it so the information is now in the amplitude not frequency.  Note that the output of this demodulation is a real signal, even though we fed in a complex signal.
+Comme nous l'avons vu au début de ce chapitre, plusieurs signaux individuels sont combinés en fréquence et modulés en FM pour créer ce qui est réellement transmis dans l'air.  La première étape consiste donc à annuler cette modulation FM.  Une autre façon de voir les choses est que l'information est stockée dans la variation de fréquence du signal que nous recevons, et nous voulons le démoduler pour que l'information soit maintenant dans l'amplitude et non dans la fréquence.  Notez que la sortie de cette démodulation est un signal réel, même si nous avons introduit un signal complexe.
 
-What this single line of Python is doing, is first calculating the product of our signal with a delayed and conjugated version of our signal.  Next, it finds the phase of each sample in that result, which is the moment at which it goes from complex to real.  To prove to ourselves that this gives us the information contained in the frequency variations, consider a tone at frequency :math:`f` with some arbitrary phase :math:`\phi`, which we can represent as :math:`e^{j2 \pi (f t + \phi)}`.  When dealing in discrete time, which uses an integer :math:`n` instead of :math:`t`, this becomes :math:`e^{j2 \pi (f n + \phi)}`.  The conjugated and delayed version is :math:`e^{-j2 \pi (f (n-1) + \phi)}`.  Multiplying these two together leads to :math:`e^{j2 \pi f}`, which is great because :math:`\phi` is gone, and when we calculate the phase of that expression we are left with just :math:`f`.
+Ce que fait cette simple ligne de Python, c'est d'abord calculer le produit de notre signal avec une version retardée et conjuguée de notre signal.  Ensuite, elle trouve la phase de chaque échantillon dans ce résultat, qui est le moment où il passe de complexe à réel. Pour nous prouver que cela nous donne l'information contenue dans les variations de fréquence, considérons un son à la fréquence :math:`f` avec une phase arbitraire :math:`\phi`, que nous pouvons représenter comme :math:`e^{j2 \pi (f t + \phi)}`. En temps discret, on utilise un entier :math:`n` au lieu de :math:`t`, cela devient :math:`e^{j2 \pi (f n + \phi)}`.  La version conjuguée et retardée est :math:`e^{-j2 \pi (f (n-1) + \phi)}`.  En multipliant les deux, on obtient :math:`e^{j2 \pi f}`, ce qui est génial car :math:`\phi` a disparu, et quand on calcule la phase de cette expression, il ne reste que :math:`f`.
 
-One convenient side effect of FM modulation is that amplitude variations of the received signal does not actually change the volume of the audio, unlike AM radio.  
+Un effet secondaire pratique de la modulation FM est que les variations d'amplitude du signal reçu ne modifient pas réellement le volume de l'audio, contrairement à la radio AM.  
 
 ********************************
-Frequency Shift
+Déplacement de fréquence
 ********************************
 
 .. code-block:: python
 
- # Freq shift
+ # décalage de freq
  N = len(x)
- f_o = -57e3 # amount we need to shift by
- t = np.arange(N)/sample_rate # time vector
- x = x * np.exp(2j*np.pi*f_o*t) # down shift
+ f_o = -57e3 # valeur du décalage
+ t = np.arange(N)/sample_rate # vecteur de temps
+ x = x * np.exp(2j*np.pi*f_o*t) # décalage de freq
 
-Next we frequency shift down by 57 kHz, using the :math:`e^{j2 \pi f_ot}` trick we learned in the :ref:`sync-chapter` chapter where :code:`f_o` is the frequency shift in Hz and :code:`t` is just a time vector, the fact it starts at 0 isn't important, what matters is that it uses the right sample period (which is inverse of sample rate).  As an aside, because it's a real signal being fed in, it doesn't actually matter if you use a -57 or +57 kHz because the negative frequencies match the positive, so either way we are going to get our RDS shifted to 0 Hz.
+Ensuite, nous décalons la fréquence de 57 kHz vers le bas, en utilisant l'astuce :math:`e^{j2 \pi f_ot}` que nous avons apprise dans le chapitre :ref:`sync-chapter` où :code:`f_o` est le décalage de fréquence en Hz et :code:`t` est juste un vecteur temps, le fait qu'il commence à 0 n'est pas important, ce qui compte c'est qu'il utilise la bonne période d'échantillonnage (qui est l'inverse du taux d'échantillonnage).  Par ailleurs, comme il s'agit d'un signal réel, il n'est pas important d'utiliser une fréquence de -57 ou +57 kHz car les fréquences négatives correspondent aux positives, donc dans tous les cas, notre RDS sera décalé à 0 Hz.
 
 ********************************
-Filter to Isolate RDS
+Filtrer pour isoler le RDS
 ********************************
 
 .. code-block:: python
 
- # Low-Pass Filter
+ # filtre passe bas
  taps = firwin(numtaps=101, cutoff=7.5e3, fs=sample_rate)
  x = np.convolve(x, taps, 'valid')
 
-Now we must filter out everything besides RDS. Since we have RDS centered at 0 Hz, that means a low-pass filter is the one we want.  We use :code:`firwin()` to design an FIR filter (i.e., find the taps), which just needs to know how many taps we want the filter to be, and the cutoff frequency.  The sample rate must also be provided or else the cutoff frequency doesn't make sense to firwin.  The result is a symmetric low-pass filter, so we know the taps are going to be real numbers, and we can apply the filter to our signal using a convolution.  We choose :code:`'valid'` to get rid of the edge effects of doing convolution, although in this case it doesn't really matter because we are feeding in such a long signal that a few weird samples on either edge isn't going to throw anything off.
+Maintenant, nous devons filtrer tout ce qui n'est pas RDS. Puisque nous avons un RDS centré à 0 Hz, cela signifie qu'un filtre passe-bas est celui que nous voulons.  Nous utilisons :code:`firwin()` pour concevoir un filtre FIR (c'est-à-dire, trouver les taps), qui a juste besoin de savoir combien de taps nous voulons pour le filtre, et la fréquence de coupure.  La fréquence d'échantillonnage doit également être fournie, sinon la fréquence de coupure n'a pas de sens pour firwin.  Le résultat est un filtre passe-bas symétrique, donc nous savons que les taps seront des nombres réels, et nous pouvons appliquer le filtre à notre signal en utilisant une convolution. Nous choisissons :code:`'valid'` pour nous débarrasser des effets de bord de la convolution, bien que dans ce cas, cela n'ait pas vraiment d'importance parce que nous introduisons un signal si long que quelques échantillons bizarres sur l'un ou l'autre des bords ne vont rien gâcher.
 
 ********************************
-Decimate by 10
+Decimer par 10
 ********************************
 
 .. code-block:: python
 
- # Decimate by 10, now that we filtered and there wont be aliasing
+ # Décimer par 10, maintenant que nous avons filtré et qu'il n'y aura pas de repliement.
  x = x[::10]
  sample_rate = 25e3
 
-Any time you filter down to a small fraction of your bandwidth (e.g., we started with 125 kHz of *real* bandwidth and saved only 7.5 kHz of that), it makes sense to decimate.  Recall the beginning of the :ref:`sampling-chapter` chapter where we learned about the Nyquist Rate and being able to fully store band-limited information as long as we sampled at twice the highest frequency. Well now that we used our low-pass filter, our highest frequency is about 7.5 kHz, so we only need a sample rate of 15 kHz.  Just to be safe we'll add some margin and use a new sample rate of 25 kHz (this ends up working well mathematically later on).  
+Chaque fois que vous filtrez jusqu'à une petite fraction de votre bande passante (par exemple, nous avons commencé avec 125 kHz de bande passante *réelle* et n'avons sauvegardé que 7.5 kHz de celle-ci), il est logique de décimer.  Rappelez-vous le début du chapitre :ref:`sampling-chapter` où nous avons appris le taux de Nyquist et la possibilité de stocker entièrement des informations à bande limitée tant que nous échantillonnions à deux fois la fréquence la plus élevée. Maintenant que nous avons utilisé notre filtre passe-bas, notre fréquence la plus élevée est d'environ 7.5 kHz, donc nous n'avons besoin que d'une fréquence d'échantillonnage de 15 kHz.  Par sécurité, nous allons ajouter un peu de marge et utiliser une nouvelle fréquence d'échantillonnage de 25 kHz (ce qui s'avère être une bonne solution mathématique par la suite).  
 
-We perform the decimation by simply throwing out 9 out of every 10 samples, since we previously were at a sample rate of 250 kHz and we want it to now be at 25 kHz.  This might seem confusing at first, because throwing out 90% of the samples feels like you are throwing out information, but if you review the :ref:`sampling-chapter` chapter you will see why we are not actually losing anything, because we filtered properly (which acted as our anti-aliasing filter) and reduced our maximum frequency and thus signal bandwidth.
+Nous effectuons la décimation en éliminant simplement 9 échantillons sur 10, puisque nous étions précédemment à un taux d'échantillonnage de 250 kHz et que nous voulons qu'il soit maintenant à 25 kHz.  Cela peut sembler déroutant au premier abord, car en éliminant 90% des échantillons, on a l'impression de perdre de l'information, mais si vous relisez le chapitre :ref:`sampling-chapter`, vous verrez pourquoi nous ne perdons rien en fait, car nous avons filtré correctement (ce qui a agi comme notre filtre anti-repliement) et réduit notre fréquence maximale et donc la largeur de bande du signal.
 
-From a code perspective this is probably the simplest step out of them all, but make sure to update your :code:`sample_rate` variable to reflect the new sample rate.
+Du point de vue du code, c'est probablement l'étape la plus simple de toutes, mais assurez-vous de mettre à jour votre variable :code:`sample_rate` pour refléter le nouveau taux d'échantillonnage.
 
 ********************************
-Resample to 19 kHz
+Rééchantillonnage à 19 kHz
 ********************************
 
 .. code-block:: python
 
- # Resample to 19kHz
+ # Rééchantillonnage à 19 kHz
  x = resample_poly(x, 19, 25) # up, down
  sample_rate = 19e3
 
-In the :ref:`pulse-shaping-chapter` chapter we solidified the concept of "samples per symbol", and learned the convenience of having an integer number of samples per symbol (a fractional value is valid, just not convenient).  As mentioned earlier, RDS uses BPSK transmitting 1187.5 symbols per second.  If we continue to use our signal as-is, sampled at 25 kHz, we'll have 21.052631579 samples per symbol (pause and think about the math if that doesn't make sense).  So what we really want is a sample rate that is an integer multiple of 1187.5 Hz, but we can't go too low or we won't be able to "store" our full signal's bandwidth.  In the previous subsection we talked about how we need a sample rate of 15 kHz or higher, and we chose 25 kHz just to give us some margin.
+Dans le chapitre :ref:`pulse-shaping-chapter` nous avons solidifié le concept "d'échantillons par symbole", et appris la commodité d'avoir un nombre entier d'échantillons par symbole (une valeur fractionnaire est valide, mais pas pratique). Comme nous l'avons mentionné précédemment, le RDS utilise une BPSK transmettant 1187.5 symboles par seconde.  Si nous continuons à utiliser notre signal tel quel, échantillonné à 25 kHz, nous aurons 21.052631579 échantillons par symbole (faites une pause et réfléchissez au calcul si cela n'a pas de sens).  Ce que nous voulons vraiment, c'est une fréquence d'échantillonnage qui soit un multiple entier de 1187.5 Hz, mais nous ne pouvons pas aller trop bas ou nous ne serons pas en mesure de "stocker" toute la largeur de bande de notre signal. Dans la sous-section précédente, nous avons expliqué que nous avions besoin d'une fréquence d'échantillonnage de 15 kHz ou plus, et nous avons choisi 25 kHz juste pour nous donner une certaine marge.
 
-Finding the best sample rate to resample to comes down to how many samples per symbol we want, and we can work backwards.  Hypothetically, let us consider targeting 10 samples per symbol.  The RDS symbol rate of 1187.5 multiplied by 10 would give us a sample rate of 11.875 kHz, which unfortunately is not high enough for Nyquist.  How about 13 samples per symbol?  1187.5 multiplied by 13 gives us 15437.5 Hz, which is above 15 kHz, but quite the uneven number.  How about the next power of 2, so 16 samples per symbol?  1187.5 multiplied by 16 is exactly 19 kHz!  The even number is less of a coincidence and more of a protocol design choice.  
+Trouver la meilleure fréquence d'échantillonnage pour rééchantillonner se résume à savoir combien d'échantillons par symbole nous voulons.  Hypothétiquement, envisageons de viser 10 échantillons par symbole.  Le taux de symbole RDS de 1187.5 multiplié par 10 nous donnerait un taux d'échantillonnage de 11.875 kHz, ce qui n'est malheureusement pas assez élevé pour Nyquist. Que diriez-vous de 13 échantillons par symbole? 1187.5 multiplié par 13 nous donne 15437.5 Hz, ce qui est supérieur à 15 kHz, mais un nombre assez inégal.  Que diriez-vous de la puissance de 2 suivante, soit 16 échantillons par symbole? 1187.5 multiplié par 16 est exactement 19 kHz! Le nombre pair est moins une coïncidence qu'un choix de conception du protocole.  
 
-To resample from 25 kHz to 19 kHz, we use :code:`resample_poly()` which upsamples by an integer value, filters, then downsamples by an integer value.  This is convenient because instead of entering in 25000 and 19000 we can use 25 and 19.  If we had used 13 samples per symbol by using a sample rate of 15437.5 Hz, we wouldn't be able to use :code:`resample_poly()` and the resampling process would be much more complicated.
+Pour rééchantillonner de 25 kHz à 19 kHz, nous utilisons :code:`resample_poly()` qui suréchantillonne par une valeur entière, filtre, puis sous-échantillonne par une valeur entière.  C'est pratique car au lieu d'entrer 25000 et 19000, nous pouvons utiliser 25 et 19.  Si nous avions utilisé 13 échantillons par symbole en utilisant une fréquence d'échantillonnage de 15437.5 Hz, nous ne pourrions pas utiliser :code:`resample_poly()` et le processus de rééchantillonnage serait beaucoup plus compliqué.
 
-Once again, always remember to update your :code:`sample_rate` variable when performing an operation that changes it.
+Encore une fois, n'oubliez jamais de mettre à jour votre variable :code:`sample_rate` lorsque vous effectuez une opération qui la modifie.
 
 ********************************
-Band-Pass Filter
+Filtre passe-bande
 ********************************
 
 .. code-block:: python
 
- # Bandpass filter to isolate one RDS BPSK signal
+ # Filtre passe-bande pour isoler un signal RDS BPSK
  taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
  x = np.convolve(x, taps, 'valid')
 
-Recall that RDS contains two identical BPSK signals, hence the shape we saw in the PSD at the beginning.  We have to choose one, so we will arbitrarily decide to keep the positive one with a band-pass filter.  We use :code:`firwin()` again, but note the :code:`pass_zero=False` which is how you indicate you want it to be a band-pass filter instead of low-pass, and there are two cutoff frequencies to define the band.  The signal is from roughly 0 Hz to 2 kHz but you can't specify a 0 Hz starting frequency so we use 0.05 kHz.  Lastly, we need to increase our number of taps, to get a steeper frequency response.  We can verify that these numbers worked by looking at our filter in the time domain (by plotting taps) and frequency domain (by taking FFT of taps).  Note how in the frequency domain, we reach near-zero response at about 0 Hz.
+Rappelons que le RDS contient deux signaux BPSK identiques, d'où la forme que nous avons vue dans la PSD au début. Nous devons en choisir un, donc nous allons arbitrairement décider de garder le positif avec un filtre passe-bande. Nous utilisons :code:`firwin()` à nouveau, mais notez le :code:`pass_zero=False` qui indique que vous voulez un filtre passe-bande plutôt qu'un filtre passe-bas, et il y a deux fréquences de coupure pour définir la bande. Le signal s'étend approximativement de 0 Hz à 2 kHz mais vous ne pouvez pas spécifier une fréquence de départ de 0 Hz donc nous utilisons 0.05 kHz.  Enfin, nous devons augmenter le nombre de taps, pour obtenir une réponse en fréquence plus abrupte.  Nous pouvons vérifier que ces chiffres ont fonctionné en examinant notre filtre dans le domaine temporel (en traçant les taps) et dans le domaine fréquentiel (en prenant la FFT des taps).  Notez comment dans le domaine fréquentiel, nous atteignons une réponse proche de zéro à environ 0 Hz.
 
 .. image:: ../_images/bandpass_filter_taps.svg
    :align: center 
@@ -208,133 +210,133 @@ Recall that RDS contains two identical BPSK signals, hence the shape we saw in t
    :align: center 
    :target: ../_images/bandpass_filter_freq.svg
 
-Side note: At some point I will update the filter above to use a proper matched filter (root-raised cosine I believe is what RDS uses), for conceptual sake, but I got the same error rates using the firwin() approach as GNU Radio's proper matched filter, so it's clearly not a strict requirement.
+Remarque: à un moment ou à un autre, je mettrai à jour le filtre ci-dessus pour utiliser un filtre adapté (le root-raised cosine, je crois que c'est ce que RDS utilise), pour des raisons conceptuelles, mais j'ai obtenu les mêmes taux d'erreur en utilisant l'approche firwin() que le filtre adapté de GNU Radio, donc ce n'est clairement pas une exigence stricte.
 
 ***********************************
-Time Synchronization (Symbol-Level)
+Synchronisation en temps (niveau symbole)
 ***********************************
 
 .. code-block:: python
 
- # Symbol sync, using what we did in sync chapter
- samples = x # for the sake of matching the sync chapter
+ # Synchronisation des symboles, en utilisant ce que nous avons fait dans le chapitre sur la synchronisation.
+ samples = x # comme dans le chapitre de la synchronisation
  samples_interpolated = resample_poly(samples, 16, 1)
  sps = 16
- mu = 0.01 # initial estimate of phase of sample
+ mu = 0.01 # estimation initiale de la phase de l'échantillon
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
- out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stores values, each iteration we need the previous 2 values plus current value
- i_in = 0 # input samples index
- i_out = 2 # output index (let first two outputs be 0)
+ out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stocke les valeurs, à chaque itération nous avons besoin des 2 valeurs précédentes plus la valeur actuelle.
+ i_in = 0 # index des échantillons d'entrée
+ i_out = 2 # indice de sortie (les deux premières sorties sont 0)
  while i_out < len(samples) and i_in+16 < len(samples):
-     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # grab what we think is the "best" sample
+     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # prendre ce que nous pensons être le "meilleur" échantillon
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
      mm_val = np.real(y - x)
      mu += sps + 0.01*mm_val
-     i_in += int(np.floor(mu)) # round down to nearest int since we are using it as an index
-     mu = mu - np.floor(mu) # remove the integer part of mu
-     i_out += 1 # increment output index
- x = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
+     i_in += int(np.floor(mu)) # arrondir à l'entier le plus proche puisque nous l'utilisons comme un index
+     mu = mu - np.floor(mu) # supprimer la partie entière de mu
+     i_out += 1 # incrémenter l'indice de sortie
+ x = out[2:i_out] # supprimer les deux premiers, et tout ce qui suit i_out (qui n'a jamais été rempli)
 
-We are finally ready for our symbol/time synchronization, here we will use the exact same Mueller and Muller clock synchronization code from the :ref:`sync-chapter` chapter, reference it if you want to learn more about how it works.  We set the sample per symbol (:code:`sps`) to 16 as discussed earlier.  A mu gain value of 0.01 was found via experimentation to work well.  The output should now be one sample per symbol, i.e., our output is our "soft symbols", with possible frequency offset included.  The following constellation plot animation is used to verify we are getting BPSK symbols (with a frequency offset causing rotation):
+Nous sommes enfin prêts pour notre synchronisation temps symbole, ici nous utiliserons exactement le même code de synchronisation de Mueller et Muller du chapitre :ref:`sync-chapter`, rendez-vous y si vous voulez en savoir plus sur son fonctionnement.  Nous avons fixé l'échantillon par symbole (:code:`sps`) à 16 comme discuté précédemment. Une valeur de gain de 0.01 a été trouvée par expérimentation pour fonctionner correctement. La sortie devrait maintenant être un échantillon par symbole, c'est-à-dire que notre sortie est nos "symboles souples", avec un éventuel décalage de fréquence inclus.  L'animation suivante de la constellation est utilisée pour vérifier que nous obtenons des symboles BPSK (avec un décalage de fréquence provoquant une rotation) :
 
 .. image:: ../_images/constellation-animated.gif
    :scale: 80 % 
    :align: center 
 
-If you are using your own FM signal and are not getting two distinct clusters of complex samples at this point, it means either the symbol sync above failed to achieve sync, or there is something wrong with one of the previous steps.  You don't need to animate the constellation, but if you plot it, make sure to avoid plotting all the samples, because it will just look like a circle.  If you plot only 100 or 200 samples at a time, you will get a better feel for whether they are in two clusters or not, even if they are spinning.
+Si vous utilisez votre propre signal FM et que vous n'obtenez pas deux groupes distincts d'échantillons complexes à ce stade, cela signifie que la synchronisation du symbole ci-dessus n'a pas réussi à atteindre la synchronisation, ou qu'il y a un problème avec l'une des étapes précédentes. Vous n'avez pas besoin d'animer la constellation, mais si vous la tracez, veillez à ne pas tracer tous les échantillons, car cela ressemblera à un cercle. Si vous ne tracez que 100 ou 200 échantillons à la fois, vous aurez une meilleure idée de la présence ou non de deux groupes de points, même si elles tournent.
 
 ********************************
-Fine Frequency Synchronization
+Synchronisation fine de la fréquence
 ********************************
 
 .. code-block:: python
 
- # Fine freq sync
- samples = x # for the sake of matching the sync chapter
+ # Synchronisation fine de la fréquence
+ samples = x # comme dans le chapitre de la synchro
  N = len(samples)
  phase = 0
  freq = 0
- # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
+ # Ces deux paramètres suivants sont ce qu'il faut ajuster, pour rendre la boucle de rétroaction plus rapide ou plus lente (ce qui a un impact sur la stabilité).
  alpha = 8.0 
  beta = 0.002
  out = np.zeros(N, dtype=np.complex64)
  freq_log = []
  for i in range(N):
-     out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
-     error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+     out[i] = samples[i] * np.exp(-1j*phase) # ajuster l'échantillon d'entrée par l'inverse du décalage de phase estimé
+     error = np.real(out[i]) * np.imag(out[i]) # Voici la formule d'erreur pour une boucle de Costas de 2ème ordre (par exemple pour BPSK)
  
-     # Advance the loop (recalc phase and freq offset)
+     # Avancer la boucle (recalculer la phase et le décalage de fréquence)
      freq += (beta * error)
-     freq_log.append(freq * sample_rate / (2*np.pi)) # convert from angular velocity to Hz for logging
+     freq_log.append(freq * sample_rate / (2*np.pi)) # convertir de la vitesse angulaire en Hz pour les logs
      phase += freq + (alpha * error)
  
-     # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
+     # Facultatif : Ajustez la phase pour qu'elle soit toujours comprise entre 0 et 2pi, rappelez-vous que la phase tourne autour 2pi
      while phase >= 2*np.pi:
          phase -= 2*np.pi
      while phase < 0:
          phase += 2*np.pi
  x = out
 
-We will also copy the fine frequency synchronization Python code from the :ref:`sync-chapter` chapter, which uses a Costas loop to remove any residual frequency offset, as well as align our BPSK to the real (I) axis, by forcing Q to be as close to zero as possible.  Anything left in Q is likely due to the noise in the signal, assuming the Costas loop was tuned properly.  Just for fun let's view the same animation as above except after the frequency synchronization has been performed (no more spinning!):
+Nous allons également copier le code Python de synchronisation fine de fréquence du chapitre :ref:`sync-chapter`, qui utilise une boucle de Costas pour supprimer tout décalage de fréquence résiduel, ainsi que pour aligner notre BPSK sur l'axe réel (I), en forçant Q à être aussi proche de zéro que possible. Tout ce qui reste dans Q est probablement dû au bruit du signal, en supposant que la boucle de Costas a été réglée correctement. Juste pour le plaisir, regardons la même animation que ci-dessus, mais après que la synchronisation de fréquence ait été effectuée (plus de rotation !) :
 
 .. image:: ../_images/constellation-animated-postcostas.gif
    :scale: 80 % 
    :align: center 
 
-Additionally, we can look at the estimated frequency error over time to see the Costas loop working, note how we logged it in the code above.  It appears that there was about 13 Hz of frequency offset, either due to the transmitter's oscillator/LO being off or the receiver's LO (most likely the receiver).  If you are using your own FM signal, you may need to tweak :code:`alpha` and :code:`beta` until the curve looks similar, it should achieve synchronization fairly quickly (e.g., a few hundred symbols) and maintain it with minimal oscillation.  The pattern you see below after it finds its steady state is frequency jitter, not oscillation.
+De plus, nous pouvons regarder l'erreur de fréquence estimée dans le temps pour voir le fonctionnement de la boucle de Costas, notez comment nous l'avons enregistrée dans le code ci-dessus. Il semble qu'il y avait environ 13 Hz de décalage de fréquence, soit à cause de l'oscillateur local (LO) de l'émetteur qui était éteint, soit à cause de l'OL du récepteur (plus probablement le récepteur).  Si vous utilisez votre propre signal FM, vous devrez peut-être modifier :code:`alpha` et :code:`beta` jusqu'à ce que la courbe soit similaire, elle devrait atteindre la synchronisation assez rapidement (par exemple, quelques centaines de symboles) et la maintenir avec un minimum d'oscillations. Le modèle que vous voyez ci-dessous après qu'il ait trouvé son état stable est une gigue de fréquence, pas une oscillation.
 
 .. image:: ../_images/freq_error.png
    :scale: 40 % 
    :align: center 
 
 ********************************
-Demodulate the BPSK
+Démoduler le BPSK
 ********************************
 
 .. code-block:: python
 
- # Demod BPSK
- bits = (np.real(x) > 0).astype(int) # 1's and 0's
+ # Demodulation BPSK
+ bits = (np.real(x) > 0).astype(int) # 1s et 0s
 
-Demodulating the BPSK at this point is very easy, recall that each sample represents one soft symbol, so all we have to do is check whether each sample is above or below 0.  The :code:`.astype(int)` is just so we can work with an array of ints instead of an array of bools.  You may wonder whether above/below zero represents a 1 or 0.  As you will see in the next step, it doesn't matter!
+La démodulation du BPSK à ce stade est très facile, rappelez-vous que chaque échantillon représente un symbole souple, donc tout ce que nous avons à faire est de vérifier si chaque échantillon est au-dessus ou au-dessous de 0. Le :code:`.astype(int)` est juste pour que nous puissions travailler avec un tableau d'entiers au lieu d'un tableau de booléens. Vous pouvez vous demander si au-dessus ou au-dessous de zéro représente un 1 ou un 0. Comme vous le verrez à l'étape suivante, cela n'a pas d'importance!
 
 ********************************
-Differential Decoding
+Décodage différentiel
 ********************************
 
 .. code-block:: python
 
- # Differential decoding, so that it doesn't matter whether our BPSK was 180 degrees rotated without us realizing it
+ # Décodage différentiel, de sorte qu'il importe peu que notre BPSK ait subi une rotation de 180 degrés sans que nous nous en rendions compte.
  bits = (bits[1:] - bits[0:-1]) % 2
- bits = bits.astype(np.uint8) # for decoder
+ bits = bits.astype(np.uint8) # decodage
 
-The BPSK signal used differential coding when it was created, which means that each 1 and 0 of the original data was transformed such that a change from 1 to 0 or 0 to 1 got mapped to a 1, and no change got mapped to a 0.  The nice benefit of using differential coding is so you don't have to worry about 180 degree rotations in receiving the BPSK, because whether we consider a 1 to be greater than zero or less than zero is no longer an impact, what matters is changing between 1 and 0.  This concept might be easier to understand by looking at example data, below shows the first 10 symbols before and after the differential decoding:
-
-.. code-block:: python
-
- [1 1 1 1 0 1 0 0 1 1] # before differential decoding
- [- 0 0 0 1 1 1 0 1 0] # after differential decoding
-
-********************************
-RDS Decoding
-********************************
-
-We finally have our bits of information, and we are ready to decode what they mean!  The massive block of code provided below is what we will use to decode the 1's and 0's into groups of bytes.  This part would make a lot more sense if we first created the transmitter portion of RDS, but for now just know that in RDS, bytes are grouped into groups of 12 bytes, where the first 8 represent the data and the last 4 act as a sync word (called "offset words").  The last 4 bytes are not needed by the next step (the parser) so we don't include them in the output.  This block of code takes in the 1's and 0's created above (in the form of a 1D array of uint8's) and outputs a list of lists of bytes (a list of 8 bytes where those 8 bytes are in a list).  This makes it convenient for the next step, which will iterate through the list of 8 bytes, one group of 8 at a time.
-
-Most of the actual decoding code below revolves around syncing (at the byte level, not symbol) and error checking.  It works in blocks of 104 bits, each block is either received correctly or in error (using CRC to check), and every 50 blocks it checks whether more than 35 of them were received with error, in which case it resets everything and attempts to sync again.  The CRC is performed using a 10-bit check, with polynomial :math:`x^{10}+x^8+x^7+x^5+x^4+x^3+1`; this occurs when :code:`reg` is xor'ed with 0x5B9 which is the binary equivalent of that polynomial.  In Python, the bitwise operators for [and, or, not, xor] are :code:`& | ~ ^` respectively, exactly the same as C++. A left bit shift is :code:`x << y` (same as multiplying x by 2**y), and a right bit shift is :code:`x >> y` (same as dividing x by 2**y), also like in C++.  
-
-Note, you **do not** need to go through all of this code, or any of it, especially if you are focusing on learning the physical (PHY) layer side of DSP and SDR, as this does *not* represent signal processing.  This code is simply an implementation of a RDS decoder, and essentially none of it can be reused for other protocols, because it's so specific to the way RDS works.  If you are already somewhat exhausted by this chapter, feel free to just skip this enormous block of code that has one fairly simple job but does it in a complex manner.
+Le signal BPSK a utilisé un codage différentiel lors de sa création, ce qui signifie que chaque 1 et 0 des données d'origine a été transformé de telle sorte qu'un changement de 1 à 0 ou de 0 à 1 a été mis en correspondance avec un 1, et aucun changement n'a été mis en correspondance avec un 0.  L'avantage de l'utilisation du codage différentiel est que vous n'avez pas à vous soucier des rotations de 180 degrés lors de la réception de la BPSK, car le fait que nous considérions qu'un 1 est supérieur ou inférieur à zéro n'a plus d'impact, ce qui compte c'est le changement entre 1 et 0. Ce concept peut être plus facile à comprendre en regardant un exemple de données, ci-dessous les 10 premiers symboles avant et après le décodage différentiel :
 
 .. code-block:: python
 
- # Constants
+ [1 1 1 1 0 1 0 0 1 1] # avant le décodage différentiel
+ [- 0 0 0 1 1 1 0 1 0] # après le décodage différentiel
+
+********************************
+Décodage RDS
+********************************
+
+Nous avons enfin nos bits d'information, et nous sommes prêts à décoder leur signification! L'énorme bloc de code fourni ci-dessous est ce que nous allons utiliser pour décoder les 1 et les 0 en groupes d'octets. Cette partie aurait beaucoup plus de sens si nous avions d'abord créé la partie émetteur du RDS, mais pour l'instant, sachez simplement qu'en RDS, les octets sont regroupés en groupes de 12 octets, où les 8 premiers représentent les données et les 4 derniers servent de mot de synchronisation (appelés "mots de décalage"). Les 4 derniers octets ne sont pas nécessaires à l'étape suivante (l'analyseur syntaxique), nous ne les incluons donc pas dans la sortie. Ce bloc de code prend les 1 et 0 créés ci-dessus (sous la forme d'un tableau 1D d'uint8) et produit une liste de listes d'octets (une liste de 8 octets où ces 8 octets sont dans une liste). Ceci est pratique pour l'étape suivante, qui va itérer à travers la liste de 8 octets, un groupe de 8 à la fois.
+
+La plupart du code de décodage ci-dessous tourne autour de la synchronisation (au niveau de l'octet, pas du symbole) et de la vérification des erreurs.  Il fonctionne par blocs de 104 bits, chaque bloc est soit reçu correctement soit en erreur (en utilisant le CRC pour vérifier), et tous les 50 blocs il vérifie si plus de 35 d'entre eux ont été reçus avec une erreur, auquel cas il réinitialise tout et tente de se synchroniser à nouveau. Le CRC est effectué en utilisant une vérification sur 10 bits, avec le polynôme :math:`x^{10}+x^8+x^7+x^5+x^4+x^3+1`; cela se produit lorsque :code:`reg` est *xor* avec 0x5B9 qui est l'équivalent binaire de ce polynôme.  En Python, les opérateurs binaires pour [and, or, not, xor] sont :code:`& | ~ ^` respectivement, exactement comme en C++. Un décalage de bit gauche est :code:`x << y` (comme la multiplication de x par 2**y), et un décalage de bit droit est :code:`x >> y` (comme la division de x par 2**y), également comme en C++.  
+
+Notez que vous n'avez **pas** besoin de parcourir tout ce code, ou une partie de celui-ci, surtout si vous vous concentrez sur l'apprentissage de la couche physique (PHY) du DSP et de la SDR, car cela ne représente *pas* le traitement du signal. Ce code est simplement une implémentation d'un décodeur RDS, et essentiellement rien de ce code ne peut être réutilisé pour d'autres protocoles, car il est tellement spécifique à la façon dont le RDS fonctionne.  Si vous êtes déjà un peu épuisé par ce chapitre, sentez-vous libre de sauter cet énorme bloc de code qui a un travail assez simple mais qui le fait d'une manière complexe.
+
+.. code-block:: python
+
+ # Constantes
  syndrome = [383, 14, 303, 663, 748]
  offset_pos = [0, 1, 2, 3, 2]
  offset_word = [252, 408, 360, 436, 848]
  
- # see Annex B, page 64 of the standard
+ # regardez Annex B, page 64 du standard
  def calc_syndrome(x, mlen):
      reg = 0
      plen = 10
@@ -346,9 +348,9 @@ Note, you **do not** need to go through all of this code, or any of it, especial
          reg = reg << 1
          if (reg & (1 << plen)):
              reg = reg ^ 0x5B9
-     return reg & ((1 << plen) - 1) # select the bottom plen bits of reg
+     return reg & ((1 << plen) - 1) # sélectionner les plen bits de reg les plus bas
  
- # Initialize all the working vars we'll need during the loop
+ # Initialiser toutes les variables de travail dont nous aurons besoin pendant la boucle.
  synced = False
  presync = False
  
@@ -356,17 +358,17 @@ Note, you **do not** need to go through all of this code, or any of it, especial
  blocks_counter = 0
  group_good_blocks_counter = 0
  
- reg = np.uint32(0) # was unsigned long in C++ (64 bits) but numpy doesn't support bitwise ops of uint64, I don't think it gets that high anyway
+ reg = np.uint32(0) # était unsigned long en C++ (64 bits) mais numpy ne supporte pas les opérations bit à bit de uint64, je ne pense pas qu'il atteigne cette valeur de toute façon.
  lastseen_offset_counter = 0
  lastseen_offset = 0
  
- # the synchronization process is described in Annex C, page 66 of the standard */
+ # le processus de synchronisation est décrit dans l'annexe C, page 66 de la norme */
  bytes_out = []
  for i in range(len(bits)):
-     # in C++ reg doesn't get init so it will be random at first, for ours its 0s
-     # It was also an unsigned long but never seemed to get anywhere near the max value
-     # bits are either 0 or 1
-     reg = np.bitwise_or(np.left_shift(reg, 1), bits[i]) # reg contains the last 26 rds bits. these are both bitwise ops
+     # en C++, reg n'est pas initié, il sera donc aléatoire au début, pour le nôtre, il s'agit de 0.
+     # C'était aussi un unsigned long  mais il ne semblait pas s'approcher de la valeur maximale.
+     # les bits sont soit 0 soit 1
+     reg = np.bitwise_or(np.left_shift(reg, 1), bits[i]) # reg contient les 26 derniers bits de RDS. Ce sont tous deux des opérations par bit.
      if not synced:
          reg_syndrome = calc_syndrome(reg, 26)
          for j in range(5):
@@ -383,17 +385,17 @@ Note, you **do not** need to go through all of this code, or any of it, especial
                      if (block_distance*26) != (i - lastseen_offset_counter):
                          presync = False
                      else:
-                         print('Sync State Detected')
+                         print('Etat de la synchronisation détecté')
                          wrong_blocks_counter = 0
                          blocks_counter = 0
                          block_bit_counter = 0
                          block_number = (j + 1) % 4
                          group_assembly_started = False
                          synced = True
-             break # syndrome found, no more cycles
+             break # syndrome trouvé, plus de cycles
  
-     else: # SYNCED
-         # wait until 26 bits enter the buffer */
+     else: # SYNCHRONISÉ
+         # attendre que 26 bits entrent dans le tampon */
          if block_bit_counter < 25:
              block_bit_counter += 1
          else:
@@ -401,7 +403,7 @@ Note, you **do not** need to go through all of this code, or any of it, especial
              dataword = (reg >> 10) & 0xffff
              block_calculated_crc = calc_syndrome(dataword, 16)
              checkword = reg & 0x3ff
-             if block_number == 2: # manage special case of C or C' offset word
+             if block_number == 2: # gérer le cas particulier du mot de décalage C ou C'.
                  block_received_crc = checkword ^ offset_word[block_number]
                  if (block_received_crc == block_calculated_crc):
                      good_block = True
@@ -413,100 +415,100 @@ Note, you **do not** need to go through all of this code, or any of it, especial
                          wrong_blocks_counter += 1
                          good_block = False
              else:
-                 block_received_crc = checkword ^ offset_word[block_number] # bitwise xor
+                 block_received_crc = checkword ^ offset_word[block_number] # xor binaire
                  if block_received_crc == block_calculated_crc:
                      good_block = True
                  else:
                      wrong_blocks_counter += 1
                      good_block = False
                  
-             # Done checking CRC
+             # Vérification du CRC terminée
              if block_number == 0 and good_block:
                  group_assembly_started = True
                  group_good_blocks_counter = 1
-                 bytes = bytearray(8) # 8 bytes filled with 0s
+                 bytes = bytearray(8) # 8 octets remplis de 0
              if group_assembly_started:
                  if not good_block:
                      group_assembly_started = False
                  else:
-                     # raw data bytes, as received from RDS. 8 info bytes, followed by 4 RDS offset chars: ABCD/ABcD/EEEE (in US) which we leave out here
-                     # RDS information words
-                     # block_number is either 0,1,2,3 so this is how we fill out the 8 bytes
+                     # octets de données brutes, tels que reçus du RDS. 8 octets d'information, suivis de 4 caractères de décalage RDS : ABCD/ABcD/EEEE (aux Etats-Unis) que nous laissons de côté ici.
+                     # Mots d'information RDS
+                     # le numéro de bloc est soit 0,1,2,3 donc c'est comme ça qu'on remplit les 8 octets
                      bytes[block_number*2] = (dataword >> 8) & 255
                      bytes[block_number*2+1] = dataword & 255
                      group_good_blocks_counter += 1
                      #print('group_good_blocks_counter:', group_good_blocks_counter)
                  if group_good_blocks_counter == 5:
                      #print(bytes)
-                     bytes_out.append(bytes) # list of len-8 lists of bytes
+                     bytes_out.append(bytes) # liste de listes d'octets de longueur 8
              block_bit_counter = 0
              block_number = (block_number + 1) % 4
              blocks_counter += 1
              if blocks_counter == 50:
-                 if wrong_blocks_counter > 35: # This many wrong blocks must mean we lost sync
-                     print("Lost Sync (Got ", wrong_blocks_counter, " bad blocks on ", blocks_counter, " total)")
+                 if wrong_blocks_counter > 35: # Autant de blocs erronés doivent signifier que nous avons perdu la synchronisation.
+                     print("Perte de synchronisation (obtient ", wrong_blocks_counter, " mauvais blocs sur ", blocks_counter, " en total)")
                      synced = False
                      presync = False
                  else:
-                     print("Still Sync-ed (Got ", wrong_blocks_counter, " bad blocks on ", blocks_counter, " total)")
+                     print("Toujours synchronisé (obtient ", wrong_blocks_counter, " mauvais blocs sur ", blocks_counter, " en total)")
                  blocks_counter = 0
                  wrong_blocks_counter = 0
 
-Below shows an example output from this decoding step, note how in this example it synced fairly quickly but then loses sync a couple times for some reason, although it's still able to parse all of the data as we'll see.  If you are using the downloadable 1M samples file, you will only see the first few lines below.  The actual contents of these bytes just look like random numbers/characters depending on how you display them, but in the next step we will parse them into human readable information!
+Vous trouverez ci-dessous un exemple de sortie de cette étape de décodage. Notez que dans cet exemple, la synchronisation est assez rapide, mais qu'elle est perdue plusieurs fois pour une raison quelconque, bien qu'elle soit toujours capable d'analyser toutes les données comme nous le verrons.  Si vous utilisez le fichier d'échantillons téléchargeable de 1M échantillons, vous ne verrez que les premières lignes ci-dessous.  Le contenu réel de ces octets ressemble à des nombres/caractères aléatoires selon la façon dont vous les affichez, mais dans l'étape suivante, nous allons les analyser en informations lisibles par l'homme!
 
 .. code-block:: console
 
- Sync State Detected
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  1  bad blocks on  50  total)
- Still Sync-ed (Got  5  bad blocks on  50  total)
- Still Sync-ed (Got  26  bad blocks on  50  total)
- Lost Sync (Got  50  bad blocks on  50  total)
- Sync State Detected
- Still Sync-ed (Got  3  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  0  bad blocks on  50  total)
- Still Sync-ed (Got  2  bad blocks on  50  total)
- Still Sync-ed (Got  1  bad blocks on  50  total)
- Still Sync-ed (Got  20  bad blocks on  50  total)
- Lost Sync (Got  47  bad blocks on  50  total)
- Sync State Detected
- Still Sync-ed (Got  32  bad blocks on  50  total)
+ Etat de la synchronisation détecté
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   1  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   5  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   26  mauvais blocs sur  50 en total)
+ Perte de synchronisation (obtient 50 mauvais blocs sur  50 en total)
+ Etat de la synchronisation détecté
+ Toujours synchronisé (obtient   3  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   0  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   2  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   1  mauvais blocs sur  50 en total)
+ Toujours synchronisé (obtient   20  mauvais blocs sur  50 en total)
+ Perte de synchronisation (obtient 47 mauvais blocs sur  50 en total)
+ Etat de la synchronisation détecté
+ Toujours synchronisé (obtient   32 mauvais blocs sur  50 en total)
  
 ********************************
-RDS Parsing
+Analyse du RDS
 ********************************
 
-Now that we have bytes, in groups of 8, we can extract the final data, i.e., the final output that is human understandable.  This is known as parsing the bytes, and just like the decoder in the previous section, it is simply an implementation of the RDS protocol, and is really not that important to understand.  Luckily it's not a ton of code, if you don't include the two tables defined at the start, which are simply the lookup tables for the type of FM channel and the coverage area.
+Maintenant que nous avons des octets, par groupes de 8, nous pouvons extraire les données finales, c'est-à-dire la sortie finale qui est compréhensible par l'homme. C'est ce qu'on appelle l'analyse des octets, et tout comme le décodeur de la section précédente, il s'agit simplement d'une mise en œuvre du protocole RDS, et il n'est pas vraiment important de le comprendre. Heureusement, ce n'est pas une tonne de code, si vous n'incluez pas les deux tables définies au début, qui sont simplement les tables de recherche pour le type de canal FM et la zone de couverture.
 
-For those who want to learn how this code works, I'll provide some added information.  The protocol uses this concept of an A/B flag, which means some messages are marked A and others B, and the parsing changes based on which one (whether it's A or B is stored in the third bit of the second byte).  It also uses different "group" types which are analogous to message type, and in this code we are only parsing message type 2, which is the message type that has the radio text in it, which is the interesting part, it's the text that scrolls across the screen in your car.  We will still be able to parse the channel type and region, as they are stored in every message.  Lastly, note that :code:`radiotext` is a string that gets initialized to all spaces, gets filled out slowly as bytes are parsed, and then resets to all spaces if a specific set of bytes is received.  If you are curious what other message types exist, the list is: ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "EON"]. The message "RT" is radiotext which is the only one we decode.  The RDS GNU Radio block decodes "BASIC" as well, but for the stations I used for testing it didn't contain much interesting information, and would have added a lot of lines to the code below.
+Pour ceux qui veulent apprendre comment ce code fonctionne, je vais fournir quelques informations supplémentaires. Le protocole utilise le concept de drapeau A/B, ce qui signifie que certains messages sont marqués A et d'autres B, et que l'analyse syntaxique change en fonction de ces derniers (le fait qu'il s'agisse de A ou de B est stocké dans le troisième bit du deuxième octet). Il utilise également différents types de "groupes" qui sont analogues au type de message, et dans ce code, nous n'analysons que le type de message 2, qui est le type de message contenant le texte de la radio, qui est la partie intéressante, c'est le texte qui défile sur l'écran de votre voiture. Nous serons toujours en mesure d'analyser le type de chaîne et la région, car ils sont stockés dans chaque message. Enfin, notez que :code:`radiotext` est une chaîne qui est initialisée à tous les espaces, se remplit lentement au fur et à mesure que les octets sont analysés, puis se réinitialise à tous les espaces si un ensemble spécifique d'octets est reçu. Si vous êtes curieux de savoir quels autres types de messages existent, la liste est la suivante : ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "EON"]. Le message "RT" est un radiotexte qui est le seul que nous décodons. Le bloc RDS GNU Radio décode aussi "BASIC", mais pour les stations que j'ai utilisées pour les tests, il ne contenait pas beaucoup d'informations intéressantes, et aurait ajouté beaucoup de lignes au code ci-dessous.
 
 .. code-block:: python
 
- # Annex F of RBDS Standard Table F.1 (North America) and Table F.2 (Europe)
- #              Europe                   North America
+ # Annexe F de la norme RBDS Tableau F.1 (Amérique du Nord) et Tableau F.2 (Europe)
+ #              Europe                   Amérique du Nord
  pty_table = [["Undefined",             "Undefined"],
               ["News",                  "News"],
               ["Current Affairs",       "Information"],
@@ -539,7 +541,7 @@ For those who want to learn how this code works, I'll provide some added informa
               ["Documentary",           "Weather"],
               ["Alarm Test",            "Emergency Test"],
               ["Alarm",                 "Emergency"]]
- pty_locale = 1 # set to 0 for Europe which will use first column instead
+ pty_locale = 1 # mis à 0 pour l'Europe qui utilisera la première colonne à la place.
  
  # page 72, Annex D, table D.2 in the standard
  coverage_area_codes = ["Local",
@@ -568,10 +570,10 @@ For those who want to learn how this code works, I'll provide some added informa
      group_2 = bytes[5] | (bytes[4] << 8)
      group_3 = bytes[7] | (bytes[6] << 8)
       
-     group_type = (group_1 >> 12) & 0xf # here is what each one means, e.g. RT is radiotext which is the only one we decode here: ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "___", "___", "___", "___", "EON", "___"]
-     AB = (group_1 >> 11 ) & 0x1 # b if 1, a if 0
+     group_type = (group_1 >> 12) & 0xf # voici ce que chacun signifie, par exemple RT est radiotexte qui est le seul que nous décodons ici : ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "___", "___", "___", "___", "EON", "___"]
+     AB = (group_1 >> 11 ) & 0x1 # b si 1, a si 0
  
-     #print("group_type:", group_type) # this is essentially message type, i only see type 0 and 2 in my recording
+     #print("group_type:", group_type) # il s'agit essentiellement du type de message, je ne vois que les types 0 et 2 dans mon enregistrement.
      #print("AB:", AB)
  
      program_identification = group_0     # "PI"
@@ -582,7 +584,7 @@ For those who want to learn how this code works, I'll provide some added informa
      pi_area_coverage = (program_identification >> 8) & 0xf
      coverage_area = coverage_area_codes[pi_area_coverage]
      
-     pi_program_reference_number = program_identification & 0xff # just an int
+     pi_program_reference_number = program_identification & 0xff # juste un entier
      
      if first_time:
          print("PTY:", pty)
@@ -591,7 +593,7 @@ For those who want to learn how this code works, I'll provide some added informa
          first_time = False
  
      if group_type == 2:
-         # when the A/B flag is toggled, flush your current radiotext
+         # lorsque le flag A/B est activé, effacez votre radiotexte actuel.
          if radiotext_AB_flag != ((group_1 >> 4) & 0x01):
              radiotext = [' ']*65
          radiotext_AB_flag = (group_1 >> 4) & 0x01
@@ -607,9 +609,9 @@ For those who want to learn how this code works, I'll provide some added informa
          print(''.join(radiotext))
      else:
          pass
-         #print("unsupported group_type:", group_type)
+         #print("group_type non supporté:", group_type)
 
-Below shows the output of the parsing step for an example FM station.  Note how it has to build the radiotext string over multiple messages, and then it periodically clears out the string and starts again.  If you are using the 1M sample downloaded file, you will only see the first few lines below.
+L'exemple ci-dessous montre la sortie de l'étape d'analyse syntaxique pour une station FM. Notez comment il doit construire la chaîne de radiotexte sur plusieurs messages, puis il efface périodiquement la chaîne et recommence. Si vous utilisez l'exemple de fichier téléchargé de 1M, vous ne verrez que les premières lignes ci-dessous.
 
 .. code-block:: console
 
@@ -640,10 +642,10 @@ Below shows the output of the parsing step for an example FM station.  Note how 
 
 
 ********************************
-Wrap-Up and Final Code
+Récapitulation et code final
 ********************************
 
-You did it!  Below is all of the code above, concatenated, it should work with the test recording available for download.  If you find you had to make tweaks to get it to work with your own recording or live SDR, let me know what you had to do, you can submit it as a GitHub PR at `the textbook's GitHub page <https://github.com/777arc/textbook>`_.  You can also find a version of this code with dozens of debug plotting/printing included, that I originally used to make this chapter, `here <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/rds_demo.py>`_.  
+Vous avez réussi! Vous trouverez ci-dessous l'ensemble du code. Concaténé, il devrait fonctionner avec l'enregistrement de test disponible en téléchargement. Si vous trouvez que vous avez dû faire des ajustements pour le faire fonctionner avec votre propre enregistrement ou SDR en direct, faites-moi savoir ce que vous avez dû faire, vous pouvez le soumettre comme une PR GitHub à `la page GitHub du manuel <https://github.com/777arc/textbook>`_. Vous pouvez également trouver une version de ce code avec des dizaines de figures/affichages de débogage inclus, que j'ai utilisé à l'origine pour faire ce chapitre, `ici <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/rds_demo.py>`_.  
 
 .. raw:: html
 
@@ -652,92 +654,92 @@ You did it!  Below is all of the code above, concatenated, it should work with t
    
 .. code-block:: python
 
- # Read in signal
- x = np.fromfile('/home/marc/Downloads/fm_rds_250k_from_sdrplay.iq', dtype=np.complex64)
+ # Lire le signal
+ x = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64)
  sample_rate = 250e3
  center_freq = 99.5e6
 
- # Quadrature Demod
+ # Démodulation en quadrature
  x = 0.5 * np.angle(x[0:-1] * np.conj(x[1:])) # see https://wiki.gnuradio.org/index.php/Quadrature_Demod
 
- # Freq shift
+ # décalage de freq
  N = len(x)
- f_o = -57e3 # amount we need to shift by
- t = np.arange(N)/sample_rate # time vector
- x = x * np.exp(2j*np.pi*f_o*t) # down shift
+ f_o = -57e3 # valeur du décalage
+ t = np.arange(N)/sample_rate # vecteur de temps
+ x = x * np.exp(2j*np.pi*f_o*t) # décalage de freq
 
- # Low-Pass Filter
+ # filtre passe bas
  taps = firwin(numtaps=101, cutoff=7.5e3, fs=sample_rate)
  x = np.convolve(x, taps, 'valid')
 
- # Decimate by 10, now that we filtered and there wont be aliasing
+ # Décimer par 10, maintenant que nous avons filtré et qu'il n'y aura pas de repliement.
  x = x[::10]
  sample_rate = 25e3
 
- # Resample to 19kHz
+ # Rééchantillonnage à 19 kHz
  x = resample_poly(x, 19, 25) # up, down
  sample_rate = 19e3
 
- # Bandpass filter (TODO: make it a proper matched filter with RRC, even though it's not required to function)
+ # Filtre passe-bande pour isoler un signal RDS BPSK
  taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
  x = np.convolve(x, taps, 'valid')
 
- # Symbol sync, using what we did in sync chapter
- samples = x # for the sake of matching the sync chapter
+  # Synchronisation des symboles, en utilisant ce que nous avons fait dans le chapitre sur la synchronisation.
+ samples = x # comme dans le chapitre de la synchronisation
  samples_interpolated = resample_poly(samples, 16, 1)
  sps = 16
- mu = 0.01 # initial estimate of phase of sample
+ mu = 0.01 # estimation initiale de la phase de l'échantillon
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
- out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stores values, each iteration we need the previous 2 values plus current value
- i_in = 0 # input samples index
- i_out = 2 # output index (let first two outputs be 0)
+ out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stocke les valeurs, à chaque itération nous avons besoin des 2 valeurs précédentes plus la valeur actuelle.
+ i_in = 0 # index des échantillons d'entrée
+ i_out = 2 # indice de sortie (les deux premières sorties sont 0)
  while i_out < len(samples) and i_in+16 < len(samples):
-     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # grab what we think is the "best" sample
+     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # prendre ce que nous pensons être le "meilleur" échantillon
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
      mm_val = np.real(y - x)
      mu += sps + 0.01*mm_val
-     i_in += int(np.floor(mu)) # round down to nearest int since we are using it as an index
-     mu = mu - np.floor(mu) # remove the integer part of mu
-     i_out += 1 # increment output index
- x = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
+     i_in += int(np.floor(mu)) # arrondir à l'entier le plus proche puisque nous l'utilisons comme un index
+     mu = mu - np.floor(mu) # supprimer la partie entière de mu
+     i_out += 1 # incrémenter l'indice de sortie
+ x = out[2:i_out] # supprimer les deux premiers, et tout ce qui suit i_out (qui n'a jamais été rempli)
 
- # Fine freq sync
- samples = x # for the sake of matching the sync chapter
+ # Synchronisation fine de la fréquence
+ samples = x # comme dans le chapitre de la synchro
  N = len(samples)
  phase = 0
  freq = 0
- # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
+ # Ces deux paramètres suivants sont ce qu'il faut ajuster, pour rendre la boucle de rétroaction plus rapide ou plus lente (ce qui a un impact sur la stabilité).
  alpha = 8.0 
  beta = 0.002
  out = np.zeros(N, dtype=np.complex64)
  freq_log = []
  for i in range(N):
-     out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
-     error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+     out[i] = samples[i] * np.exp(-1j*phase) # ajuster l'échantillon d'entrée par l'inverse du décalage de phase estimé
+     error = np.real(out[i]) * np.imag(out[i]) # Voici la formule d'erreur pour une boucle de Costas de 2ème ordre (par exemple pour BPSK)
  
-     # Advance the loop (recalc phase and freq offset)
+     # Avancer la boucle (recalculer la phase et le décalage de fréquence)
      freq += (beta * error)
-     freq_log.append(freq * sample_rate / (2*np.pi)) # convert from angular velocity to Hz for logging
+     freq_log.append(freq * sample_rate / (2*np.pi)) # convertir de la vitesse angulaire en Hz pour les logs
      phase += freq + (alpha * error)
  
-     # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
+     # Facultatif : Ajustez la phase pour qu'elle soit toujours comprise entre 0 et 2pi, rappelez-vous que la phase tourne autour 2pi
      while phase >= 2*np.pi:
          phase -= 2*np.pi
      while phase < 0:
          phase += 2*np.pi
  x = out
 
- # Demod BPSK
- bits = (np.real(x) > 0).astype(int) # 1's and 0's
+ # Demodulation BPSK
+ bits = (np.real(x) > 0).astype(int) # 1s et 0s
 
- # Differential decoding, so that it doesn't matter whether our BPSK was 180 degrees rotated without us realizing it
+ # Décodage différentiel, de sorte qu'il importe peu que notre BPSK ait subi une rotation de 180 degrés sans que nous nous en rendions compte.
  bits = (bits[1:] - bits[0:-1]) % 2
- bits = bits.astype(np.uint8) # for decoder
+ bits = bits.astype(np.uint8) # decodage
 
  ###########
- # DECODER #
+ # DECODAGE #
  ###########
  
  # Constants
@@ -745,7 +747,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
  offset_pos = [0, 1, 2, 3, 2]
  offset_word = [252, 408, 360, 436, 848]
  
- # see Annex B, page 64 of the standard
+ # regardez Annex B, page 64 du standard
  def calc_syndrome(x, mlen):
      reg = 0
      plen = 10
@@ -757,9 +759,9 @@ You did it!  Below is all of the code above, concatenated, it should work with t
          reg = reg << 1
          if (reg & (1 << plen)):
              reg = reg ^ 0x5B9
-     return reg & ((1 << plen) - 1) # select the bottom plen bits of reg
+     return reg & ((1 << plen) - 1) # sélectionner les plen bits de reg les plus bas
  
- # Initialize all the working vars we'll need during the loop
+ # Initialiser toutes les variables de travail dont nous aurons besoin pendant la boucle.
  synced = False
  presync = False
  
@@ -767,17 +769,17 @@ You did it!  Below is all of the code above, concatenated, it should work with t
  blocks_counter = 0
  group_good_blocks_counter = 0
  
- reg = np.uint32(0) # was unsigned long in C++ (64 bits) but numpy doesn't support bitwise ops of uint64, I don't think it gets that high anyway
+ reg = np.uint32(0) # était unsigned long en C++ (64 bits) mais numpy ne supporte pas les opérations bit à bit de uint64, je ne pense pas qu'il atteigne cette valeur de toute façon.
  lastseen_offset_counter = 0
  lastseen_offset = 0
  
- # the synchronization process is described in Annex C, page 66 of the standard */
+ # le processus de synchronisation est décrit dans l'annexe C, page 66 de la norme */
  bytes_out = []
  for i in range(len(bits)):
-     # in C++ reg doesn't get init so it will be random at first, for ours its 0s
-     # It was also an unsigned long but never seemed to get anywhere near the max value
-     # bits are either 0 or 1
-     reg = np.bitwise_or(np.left_shift(reg, 1), bits[i]) # reg contains the last 26 rds bits. these are both bitwise ops
+     # en C++, reg n'est pas initié, il sera donc aléatoire au début, pour le nôtre, il s'agit de 0.
+     # C'était aussi un unsigned long  mais il ne semblait pas s'approcher de la valeur maximale.
+     # les bits sont soit 0 soit 1
+     reg = np.bitwise_or(np.left_shift(reg, 1), bits[i]) # reg contient les 26 derniers bits de RDS. Ce sont tous deux des opérations par bit.
      if not synced:
          reg_syndrome = calc_syndrome(reg, 26)
          for j in range(5):
@@ -794,17 +796,17 @@ You did it!  Below is all of the code above, concatenated, it should work with t
                      if (block_distance*26) != (i - lastseen_offset_counter):
                          presync = False
                      else:
-                         print('Sync State Detected')
+                         print('Etat de la synchronisation détecté')
                          wrong_blocks_counter = 0
                          blocks_counter = 0
                          block_bit_counter = 0
                          block_number = (j + 1) % 4
                          group_assembly_started = False
                          synced = True
-             break # syndrome found, no more cycles
+             break # syndrome trouvé, plus de cycles
  
-     else: # SYNCED
-         # wait until 26 bits enter the buffer */
+     else: # SYNCHRONISÉ
+         # attendre que 26 bits entrent dans le tampon */
          if block_bit_counter < 25:
              block_bit_counter += 1
          else:
@@ -812,7 +814,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
              dataword = (reg >> 10) & 0xffff
              block_calculated_crc = calc_syndrome(dataword, 16)
              checkword = reg & 0x3ff
-             if block_number == 2: # manage special case of C or C' offset word
+             if block_number == 2: # gérer le cas particulier du mot de décalage C ou C'.
                  block_received_crc = checkword ^ offset_word[block_number]
                  if (block_received_crc == block_calculated_crc):
                      good_block = True
@@ -824,51 +826,51 @@ You did it!  Below is all of the code above, concatenated, it should work with t
                          wrong_blocks_counter += 1
                          good_block = False
              else:
-                 block_received_crc = checkword ^ offset_word[block_number] # bitwise xor
+                 block_received_crc = checkword ^ offset_word[block_number] # xor binaire
                  if block_received_crc == block_calculated_crc:
                      good_block = True
                  else:
                      wrong_blocks_counter += 1
                      good_block = False
                  
-             # Done checking CRC
+             # Vérification du CRC terminée
              if block_number == 0 and good_block:
                  group_assembly_started = True
                  group_good_blocks_counter = 1
-                 bytes = bytearray(8) # 8 bytes filled with 0s
+                 bytes = bytearray(8) # 8 octets remplis de 0
              if group_assembly_started:
                  if not good_block:
                      group_assembly_started = False
                  else:
-                     # raw data bytes, as received from RDS. 8 info bytes, followed by 4 RDS offset chars: ABCD/ABcD/EEEE (in US) which we leave out here
-                     # RDS information words
-                     # block_number is either 0,1,2,3 so this is how we fill out the 8 bytes
+                     # octets de données brutes, tels que reçus du RDS. 8 octets d'information, suivis de 4 caractères de décalage RDS : ABCD/ABcD/EEEE (aux Etats-Unis) que nous laissons de côté ici.
+                     # Mots d'information RDS
+                     # le numéro de bloc est soit 0,1,2,3 donc c'est comme ça qu'on remplit les 8 octets
                      bytes[block_number*2] = (dataword >> 8) & 255
                      bytes[block_number*2+1] = dataword & 255
                      group_good_blocks_counter += 1
                      #print('group_good_blocks_counter:', group_good_blocks_counter)
                  if group_good_blocks_counter == 5:
                      #print(bytes)
-                     bytes_out.append(bytes) # list of len-8 lists of bytes
+                     bytes_out.append(bytes) # liste de listes d'octets de longueur 8
              block_bit_counter = 0
              block_number = (block_number + 1) % 4
              blocks_counter += 1
              if blocks_counter == 50:
-                 if wrong_blocks_counter > 35: # This many wrong blocks must mean we lost sync
-                     print("Lost Sync (Got ", wrong_blocks_counter, " bad blocks on ", blocks_counter, " total)")
+                 if wrong_blocks_counter > 35: # Autant de blocs erronés doivent signifier que nous avons perdu la synchronisation.
+                     print("Perte de synchronisation (obtient ", wrong_blocks_counter, " mauvais blocs sur ", blocks_counter, " en total)")
                      synced = False
                      presync = False
                  else:
-                     print("Still Sync-ed (Got ", wrong_blocks_counter, " bad blocks on ", blocks_counter, " total)")
+                     print("Toujours synchronisé (obtient ", wrong_blocks_counter, " mauvais blocs sur ", blocks_counter, " en total)")
                  blocks_counter = 0
                  wrong_blocks_counter = 0
 
  ###########
- # PARSER  #
+ # Analyse  #
  ###########
 
- # Annex F of RBDS Standard Table F.1 (North America) and Table F.2 (Europe)
- #              Europe                   North America
+ # Annexe F de la norme RBDS Tableau F.1 (Amérique du Nord) et Tableau F.2 (Europe)
+ #              Europe                   Amérique du Nord
  pty_table = [["Undefined",             "Undefined"],
               ["News",                  "News"],
               ["Current Affairs",       "Information"],
@@ -901,7 +903,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
               ["Documentary",           "Weather"],
               ["Alarm Test",            "Emergency Test"],
               ["Alarm",                 "Emergency"]]
- pty_locale = 1 # set to 0 for Europe which will use first column instead
+ pty_locale = 1 # mis à 0 pour l'Europe qui utilisera la première colonne à la place.
  
  # page 72, Annex D, table D.2 in the standard
  coverage_area_codes = ["Local",
@@ -930,10 +932,10 @@ You did it!  Below is all of the code above, concatenated, it should work with t
      group_2 = bytes[5] | (bytes[4] << 8)
      group_3 = bytes[7] | (bytes[6] << 8)
       
-     group_type = (group_1 >> 12) & 0xf # here is what each one means, e.g. RT is radiotext which is the only one we decode here: ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "___", "___", "___", "___", "EON", "___"]
-     AB = (group_1 >> 11 ) & 0x1 # b if 1, a if 0
+     group_type = (group_1 >> 12) & 0xf # voici ce que chacun signifie, par exemple RT est radiotexte qui est le seul que nous décodons ici : ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "___", "___", "___", "___", "EON", "___"]
+     AB = (group_1 >> 11 ) & 0x1 # b si 1, a si 0
  
-     #print("group_type:", group_type) # this is essentially message type, i only see type 0 and 2 in my recording
+     #print("group_type:", group_type) # il s'agit essentiellement du type de message, je ne vois que les types 0 et 2 dans mon enregistrement.
      #print("AB:", AB)
  
      program_identification = group_0     # "PI"
@@ -944,7 +946,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
      pi_area_coverage = (program_identification >> 8) & 0xf
      coverage_area = coverage_area_codes[pi_area_coverage]
      
-     pi_program_reference_number = program_identification & 0xff # just an int
+     pi_program_reference_number = program_identification & 0xff # juste un entier
      
      if first_time:
          print("PTY:", pty)
@@ -953,7 +955,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
          first_time = False
  
      if group_type == 2:
-         # when the A/B flag is toggled, flush your current radiotext
+         # lorsque le flag A/B est activé, effacez votre radiotexte actuel.
          if radiotext_AB_flag != ((group_1 >> 4) & 0x01):
              radiotext = [' ']*65
          radiotext_AB_flag = (group_1 >> 4) & 0x01
@@ -969,56 +971,56 @@ You did it!  Below is all of the code above, concatenated, it should work with t
          print(''.join(radiotext))
      else:
          pass
-         #print("unsupported group_type:", group_type)
+         #print("group_type non supporté:", group_type)
 
 .. raw:: html
 
    </details>
 
-Once again, the example FM recording known to work with this code `can be found here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.
+Encore une fois, l'exemple d'enregistrement FM connu pour fonctionner avec ce code `peut être trouvé ici <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.
 
-For those interested in demodulating the actual audio signal, just add the following lines right after the "Acquiring a Signal" section (special thanks to `Joel Cordeiro <http://github.com/joeugenio>`_ for the code):
+Pour ceux qui sont intéressés par la démodulation du signal audio réel, il suffit d'ajouter les lignes suivantes juste après (merci à `Joel Cordeiro <http://github.com/joeugenio>`_ pour le code):
 
 .. code-block:: python
 
- # Add the following code right after the "Acquiring a Signal" section
+ # Ajoutez le code suivant juste après la section acquisition d'un signal.
  
  from scipy.io import wavfile
  
  # Demodulation
  x = np.diff(np.unwrap(np.angle(x)))
  
- # De-emphasis filter, H(s) = 1/(RC*s + 1), implemented as IIR via bilinear transform
+ # Filtre de désaccentuation (de-emphasis), H(s) = 1/(RC*s + 1), implémenté comme un IIR via une transformation bilinéaire
  bz, az = bilinear(1, [75e-6, 1], fs=sample_rate)
  x = lfilter(bz, az, x)
  
- # decimate filter to get mono audio
+ # filtre de décimation pour obtenir un son mono
  x = x[::6]
  sample_rate = sample_rate/6
  
- # normalizes volume
+ # normaliser le volume
  x /= x.std() 
  
- # Save to wav file, you can open this in Audacity for example
+ # Enregistrez dans un fichier wav, vous pouvez l'ouvrir dans Audacity par exemple.
  wavfile.write('fm.wav', int(sample_rate), x)
 
-The most complicated part is the de-emphasis filter, `which you can learn about here <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, although it's actually an optional step if you are OK with audio that has a poor bass/treble balance.  For those curious, here is what the frequency response of the `IIR <https://en.wikipedia.org/wiki/Infinite_impulse_response>`_ de-emphasis filter looks like, it doesn't fully filter out any frequencies, it's more of a "shaping" filter.
+La partie la plus compliquée est le filtre de désaccentuation (ou de-emphasis), `que vous pouvez apprendre ici <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, bien qu'il s'agisse en fait d'une étape optionnelle si vous pouvre vous suffir d'un audio qui a un mauvais équilibre entre les basses et les aigus. Pour les curieux, voici à quoi ressemble la réponse en fréquence de ce filtre `IIR <https://fr.wikipedia.org/wiki/Filtre_à_réponse_impulsionnelle_infinie>`_, il ne filtre pas complètement les fréquences, c'est plus un filtre de "mise en forme".
 
 .. image:: ../_images/fm_demph_filter_freq_response.svg
    :align: center 
    :target: ../_images/fm_demph_filter_freq_response.svg
    
 ********************************
-Acknowledgments
+Remerciements
 ********************************
 
-Most of the steps above used to receive RDS were adapted from the GNU Radio implementation of RDS, which lives in the GNU Radio Out-of-Tree Module called `gr-rds <https://github.com/bastibl/gr-rds>`_, originally created by Dimitrios Symeonidis and maintained by Bastian Bloessl, and I would like to acknowledge the work of these authors.  In order to create this chapter, I started with using gr-rds in GNU Radio, with a working FM recording, and slowly converted each of the blocks (including many built-in blocks) to Python.  It took quite a bit of time, there are some nuances to the built-in blocks that are easy to miss, and going from stream-style signal processing (i.e., using a work function that processes a few thousand samples at a time in a stateful manner) to a block of Python is not always straightforward.  GNU Radio is an amazing tool for this kind of prototyping and I would never have been able to create all of this working Python code without it.
+La plupart des étapes ci-dessus utilisées pour recevoir le RDS ont été adaptées de l'implémentation GNU Radio du RDS, qui est dans le module GNU Radio appelé `gr-rds <https://github.com/bastibl/gr-rds>`_, créé à l'origine par Dimitrios Symeonidis et maintenu par Bastian Bloessl, et je voudrais remercier le travail de ces auteurs. Afin de créer ce chapitre, j'ai commencé par utiliser gr-rds dans GNU Radio, avec un enregistrement FM fonctionnel, et j'ai converti pas-à-pas chacun des blocs (y compris de nombreux blocs intégrés) en Python. Cela a pris pas mal de temps, il y a des nuances dans les blocs intégrés qui sont faciles à rater, et passer d'un traitement de signal de type stream (c'est-à-dire utilisant une fonction de travail qui traite quelques milliers d'échantillons à la fois) à un bloc de Python n'a pas été toujours simple. GNU Radio est un outil extraordinaire pour ce type de prototypage et je n'aurais jamais pu créer tout ce code Python fonctionnel sans lui.
 
 ********************************
-Further Reading
+Aller plus loin
 ********************************
 
-#. https://en.wikipedia.org/wiki/Radio_Data_System
-#. `https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS) <https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS)>`_
+#. https://fr.wikipedia.org/wiki/RDS_(radio)
+#. `https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS) (anglais) <https://www.sigidwiki.com/wiki/Radio_Data_System_(RDS)>`_
 #. https://github.com/bastibl/gr-rds
 #. https://www.gnuradio.org/

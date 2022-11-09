@@ -1,145 +1,148 @@
 .. _pulse-shaping-chapter:
 
 #######################
-Pulse Shaping
+Mise en Forme
 #######################
 
-This chapter covers pulse shaping, inter-symbol-interference, matched filtering, and raised-cosine filters.  At the end we use Python to add pulse shaping to BPSK symbols.  You can consider this section Part II of the Filters chapter, where we take a deeper dive into pulse shaping.
+Ce chapitre traite de la mise en forme, des interférences inter-symboles, du filtrage adapté et des filtres à cosinus surélevé.  À la fin, nous utilisons Python pour ajouter la mise en forme aux symboles BPSK.  Vous pouvez considérer cette section comme la deuxième partie du chapitre sur les filtres, où nous approfondissons les mises en forme.
 
 **********************************
-Inter-Symbol-Interference (ISI)
+Interférence inter-symboles (ISI)
 **********************************
 
-In the :ref:`filters-chapter` chapter we learned that blocky-shaped symbols/pulses use an excess amount of spectrum, and we can greatly reduce the amount of spectrum used by "shaping" our pulses.  However, you can't  use just any low-pass filter or you might get inter-symbol-interference (ISI), where symbols bleed into and interfere with each other.
+Dans le chapitre :ref:`filters-chapter`, nous avons appris que les symboles/impulsions en forme de blocs utilisent une quantité excessive de spectre, et que nous pouvons réduire considérablement la quantité de spectre utilisée en " façonnant " nos impulsions.  Cependant, vous ne pouvez pas utiliser n'importe quel filtre passe-bas, sinon vous risquez d'obtenir des interférences inter-symboles (ISI), où les symboles se mélangent et interfèrent les uns avec les autres.
 
-When we transmit digital symbols, we transmit them back-to-back (as opposed to waiting some time between them).  When you apply a pulse-shaping filter, it elongates the pulse in the time domain (in order to condense it in frequency), which causes adjacent symbols to overlap with each other.  The overlap is fine, as long as your pulse-shaping filter meets this one criterion: all of the pulses must add up to zero at every multiple of our symbol period :math:`T`, except for one of the pulses.  The idea is best understood through the following visualization:
+Lorsque nous transmettons des symboles numériques, nous les transmettons dos à dos (au lieu d'attendre un certain temps entre eux).  Lorsque vous appliquez un filtre de mise en forme, il allonge l'impulsion dans le domaine temporel (afin de la condenser en fréquence), ce qui entraîne un chevauchement des symboles adjacents.  Ce chevauchement n'est pas un problème, à condition que votre filtre de mise en forme réponde à un critère: la somme de toutes les impulsions doit être égale à zéro à chaque multiple de notre période de symbole :math:`T`, sauf pour l'une des impulsions. L'idée est mieux comprise grâce à la visualisation suivante:
 
 .. image:: ../_images/pulse_train.svg
    :align: center 
    :target: ../_images/pulse_train.svg
 
-As you can see at every interval of :math:`T`, there is one peak of a pulse while rest of the pulses are at 0 (they cross the x-axis).  When the receiver samples the signal, it does so at the perfect time (at the peak of the pulses), meaning that is the only point in time which matters.  Usually there is a symbol synchronization block at the receiver that ensures the symbols are sampled at the peaks.
+Comme vous pouvez le voir, à chaque intervalle de :math:`T`, il y a un pic d'une impulsion tandis que le reste des impulsions sont à 0 (elles traversent l'axe des x). Lorsque le récepteur échantillonne le signal, il le fait au moment parfait (au pic des impulsions), ce qui signifie que c'est le seul point dans le temps qui compte. Il existe généralement un bloc de synchronisation des symboles au niveau du récepteur qui garantit que les symboles sont échantillonnés aux pics.
 
 **********************************
-Matched Filter
+Filtre Adapté
 **********************************
 
-One trick we use in wireless communications is called matched filtering.  To understand matched filtering you must first understand these two points:
+Une astuce que nous utilisons dans les communications sans fil s'appelle le filtrage adapté. Pour comprendre le filtrage adapté, vous devez d'abord comprendre ces deux points:
 
-1. The pulses we discussed above only have to be aligned perfectly *at the receiver* prior to sampling.  Until that point it doesn't really matter if there is ISI, i.e., the signals can fly through the air with ISI and it's OK.
+1. Les impulsions dont nous avons parlé ci-dessus doivent seulement être parfaitement alignées *au niveau du récepteur* avant l'échantillonnage.  Jusqu'à ce moment-là, l'existence d'une ISI n'a pas vraiment d'importance, c'est-à-dire que les signaux peuvent être envoyés dans l'air avec une ISI et tout va bien.
 
-2. We want a low-pass filter in our transmitter to reduce the amount of spectrum our signal uses.  But the receiver also needs a low-pass filter to eliminate as much noise/interference next to the signal as possible.  As a result, we have a low-pass filter at the transmitter (Tx) and another at the receiver (Rx), then sampling occurs after both filters (and the wireless channel's effects).
+2. Nous voulons un filtre passe-bas dans notre émetteur pour réduire la quantité de spectre que notre signal utilise. Mais le récepteur a également besoin d'un filtre passe-bas pour éliminer autant de bruit/interférences que possible à côté du signal. Par conséquent, nous avons un filtre passe-bas à l'émetteur (Tx) et un autre au récepteur (Rx), puis l'échantillonnage se produit après les deux filtres (et les effets du canal sans fil).
 
-What we do in modern communications is split the pulse shaping filter equally between the Tx and Rx.  They don't *have* to be identical filters, but, theoretically, the optimal linear filter for maximizing the SNR in the presence of AWGN is to use the *same* filter at both the Tx and Rx.  This strategy is called the "matched filter" concept.
+Ce que nous faisons dans les communications modernes est de diviser le filtre de mise en forme des impulsions de manière égale entre la Tx et la Rx. Il n'est pas nécessaire qu'il s'agisse de filtres identiques, mais, en théorie, le filtre linéaire optimal pour maximiser le rapport signal/bruit en présence d'un bruit blanc gaussien (AWGN) est d'utiliser le même filtre à la fois à la Tx et à la Rx. Cette stratégie est appelée le concept de "filtre adapté".
 
-Another way of thinking about matched filters is that the receiver correlates the received signal with the known template signal.  The template signal is essentially the pulses the transmitter sends, irrespective of the phase/amplitude shifts applied to them.  Recall that filtering is done by convolution, which is basically correlation (in fact they are mathematically the same when the template is symmetrical).  This process of correlating the received signal with the template gives us our best chance at recovering what was sent, and it is why it's theoretically optimal.  As an analogy, think of an image recognition system that looks for faces using a template of a face and a 2D correlation:
+Une autre façon d'envisager les filtres appariés est que le récepteur corrèle le signal reçu avec le signal modèle connu. Le signal modèle est essentiellement constitué des impulsions envoyées par l'émetteur, indépendamment des déphasages/amplitudes qui leur sont appliqués. Rappelez-vous que le filtrage est effectué par convolution, qui est en fait une corrélation (en fait, elles sont mathématiquement identiques lorsque le modèle est symétrique). Ce processus de corrélation du signal reçu avec le modèle nous donne notre meilleure chance de récupérer ce qui a été envoyé, et c'est pourquoi il est théoriquement optimal. Par analogie, pensez à un système de reconnaissance d'images qui recherche des visages à l'aide d'un modèle de visage et d'une corrélation 2D :
 
 .. image:: ../_images/face_template.png
    :scale: 70 % 
    :align: center 
 
 **********************************
-Splitting a Filter in Half
+Diviser un Filtre en Deux
 **********************************
 
-How do we actually split a filter in half?  Convolution is associative, which means:
+Comment fait-on pour diviser un filtre en deux? La convolution est associative, ce qui signifie:
 
 .. math::
  (f * g) * h = f * (g * h)
 
-Let's imagine :math:`f` as our input signal, and :math:`g` and :math:`h` are filters.  Filtering :math:`f` with :math:`g`, and then :math:`h` is the same as filtering with one filter equal to :math:`g * h`.
+Imaginons que :math:`f` soit notre signal d'entrée, et que :math:`g` et :math:`h` soient des filtres.  Filtrer :math:`f` avec :math:`g`, puis :math:`h` revient à filtrer avec un filtre égal à :math:`g * h`.
 
-Also, recall that convolution in time domain is multiplication in frequency domain:
+
+Rappelons également que la convolution dans le domaine temporel est une multiplication dans le domaine fréquentiel:
 
 .. math::
  g(t) * h(t) \leftrightarrow G(f)H(f)
  
-To split a filter in half you can take the square root of the frequency response.
+Pour diviser un filtre en deux, vous pouvez prendre la racine carrée de la réponse en fréquence.
 
 .. math::
  X(f) = X_H(f) X_H(f) \quad \mathrm{where} \quad X_H(f) = \sqrt{X(f)}
 
 
 **********************************
-Specific Pulse Shaping Filters
+Filtres de Mise en Forme Spécifiques
 **********************************
 
-We know that we want to:
+Nous savons que nous voulons :
 
-1. Design a filter that reduces the bandwidth of our signal (to use less spectrum) and all pulses except one should sum to zero every symbol interval.
+1. Concevoir un filtre qui réduit la largeur de bande de notre signal (pour utiliser moins de spectre) et toutes les impulsions sauf une doivent s'additionner à zéro à chaque intervalle de symbole.
 
-2. Split the filter in half, putting one half in the Tx and the other in the Rx.
+2. Diviser le filtre en deux, en plaçant une moitié dans la Tx et l'autre dans la Rx.
 
-Let's look at some specific filters that are common to use for pulse-shaping.
+Examinons quelques filtres spécifiques qui sont couramment utilisés pour la mise en forme.
 
-Raised-Cosine Filter
+Filtre Cosinus Surélevé
 #########################
 
-The most popular pulse-shaping filter seems to be the "raised-cosine" filter.  It's a good low-pass filter for limiting the bandwidth our signal will occupy, and it also has the property of summing to zero at intervals of :math:`T`:
+Le filtre de mise en forme le plus populaire semble être le filtre "cosinus surélevé".  C'est un bon filtre passe-bas pour limiter la largeur de bande que notre signal occupera, et il a aussi la propriété de ramener la somme à zéro à des intervalles de :math:`T`:
 
 .. image:: ../_images/raised_cosine.svg
    :align: center 
    :target: ../_images/raised_cosine.svg
 
-Note that the above plot is in the time domain. It depicts the impulse response of the filter.  The :math:`\beta` parameter is the only parameter for the raised-cosine filter, and it determines how quickly the filter tapers off in the time domain, which will be inversely proportional with how quickly it tapers off in frequency:
+Notez que le graphique ci-dessus est dans le domaine temporel. Il représente la réponse impulsionnelle du filtre. Le paramètre :math:`beta` est le seul paramètre du filtre à cosinus surélevé. Il détermine la vitesse à laquelle le filtre se réduit dans le domaine temporel, ce qui est inversement proportionnel à la vitesse à laquelle il se réduit en fréquence:
 
 .. image:: ../_images/raised_cosine_freq.svg
    :align: center 
    :target: ../_images/raised_cosine_freq.svg
 
-The reason it's called the raised-cosine filter is because the frequency domain when :math:`\beta = 1` is a half-cycle of a cosine wave, raised up to sit on the x-axis.
+La raison pour laquelle on l'appelle le filtre à cosinus surélevé est que le domaine de fréquence lorsque :math:`\beta = 1` est un demi-cycle d'une onde cosinusoïdale, surélevée pour s'asseoir sur l'axe des abscisses.
 
-The equation that defines the impulse response of the raised-cosine filter is:
+L'équation qui définit la réponse impulsionnelle du filtre à cosinus surélevé est la suivante:
 
 .. math::
  h(t) = \frac{1}{T} \mathrm{sinc}\left( \frac{t}{T} \right) \frac{\cos\left(\frac{\pi\beta t}{T}\right)}{1 - \left( \frac{2 \beta t}{T}   \right)^2}
 
-More information about the :math:`\mathrm{sinc}()` function can be found `here <https://en.wikipedia.org/wiki/Sinc_function>`_.
 
-Remember: we split this filter between the Tx and Rx equally.  Enter the Root Raised Cosine (RRC) Filter!
+Vous trouverez de plus amples informations sur la fonction :math:`\mathrm{sinc}()` `ici <https://fr.wikipedia.org/wiki/Sinus_cardinal>`_.
 
-Root Raised-Cosine Filter
+Rappelez-vous: nous partageons ce filtre entre la Tx et la Rx de manière égale. Entrez dans le filtre racine cosinus surélevé (RRC en anglais pour *Root Raised Cosine*)!
+
+Filtre Racine Cosinus Surélevé 
 #########################
 
-The root raised-cosine (RRC) filter is what we actually implement in our Tx and Rx. Combined they form a normal raised-cosine filter, as we discussed.  Because splitting a filter in half involves a frequency-domain square root, the impulse response gets a bit messy:
+Le filtre racine cosinus surélevé (RRC) est ce que nous mettons réellement en œuvre dans nos Tx et Rx. Combinés, ils forment un filtre normal à cosinus surélevé, comme nous l'avons vu. Comme la division d'un filtre en deux implique une racine carrée dans le domaine de la fréquence,la réponse impulsionnelle devient un peu désordonnée :
 
 .. image:: ../_images/rrc_filter.png
    :scale: 70 % 
    :align: center 
 
-Luckily it's a heavily used filter and there are plenty of implementations, including `in Python <https://commpy.readthedocs.io/en/latest/generated/commpy.filters.rrcosfilter.html>`_.
+Heureusement, il s'agit d'un filtre très utilisé et il existe de nombreuses implémentations, dont les suivantes `in Python <https://commpy.readthedocs.io/en/latest/generated/commpy.filters.rrcosfilter.html>`_.
 
-Other Pulse-Shaping Filters
+Autres Filtres de Mise en Forme des Impulsions
 ###########################
 
-Other filters include the Gaussian filter, which has an impulse response resembling a Gaussian function.  There is also a sinc filter, which is equivalent to the raised-cosine filter when :math:`\beta = 0`.  The sinc filter is more of an ideal filter, meaning it eliminates the frequencies necessary without much of a transition region.
+Parmi les autres filtres, citons le filtre gaussien, dont la réponse impulsionnelle ressemble à une fonction gaussienne. Il existe également un filtre sinc qui est équivalent au filtre à cosinus surélevé lorsque :math:`\beta = 0`.  Le filtre sinc est plutôt un filtre idéal, c'est-à-dire qu'il élimine les fréquences nécessaires sans grande région de transition.
 
 **********************************
-Roll-Off Factor
+Facteur Roll-Off
 **********************************
 
-Let's scrutinize the parameter :math:`\beta`.  It is a number between 0 and 1, and is called the "roll-off" factor or sometimes "excess bandwidth".  It determines how fast, in the time domain, the filter rolls off to zero.  Recall that, to be used as a filter, the impulse response should decay to zero on both sides:
+Examinons le paramètre :math:`\beta`.  Il s'agit d'un nombre compris entre 0 et 1, appelé facteur de "roll-off" ou parfois "excès de bande passante".  Il détermine à quelle vitesse, dans le domaine temporel, le filtre se réduit à zéro.  Rappelez-vous que, pour être utilisée comme un filtre, la réponse impulsionnelle doit décroître jusqu'à zéro des deux côtés :
 
 .. image:: ../_images/rrc_rolloff.svg
    :align: center 
    :target: ../_images/rrc_rolloff.svg
 
-More filter taps are required the lower :math:`\beta` gets.  When :math:`\beta = 0` the impulse response never fully hits zero, so we try to get :math:`\beta` as low as possible without causing other issues.  The lower the roll-off, the more compact in frequency we can create our signal for a given symbol rate, which is always important.
+Plus le nombre de taps du filtre requis est élevé, plus :math:`\beta` est faible. Lorsque :math:`\beta = 0`, la réponse impulsionnelle n'atteint jamais complètement zéro, nous essayons donc d'obtenir :math:`\beta` aussi bas que possible sans causer d'autres problèmes. Plus le roll-off est faible, plus nous pouvons créer un signal compact en fréquence pour un débit de symboles donné, ce qui est toujours important.
 
-A common equation used to approximate bandwidth, in Hz, for a given symbol rate and roll-off factor is:
+Une équation courante utilisée pour calculer approximativement la largeur de bande, en Hz, pour un débit de symboles et un facteur Roll-Off donnés est la suivante :
 
 .. math::
     \mathrm{BW} = R_S(\beta + 1)
 
-:math:`R_S` is the symbol rate in Hz.  For wireless communications we usually like a roll-off between 0.2 and 0.5.  As a rule of thumb, a digital signal that uses symbol rate :math:`R_S` is going to occupy a little more than :math:`R_S` worth of spectrum, including both positive and negative portions of spectrum.  Once we upconvert and transmit our signal, both sides certainly matter.  If we transmit QPSK at 1 million symbols per second (MSps), it will occupy around 1.3 MHz.  The data rate will be 2 Mbps (recall that QPSK uses 2 bits per symbol), including any overhead like channel coding and frame headers.
+
+:math:`R_S` est le débit de symboles en Hz. Pour les communications sans fil, nous aimons généralement un roll-off entre 0,2 et 0,5.  En règle générale, un signal numérique qui utilise le rythme symbole :math:`R_S` va occuper un peu plus de :math:`R_S` de spectre, y compris les parties positives et négatives du spectre. Une fois que nous convertissons et transmettons notre signal, les deux côtés sont certainement importants. Si nous transmettons une QPSK à 1 million de symboles par seconde (MSps), elle occupera environ 1,3 MHz. Le débit de données sera de 2 Mbps (rappelons que la QPSK utilise 2 bits par symbole), y compris les redondances du codage de canal et les en-têtes de trame.
 
 **********************************
-Python Exercise
+Exercise Python
 **********************************
 
-As a Python exercise let's filter and shape some pulses.  We will use BPSK symbols so that it's easier to visualize--prior to the pulse-shaping step, BPSK involves transmitting 1's or -1's with the "Q" portion equal to zero.  With Q equal to zero we can plot the I portion only, and it's easier to look at.
+En guise d'exercice Python, filtrons et façonnons quelques impulsions. Nous utiliserons des symboles BPSK afin de faciliter la visualisation. Avant l'étape de mise en forme des impulsions, la BPSK consiste à transmettre des 1 ou des -1 avec la partie "Q" égale à zéro. Avec Q égal à zéro, nous pouvons tracer la partie I uniquement, et c'est plus facile à regarder.
 
-In this simulation we will use 8 samples per symbol, and instead of using a square-wave looking signal of 1's and -1's, we use a pulse train of impulses.  When you put an impulse through a filter, the output is the impulse response (hence the name).  Therefore if you want a series of pulses, you want to use impulses with zeros in between to avoid square pulses.
+Dans cette simulation, nous utiliserons 8 échantillons par symbole et, au lieu d'utiliser un signal de type onde carrée composé de 1 et de -1, nous utiliserons un train d'impulsions.  Lorsque vous faites passer une impulsion dans un filtre, la sortie est la réponse impulsionnelle (d'où le nom).  Par conséquent, si vous voulez une série d'impulsions, vous devez utiliser des impulsions entrecoupées de zéros pour éviter les impulsions carrées.
 
 .. code-block:: python
 
@@ -150,13 +153,13 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
     num_symbols = 10
     sps = 8
 
-    bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
+    bits = np.random.randint(0, 2, num_symbols) # les données a envoyées de 1's and 0's
 
     x = np.array([])
     for bit in bits:
         pulse = np.zeros(sps)
-        pulse[0] = bit*2-1 # set the first value to either a 1 or -1
-        x = np.concatenate((x, pulse)) # add the 8 samples to the signal
+        pulse[0] = bit*2-1 # définir la première valeur à 1 ou -1
+        x = np.concatenate((x, pulse)) # ajouter les 8 échantillons au signal
     plt.figure(0)
     plt.plot(x, '.-')
     plt.grid(True)
@@ -166,23 +169,23 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
    :scale: 80 % 
    :align: center 
 
-At this point our symbols are still 1's and -1's.  Don't be caught up in the fact we used impulses.  In fact, it might be easier to *not* visualize the impulses response but rather think of it as an array:
+A ce stade, nos symboles sont toujours des 1 et des -1.  Ne vous laissez pas emporter par le fait que nous avons utilisé des impulsions. En fait, il est peut-être plus facile de *ne pas* visualiser la réponse des impulsions, mais plutôt d'y penser comme à un tableau :
 
 .. code-block:: python
 
  bits: [0, 1, 1, 1, 1, 0, 0, 0, 1, 1]
- BPSK symbols: [-1, 1, 1, 1, 1, -1, -1, -1, 1, 1]
- Applying 8 samples per symbol: [-1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, ...]
+ Symboles BPSK: [-1, 1, 1, 1, 1, -1, -1, -1, 1, 1]
+ Application de 8 échantillons par symbole: [-1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, ...]
 
-We will create a raised-cosine filter using a :math:`\beta` of 0.35, and we will make it 101 taps long to give the signal enough time to decay to zero.  While the raised cosine equation asks for our symbol period and a time vector :math:`t`, we can assume a **sample** period of 1 second to "normalize" our simulation.  It means our symbol period :math:`Ts` is 8 because we have 8 samples per symbol.  Our time vector then will be a list of integers.  With the way the raised-cosine equation works, we want :math:`t=0` to be in the center.  We will generate the 101-length time vector starting at -51 and ending at +51.
+Nous allons créer un filtre en cosinus surélevé en utilisant un :math:`\beta` de 0.35, et nous allons le faire durer 101 taps pour donner au signal suffisamment de temps pour décroître jusqu'à zéro. Bien que l'équation du cosinus surélevé a besoin de la période du symbole et d'un vecteur temporel :math:`t`, nous pouvons supposer une période d'échantillon** de 1 seconde pour "normaliser" notre simulation. Cela signifie que notre période de symbole :math:`Ts` est de 8 car nous avons 8 échantillons par symbole.  Notre vecteur temps sera donc une liste d'entiers. Avec la façon dont l'équation du cosinus surélevé fonctionne, nous voulons que :math:`t=0` soit au centre.  Nous allons générer un vecteur temporel de 101 longueurs, commençant à -51 et finissant à +51.
 
 .. code-block:: python
 
-    # Create our raised-cosine filter
+    # Créer notre filtre à base de cosinus surélevé
     num_taps = 101
     beta = 0.35
-    Ts = sps # Assume sample rate is 1 Hz, so sample period is 1, so *symbol* period is 8
-    t = np.arange(-50, 51) # remember it's not inclusive of final number
+    Ts = sps # Supposons que la fréquence d'échantillonnage soit de 1 Hz, donc que la période d'échantillonnage soit de 1, donc que la période du symbole soit de 8.
+    t = np.arange(-50, 51) # n'oubliez pas que le nombre final n'est pas inclus
     h = 1/Ts*np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
     plt.figure(1)
     plt.plot(t, h, '.')
@@ -194,13 +197,13 @@ We will create a raised-cosine filter using a :math:`\beta` of 0.35, and we will
    :scale: 80 % 
    :align: center 
 
-Note how the output definitely decays to zero.  The fact we are using 8 samples per symbol determines how narrow this filter appears and how fast it decays to zero.  The above impulse response looks like a typical low-pass filter, and there's really no way for us to know that it's a pulse-shaping specific filter versus any other low-pass filter.
+Notez comment la sortie décroît définitivement vers zéro. Le fait que nous utilisions 8 échantillons par symbole détermine l'étroitesse de ce filtre et la vitesse à laquelle il décroît vers zéro. La réponse impulsionnelle ci-dessus ressemble à un filtre passe-bas typique, et il n'y a vraiment aucun moyen pour nous de savoir qu'il s'agit d'un filtre spécifique de mise en forme d'impulsion par rapport à n'importe quel autre filtre passe-bas.
 
-Lastly, we can filter our signal :math:`x` and examine the result.  Don't focus heavily on the introduction of a for loop in the provided code.  We'll discuss why it's there after the code block.
+Enfin, nous pouvons filtrer notre signal :math:`x` et examiner le résultat. Ne vous focalisez pas trop sur l'introduction d'une boucle for dans le code fourni. Nous verrons pourquoi elle est là après le bloc de code.
 
 .. code-block:: python 
  
-    # Filter our signal, in order to apply the pulse shaping
+    # Filtrer notre signal, afin d'appliquer la mise en forme
     x_shaped = np.convolve(x, h)
     plt.figure(2)
     plt.plot(x_shaped, '.-')
@@ -213,36 +216,36 @@ Lastly, we can filter our signal :math:`x` and examine the result.  Don't focus 
    :align: center 
    :target: ../_images/pulse_shaping_python3.svg
 
-This resulting signal is summed together from many of our impulse responses, with approximately half of them first multiplied by -1.  It might look complicated, but we will step through it together.
+Le signal résultant est additionné à partir d'un grand nombre de nos réponses impulsionnelles, dont la moitié environ est d'abord multipliée par -1.  Cela peut sembler compliqué, mais nous allons le faire ensemble.
 
-Firstly, there are transient samples before and after the data because of the filter and the way convolution works.  These extra samples get included in our transmission but they don't actually contain "peaks" of pulses.
+Tout d'abord, il y a des échantillons transitoires avant et après les données à cause du filtre et de la façon dont la convolution fonctionne. Ces échantillons supplémentaires sont inclus dans notre transmission, mais ils ne contiennent pas réellement de "pics" d'impulsions.
 
-Secondly, the vertical lines were created in the for loop for visualization's sake.  They are meant to demonstrate where intervals of :math:`Ts` occur.  These intervals represent where this signal will be sampled by the receiver.  Observe that for intervals of :math:`Ts` the curve has the value of exactly 1.0 or -1.0, making them the ideal points in time to sample.
+Deuxièmement, les lignes verticales ont été créées dans la boucle for pour des raisons de visualisation. Elles sont destinées à montrer où se trouvent les intervalles de :math:`Ts`. Ces intervalles représentent l'endroit où ce signal sera échantillonné par le récepteur.  Observez que pour les intervalles :math:`Ts` la courbe a la valeur exacte de 1.0 ou -1.0, ce qui en fait les points idéaux dans le temps pour l'échantillonnage.
 
-If we were to upconvert and transmit this signal, the receiver would have to determine when the boundaries of :math:`Ts` are e.g., using a symbol synchronization algorithm.  That way the receiver knows *exactly* when to sample to get the right data.  If the receiver samples a little too early or late, it will see values that are slightly skewed due to ISI, and if it's way off then it will get a bunch of weird numbers.
+Si nous devions convertir et transmettre ce signal, le récepteur devrait déterminer quand se trouvent les positions de :math:`Ts`, par exemple, en utilisant un algorithme de synchronisation des symboles. De cette façon, le récepteur sait *exactement* quand il doit échantillonner pour obtenir les bonnes données. Si le récepteur échantillonne un peu trop tôt ou trop tard, il obtiendra des valeurs légèrement faussées à cause de l'ISI, et s'il se trompe, il obtiendra un tas de nombres bizarres.
 
-Here is an example, created using GNU Radio, that illustrates what the IQ plot (a.k.a. constellation) looks like when we sample at the right and wrong times.  The original pulses have their bit values annotated.
+Voici un exemple, créé à l'aide de GNU Radio, qui illustre ce à quoi ressemble le tracé IQ (ou constellation) lorsque nous échantillonnons au bon et au mauvais moment.  Les impulsions originales ont leurs valeurs binaires annotées.
 
 .. image:: ../_images/symbol_sync1.png
    :scale: 50 % 
    :align: center 
 
-The below graph represents the ideal position in time to sample, along with the IQ plot:
+Le graphique ci-dessous représente la position idéale dans le temps pour échantillonner, ainsi que le tracé du QI :
 
 .. image:: ../_images/symbol_sync2.png
    :scale: 40 % 
    :align: center 
 
-Compare that to the worst time to sample.  Notice the three clusters in the constellation.  We are sampling directly in between each symbol; our samples are going to be way off.
+Comparez cela au pire temps d'échantillonnage. Remarquez les trois clusters dans la constellation. Nous échantillonnons directement entre chaque symbole; nos échantillons vont être très différents.
 
 .. image:: ../_images/symbol_sync3.png
    :scale: 40 % 
    :align: center 
 
-Here is another example of a poor sample time, somewhere in between our ideal and worst cases. Heed the four clusters.  With a high SNR we might be able to get away with this sampling time interval, though it isn't advisable.
+Voici un autre exemple d'un mauvais temps d'échantillonnage, quelque part entre notre cas idéal et le pire. Tenez compte des quatre groupes.  Avec un SNR élevé, nous pourrions nous en sortir avec cet intervalle de temps d'échantillonnage, mais ce n'est pas conseillé.
 
 .. image:: ../_images/symbol_sync4.png
    :scale: 40 % 
    :align: center 
    
-Remember that our Q values are not shown on the time domain plot because they are roughly zero, allowing the IQ plots to spread horizontally only.
+Rappelez-vous que nos valeurs Q n'apparaissent pas sur le tracé du domaine temporel parce qu'elles sont à peu près nulles, ce qui permet aux courbes IQ de s'étendre horizontalement seulement.
