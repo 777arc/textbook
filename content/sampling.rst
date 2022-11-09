@@ -320,10 +320,10 @@ Last chapter we learned that we can convert a signal to the frequency domain usi
 But to actually find the PSD of a batch of samples and plot it, we do more than just take an FFT.
 We must do the following six operations to calculate PSD:
 
-1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default. Let's use the first 1,024 samples as an example to create a 1,024-size FFT.  The output will be 1,024 complex floats.
-2. Take the magnitude of the FFT output, which provides us 1,024 real floats.
-3. Normalize: divide by the FFT size (:math:`N`, or 1,024 in this case).
-4. Square the resulting magnitude to get power.
+1. Take the FFT of our samples.  If we have x samples, the FFT size will be the length of x by default. Let's use the first 1024 samples as an example to create a 1024-size FFT.  The output will be 1024 complex floats.
+2. Take the magnitude of the FFT output, which provides us 1024 real floats.
+3. Square the resulting magnitude to get power.
+4. Normalize: divide by the FFT size (:math:`N`) and sample rate (:math:`Fs`).
 5. Convert to dB using :math:`10 \log_{10}()`; we always view PSDs in log scale.
 6. Perform an FFT shift, covered in the previous chapter, to move "0 Hz" in the center and negative frequencies to the left of center.
 
@@ -335,7 +335,7 @@ Those six steps in Python are:
  # assume x contains your array of IQ samples
  N = 1024
  x = x[0:N] # we will only take the FFT of the first 1024 samples, see text below
- PSD = (np.abs(np.fft.fft(x))/N)**2
+ PSD = np.abs(np.fft.fft(x))**2 / (N*Fs)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
@@ -349,7 +349,7 @@ Optionally we can apply a window, like we learned about in the :ref:`freq-domain
 To plot this PSD we need to know the values of the x-axis.
 As we learned last chapter, when we sample a signal, we only "see" the spectrum between -Fs/2 and Fs/2 where Fs is our sample rate.
 The resolution we achieve in the frequency domain depends on the size of our FFT, which by default is equal to the number of samples on which we perform the FFT operation.
-In this case our x-axis is 1,024 equally spaced points between -0.5 MHz and 0.5 MHz.
+In this case our x-axis is 1024 equally spaced points between -0.5 MHz and 0.5 MHz.
 If we had tuned our SDR to 2.4 GHz, our observation window would be between 2.3995 GHz and 2.4005 GHz.
 In Python, shifting the observation window will look like:
 
@@ -385,7 +385,7 @@ Here is a full code example that includes generating a signal (complex exponenti
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
- PSD = (np.abs(np.fft.fft(r))/N)**2
+ PSD = np.abs(np.fft.fft(r))**2 / (N*Fs)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  

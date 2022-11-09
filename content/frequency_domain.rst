@@ -46,10 +46,10 @@ Some signals require more sine waves than others, and some require an infinite a
 To understand how we can break down a signal into sine waves, or sinusoids, we need to first review the three attributes of a sine wave:
 
 #. Amplitude
-#. Phase
 #. Frequency
+#. Phase
 
-**Amplitude** indicates the "strength" of the wave, while **phase** is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`).  **Frequency** is the number of waves per second.
+**Amplitude** indicates the "strength" of the wave, while **frequency** is the number of waves per second.  **Phase** is used to represent how the sine wave is shifted in time, anywhere from 0 to 360 degrees (or 0 to :math:`2\pi`), but it must be relative to something to have any meaning, such as two signals with the same frequency being 30 degrees out of phase with each other.
 
 .. image:: ../_images/amplitude_phase_period.svg
    :align: center
@@ -249,7 +249,7 @@ Regarding the frequency interval, each bin corresponds to :math:`f_s/N` Hz, i.e.
 Negative Frequencies
 ********************
 
-What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers)--there isn't really such thing as a "negative frequency", it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
+What in the world is a negative frequency?  For now, just know that they have to do with using complex numbers (imaginary numbers)--there isn't really such thing as a "negative frequency" when it comes to transmitting/receiving RF signals, it's just a representation we use.  Here's an intuitive way to think about it.  Consider we tell our SDR to tune to 100 MHz (the FM radio band) and sample at a rate of 10 MHz.  In other words, we will view the spectrum from 95 MHz to 105 MHz.  Perhaps there are three signals present:
 
 .. image:: ../_images/negative-frequencies2.svg
    :align: center
@@ -261,7 +261,7 @@ Now, when the SDR gives us the samples, it will appear like this:
    :align: center
    :target: ../_images/negative-frequencies3.svg
 
-Remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz, which is a negative frequency.  In reality it's just a frequency lower than the center frequency.  It will make more sense when we learn more about sampling and use our SDRs.
+Remember that we tuned the SDR to 100 MHz.  So the signal that was at about 97.5 MHz shows up at -2.5 MHz when we represent it digitally, which is technically a negative frequency.  In reality it's just a frequency lower than the center frequency.  This will make more sense when we learn more about sampling and obtain experience using our SDRs.
 
 ****************************
 Order in Time Doesn't Matter
@@ -271,9 +271,9 @@ One last property before we jump into FFTs.  The FFT function sort of "mixes aro
 .. image:: ../_images/fft_signal_order.png
    :scale: 50 % 
    :align: center 
-   
-Technically, the phase of the FFT will change because of the time-shift of the sinusoids; however, 99% of the time we are only concerned with the magnitude of the FFT, as we will learn shortly.
-   
+
+Technically, the phase of the FFT values will change because of the time-shift of the sinusoids.  However, for the first several chapters of this textbook we will mostly be concerned with the magnitude of the FFT.
+
 *******************
 FFT in Python
 *******************
