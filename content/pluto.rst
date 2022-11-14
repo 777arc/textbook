@@ -74,7 +74,7 @@ The terminal commands below should build and install the latest version of:
  sudo make install
  
  cd ~
- git clone https://github.com/analogdevicesinc/pyadi-iio.git
+ git clone --branch v0.0.14 https://github.com/analogdevicesinc/pyadi-iio.git
  cd pyadi-iio
  pip3 install --upgrade pip
  pip3 install -r requirements.txt
