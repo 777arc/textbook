@@ -18,9 +18,9 @@ Nous étudions ici les bilans de liaison non pas dans le but d'être capable de 
 
 Nous traiterons d'abord du bilan de puissance du signal reçu, puis du bilan de puissance du bruit, et enfin nous combinerons les deux pour trouver le SNR (puissance du signal divisée par la puissance du bruit).
 
-*************************
+****************************
 bilan de puissance du signal
-*************************
+****************************
 
 La figure ci-dessous montre le schéma le plus élémentaire d'une liaison sans fil générique.  Dans ce chapitre, nous nous concentrerons sur une direction, c'est-à-dire d'un émetteur (Tx) à un récepteur (Rx).  Pour un système donné, nous connaissons la puissance *d'émission* ; il s'agit généralement d'un paramètre de l'émetteur.  Comment déterminer la puissance *reçue* au niveau du récepteur ?
 
@@ -40,21 +40,21 @@ Nous avons besoin de quatre paramètres système pour déterminer la puissance r
    :target: ../_images/tx_rx_system_params.svg
 
 Puissance d'émission :math:`P_{t}`
-#####################
+##########################################
 
 La puissance d'émission est assez simple; il s'agit d'une valeur en watts, dBW ou dBm (rappelons que dBm est l'abréviation de dBmW).  Chaque émetteur possède un ou plusieurs amplificateurs, et la puissance d'émission est principalement fonction de ces amplificateurs.  Une analogie pour la puissance d'émission serait la puissance d'une ampoule électrique: plus cette puissace est élevée, plus l'ampoule transmet de lumière.  Voici des exemples de puissance d'émission approximative pour différentes technologies :
 
-==================  =====  =======
-\                       Power    
-------------------  --------------
-Bluetooth           10 mW  -20 dBW   
-WiFi                100mW  -10 dBW
-Station de base LTE 1W     0 dBW
-Station FM          10kW   40 dBW
-==================  =====  =======
+===================  =====  =======
+\                        Power    
+-------------------  --------------
+Bluetooth            10 mW  -20 dBW   
+WiFi                 100mW  -10 dBW
+Station de base LTE  1W     0 dBW
+Station FM           10kW   40 dBW
+===================  =====  =======
 
 Gains d'antenne :math:`G_{t}` et :math:`G_{r}`
-#####################
+###############################################
 
 Les gains d'antenne d'émission et de réception sont cruciaux pour le calcul des bilans de liaison. Qu'est-ce que le gain d'antenne, me direz-vous?  Il indique la directivité de l'antenne.  Vous pouvez y faire référence en tant que gain de puissance de l'antenne, mais ne vous y trompez pas, la seule façon pour une antenne d'avoir un gain plus élevé est de diriger l'énergie dans une région plus ciblée.
 
@@ -75,7 +75,7 @@ Les antennes omnidirectionnelles sont utilisées lorsque pointer dans la bonne d
 Dans un bilan de liaison, nous devons supposer que toute antenne directionnelle, qu'elle émette ou reçoive, est pointée dans la bonne direction.  Si elle n'est pas pointée correctement, notre budget de liaison ne sera pas précis et il pourrait y avoir une perte de communication (par exemple, l'antenne satellite sur votre toit est frappée par un ballon de basket et se déplace).  En général, nos budgets de liaison supposent des circonstances idéales tout en ajoutant une perte diverse pour tenir compte des facteurs du monde réel.
 
 Perte due à la distance entre la Tx et la Rx :math:`L_{p}`
-#####################
+############################################################
 
 Lorsqu'un signal se déplace dans l'air (ou le vide), sa force diminue.  Imaginez que vous tenez un petit panneau solaire devant une ampoule électrique.  Plus le panneau solaire est éloigné, moins l'ampoule absorbera d'énergie.  **Le flux** est un terme de physique et de mathématiques, défini comme "la quantité de matière qui passe à travers votre objet".  Pour nous, c'est la quantité de champ électromagnétique qui passe dans notre antenne de réception.  Nous voulons savoir combien de puissance est perdue, pour une distance donnée.
 
@@ -116,7 +116,7 @@ où :math:`h_M` est la hauteur de l'antenne de réception au-dessus du sol, en m
 Ne vous inquiétez pas si le modèle Okumura-Hata ci-dessus vous a semblé confus; il est principalement présenté ici pour démontrer comment les modèles de perte de chemin hors espace libre sont beaucoup plus compliqués que notre simple équation en FSPL.  Le résultat final de n'importe lequel de ces modèles est un nombre unique que nous pouvons utiliser pour la partie perte de chemin de notre budget de liaison.  Nous nous en tiendrons à l'équation FSPL pour le reste de ce chapitre.
 
 Pertes diverses :math:`L_{misc}`
-#####################
+##########################################
 
 Dans notre budget de liaison, nous voulons également prendre en compte les pertes diverses.  Nous les regrouperons en un seul terme, généralement entre 1 et 3 dB.  Exemples de pertes diverses :
 
@@ -132,7 +132,7 @@ Le graphique ci-dessous montre la perte atmosphérique en dB/km en fonction de l
    :target: ../_images/atmospheric_attenuation.svg
 
 Signal Power Equation
-#####################
+######################
 
 Il est maintenant temps d'assembler tous ces gains et pertes pour calculer la puissance de notre signal au niveau du récepteur, :math:`P_r` :
 
@@ -159,9 +159,9 @@ Globalement, c'est une équation facile. On additionne les gains et les pertes. 
      - **-143.0 dBW**
 
 
-*************************
+****************************
 Bilan de puissance du bruit
-*************************
+****************************
 
 Maintenant que nous connaissons la puissance du signal reçu, changeons de sujet pour parler du bruit reçu, puisque nous avons besoin des deux pour calculer le SNR.  Nous pouvons trouver le bruit reçu avec un bilan de puissance de style similaire.
 
@@ -192,9 +192,9 @@ Maintenant que nous avons les deux nombres, nous pouvons prendre le rapport pour
 
 Nous visons généralement un SNR > 10 dB, bien que cela dépende vraiment de l'application.  En pratique, le SNR peut être vérifié en regardant la FFT du signal reçu ou en calculant la puissance avec et sans le signal présent (rappelons que variance = puissance).  Plus le SNR est élevé, plus vous pouvez gérer de bits par symbole sans trop d'erreurs.
 
-***************************
+**********************************
 Exemple de bilan de liaison: ADS-B
-***************************
+**********************************
 
 L'ADS-B (Automatic Dependent Surveillance-Broadcast) est une technologie utilisée par les avions pour diffuser des signaux qui permettent de partager leur position et d'autres informations avec les stations au sol de contrôle du trafic aérien et d'autres avions.  L'ADS-B est automatique en ce sens qu'il ne nécessite aucune intervention du pilote ou d'un tiers; il dépend des données du système de navigation de l'avion et d'autres calculateurs.  Les messages ne sont pas cryptés (youpi !).  L'équipement ADS-B est actuellement obligatoire dans certaines parties de l'espace aérien australien, tandis que les États-Unis exigent que certains avions soient équipés, en fonction de leur taille.
 

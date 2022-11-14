@@ -16,9 +16,9 @@ Nous avons vu comment transmettre numériquement par voie hertzienne, en utilisa
    :align: center 
    :target: ../_images/sync-diagram.svg
 
-***************************
+*********************************
 Simulation d'un canal sans fil
-***************************
+*********************************
 
 Avant d'apprendre à mettre en œuvre la synchronisation temporelle et fréquentielle, nous devons rendre nos signaux simulés plus réalistes.  Sans l'ajout d'un retard aléatoire, la synchronisation dans le temps est triviale.  En fait, il suffit de prendre en compte le retard d'échantillonnage de tous les filtres que vous utilisez.  Nous voulons également simuler un décalage de fréquence car, comme nous le verrons, les oscillateurs ne sont pas parfaits; il y aura toujours un certain décalage entre la fréquence centrale de l'émetteur et celle du récepteur.
 
@@ -64,7 +64,7 @@ Nous laisserons de côté le code relatif au tracé car vous avez probablement d
 
 
 Ajouter un délai
-##############
+#################
 
 Nous pouvons facilement simuler un retard en décalant les échantillons, mais cela ne simule qu'un retard qui est un multiple entier de notre période d'échantillonnage.  Dans le monde réel, le retard sera une fraction de la période d'échantillonnage.  Nous pouvons simuler le retard d'une fraction d'échantillon en créant un filtre à "retard fractionnel", qui laisse passer toutes les fréquences mais retarde les échantillons d'une certaine quantité qui n'est pas limitée à l'intervalle d'échantillonnage.  Vous pouvez l'imaginer comme un filtre passe-tout qui applique le même déphasage à toutes les fréquences.  (Rappelez-vous qu'un retard temporel et un déphasage sont équivalents.) Le code Python permettant de créer ce filtre est présenté ci-dessous:
 
@@ -90,7 +90,7 @@ Si nous traçons le graphique "avant" et "après" le filtrage d'un signal, nous 
 
 
 Ajout d'un décalage de fréquence
-##########################
+################################
 
 Pour rendre notre signal simulé plus réaliste, nous allons appliquer un décalage de fréquence.  Disons que notre fréquence d'échantillonnage dans cette simulation est de 1 MHz (la valeur n'a pas vraiment d'importance, mais vous verrez pourquoi il est plus facile de choisir un nombre).  Si nous voulons simuler un décalage de fréquence de 13 kHz (un nombre arbitraire), nous pouvons le faire via le code suivant:
 
@@ -172,9 +172,9 @@ Le graphique suivant montre un exemple de sortie où nous avons *désactivé* le
 
 Concentrons-nous sur le graphique du bas, qui est la sortie de la synchronisation.  Il a fallu près de 30 symboles pour que la synchronisation se verrouille sur le bon délai.  En raison inévitablement du temps nécessaire aux synchroniseurs pour se verrouiller, de nombreux protocoles de communication utilisent un préambule contenant une séquence de synchronisation: il sert à annoncer l'arrivée d'un nouveau paquet et donne au récepteur le temps de se synchroniser sur celui-ci.  Mais après ces ~30 échantillons, la synchronisation fonctionne parfaitement.  Nous nous retrouvons avec des 1 et des -1 parfaits qui correspondent aux données d'entrée.  Il est utile que cet exemple n'ait pas eu de bruit ajouté.  N'hésitez pas à ajouter du bruit ou des décalages temporels et voyez comment la synchronisation se comporte.  Si nous utilisions la QPSK, nous aurions affaire à des nombres complexes, mais l'approche serait la même.
 
-****************************************
+**********************************************
 Synchronisation du temps avec interpolation
-****************************************
+**********************************************
 
 Les synchroniseurs de symboles ont tendance à interpoler les échantillons d'entrée par un certain nombre, par exemple 16, afin de pouvoir se décaler d'une *fraction* d'échantillon.  Le retard aléatoire causé par le canal sans fil ne sera probablement pas un multiple exact d'un échantillon, de sorte que le pic du symbole peut ne pas se produire réellement sur un échantillon.  C'est particulièrement vrai dans le cas où il n'y aurait que 2 ou 4 échantillons par symbole reçu.  L'interpolation des échantillons nous permet d'échantillonner "entre" les échantillons réels, afin d'atteindre le pic de chaque symbole.  La sortie du synchroniseur n'est toujours qu'un échantillon par symbole. Les échantillons d'entrée sont eux-mêmes interpolés.
 
@@ -236,9 +236,9 @@ Ensuite, nous allons étudier la synchronisation de la fréquence, que nous divi
 
 
 
-**********************************
+**********************************************
 Synchronisation grossière des fréquences
-**********************************
+**********************************************
 
 Même si nous demandons à l'émetteur et au récepteur de fonctionner sur la même fréquence centrale, il y aura un léger décalage de fréquence entre les deux en raison d'imperfections matérielles (par exemple, l'oscillateur) ou d'un décalage Doppler dû au mouvement.  Ce décalage de fréquence sera minuscule par rapport à la fréquence porteuse, mais même un petit décalage peut perturber un signal numérique.  Le décalage évoluera probablement dans le temps, ce qui nécessite une boucle de rétroaction permanente pour corriger le décalage.  Par exemple, l'oscillateur à l'intérieur du Pluto a une spécification de décalage maximale de 25 PPM.  C'est-à-dire 25 parties par million par rapport à la fréquence centrale.  Si vous êtes réglé sur 2.4 GHz, le décalage maximal serait de +/- 60 kHz.  Les échantillons que notre SDR nous fournit sont en bande de base, ce qui fait que tout décalage de fréquence se manifeste dans ce signal en bande de base.  Un signal BPSK avec un petit décalage de la porteuse ressemblera au tracé temporel ci-dessous, ce qui n'est évidemment pas idéal pour démoduler des bits.  Nous devons supprimer tout décalage de fréquence avant la démodulation.
 
@@ -337,9 +337,9 @@ En fait, la correction de ce décalage de fréquence se fait exactement comme no
 
 C'est à vous de décider si vous voulez le corriger ou modifier le décalage de fréquence initial que nous avons appliqué au début à un nombre plus petit (comme 500Hz) pour tester la synchronisation de fréquence fine que nous allons maintenant apprendre à faire.
 
-**********************************
+****************************************
 Synchronisation fine de la fréquence
-**********************************
+****************************************
 
 Ensuite, nous allons passer à la synchronisation fine de la fréquence. L'astuce précédente est plutôt destinée à l'évanouissement grossier, et ce n'est pas une opération en boucle fermée (de type feedback).  Mais pour la synchronisation fine de la fréquence, nous aurons besoin d'une boucle de rétroaction par laquelle nous ferons passer des échantillons, ce qui sera une fois de plus une forme de PLL.  Notre objectif est de ramener le décalage de fréquence à zéro et de l'y maintenir, même si le décalage change au fil du temps.  Nous devons continuellement suivre le décalage.  Les techniques de synchronisation fine de la fréquence fonctionnent mieux avec un signal qui a déjà été synchronisé dans le temps au niveau du symbole, donc le code dont nous parlons dans cette section viendra *après* la synchronisation temporelle.
 

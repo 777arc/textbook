@@ -24,9 +24,9 @@ Tout d'abord, pourquoi aimons-nous regarder les signaux dans le domaine des fré
 Comme vous pouvez le voir, dans le domaine temporel, ils ressemblent tous les deux à du bruit, mais dans le domaine fréquentiel, nous pouvons voir des caractéristiques différentes.  Dans le domaine temporel, tout se trouve sous sa forme *naturelle*; lorsque nous échantillonnons des signaux, nous le faisons dans le domaine temporel, car vous ne pouvez pas échantillonner *directement* un signal dans le domaine fréquentiel. Et pourtant, les choses les plus intéressantes se passent généralement dans le domaine des fréquences. 
 
 
-***************
+***********************************
 Séries de Fourier
-***************
+***********************************
 
 Les bases du domaine fréquentiel commencent par comprendre que tout signal peut être représenté par la somme d'ondes sinusoïdales. Lorsque nous décomposons un signal en ses ondes sinusoïdales, on obtient ce qu'on appelle une série de Fourier. Voici un exemple de signal composé de seulement deux ondes sinusoïdales:
 
@@ -64,9 +64,9 @@ Lorsque nous décomposons un signal en une somme d'ondes sinusoïdales, chacune 
 
 Il est plus important de comprendre le concept sous-jacent que les équations réelles pour résoudre une série de Fourier, mais pour ceux qui sont intéressés par les équations, je vous renvoie à l'explication concise de Wolfram : https://mathworld.wolfram.com/FourierSeries.html.
 
-********************
+****************************************
 La dualité temps-fréquence
-********************
+****************************************
 
 Nous avons expliqué que les signaux peuvent être représentés comme des ondes sinusoïdales, chacune ayant plusieurs paramètres. Maintenant, voyons comment tracer ces signaux dans le domaine des fréquences. Là où la représentation dans le domaine temporel montre comment un signal évolue dans le temps, le domaine fréquentiel, lui, montre la proportion du signal qui se trouve dans telle ou telle fréquence. De ce fait, l'axe des x ne sera plus le temps mais la fréquence. Nous pouvons représenter un signal donné à la fois en temps *et* en fréquence. Prenons quelques exemples simples pour commencer.
 
@@ -105,9 +105,9 @@ Comme il n'y a pas de fréquence, nous avons un pic à 0 Hz dans le domaine des 
 
 Nous verrons plus tard ce que signifie exactement l'axe des y dans le graphique du domaine des fréquences, mais pour l'instant, vous pouvez le considérer comme une sorte d'amplitude qui vous indique la quantité de cette fréquence présente dans le signal temporel.
    
-*****************
+**********************
 Transformée de Fourier
-*****************
+**********************
 
 Mathématiquement, la "transformation" que nous utilisons pour passer du domaine temporel au domaine fréquentiel ou inversement s'appelle la transformation de Fourier. Elle est définie comme suit :
 
@@ -137,9 +137,9 @@ Notez que la principale différence est que nous avons remplacé l'intégrale pa
 
 Ce n'est pas grave si aucune de ces équations ne vous intéresse. En fait, nous n'avons pas besoin de les utiliser directement pour faire des trucs cool avec les DSP et les SDR!
 
-*************************
+***************************
 Propriétés temps-fréquence
-*************************
+***************************
 
 Earlier we examined examples of how signals appear in the time domain and the frequency domain.  Now, we will cover five important "Fourier properties".  These are properties that tell us if we do ____ to our time domain signal, then ____ happens to our frequency domain signal.  It will give us an important insight into the type of Digital Signal Processing (DSP) we will perform on time domain signals in practice.
 
@@ -222,9 +222,9 @@ Enfin, je tiens à souligner que la propriété de convolution fonctionne en sen
 Il existe d'autres propriétés, mais les cinq ci-dessus sont, à mon avis, les plus importantes à comprendre. Même si nous n'avons pas démontré chaque propriété, le fait est que nous utilisons les propriétés mathématiques pour comprendre ce qui arrive aux signaux réels lorsque nous les analysons et les traitons. Ne vous attardez pas sur les équations. Assurez-vous de bien comprendre la description de chaque propriété.
 
 
-******************************
+***********************************
 Transformée de Fourier rapide (FFT)
-******************************
+***********************************
 
 Revenons maintenant à la Transformée de Fourier. Je vous ai montré l'équation de la transformée de Fourier discrète, mais ce que vous utiliserez en codant 99,9% du temps sera la fonction *fft()*. La transformée de Fourier rapide (FFT pour *Fast Fourier Transform*) est simplement un algorithme permettant de calculer la transformée de Fourier discrète. Il a été développé il y a plusieurs dizaines d'années, et même s'il existe plusieurs variations dans son implémentation, il reste le principal algorithme de calcul de la transformée de Fourier discrète. Une chance pour nous, vu qu'ils ont utilisé le mot "rapide" dans le nom.
 
@@ -270,9 +270,9 @@ Maintenant, quand le SDR nous donne les échantillons, cela apparaîtra comme ce
 
 Rappelez-vous que nous avons réglé le SDR sur 100 MHz.  Le signal qui était à environ 97,5 MHz apparaît donc à -2,5 MHz, ce qui est une fréquence négative.  En réalité, il s'agit simplement d'une fréquence inférieure à la fréquence centrale. Cela aura plus de sens lorsque nous en saurons plus sur l'échantillonnage et que nous utiliserons nos SDR.
 
-****************************
+********************************************************
 L'ordre dans le domaine temporel n'a pas d'importance
-****************************
+********************************************************
 Une dernière propriété avant de passer aux FFT. La fonction FFT "mélange" en quelque sorte le signal d'entrée pour former la sortie, qui a une échelle et des unités différentes. Après tout, nous ne sommes plus dans le domaine temporel. Une bonne façon de comprendre cette différence entre les domaines est de réaliser que le fait de changer l'ordre des choses dans le domaine temporel ne change pas les composantes de fréquence du signal.  Par exemple, la FFT des deux signaux suivants présentera les deux mêmes pics parce que le signal n'est que deux ondes sinusoïdales à des fréquences différentes. Le fait de changer l'ordre dans lequel les ondes sinusoïdales se produisent ne change pas le fait qu'il s'agit de deux ondes sinusoïdales à des fréquences différentes.
 
 .. image:: ../_images/fft_signal_order.png

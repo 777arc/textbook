@@ -7,9 +7,9 @@ Filtres
 Dans ce chapitre, nous nous familiarisons avec les filtres numériques en utilisant Python.  Nous couvrons les types de filtres (FIR/IIR et passe-bas/passe-haut/passe-bande/coupe-bande), comment les filtres sont représentés numériquement et comment ils sont conçus.  Nous terminons par une introduction aux filtres de mise en forme, que nous approfondissons dans le chapitre :ref:`pulse-shaping-chapter`.
 
 
-*************************
+******************************
 Principes de Base des Filtres
-*************************
+******************************
 
 Les filtres sont utilisés dans de nombreuses disciplines. Par exemple, le traitement des images fait un usage intensif des filtres 2D, où l'entrée et la sortie sont des images.  Vous utilisez peut-être un filtre chaque matin pour faire votre café, qui filtre les solides du liquide.  En DSP, les filtres sont principalement utilisés pour :
 
@@ -47,9 +47,9 @@ Chaque filtre permet à certaines fréquences de rester dans un signal tout en b
 
 Ne confondez pas ces types de filtrage avec la mise en œuvre algorithmique du filtre (par exemple, IIR vs FIR).  Le type le plus courant est de loin le filtre passe-bas (LPF pour *Low Pass Filter* en anglais) car nous représentons souvent des signaux en bande de base.  Le LPF nous permet de filtrer tout ce qui se trouve "autour" de notre signal, en éliminant le bruit excessif et les autres signaux.
 
-*************************
+***************************
 Représentation des Filtres
-*************************
+***************************
 
 Pour la plupart des filtres que nous verrons (connus sous le nom de filtres FIR, pour *Finite Impulse Response* en anglais, ou *filtres à réponse impulsionnelle finie* en français), nous pouvons représenter le filtre lui-même avec un seul tableau de flottants.  Pour les filtres symétriques dans le domaine fréquentiel, ces flottants seront réels (par opposition à complexes), et leur nombre tend à être impair.  Nous appelons ce tableau de flottants *les coéfficients* du filtre ou usuellement *taps* en anglais.  Nous utilisons souvent :math:`h` comme symbole pour les taps du filtre.  Voici un exemple d'un ensemble de taps qui définissent un filtre :
 
@@ -70,7 +70,7 @@ Pour la plupart des filtres que nous verrons (connus sous le nom de filtres FIR,
       1.08410297e-03  9.92977939e-04]
 
 Exemple de cas d'utilisation
-########################
+#############################
 
 Pour comprendre comment les filtres sont utilisés, prenons un exemple où nous accordons notre radio logicielle sur la fréquence d'un signal existant, et nous voulons l'isoler des autres signaux.  Rappelez-vous que nous indiquons à notre SDR la fréquence à laquelle il doit s'accorder, mais que les échantillons capturés par le SDR sont en bande de base, ce qui signifie que le signal s'affichera comme centré autour de 0 Hz. Nous devrons garder la trace de la fréquence sur laquelle nous avons demandé au SDR de s'accorder.  Voici ce que nous pourrions recevoir :
 
@@ -187,7 +187,7 @@ Et voici le code qui a été utilisé pour produire la réponse fréquentielle, 
     plt.show()
 
 Filtres Réels et Complexes
-########################
+###########################
 
 Le filtre que je vous ai montré avait des taps réelles, mais les taps peuvent aussi être complexes. Le fait que les taps soient réelles ou complexes ne doit pas nécessairement correspondre au signal que vous faites passer par le filtre, c'est-à-dire que vous pouvez faire passer un signal complexe par un filtre avec des taps réelles et vice versa.  Lorsque les taps sont réelles, la réponse en fréquence du filtre sera symétrique autour du DC (0 Hz).  En général, nous utilisons des prises complexes lorsque nous avons besoin d'asymétrie, ce qui arrive très rarement.
 
@@ -240,9 +240,9 @@ Comme notre filtre n'est pas symétrique autour de 0 Hz, il doit utiliser des ta
 
 Si cette sous-section a ajouté à la confusion, ne vous inquiétez pas, dans 99% des cas, vous aurez affaire à de simples filtres passe-bas avec des taps réelles de toute façon. 
 
-*************************
+***************************
 Implémentation des Filtres
-*************************
+***************************
 
 Nous n'allons pas nous plonger trop profondément dans l'implémentation des filtres. Je me concentre plutôt sur la conception des filtres (de toute façon, vous pouvez trouver des implémentations prêtes à l'emploi dans n'importe quel langage de programmation).  Pour l'instant, voici ce qu'il faut retenir: pour filtrer un signal avec un filtre FIR, il suffit de convoluer la réponse impulsionnelle (le vecteur de taps) avec le signal d'entrée.  (Ne vous inquiétez pas, une section ultérieure explique la convolution.) Dans le monde discret, nous utilisons une convolution discrète (exemple ci-dessous). Les triangles labelisés par des *b* sont les taps. Dans le schéma, les carrés labelisés :math:`z^{-1}` au-dessus des triangles signifient qu'il faut retarder d'un pas de temps.
 
@@ -291,9 +291,9 @@ Maintenant, un exemple de filtre IIR.  L'un d'entre vous a-t-il déjà fait ceci
 
 où les 0,99 et 0,01 représentent la vitesse de mise à jour de la valeur (ou le taux de décroissance, même chose). C'est un moyen pratique de mettre à jour lentement une variable sans avoir à se souvenir des dernières valeurs.  Il s'agit en fait d'une forme de filtre IIR passe-bas.  Avec un peu de chance, vous avez compris pourquoi les filtres IIR sont moins stables que les filtres FIR: les valeurs ne disparaissent jamais complètement !
 
-*************************
+*********************************
 Outils de conception de filtres
-*************************
+*********************************
 
 En pratique, la plupart des gens utiliseront un outil de conception de filtre ou une fonction dans le code qui conçoit le filtre.  Il existe de nombreux outils différents, mais pour les étudiants, je recommande cette application Web facile à utiliser de Peter Isza qui vous montrera la réponse impulsionnelle et fréquencielle : http://t-filter.engineerjs.com.  En utilisant les valeurs par défaut, du moins au moment de l'écriture de ce document, l'application est configurée pour concevoir un filtre passe-bas avec une bande passante de 0 à 400 Hz et une bande rejetée à partir de 500 Hz. La fréquence d'échantillonnage est de 2 kHz, donc la fréquence maximale que nous pouvons "voir" est de 1 kHz.
 
@@ -377,9 +377,9 @@ Maintenant que nous commençons à comprendre la convolution, je vais vous prés
  
 Dans l'expression ci-dessus, :math:`g(t)` est le signal ou l'entrée qui est inversée et glisse sur :math:`f(t)`, mais :math:`g(t)` et :math:`f(t)` peuvent être intervertis et il s'agit toujours de la même expression.  En général, le vecteur le plus court sera utilisé comme :math:`g(t)`. La convolution est égale à une corrélation croisée, définie comme :math:`\int f(\tau) g(t+\tau)`, lorsque :math:`g(t)` est symétrique, c'est-à-dire qu'il ne change pas lorsqu'il est retourné autour de l'origine.
 
-*************************
+********************************
 Conception de Filtres en Python
-*************************
+********************************
 
 Nous allons maintenant étudier une façon de concevoir nous-mêmes un filtre FIR en Python.  Bien qu'il existe de nombreuses approches de la conception de filtres, nous utiliserons la méthode consistant à commencer dans le domaine fréquentiel et à revenir en arrière pour trouver la réponse impulsionnelle. Car en fin de compte, c'est ainsi que notre filtre est représenté (par ses taps).
 
@@ -481,9 +481,9 @@ Voyez comment la réponse en fréquence n'est pas très droite... elle ne corres
 Les deux options ont fonctionné. Laquelle choisiriez-vous?  La deuxième méthode a permis d'obtenir plus de prises, mais la première méthode a permis d'obtenir une réponse en fréquence qui n'était pas très nette et dont le front descendant n'était pas très raide.  Il existe de nombreuses façons de concevoir un filtre, chacune ayant ses propres compromis. Beaucoup considèrent la conception de filtres comme un art.
 
 
-*************************
+*********************************
 Introduction à la Mise en Forme
-*************************
+*********************************
 
 Nous allons présenter brièvement un sujet très intéressant au sein de la DSP: la mise en forme. Nous l'étudierons plus tard en profondeur dans son propre chapitre, voir :ref:`pulse-shaping-chapter`. Il est intéressant de le mentionner en même temps que le filtrage, car la mise en forme est finalement un type de filtre, utilisé dans un but spécifique, avec des propriétés spéciales.
 

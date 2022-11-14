@@ -1,8 +1,8 @@
 .. _iq-files-chapter:
 
-##################
+####################
 Fichiers IQ et SigMF
-##################
+####################
 
 Dans tous nos exemples Python précédents, nous avons stocké les signaux sous forme de tableaux NumPy 1D de type "flottants complexes".  Dans ce chapitre, nous apprenons comment les signaux peuvent être stockés dans un fichier, puis relus dans Python, et nous présentons la norme SigMF.  Le stockage des données de signaux dans un fichier est extrêmement utile ; vous pouvez souhaiter enregistrer un signal dans un fichier afin de l'analyser manuellement hors ligne, de le partager avec un collègue ou de constituer un ensemble de données complet.
 
@@ -88,9 +88,9 @@ or
  samples /= 32768 # convertir en -1 en +1 (facultatif)
  samples = samples[::2] + 1j*samples[1::2] # convertir en IQIQIQ...
 
-*****************************
+********************************
 Analyse visuelle d'un fichier RF
-*****************************
+********************************
 
 Bien que nous ayons appris à créer notre propre tracé de spectrogramme dans le chapitre :ref:`freq-domain-chapter`, rien ne vaut l'utilisation d'un logiciel déjà créé, et quand il s'agit d'analyser un long enregistrement RF, je recommande d'utiliser `inspectrum <https://github.com/miek/inspectrum>`_.  Inspectrum est un outil graphique assez simple mais puissant pour balayer visuellement un fichier RF, avec un contrôle fin sur la gamme de cartes de couleurs et la taille de la FFT (quantité de zoom).  Vous pouvez maintenir la touche alt et utiliser la molette de défilement pour vous déplacer dans le temps.  Il dispose de curseurs optionnels pour mesurer le delta-temps entre deux rafales d'énergie, et la possibilité d'exporter une tranche du fichier RF dans un nouveau fichier.  Pour l'installation sur des plateformes basées sur Debian comme Ubuntu, utilisez les commandes suivantes :
 
@@ -110,9 +110,9 @@ Bien que nous ayons appris à créer notre propre tracé de spectrogramme dans l
    :scale: 30 % 
    :align: center 
    
-*************************
+*******************************
 Valeurs maximales et saturation
-*************************
+*******************************
 
 Lorsque vous recevez des échantillons d'un SDR, il est important de connaître la valeur maximale de l'échantillon.  De nombreux SDR émettent les échantillons sous forme de flottants avec une valeur maximale de 1.0 et une valeur minimale de -1.0.  D'autres SDR vous donneront des échantillons sous forme d'entiers, généralement 16 bits, auquel cas les valeurs max et min seront +32767 et -32768 (sauf indication contraire), et vous pouvez choisir de diviser par 32 768 pour les convertir en flottants de -1,0 à 1,0.  La raison pour laquelle il faut connaître la valeur maximale de votre SDR est due à la saturation : lors de la réception d'un signal extrêmement fort (ou si le gain est réglé trop haut), le récepteur va "saturer" et il va tronquer les valeurs élevées à la valeur maximale de l'échantillon.  Les ADCs de nos SDRs ont un nombre limité de bits.  Lorsque vous créez une application SDR, il est sage de toujours vérifier la saturation, et lorsque cela se produit, vous devez l'indiquer d'une manière ou d'une autre.
 Un signal qui est saturé aura l'air perturbé dans le domaine temporel, comme ceci :
@@ -123,9 +123,9 @@ Un signal qui est saturé aura l'air perturbé dans le domaine temporel, comme c
 
 En raison des changements soudains dans le domaine temporel, dus à la troncature, le domaine fréquentiel peut sembler étalé.  En d'autres termes, le domaine des fréquences comprendra de fausses caractéristiques, des caractéristiques résultant de la saturation et ne faisant pas réellement partie du signal, ce qui peut déconcerter les gens lors de l'analyse d'un signal. 
 
-*****************************
+**********************************************************
 SigMF et l'annotation des fichiers IQ 
-*****************************
+**********************************************************
 
 Comme le fichier IQ lui-même n'est associé à aucune métadonnée, il est courant d'avoir un second fichier contenant des informations sur le signal, portant le même nom de fichier mais une extension .txt ou autre.  Ces informations devraient au minimum inclure la fréquence d'échantillonnage utilisée pour collecter le signal, et la fréquence sur laquelle le SDR était accordé.  Après l'analyse du signal, le fichier de métadonnées peut inclure des informations sur les plages d'échantillonnage des caractéristiques intéressantes, telles que les rafales d'énergie.  L'index d'échantillon est simplement un nombre entier qui commence à 0 et s'incrémente à chaque échantillon complexe.  Si vous savez qu'il y a de l'énergie entre les échantillons 492342 et 528492, vous pouvez lire le fichier et extraire cette partie du tableau : :code:`samples[492342:528493]`.
 

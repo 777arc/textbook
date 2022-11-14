@@ -6,9 +6,9 @@ Codage Canal
 
 Dans ce chapitre, nous présentons les bases du codage de canal, c'est-à-dire les codes correcteurs d'erreur (FEC pour *Forward Error Correction* en anglais), la limite de Shannon, les codes de Hamming, les turbo-codes et les codes LDPC.  Le codage de canal est un domaine énorme dans les communications sans fil, et est une branche de la "théorie de l'information", qui est l'étude de la quantification, du stockage et de la communication de l'information.
 
-***************************
+***********************************************
 Pourquoi nous avons besoin du codage des canaux
-***************************
+***********************************************
 
 Comme nous l'avons appris dans le chapitre :ref:`noise-chapter`, les canaux sans fil sont bruyants, et nos symboles numériques n'atteindront pas parfaitement le récepteur.  Si vous avez suivi un cours des réseaux, vous connaissez peut-être déjà les contrôles de redondance cyclique (CRC pour *cyclic redundancy checks* en anglais), qui **détectent** les erreurs au niveau de la réception. L'objectif du codage de canal est de détecter **et de corriger** les erreurs au niveau du récepteur.  Si nous laissons une certaine marge d'erreur, nous pouvons transmettre avec un système de modulation d'ordre supérieur par exemple, sans que la liaison soit rompue.  À titre d'exemple visuel, considérez les constellations suivantes montrant une QPSK (à gauche) et une 16QAM (à droite) avec la même quantité de bruit.  La QPSK fournit 2 bits par symbole, tandis que la 16QAM offre un débit deux fois plus élevé avec 4 bits par symbole.  Mais notez comment dans la constellation QPSK, les symboles ont tendance à ne pas dépasse pas les frontières de décision des symboles, ou l'axe des x et l'axe des y, ce qui signifie que les symboles seront reçus correctement.  En revanche, dans le tracé de la constellation 16QAM, il y a un chevauchement des groupes de points et, par conséquent, de nombreux symboles seront mal reçus.
 

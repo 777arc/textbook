@@ -1,8 +1,8 @@
 .. _noise-chapter:
 
-#############
+##########################
 le Bruit et les dB
-#############
+##########################
 
 Dans ce chapitre, nous aborderons le bruit, notamment la façon dont il est modélisé et traité dans un système de communication sans fil.  Les concepts comprennent l'AWGN, le bruit complexe et le SNR/SINR.  Nous introduirons également les décibels (dB) en cours de route, car ils sont largement utilisés dans les communications sans fil et la radio logicielle.
 
@@ -124,9 +124,9 @@ Enfin, pour mettre ces chiffres en perspective, voici quelques exemples de nivea
 =========== ===
 
 
-*************************
+**************************************************
 Bruit dans le Domaine Fréquentiel
-*************************
+**************************************************
 
 Dans le chapitre :ref:`freq-domain-chapter`, nous avons abordé la correspondance temps-fréquence de la transformée de Fourier, c'est-à-dire ce à quoi ressemble un certain signal dans le domaine temporel dans le domaine fréquentiel. Et bien, à quoi ressemble un bruit gaussien dans le domaine des fréquences?  Les graphiques suivants montrent un certain bruit simulé dans le domaine temporel (en haut) et un tracé de la densité spectrale de puissance (DSP) de ce bruit (en bas).  Ces graphiques sont tirés de GNU Radio.
 
@@ -258,9 +258,9 @@ Le rapport signal à interférence plus bruit (SINR pour *signal to interference
 
 La définition de l'interférence dépend de l'application/de la situation, mais il s'agit généralement d'un autre signal qui interfère avec le signal d'intérêt, qui le empiète sur lui dans le domaine fréquentiel, et/ou qui ne peut pas être filtré pour une raison quelconque.  
 
-*************************
+**************************************************
 Ressources Externes (en anglais)
-*************************
+**************************************************
 
 Autres ressources sur l'AWGN, le SNR et la variance:
 

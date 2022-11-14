@@ -1,8 +1,8 @@
 .. _multipath-chapter:
 
-#######################
+##############################################
 Evanouissement par Multi-Trajets
-#######################
+##############################################
 
 Dans ce chapitre, nous présentons les trajets multiples, un phénomène de propagation qui fait que les signaux atteignent le récepteur par deux chemins ou plus, ce qui est le cas dans les systèmes sans fil du monde réel.  Jusqu'à présent, nous n'avons abordé que le "canal AWGN", c'est-à-dire un modèle de canal sans fil où le signal est simplement ajouté au bruit, qui ne s'applique réellement qu'aux signaux transmis par câble et à certains systèmes de communication par satellite. 
 
@@ -63,9 +63,9 @@ Voici un exemple d'un signal de 16 MHz de large qui émet en continu. Il y a plu
    :scale: 60 % 
    :align: center 
    
-**************************
+****************************************************
 Simulation de l'évanouissement de Rayleigh
-**************************
+****************************************************
 
 L'évanouissement de Rayleigh est utilisé pour modéliser l'évanouissement dans le temps, lorsqu'il n'y a pas de trajet LOS significatif.  Lorsqu'il y a un chemin LOS dominant, le modèle d'évanouissement de Rice devient plus approprié, mais nous nous concentrerons sur Rayleigh. Notez que les modèles de Rayleigh et de Rice ne tiennent pas compte de l'évanouissement sur le trajet principal entre l'émetteur et le récepteur (telle que l'atténuation sur le trajet calculée dans le cadre d'un bilan de liaison), ni de l'ombrage (*shadowing* en anglais) causé par de grands objets. Leur rôle est de modéliser l'évanouissement par trajets multiples qui se produit au fil du temps, en raison du mouvement et des diffuseurs (*scatterers* en anglais) dans l'environnement. 
 
@@ -125,9 +125,9 @@ Si vous avez l'intention d'utiliser ce modèle de canal dans le cadre d'une simu
 Observez les évanouissements profonds qui se produisent brièvement, ainsi que la petite fraction de temps où le canal est de meilleur qualité que s'il n'y avait pas d'évanouissement du tout.  
 
 
-****************************
+********************************************************
 Atténuation de l'Evanouissement Multi-Trajets
-****************************
+********************************************************
 
 Dans les communications modernes, nous avons développé des moyens de lutter contre les évanouissements par trajets multiples.  
 

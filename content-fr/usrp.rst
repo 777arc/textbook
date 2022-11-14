@@ -10,14 +10,14 @@ USRP en Python
    
 Dans ce chapitre, nous apprenons à utiliser l'API Python UHD pour contrôler et recevoir/transmettre des signaux avec un `USRP <https://www.ettus.com/>`_ qui est une série de SDRs fabriqués par Ettus Research (qui fait maintenant partie de NI).  Nous discuterons de la transmission et de la réception sur l'USRP en Python, et nous plongerons dans les sujets spécifiques à l'USRP, notamment les args de streams ou flux, les sous-devices, les canaux, la synchronisation 10 MHz et PPS.   
 
-************************
+************************************
 Installation de logiciels/pilotes
-************************
+************************************
 
 Bien que le code Python fourni dans ce manuel doive fonctionner sous Windows, Mac et Linux, nous ne fournirons que des instructions d'installation des pilotes/API spécifiques à Ubuntu 20 (bien que les instructions ci-dessous doivent fonctionner sur la plupart des distributions basées sur Debian).  Nous allons commencer par créer une VM Ubuntu 20 VirtualBox ; n'hésitez pas à sauter la partie VM si votre système d'exploitation est déjà prêt.
 
 Configuration d'une VM Ubuntu 20
-##########################
+#################################
 
 (Optionel)
 
@@ -32,7 +32,7 @@ Configuration d'une VM Ubuntu 20
 9. Pour les USRP de type USB, vous devrez installer des ajouts invités VM. Dans la VM, allez dans Périphériques > Insérer le CD Guest Additions > cliquez sur run quand une boîte apparaît.  Suivez les instructions. Redémarrez la VM, puis essayez de transférer l'USRP à la VM, en supposant qu'elle apparaisse dans la liste sous Périphériques > USB.  Le presse-papiers partagé peut être activé via Dispositifs > Presse-papiers partagé > Bidirectionnel.
 
 Installation de l'UHD et de l'API Python
-#############################
+#########################################
 
 Les commandes de terminal ci-dessous devraient compiler et installer la dernière version de UHD, y compris l'API Python :
 
@@ -52,7 +52,7 @@ Les commandes de terminal ci-dessous devraient compiler et installer la dernièr
 Pour plus d'aide, voir la page officielle d'Ettus `Building and Installing UHD from source <https://files.ettus.com/manual/page_build_guide.html>`_.  Notez qu'il existe également des méthodes d'installation des pilotes qui ne nécessitent pas de construire à partir des sources.
 
 Test des pilotes UHD et de l'API Python
-###################################
+########################################
 
 Ouvrez un nouveau terminal et tapez les commandes suivantes :
 
@@ -68,7 +68,7 @@ Si aucune erreur ne se produit, vous êtes prêt à partir !
 
 
 Analyse comparative de la vitesse de l'USRP en Python
-#################################
+#########################################################
 
 (Optionel)
 
@@ -148,7 +148,7 @@ Pour des applications plus sérieuses, je recommande de ne pas utiliser la fonct
 Avec num_samps fixé à 10 000 et le recv_buffer fixé à 1000, la boucle for sera exécutée 10 fois, c'est-à-dire qu'il y aura 10 appels à streamer.recv.  Notez que nous avons codé en dur le recv_buffer à 1000 mais vous pouvez trouver la valeur maximale autorisée en utilisant :code:`streamer.get_max_num_samps()`, qui se situe souvent autour de 3000 et quelques.  Notez également que recv_buffer doit être 2d car la même API est utilisée lors de la réception de plusieurs canaux à la fois, mais dans notre cas, nous n'avons reçu qu'un seul canal, donc recv_buffer[0] nous a donné le tableau 1D d'échantillons que nous voulions.  Pour l'instant, vous n'avez pas besoin d'en savoir trop sur la façon dont le flux démarre/arrête, mais sachez qu'il existe d'autres options que le mode "continu", comme recevoir un nombre spécifique d'échantillons et faire en sorte que le flux s'arrête automatiquement.  Bien que nous ne traitions pas les métadonnées dans cet exemple de code, elles contiennent toutes les erreurs qui se produisent, entre autres choses, que vous pouvez vérifier en regardant metadata.error_code à chaque itération de la boucle, si vous le souhaitez (les erreurs ont tendance à apparaître également dans la console elle-même, en raison de l'UHD, donc ne vous sentez pas obligé de les vérifier dans votre code Python). 
 
 Gain de réception
-############
+############################
 
 La liste suivante montre la gamme de gain des différents USRP, ils vont tous de 0dB au nombre spécifié ci-dessous.  Notez que ce n'est pas du dBm, c'est essentiellement du dBm combiné à un décalage inconnu car ce ne sont pas des appareils calibrés. 
 
@@ -163,7 +163,7 @@ Vous pouvez également utiliser la commande :code:`uhd_usrp_probe` dans un termi
 Pour spécifier le gain, vous pouvez utiliser la fonction normale set_rx_gain() qui prend la valeur du gain en dB, mais vous pouvez aussi utiliser set_normalized_rx_gain() qui prend une valeur de 0 à 1 et la convertit automatiquement dans la gamme de l'USRP que vous utilisez.  Ceci est pratique lorsqu'on crée une application qui supporte différents modèles d'USRP.  L'inconvénient de l'utilisation du gain normalisé est que vous n'avez plus vos unités en dB, donc si vous voulez augmenter votre gain de 10dB, par exemple, vous devez maintenant calculer la quantité.
 
 Contrôle automatique du gain
-######################
+######################################
 
 Certains USRP, y compris les séries B200 et E310, prennent en charge la commande automatique de gain (AGC pour *automatic gain controller*  en anglais) qui ajuste automatiquement le gain de réception en fonction du niveau du signal reçu, afin d'essayer de "remplir" au mieux les bits de l'ADC.  L'AGC peut être activé en utilisant :
 
@@ -174,7 +174,7 @@ Certains USRP, y compris les séries B200 et E310, prennent en charge la command
 Si vous avez une USRP qui n'implémente pas d'AGC, une exception sera levée lors de l'exécution de la ligne ci-dessus.  Avec l'AGC activé, le réglage du gain ne fera rien. 
 
 Arguments relatifs aux flux
-****************
+****************************
 
 Dans l'exemple complet ci-dessus, vous verrez la ligne :code:`st_args = uhd.usrp.StreamArgs("fc32", "sc16")`.  Le premier argument est le format de données CPU, qui est le type de données des échantillons une fois qu'ils sont sur votre ordinateur hôte.  UHD supporte les types de données CPU suivants lors de l'utilisation de l'API Python :
 
@@ -220,7 +220,7 @@ Pour plus de détails sur la façon dont cette fonction pratique fonctionne sous
 
 
 Gain d'émission
-#############
+####################
 
 Comme pour la réception, la plage de gain d'émission varie en fonction du modèle USRP, allant de 0 dB au nombre spécifié ci-dessous :
 
@@ -238,9 +238,9 @@ Transmettre et recevoir simultanément
 
 Si vous voulez émettre et recevoir en utilisant la même USRP en même temps, la clé est de le faire en utilisant plusieurs threads dans le même processus ; l'USRP ne peut pas couvrir plusieurs processus.  Par exemple, dans l'exemple C++ `txrx_loopback_to_file <https://github.com/EttusResearch/uhd/blob/master/host/examples/txrx_loopback_to_file.cpp>`_ un thread séparé est créé pour exécuter l'émetteur, et la réception est faite dans le thread principal.  Vous pouvez aussi simplement créer deux threads, un pour l'émission et un pour la réception, comme cela est fait dans l'exemple Python `benchmark_rate <https://github.com/EttusResearch/uhd/blob/master/host/examples/python/benchmark_rate.py>`_.  Un exemple complet n'est pas montré ici, simplement parce que ce serait un exemple assez long et que le benchmark_rate.py d'Ettus peut toujours servir de point de départ à quelqu'un.
 
-*********************************
+*************************************
 Sous-dispositif, canaux et antennes
-*********************************
+*************************************
 
 Une source fréquente de confusion lors de l'utilisation des USRP est de savoir comment choisir le bon ID de sous-dispositif et de canal.  Vous avez peut-être remarqué que dans tous les exemples ci-dessus, nous avons utilisé le canal 0, et n'avons rien spécifié concernant le subdev.  Si vous utilisez un B210 et que vous voulez juste utiliser RF:B au lieu de RF:A, tout ce que vous avez à faire est de choisir le canal 1 au lieu de 0. Mais sur les USRP comme le X310 qui ont deux slots pour carte fille, vous devez dire à UHD si vous voulez utiliser le slot A ou B, et quel canal sur cette carte fille, par exemple :
 
@@ -258,9 +258,9 @@ qui ne fait que contrôler un commutateur RF à bord de l'USRP, pour l'acheminer
 
 Pour recevoir ou émettre sur deux canaux à la fois, au lieu d'utiliser :code:`st_args.channels = [0]` vous fournissez une liste, telle que :code:`[0,1]`.  Le tampon de réception des échantillons devra être de taille (2, N) dans ce cas, au lieu de (1,N).  Rappelez-vous qu'avec la plupart des USRP, les deux canaux partagent un LO, donc vous ne pouvez pas indiquer différentes fréquences en même temps.
 
-**************************
+**********************************
 Synchronisation à 10 MHz et PPS
-**************************
+**********************************
 
 Un des énormes avantages de l'utilisation d'une USRP par rapport à d'autres SDR est leur capacité à se synchroniser à une source externe ou au `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_ embarqué.  Si vous avez connecté une source externe 10 MHz et PPS à votre USRP, vous voudrez vous assurer d'appeler ces deux lignes après avoir initialisé votre USRP :
 

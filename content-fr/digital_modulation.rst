@@ -1,8 +1,8 @@
 .. _modulation-chapter:
 
-###################
+#####################
 Modulation numérique
-###################
+#####################
 
 Dans ce chapitre, nous aborderons la transmission *réelle de données* à l'aide de la modulation numérique et des symboles sans fil!  Nous concevrons des signaux qui transmettent des "informations", par exemple des 1 et des 0, en utilisant des schémas de modulation comme ASK, PSK, QAM et FSK.  Nous aborderons également les diagrammes et constellations IQ et terminerons le chapitre par quelques exemples Python.
 
@@ -69,9 +69,9 @@ De quelles manières pouvons-nous moduler la porteuse?  Autre façon de poser la
 
 Nous pouvons moduler nos données sur une porteuse en modifiant l'un (ou plusieurs) de ces trois éléments.  
 
-****************************
+***************************************
 Modulation par déplacement d'amplitude
-****************************
+***************************************
 
 Modulation par déplacement d'amplitude (ou ASK en anglais pour Amplitude Shift Keying) est le premier schéma de modulation numérique que nous allons aborder car la modulation d'amplitude est la plus simple à visualiser parmi les trois propriétés des sinusoïdes.  Nous modulons littéralement l' **amplitude** de la porteuse.  Voici un exemple de modulation par déplacement d'amplitude à deux niveaux, appelé 2-ASK:
 
@@ -109,9 +109,9 @@ Comment créer réellement ce signal numériquement, par le biais d'un code?  To
 
 Le graphique du haut montre les échantillons discrets représentés par des points rouges, c'est-à-dire notre signal numérique.  Le graphique du bas montre à quoi ressemble le signal modulé résultant, qui pourrait être transmis par voie aérienne.  Dans les systèmes réels, la fréquence de la porteuse est généralement beaucoup plus élevée que la vitesse à laquelle les symboles changent.  Dans cet exemple, il n'y a que trois cycles de la sinusoïde dans chaque symbole, mais dans la pratique, il peut y en avoir des milliers, en fonction de la hauteur du spectre dans lequel le signal est transmis.
 
-************************
+***********************************
 Modulation par déplacement de phase
-************************
+***********************************
 
 Envisageons maintenant de moduler la phase de la même manière que nous l'avons fait pour l'amplitude.  La forme la plus simple est la modulation PSK binaire, aussi appelée BPSK, où il y a deux niveaux de phase:
 
@@ -132,9 +132,9 @@ Ce n'est pas très amusant de regarder des graphiques comme celui-ci:
 
 Au lieu de cela, nous représentons habituellement la phase dans le plan complexe.  
 
-***********************
+****************************
 Diagrammes IQ/Constellations
-***********************
+****************************
 
 Vous avez déjà vu des diagrammes IQ dans la sous-section sur les nombres complexes du chapitre :ref:`sampling-chapter`, mais maintenant nous allons les utiliser d'une manière nouvelle et amusante.  Pour un symbole donné, nous pouvons montrer l'amplitude et la phase sur un diagramme IQ.  Pour l'exemple BPSK, nous avons dit que nous avions des phases de 0 et 180 degrés. Traçons ces deux points sur le diagramme IQ. Nous supposerons que l'amplitude est de 1. Dans la pratique, l'amplitude utilisée n'a pas vraiment d'importance; une valeur plus élevée signifie un signal plus puissant, mais vous pouvez également augmenter le gain de l'amplificateur.
 
@@ -216,9 +216,9 @@ Notez que la plupart des schémas de modulation, à l'exception des diverses ASK
 
 Étant donné la difficulté de discerner les schémas de modulation dans le domaine temporel, nous préférons utiliser des diagrammes IQ plutôt que d'afficher le signal dans le domaine temporel.  Nous pouvons néanmoins montrer le signal dans le domaine temporel s'il y a une certaine structure de paquets ou si la séquence des symboles est importante.
 
-****************************
+****************************************
 Modulation par déplacement de fréquence
-****************************
+****************************************
 
 La dernière sur la liste est la modulation par déplacement de fréquence (ou FSK en anglais pour *Frequency Shift Keying*).  La FSK est assez simple à comprendre: nous nous déplaçons simplement entre N fréquences, chaque fréquence représentant un symbole possible.  Cependant, comme nous modulons une porteuse, il s'agit en fait de notre fréquence porteuse +/- ces N fréquences. Par exemple, nous pourrions être sur une porteuse de 1.2 GHz et nous déplacer entre ces quatre fréquences :
 

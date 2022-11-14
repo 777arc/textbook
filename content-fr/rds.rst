@@ -1,15 +1,15 @@
 .. _rds-chapter:
 
-##################
+#####################
 Exemple bout en bout
-##################
+#####################
 
 Dans ce chapitre, nous regroupons un grand nombre des concepts que nous avons appris précédemment et nous présentons un exemple complet de réception et de décodage d'un signal numérique réel.  Nous allons étudier le système de données radio (RDS pour *Radio Data System* en anglais), qui est un protocole de communication permettant d'intégrer de petites quantités d'informations dans les émissions de radio FM, comme le nom de la station et de la chanson.  Nous devrons démoduler la FM, décaler la fréquence, filtrer, décimer, rééchantillonner, synchroniser, décoder et analyser les octets.  Un exemple de fichier IQ est fourni à des fins de test ou si vous n'avez pas de SDR sous la main.
 
 
-********************************
+************************************
 Introduction à la radio FM et au RDS
-********************************
+************************************
 
 Pour comprendre le RDS, nous devons d'abord examiner les émissions de radio FM et la façon dont leurs signaux sont structurés.  Vous connaissez probablement la partie audio des signaux FM, qui sont simplement des signaux audio modulés en fréquence et transmis à des fréquences centrales correspondant au nom de la station, par exemple, "Sud Radio" est centré à exactement 101.8 MHz à Toulouse.  En plus de la partie audio, chaque émission FM contient d'autres composants qui sont modulés en fréquence en même temps que l'audio.  Au lieu de rechercher la structure du signal sur Google, examinons la densité spectrale de puissance (DSP) d'un exemple de signal FM, *après* la démodulation FM. Nous ne voyons que la partie positive car la sortie de la démodulation FM est un signal réel, même si l'entrée est complexe (nous verrons bientôt le code pour effectuer cette démodulation). 
 
@@ -76,7 +76,7 @@ Le signal final "double BPSK" est ensuite décalé en fréquence jusqu'à 57 kHz
 Il ne s'agissait là que d'un bref aperçu de l'aspect transmission, mais nous entrerons dans les détails lorsque nous aborderons la réception du RDS.
 
 Côté récepteur
-############
+##############
 
 Afin de démoduler et de décoder le RDS, nous allons effectuer les étapes suivantes, dont beaucoup sont des étapes de transmission en sens inverse (pas besoin de mémoriser cette liste, nous allons parcourir chaque étape individuellement ci-dessous):
 
@@ -212,9 +212,9 @@ Rappelons que le RDS contient deux signaux BPSK identiques, d'où la forme que n
 
 Remarque: à un moment ou à un autre, je mettrai à jour le filtre ci-dessus pour utiliser un filtre adapté (le root-raised cosine, je crois que c'est ce que RDS utilise), pour des raisons conceptuelles, mais j'ai obtenu les mêmes taux d'erreur en utilisant l'approche firwin() que le filtre adapté de GNU Radio, donc ce n'est clairement pas une exigence stricte.
 
-***********************************
+******************************************
 Synchronisation en temps (niveau symbole)
-***********************************
+******************************************
 
 .. code-block:: python
 
@@ -247,9 +247,9 @@ Nous sommes enfin prêts pour notre synchronisation temps symbole, ici nous util
 
 Si vous utilisez votre propre signal FM et que vous n'obtenez pas deux groupes distincts d'échantillons complexes à ce stade, cela signifie que la synchronisation du symbole ci-dessus n'a pas réussi à atteindre la synchronisation, ou qu'il y a un problème avec l'une des étapes précédentes. Vous n'avez pas besoin d'animer la constellation, mais si vous la tracez, veillez à ne pas tracer tous les échantillons, car cela ressemblera à un cercle. Si vous ne tracez que 100 ou 200 échantillons à la fois, vous aurez une meilleure idée de la présence ou non de deux groupes de points, même si elles tournent.
 
-********************************
+**************************************
 Synchronisation fine de la fréquence
-********************************
+**************************************
 
 .. code-block:: python
 
@@ -738,9 +738,9 @@ Vous avez réussi! Vous trouverez ci-dessous l'ensemble du code. Concaténé, il
  bits = (bits[1:] - bits[0:-1]) % 2
  bits = bits.astype(np.uint8) # decodage
 
- ###########
+ ############
  # DECODAGE #
- ###########
+ ############
  
  # Constants
  syndrome = [383, 14, 303, 663, 748]
@@ -865,9 +865,9 @@ Vous avez réussi! Vous trouverez ci-dessous l'ensemble du code. Concaténé, il
                  blocks_counter = 0
                  wrong_blocks_counter = 0
 
- ###########
+ ############
  # Analyse  #
- ###########
+ ############
 
  # Annexe F de la norme RBDS Tableau F.1 (Amérique du Nord) et Tableau F.2 (Europe)
  #              Europe                   Amérique du Nord

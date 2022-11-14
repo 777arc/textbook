@@ -11,12 +11,12 @@ PlutoSDR en Python
 Dans ce chapitre, nous apprenons à utiliser l'API Python pour le `PlutoSDR <https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`_, qui est une radio SDR à faible coût d'Analog Devices.  Nous couvrirons les étapes d'installation du PlutoSDR afin de faire fonctionner les pilotes et le logiciel, puis nous discuterons de la transmission et de la réception avec le PlutoSDR en Python.
 
 
-************************
+*************************************************
 Installation de logiciels/pilotes
-************************
+*************************************************
 
 Configuration de la VM
-#############
+##########################
 
 Bien que le code Python fourni dans ce manuel devrait fonctionner sous Windows, Mac et Linux, les instructions d'installation ci-dessous sont spécifiques à Ubuntu 18. Si vous avez des difficultés à installer le logiciel sur votre OS en suivant `les instructions fournies par Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, je vous recommande d'installer une VM Ubuntu 18 et d'essayer les instructions ci-dessous.
 
@@ -31,7 +31,7 @@ Bien que le code Python fourni dans ce manuel devrait fonctionner sous Windows, 
 9. Je recommande d'installer des addons d'invités VM. Dans la VM, allez dans Devices > Insert Guest Additions CD > cliquez sur run quand une boîte apparaît.  Suivez les instructions. Redémarrez la VM.  Le presse-papiers partagé peut être activé via Dispositifs > Presse-papiers partagé > Bidirectionnel.
 
 Connecter la PlutoSDR
-###################
+######################
 
 1. Si vous utilisez OSX, dans OSX, et non dans la VM, dans les préférences système, activez "kernel extensions".  Puis installez HoRNDIS (vous devrez peut-être redémarrer après).
 2. Si vous utilisez Windows, installez ce pilote : https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
@@ -43,7 +43,7 @@ Connecter la PlutoSDR
 8. Notez l'adresse IP du Pluto car vous en aurez besoin lorsque nous commencerons à utiliser la Pluto en Python.
 
 Installation du pilote PlutoSDR
-##########################
+###############################
 
 Les commandes de terminal ci-dessous devraient construire et installer la dernière version de :
 
@@ -109,7 +109,7 @@ Si, pour une raison quelconque, l'IP par défaut de 192.168.2.1 ne fonctionne pa
 Notez que cette procédure est également utilisée pour flasher une image de firmware différente sur la Pluto. Pour plus de détails, voir https://wiki.analog.com/university/tools/pluto/users/firmware.
 
 "Hacker" PlutoSDR pour augmenter la plage RF
-####################################
+#############################################
 
 Les PlutoSDR sont livrés avec une gamme de fréquences centrales et un taux d'échantillonnage limités, mais la puce sous-jacente est capable de fréquences beaucoup plus élevées.  Suivez ces étapes pour débloquer la gamme de fréquences complète de la puce.  S'il vous plaît garder à l'esprit que ce processus est fourni par Analog Devices, il est donc aussi faible risque que vous pouvez obtenir.  La limitation de fréquence du PlutoSDR est due au fait qu'Analog Devices utilisant l'AD9364 sur la base d'exigences strictes de performance à des fréquences plus élevées. .... En tant que passionnés de SDR et expérimentateurs, nous ne sommes pas trop concernés par ces exigences de performance.
 
@@ -172,7 +172,7 @@ Pour l'instant, nous n'allons rien faire d'intéressant avec ces échantillons, 
 
 
 Gain de réception
-############
+##################
 
 La Pluto peut être configuré pour avoir un gain de réception fixe ou automatique. Un contrôle automatique de gain (CAG) ajustera automatiquement le gain de réception pour maintenir un niveau de signal fort (-12dBFS pour ceux qui sont curieux).  L'AGC ne doit pas être confondu avec le convertisseur analogique-numérique (CAN) qui numérise le signal.  Techniquement parlant, l'AGC est un circuit de rétroaction en boucle fermée qui contrôle le gain de l'amplificateur en réponse au signal reçu.  Son objectif est de maintenir un niveau de puissance de sortie constant malgré un niveau de puissance d'entrée variable.  En général, le CAG ajuste le gain pour éviter de saturer le récepteur (c'est-à-dire d'atteindre la limite supérieure de la plage du CAN) tout en permettant au signal de "remplir" autant de bits CAN que possible.
 
@@ -232,7 +232,7 @@ Transmettre est très similaire à recevoir, sauf qu'au lieu de dire au SDR de r
 Voici quelques notes sur ce code.  Tout d'abord, vous voulez simuler vos échantillons IQ pour qu'ils soient entre -1 et 1, mais avant de les transmettre, nous devons les mettre à l'échelle par 2^14 à cause de la façon dont Analog Devices a implémenté la fonction :code:`tx()`.  Si vous n'êtes pas sûr des valeurs min/max, imprimez-les simplement avec :code:`print(np.min(samples), np.max(samples))` ou écrivez une instruction if pour vous assurer qu'elles ne sont jamais supérieures à 1 ou inférieures à -1 (en supposant que ce code vienne avant la mise à l'échelle de 2^14).  En ce qui concerne le gain d'émission, la gamme est de -90 à 0 dB, donc 0 dB est la puissance d'émission la plus élevée.  Nous voulons toujours commencer à une faible puissance d'émission, puis augmenter si nécessaire, donc nous avons réglé le gain à -50 dB par défaut, ce qui est vers le bas.  Ne vous contentez pas de le régler sur 0 dB simplement parce que votre signal n'apparaît pas; il y a peut-être un autre problème et vous ne voulez pas griller votre récepteur. 
 
 Transmettre des échantillons en répétition
-##############################
+############################################
 
 Si vous voulez transmettre continuellement le même ensemble d'échantillons de manière répétée, au lieu d'utiliser une boucle for/while dans Python comme nous l'avons fait ci-dessus, vous pouvez dire au Pluto de le faire en utilisant une seule ligne :
 
@@ -244,7 +244,7 @@ Vous transmettez alors vos échantillons comme d'habitude : :code:`sdr.tx(sample
 
 
 Transmettre par voie hertzienne en toute légalité
-#################################
+##################################################
 
 D'innombrables fois, des étudiants m'ont demandé sur quelles fréquences ils étaient autorisés à émettre avec une antenne (aux États-Unis).  La réponse courte est aucune, pour autant que je sache.  Généralement, lorsque les gens font référence à des réglementations spécifiques qui parlent de limites de puissance d'émission, ils se réfèrent aux fréquences suivantes `the FCC's "Title 47, Part 15" (47 CFR 15) regulations <https://www.ecfr.gov/cgi-bin/text-idx?SID=7ce538354be86061c7705af3a5e17f26&mc=true&node=pt47.1.15&rgn=div5>`_.  Mais il s'agit de réglementations pour les fabricants qui construisent et vendent des appareils fonctionnant dans les bandes ISM, et ces réglementations traitent de la manière dont ils doivent être testés.  Un appareil de la partie 15 est un appareil pour lequel une personne n'a pas besoin de licence pour le faire fonctionner dans le spectre qu'il utilise, mais l'appareil lui-même doit être autorisé/certifié pour montrer qu'il fonctionne conformément aux réglementations de la FCC avant d'être commercialisé et vendu.  Les réglementations de la partie 15 spécifient les niveaux de puissance maximum d'émission et de réception pour les différents éléments du spectre, mais rien de tout cela ne s'applique réellement à une personne transmettant un signal avec une radio SDR ou une radio de fabrication artisanale.  Les seules réglementations que j'ai pu trouver concernant les radios qui ne sont pas réellement des produits vendus étaient spécifiques à l'exploitation d'une station radio AM ou FM de faible puissance dans les bandes AM/FM.  Il y a également une section sur les "appareils de fabrication artisanale", mais il est spécifiquement dit qu'elle ne s'applique pas à tout ce qui est construit à partir d'un kit, et il serait exagéré de dire qu'une plate-forme d'émission utilisant une radio logicielle est un appareil de fabrication artisanale.  En résumé, les réglementations de la FCC ne sont pas aussi simples que "vous pouvez transmettre à ces fréquences uniquement sous ces niveaux de puissance", mais il s'agit plutôt d'un énorme ensemble de règles destinées aux tests et à la conformité.
 
@@ -344,7 +344,7 @@ Exercices Python
 Au lieu de vous fournir du code à exécuter, j'ai créé plusieurs exercices où 95 % du code est fourni et où le code restant est du Python assez simple à créer.  Les exercices ne sont pas censés être difficiles. Il leur manque juste assez de code pour vous faire réfléchir.
 
 Exercice 1 : Déterminer le débit de votre USB
-#########################################
+##############################################
 
 Essayons de recevoir des échantillons du PlutoSDR, et dans le processus, voyons combien d'échantillons par seconde nous pouvons pousser à travers la connexion USB 2.0.  
 

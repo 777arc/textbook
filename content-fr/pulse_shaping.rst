@@ -61,9 +61,9 @@ Pour diviser un filtre en deux, vous pouvez prendre la racine carrée de la rép
  X(f) = X_H(f) X_H(f) \quad \mathrm{where} \quad X_H(f) = \sqrt{X(f)}
 
 
-**********************************
+*************************************
 Filtres de Mise en Forme Spécifiques
-**********************************
+*************************************
 
 Nous savons que nous voulons :
 
@@ -101,7 +101,7 @@ Vous trouverez de plus amples informations sur la fonction :math:`\mathrm{sinc}(
 Rappelez-vous: nous partageons ce filtre entre la Tx et la Rx de manière égale. Entrez dans le filtre racine cosinus surélevé (RRC en anglais pour *Root Raised Cosine*)!
 
 Filtre Racine Cosinus Surélevé 
-#########################
+###############################
 
 Le filtre racine cosinus surélevé (RRC) est ce que nous mettons réellement en œuvre dans nos Tx et Rx. Combinés, ils forment un filtre normal à cosinus surélevé, comme nous l'avons vu. Comme la division d'un filtre en deux implique une racine carrée dans le domaine de la fréquence,la réponse impulsionnelle devient un peu désordonnée :
 
@@ -112,7 +112,7 @@ Le filtre racine cosinus surélevé (RRC) est ce que nous mettons réellement en
 Heureusement, il s'agit d'un filtre très utilisé et il existe de nombreuses implémentations, dont les suivantes `in Python <https://commpy.readthedocs.io/en/latest/generated/commpy.filters.rrcosfilter.html>`_.
 
 Autres Filtres de Mise en Forme des Impulsions
-###########################
+###############################################
 
 Parmi les autres filtres, citons le filtre gaussien, dont la réponse impulsionnelle ressemble à une fonction gaussienne. Il existe également un filtre sinc qui est équivalent au filtre à cosinus surélevé lorsque :math:`\beta = 0`.  Le filtre sinc est plutôt un filtre idéal, c'est-à-dire qu'il élimine les fréquences nécessaires sans grande région de transition.
 

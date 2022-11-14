@@ -7,9 +7,9 @@
 Dans ce chapitre, nous présentons un concept appelé échantillonnage IQ, ou échantillonnage complexe ou échantillonnage en quadrature.  Nous abordons également l'échantillonnage de Nyquist, les nombres complexes, les porteuses RF, les fréquences intermédiaires, et la densité spectrale de puissance.  L'échantillonnage IQ est la forme d'échantillonnage utilisée par la radio logicielle, ainsi que par de nombreux récepteurs (et émetteurs) numériques.  Il s'agit d'une version légèrement plus complexe de l'échantillonnage numérique ordinaire (jeu de mots), nous allons donc y aller doucement et, avec un peu de pratique, le concept va certainement faire tilt!
 
 
-*************************
+**********************************
 Les bases de l'échantillonnage
-*************************
+**********************************
 
 Avant d'aborder l'échantillonnage QI, voyons d'abord ce que signifie l'échantillonnage. Vous avez peut-être déjà rencontré l'échantillonnage sans vous en rendre compte en enregistrant des données audio avec un microphone. Le microphone est un transducteur qui convertit les ondes sonores en un signal électrique (un niveau de tension). Ce signal électrique est transformé par un convertisseur analogique-numérique (CAN), produisant une représentation numérique de l'onde sonore. Pour simplifier, le microphone capte les ondes sonores qui sont converties en électricité, et cette électricité est à son tour convertie en nombres. Le CAN fait le lien entre les domaines analogique et numérique. Les SDR sont étonnamment similaires. Au lieu d'un microphone, ils utilisent une antenne, et utilisent également des ADC. Dans les deux cas, le niveau de tension est échantillonné par un CAN. Pour les SDR, il s'agit d'ondes radio en entrée et de nombres en sortie.
 
@@ -24,9 +24,9 @@ Nous enregistrons la valeur de :math:`S(t)` à intervalles réguliers de :math:`
 
 Pour ceux qui préfèrent les mathématiques, soit :math:`S_n` l'échantillon :math:`n`, généralement un nombre entier commençant à 0. En utilisant cette convention, le processus d'échantillonnage peut être représenté mathématiquement comme :math:`S_n = S(nT)` pour des valeurs entières de :math:`n`.  C'est-à-dire que nous évaluons le signal analogique :math:`S(t)` à ces intervalles de :math:`nT`.
 
-*************************
+***************************
 Echantillonnage de Nyquist
-*************************
+***************************
 
 Pour un signal donné, la grande question est souvent de savoir à quelle vitesse nous devons échantillonner. Examinons un signal qui est juste une onde sinusoïdale, de fréquence f, représentée en vert ci-dessous. Disons que nous échantillonnons à une fréquence Fs (échantillons représentés en bleu).  Si nous échantillonnons ce signal à une fréquence égale à f (c'est-à-dire Fs = f), nous obtiendrons quelque chose qui ressemble à ceci:
 
@@ -67,9 +67,9 @@ Nous devons identifier la composante de fréquence la plus élevée, puis la dou
 
 Si l'échantillonnage n'est pas assez rapide, nous obtenons ce que l'on appelle le repliement ou l'alaising, dont nous parlerons plus tard, et que nous essayons d'éviter à tout prix. Ce que font nos SDR (et la plupart des récepteurs en général), c'est filtrer tout ce qui est au-dessus de Fs/2 juste avant l'échantillonnage. Si nous essayons de recevoir un signal avec une fréquence d'échantillonnage trop faible, ce filtre coupera une partie du signal. Nos récepteurs SDR se donnent beaucoup de mal pour nous fournir des échantillons exempts de repliement ainsi que d'autres imperfections.
 
-*************************
+*******************************
 Échantillonnage en quadrature
-*************************
+*******************************
 
 Le terme "quadrature" a de nombreuses significations, mais dans le contexte du DSP et de la SDR, il désigne deux ondes déphasées de 90 degrés. Pourquoi un déphasage de 90 degrés? Observez que deux ondes qui sont déphasées de 180 degrés sont essentiellement la même onde avec une multipliée par -1. En étant déphasées de 90 degrés, elles deviennent orthogonales, et il y a beaucoup de choses intéressantes à faire avec les fonctions orthogonales. Par souci de simplicité, nous utilisons le sinus et le cosinus comme nos deux ondes sinusoïdales déphasées de 90 degrés.
 
@@ -155,9 +155,9 @@ Nous pouvons utiliser l'identité trigonométrique :math:`a \cos(x) + b \sin(x) 
 
 Même si nous avons commencé avec un nombre complexe, ce que nous transmettons est réel, ce qui est une bonne chose car vous ne pouvez pas réellement transmettre quelque chose d'imaginaire avec des ondes électromagnétiques. Nous utilisons simplement des nombres imaginaires/complexes pour représenter *ce que* nous transmettons. Nous parlerons bientôt de la fonction :math:`f`.
 
-*************************
+*************************************
 Les nombres complexes dans les FFT
-*************************
+*************************************
 
 Les nombres complexes ci-dessus ont été supposés être des échantillons du domaine temporel, mais vous rencontrerez également des nombres complexes lorsque vous effectuerez une FFT. Lorsque nous avons abordé les séries de Fourier et les FFT au chapitre précédent, nous n'avions pas encore plongé dans les nombres complexes. Lorsque vous effectuez la FFT d'une série d'échantillons, vous obtenez la représentation dans le domaine fréquentiel. Nous avons parlé de la façon dont la FFT détermine quelles fréquences existent dans cet ensemble d'échantillons (l'amplitude de la FFT indique la "puissance" de chaque fréquence). Mais la FFT détermine également le retard (décalage temporel) nécessaire à appliquer à chacune de ces fréquences, afin que l'ensemble des sinusoïdes puisse être additionné pour reconstruire le signal dans le domaine temporel. Ce retard est simplement la phase de la FFT. La sortie d'une FFT est un tableau de nombres complexes, et chaque nombre complexe vous donne la magnitude et la phase, et l'indice de ce nombre vous donne la fréquence. Si vous générez des sinusoïdes à ces fréquences/amplitudes/phases et que vous les additionnez, vous obtiendrez votre signal original dans le domaine temporel (ou quelque chose de très proche, et c'est là que le théorème d'échantillonnage de Nyquist entre en jeu).
 
@@ -180,9 +180,9 @@ Tout au long de ce manuel, vous deviendrez **très** familier avec le fonctionne
 Une dernière remarque importante: la figure ci-dessus montre ce qui se passe **à l'intérieur** de la SDR. Nous n'avons pas besoin de générer une onde sinusoïdale, de la décaler de 90, de la multiplier ou de l'additionner - la SDR le fait pour nous. Nous indiquons à la SDR la fréquence à laquelle nous voulons échantillonner, ou la fréquence à laquelle nous voulons transmettre nos échantillons. Du côté du récepteur, le SDR nous fournira les échantillons IQ. Du côté de l'émetteur, nous devons fournir au SDR les échantillons IQ. En termes de type de données, il s'agira soit d'entiers complexes, soit de flottants.
    
    
-**************************
+**************************************
 Porteurse et Descente en Fréquence
-**************************
+**************************************
 
 Jusqu'à présent, nous n'avons pas parlé de la fréquence, mais nous avons vu qu'il y avait un :math:`f` dans les équations impliquant le cos() et le sin(). Cette fréquence est la fréquence de l'onde sinusoïdale que nous envoyons réellement dans l'air (la fréquence de l'onde électromagnétique). Nous l'appelons la "porteuse" car elle transporte nos informations sur une certaine fréquence. Lorsque nous nous accordons sur une fréquence avec notre SDR et recevons des échantillons, nos informations sont stockées dans I et Q; cette porteuse n'apparaît pas dans I et Q, en supposant que nous nous sommes réglés sur la porteuse.
 
@@ -221,18 +221,18 @@ Enfin, vous êtes peut-être curieux de savoir à quelle vitesse les signaux se 
 
 où :math:`c` est la vitesse de la lumière, généralement fixée à 3e8 lorsque :math:`f` est en Hz et :math:``lambda` en mètre.  Dans le domaine des communications sans fil, cette relation devient importante lorsqu'il s'agit d'antennes, car pour recevoir un signal à une certaine fréquence porteuse, :math:`f`, vous avez besoin d'une antenne qui correspond à sa longueur d'onde, :math:`\lambda`, généralement l'antenne a une longueur de :math:`\lambda/2` ou :math:`\lambda/4`.  Cependant, quelle que soit la fréquence/longueur d'onde, l'information transportée par ce signal se déplace toujours à la vitesse de la lumière, de l'émetteur au récepteur.  Pour calculer ce délai dans l'air, une règle empirique est que la lumière parcourt environ un 30 cm en une nanoseconde. Autre règle empirique : un signal se rendant à un satellite en orbite géostationnaire et en revenant prendra environ 0.25 seconde pour l'ensemble du trajet.
 
-**************************
+********************************
 Architectures des récepteurs
-**************************
+********************************
 
 La figure de la section "Côté récepteur" montre comment le signal d'entrée est converti et divisé en I et Q. Cet arrangement est appelé "conversion directe", car les fréquences RF sont directement converties en bande de base. Une autre option consiste à ne pas effectuer de conversion de fréquence du tout et à échantillonner très rapidement pour tout capturer de 0 Hz à la moitié de la fréquence d'échantillonnage. Cette stratégie est appelée "échantillonnage direct", et elle nécessite une puce CAN extrêmement coûteuse.  Une troisième architecture, populaire car c'est ainsi que fonctionnaient les anciennes radios, est connue sous le nom de "superhétérodyne". Elle implique une conversion vers le bas, mais pas jusqu'à 0 Hz. Elle place le signal d'intérêt à une fréquence intermédiaire, appelée "FI".  Un amplificateur à faible bruit (LNA pour *Low Noise Amplifier* en anglais) est simplement un amplificateur conçu pour des signaux de très faible puissance à l'entrée.  Voici les schémas fonctionnels de ces trois architectures, notez que des variations et des hybrides de ces architectures existent également :
 
 .. image:: ../_images/receiver_arch_diagram.svg
    :align: center
 
-***********************************
+*****************************************
 Signaux en Bande de Base et Passe-Bande
-***********************************
+*****************************************
 On dit d'un signal centré autour de 0 Hz qu'il est en "bande de base".  À l'inverse, on parle de "bande passante" lorsqu'un signal existe à une fréquence RF qui n'est pas proche de 0 Hz, mais qui a été décalée vers le haut dans le but d'une transmission sans fil.  Il n'y a pas de notion de "transmission en bande de base", car on ne peut pas transmettre quelque chose d'imaginaire.  Un signal en bande de base peut être parfaitement centré à 0 Hz, comme la partie droite de la figure de la section précédente. Il peut être *proche* de 0 Hz, comme les deux signaux illustrés ci-dessous. Ces deux signaux sont toujours considérés comme étant en bande de base. Vous trouverez également un exemple de signal passe-bande, centré sur une fréquence très élevée notée :math:`f_c`.
 
 .. image:: ../_images/baseband_bandpass.png
@@ -274,18 +274,18 @@ Il y a un problème: si nous voulons que notre signal soit centré à 100 MHz et
 Cette sous-section concernant les décalages DC est un bon exemple de ce qui différencie ce manuel des autres. Votre manuel DSP moyen abordera l'échantillonnage, mais il a tendance à ne pas inclure les obstacles à la mise en œuvre tels que les décalages DC, malgré leur importance dans la pratique.
 
 
-****************************
+****************************************
 Echantillonnage à l'aide de notre SDR
-****************************
+****************************************
 
 Pour obtenir des informations spécifiques à la SDR sur l'exécution de l'échantillonnage, consultez l'un des chapitres suivants :
 
 * Chapitre :ref:`pluto-chapter`
 * Chapitre :ref:`usrp-chapter`
 
-*************************
+*******************************
 Calcul de la puissance moyenne
-*************************
+*******************************
 
 Pour un signal complexe discret, c'est-à-dire un signal que nous avons échantillonné, nous pouvons trouver la puissance moyenne en prenant la module de chaque échantillon, en l'élevant au carré, puis en calculant la moyenne :
 
@@ -309,9 +309,9 @@ Si votre signal a une moyenne approximativement nulle - ce qui est généralemen
 
 La raison pour laquelle la variance des échantillons calcule la puissance moyenne est assez simple: l'équation de la variance est :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2` où :math:`\mu` est la moyenne du signal. Cette équation semble familière! Si :math:`\mu` est égal à zéro, l'équation permettant de déterminer la variance des échantillons devient équivalente à l'équation de la puissance.  Vous pouvez également soustraire la moyenne des échantillons de votre fenêtre d'observation, puis calculer la variance. Sachez simplement que si la valeur moyenne n'est pas nulle, la variance et la puissance ne sont pas égales.
  
-**********************************
+**********************************************
 Calcul de la densité spectrale de puissance
-**********************************
+**********************************************
 
 Dans le chapitre précédent, nous avons appris que nous pouvions convertir un signal dans le domaine des fréquences à l'aide d'une FFT, et que le résultat était appelé densité spectrale de puissance (DSP), qu'on notera par la suite PSD (pour *Power Spectral Density*) et eviter ainsi toute confusion avec DSP de *Digitl Signal Processing*.
 
@@ -399,8 +399,8 @@ sortie:
 .. image:: ../_images/fft_example1.svg
    :align: center
 
-******************
+******************************
 Aller plus loin (anglais)
-******************
+******************************
 
 #. http://rfic.eecs.berkeley.edu/~niknejad/ee242/pdf/eecs242_lect3_rxarch.pdf
