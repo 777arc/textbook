@@ -58,5 +58,6 @@ Thank you to anyone who has read any portion of this textbook and provided feedb
 - `Barry Duggan <http://github.com/duggabe>`_
 - Matthew Hannon
 - James Hayek
-- `Deidre Stuffer
-- Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_ 
+- Deidre Stuffer
+- Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_
+

@@ -58,5 +58,6 @@ Nous remercions tous ceux qui ont lu une partie de ce manuel et nous ont fait pa
 - `Barry Duggan <http://github.com/duggabe>`_
 - Matthew Hannon
 - James Hayek
-- `Deidre Stuffer
-- Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_ 
+- Deidre Stuffer
+- Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_
+
