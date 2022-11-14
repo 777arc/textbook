@@ -59,3 +59,4 @@ Thank you to anyone who has read any portion of this textbook and provided feedb
 - Matthew Hannon
 - James Hayek
 - `Deidre Stuffer <http://kd9qgl.wordpress.com/>`_
+- Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_ 
