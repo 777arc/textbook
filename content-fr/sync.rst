@@ -1,33 +1,33 @@
 .. _sync-chapter:
 
 ################
-Synchronization
+Synchronisation
 ################
 
-This chapter covers wireless signal synchronization in both time and frequency, to correct for carrier frequency offsets and perform timing alignment at the symbol and frame level.  We will utilize the Mueller and Muller clock recovery technique, and the Costas Loop, in Python. 
+Ce chapitre traite de la synchronisation des signaux sans fil en temps et en fréquence, afin de corriger les décalages de la fréquence porteuse et d'effectuer un alignement temporel au niveau des symboles et des trames.  Nous utiliserons la technique de récupération d'horloge de Mueller et Muller, ainsi que la boucle de Costas, en Python. 
 
 ***************************
 Introduction
 ***************************
 
-We have discussed how to transmit digitally over the air, utilizing a digital modulation scheme like QPSK and by applying pulse shaping to limit the signal bandwidth.  Channel coding can be used to deal with noisy channels, such as when you have low SNR at the receiver.  Filtering out as much as possible before digitally processing the signal always helps.  In this chapter we will investigate how synchronization is performed on the receiving end.  Synchronization is a set of processing that occurs *before* demodulation and channel decoding.  The overall tx-channel-rx chain is shown below, with the blocks discussed in this chapter highlighted in yellow.  (This diagram is not all-encompassing--most systems also include equalization and multiplexing).
+Nous avons vu comment transmettre numériquement par voie hertzienne, en utilisant un schéma de modulation numérique comme la QPSK et en appliquant une mise en forme des impulsions pour limiter la largeur de bande du signal.  Le codage de canal peut être utilisé pour traiter les canaux bruyants, par exemple lorsque le rapport signal/bruit est faible au niveau du récepteur.  Il est toujours utile de filtrer autant que possible le signal avant de le traiter numériquement.  Dans ce chapitre, nous allons étudier la manière dont la synchronisation est effectuée du côté de la réception.  La synchronisation est un ensemble de traitements qui se produisent *avant* la démodulation et le décodage du canal.  La chaîne globale tx-canal-rx est représentée ci-dessous, avec les blocs abordés dans ce chapitre surlignés en jaune.  (Ce diagramme n'est pas exhaustif : la plupart des systèmes incluent également l'égalisation et le multiplexage).
 
 .. image:: ../_images/sync-diagram.svg
    :align: center 
    :target: ../_images/sync-diagram.svg
 
 ***************************
-Simulating Wireless Channel
+Simulation d'un canal sans fil
 ***************************
 
-Before we learn how to implement time and frequency synchronization, we need to make our simulated signals more realistic.  Without adding some random time delay, the act of synchronizing in time is trivial.  In fact, you only need to take into account the sample delay of any filters you use.  We also want to simulate a frequency offset because, as we will discuss, oscillators are not perfect; there will always be some offset between the transmitter and receiver's center frequency.
+Avant d'apprendre à mettre en œuvre la synchronisation temporelle et fréquentielle, nous devons rendre nos signaux simulés plus réalistes.  Sans l'ajout d'un retard aléatoire, la synchronisation dans le temps est triviale.  En fait, il suffit de prendre en compte le retard d'échantillonnage de tous les filtres que vous utilisez.  Nous voulons également simuler un décalage de fréquence car, comme nous le verrons, les oscillateurs ne sont pas parfaits; il y aura toujours un certain décalage entre la fréquence centrale de l'émetteur et celle du récepteur.
 
-Let's examine Python code for simulating a non-integer delay and a frequency offset.  The Python code in this chapter will start from the code we wrote during the pulse shaping Python exercise (click below if you need it); you can consider it the starting point of the code in this chapter, and all new code will come after.
+Examinons maintenant le code Python permettant de simuler un retard non entier et un décalage de fréquence. Le code Python de ce chapitre part du code que nous avons écrit lors de l'exercice Python de mise en forme des impulsions (cliquez ci-dessous si vous en avez besoin); vous pouvez le considérer comme le point de départ du code de ce chapitre, et le nouveau code viendra ensuite.
 
 .. raw:: html
 
    <details>
-   <summary>Python Code from Pulse Shaping</summary>
+   <summary>Code Python de la mise en forme des impulsions</summary>
 
 .. code-block:: python
 
@@ -36,52 +36,52 @@ Let's examine Python code for simulating a non-integer delay and a frequency off
     from scipy import signal
     import math
 
-    # this part came from pulse shaping exercise
+    # cette partie provient de l'exercice des impulsions de mise en forme
     num_symbols = 100
     sps = 8
-    bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
+    bits = np.random.randint(0, 2, num_symbols) # Nos données à transmettre: des 1 et des 0.
     pulse_train = np.array([])
     for bit in bits:
         pulse = np.zeros(sps)
-        pulse[0] = bit*2-1 # set the first value to either a 1 or -1
-        pulse_train = np.concatenate((pulse_train, pulse)) # add the 8 samples to the signal
+        pulse[0] = bit*2-1 # définir la première valeur à 1 ou -1
+        pulse_train = np.concatenate((pulse_train, pulse)) # ajouter les 8 échantillons au signal
 
-    # Create our raised-cosine filter
+    # Créer notre filtre à base de cosinus surélevé
     num_taps = 101
     beta = 0.35
-    Ts = sps # Assume sample rate is 1 Hz, so sample period is 1, so *symbol* period is 8
-    t = np.arange(-51, 52) # remember it's not inclusive of final number
+    Ts = sps # Supposons que la fréquence d'échantillonnage est de 1Hz, donc la période d'échantillonnage est de 1, donc la période du *symbole* est de 8.
+    t = np.arange(-51, 52) # n'oubliez pas que le nombre final n'est pas inclus
     h = np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
 
-    # Filter our signal, in order to apply the pulse shaping
+    # Filtrer notre signal, afin d'appliquer l'impulsion de mise en forme
     samples = np.convolve(pulse_train, h)
 
 .. raw:: html
 
    </details>
 
-We will leave out the plotting-related code because by now you have probably learned how to plot any signal you want.  Making the plots look pretty, as they often do in this textbook, requires a lot of extra code that is not necessary to understand.
+Nous laisserons de côté le code relatif au tracé car vous avez probablement déjà appris à tracer n'importe quel signal. Pour que les tracés soient jolis, comme c'est souvent le cas dans ce manuel, il faut beaucoup de code supplémentaire qu'il n'est pas nécessaire de comprendre.
 
 
-Adding a Delay
+Ajouter un délai
 ##############
 
-We can easily simulate a delay by shifting samples, but it only simulates a delay that is an integer multiple of our sample period.  In the real world the delay will be some fraction of a sample period.  We can simulate the delay of a fraction of a sample by making a "fractional delay" filter, which passes all frequencies but delays the samples by some amount that isn't limited to the sample interval.  You can think of it as an all-pass filter that applies the same phase shift to all frequencies.  (Recall that a time delay and phase shift are equivalent.)  The Python code to create this filter is shown below:
+Nous pouvons facilement simuler un retard en décalant les échantillons, mais cela ne simule qu'un retard qui est un multiple entier de notre période d'échantillonnage.  Dans le monde réel, le retard sera une fraction de la période d'échantillonnage.  Nous pouvons simuler le retard d'une fraction d'échantillon en créant un filtre à "retard fractionnel", qui laisse passer toutes les fréquences mais retarde les échantillons d'une certaine quantité qui n'est pas limitée à l'intervalle d'échantillonnage.  Vous pouvez l'imaginer comme un filtre passe-tout qui applique le même déphasage à toutes les fréquences.  (Rappelez-vous qu'un retard temporel et un déphasage sont équivalents.) Le code Python permettant de créer ce filtre est présenté ci-dessous:
 
 .. code-block:: python
 
-    # Create and apply fractional delay filter
-    delay = 0.4 # fractional delay, in samples
-    N = 21 # number of taps
+    # Créer et appliquer un filtre à retard fractionnel
+    delay = 0.4 # délai fractionné, en échantillons
+    N = 21 # nombre de taps
     n = np.arange(-N//2, N//2) # ...-3,-2,-1,0,1,2,3...
-    h = np.sinc(n - delay) # calc filter taps
-    h *= np.hamming(N) # window the filter to make sure it decays to 0 on both sides
-    h /= np.sum(h) # normalize to get unity gain, we don't want to change the amplitude/power
-    samples = np.convolve(samples, h) # apply filter
+    h = np.sinc(n - delay) # calcul des taps du filtre
+    h *= np.hamming(N) # fenêtre du filtre pour s'assurer qu'il décroit vers 0 des deux côtés
+    h /= np.sum(h) # normaliser pour obtenir un gain unitaire, nous ne voulons pas changer l'amplitude/puissance
+    samples = np.convolve(samples, h) # appliquer le filtre
+    
+Comme vous pouvez le voir, nous calculons les prises du filtre à l'aide d'une fonction sinc().  Une fonction sinc dans le domaine temporel est un rectangle dans le domaine fréquentiel, et notre rectangle pour ce filtre couvre toute la gamme de fréquences de notre signal.  Ce filtre ne remodèle pas le signal, il le retarde simplement dans le temps.  Dans notre exemple, nous retardons de 0.4 échantillon.  N'oubliez pas que l'application de *n'importe quel* filtre retarde un signal de la moitié des taps du filtre moins un, en raison de la convolution du signal à travers le filtre.
 
-As you can see, we are calculating the filter taps using a sinc() function.  A sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal.  This filter does not reshape the signal, it just delays it in time.  In our example we are delaying by 0.4 of a sample.  Keep in mind that applying *any* filter delays a signal by half of the filter taps minus one, due to the act of convolving the signal through the filter.
-
-If we plot the "before" and "after" of filtering a signal, we can observe the fractional delay.  In our plot we zoom into only a couple of symbols.  Otherwise, the fractional delay is not viewable.
+Si nous traçons le graphique "avant" et "après" le filtrage d'un signal, nous pouvons observer le retard fractionnel.  Dans notre graphique, nous ne zoomons que sur quelques symboles.  Sinon, le retard fractionnel n'est pas visible.
 
 .. image:: ../_images/fractional-delay-filter.svg
    :align: center
@@ -89,210 +89,210 @@ If we plot the "before" and "after" of filtering a signal, we can observe the fr
 
 
 
-Adding a Frequency Offset
+Ajout d'un décalage de fréquence
 ##########################
 
-To make our simulated signal more realistic, we will apply a frequency offset.  Let's say that our sample rate in this simulation is 1 MHz (it doesn't actually matter what it is, but you'll see why it makes it easier to choose a number).  If we want to simulate a frequency offset of 13 kHz (some arbitrary number), we can do it via the following code:
+Pour rendre notre signal simulé plus réaliste, nous allons appliquer un décalage de fréquence.  Disons que notre fréquence d'échantillonnage dans cette simulation est de 1 MHz (la valeur n'a pas vraiment d'importance, mais vous verrez pourquoi il est plus facile de choisir un nombre).  Si nous voulons simuler un décalage de fréquence de 13 kHz (un nombre arbitraire), nous pouvons le faire via le code suivant:
 
 .. code-block:: python
 
-    # apply a freq offset
-    fs = 1e6 # assume our sample rate is 1 MHz
-    fo = 13000 # simulate freq offset
-    Ts = 1/fs # calc sample period
-    t = np.arange(0, Ts*len(samples), Ts) # create time vector
-    samples = samples * np.exp(1j*2*np.pi*fo*t) # perform freq shift
+    # appliquer un décalage de fréquence
+    fs = 1e6 # supposons que notre fréquence d'échantillonnage est de 1 MHz
+    fo = 13000 # simuler le décalage de la fréquence
+    Ts = 1/fs # période d'échantillonnage
+    t = np.arange(0, Ts*len(samples), Ts) # créer un vecteur temps
+    samples = samples * np.exp(1j*2*np.pi*fo*t) # effectuer un décalage de fréquence
  
-Below demonstrates the signal before and after the frequency offset is applied.
+La figure ci-dessous montre le signal avant et après l'application du décalage de fréquence.
  
 .. image:: ../_images/sync-freq-offset.svg
    :align: center
    :target: ../_images/sync-freq-offset.svg
 
-We have not been graphing the Q portion since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
+Nous n'avons pas représenté graphiquement la partie Q puisque nous transmettions en BPSK, ce qui fait que la partie Q est toujours nulle.  Maintenant que nous ajoutons un décalage de fréquence pour simuler les canaux sans fil, l'énergie s'étend sur I et Q. À partir de maintenant, nous devrions tracer à la fois I et Q. N'hésitez pas à substituer un décalage de fréquence différent pour votre code.  Si vous abaissez le décalage à environ 1 kHz, vous serez en mesure de voir la sinusoïde dans l'enveloppe du signal car elle oscille suffisamment lentement pour couvrir plusieurs symboles.
 
-As far as picking an arbitrary sample rate, if you scrutinize the code you will notice what matters is the ratio of :code:`fo` to :code:`fs`.
+En ce qui concerne le choix d'une fréquence d'échantillonnage arbitraire, si vous examinez le code, vous remarquerez que ce qui importe est le rapport entre :code:`fo` et :code:`fs`.
 
-You can pretend that the two code blocks presented earlier simulate a the wireless channel.  The code should come after the transmit-side code (what we did in the pulse shaping chapter) and before the receive-side code, which is what we will explore the rest of this chapter.
+Vous pouvez prétendre que les deux blocs de code présentés précédemment simulent un canal sans fil.  Le code devrait venir après le code côté émission (ce que nous avons fait dans le chapitre sur les impulsions de mise en forme) et avant le code côté réception, qui est ce que nous allons explorer dans le reste de ce chapitre.
 
 ***************************
-Time Synchronization
+Synchronisation du temps
 ***************************
 
-When we transmit a signal wirelessly, it arrives at the receiver with a random phase shift due to time traveled.  We cannot just start sampling the symbols at our symbol rate because we are unlikely to sample it at the right spot in the pulse, as discussed at the end of the :ref:`pulse-shaping-chapter` chapter.  Review the three figures at the end of that chapter if you are not following.
+Lorsque nous transmettons un signal sans fil, il arrive au récepteur avec un déphasage aléatoire dû au temps parcouru.  Nous ne pouvons pas simplement commencer à échantillonner les symboles à notre débit de symboles car il est peu probable que nous l'échantillonnions au bon endroit dans l'impulsion, comme nous l'avons vu à la fin du chapitre :ref:`pulse-shaping-chapter`.  Revoyez les trois figures à la fin de ce chapitre si vous ne suivez pas.
 
-Most timing synchronization techniques take the form of a phase lock loop (PLL); we won't study PLLs here but it's important to know the term, and you can read about them on your own if you are interested.  PLLs are closed-loop systems that use feedback to continuously adjust something; in our case, a time shift permits us to sample at the peak of the digital symbols.
+La plupart des techniques de synchronisation prennent la forme d'une boucle à verrouillage de phase (ou PLL en anglais pour *phase locked loop*). Nous n'étudierons pas les PLL ici, mais il est important de connaître ce terme et vous pouvez vous documenter sur le sujet si vous êtes intéressé.  Les PLL sont des systèmes en boucle fermée qui utilisent la rétroaction pour ajuster continuellement un paramètre; dans notre cas, un décalage temporel nous permet d'échantillonner au pic des symboles numériques.
 
-You can picture timing recovery as a block in the receiver, which accepts a stream of samples and outputs another stream of samples (similar to a filter).  We program this timing recovery block with information about our signal, the most important being the number of samples per symbol (or our best guess at it, if we are not 100% sure what was transmitted).  This block acts as a "decimator", i.e., our sample output will be a fraction of the number of samples in.  We want one sample per digital symbol, so the decimation rate is simply the samples per symbol.  If the transmitter transmits at 1M symbols per second, and we sample at 16 Msps, we will receive 16 samples per symbol.  That will be the sample rate going into the timing sync block.  The sample rate coming out of the block will be 1 Msps because we want one sample per digital symbol.
+Vous pouvez vous représenter la récupération du temps comme un bloc dans le récepteur, qui accepte un flux d'échantillons et sort un autre flux d'échantillons (similaire à un filtre).  Nous programmons ce bloc de récupération du temps avec des informations sur notre signal, la plus importante étant le nombre d'échantillons par symbole (ou notre meilleure estimation de celui-ci, si nous ne sommes pas sûrs à 100 % de ce qui a été transmis).  Ce bloc agit comme un "décimateur", c'est-à-dire que notre échantillon de sortie sera une fraction du nombre d'échantillons d'entrée.  Nous voulons un échantillon par symbole numérique, donc le taux de décimation est simplement les échantillons par symbole.  Si l'émetteur transmet à 1M symboles par seconde et que nous échantillonnons à 16 Msps, nous recevrons 16 échantillons par symbole.  Ce sera le taux d'échantillonnage entrant dans le bloc de synchronisation.  Le taux d'échantillonnage sortant du bloc sera de 1 Msps car nous voulons un échantillon par symbole numérique.
 
-Most timing recovery methods rely on the fact that our digital symbols rise and then fall, and the crest is the point at which we want to sample the symbol. To put it another way, we sample the maximum point after taking the absolute value:
+La plupart des méthodes de récupération du temps reposent sur le fait que nos symboles numériques montent puis descendent, et que la crête est le point auquel nous voulons échantillonner le symbole. En d'autres termes, nous échantillonnons le point maximum après avoir pris la valeur absolue :
 
 .. image:: ../_images/symbol_sync2.png
    :scale: 40 % 
    :align: center 
 
-There are many timing recovery methods, most resembling a PLL.  Generally the difference between them is the equation used to perform "correction" on the timing offset, which we denote as :math:`\mu` or :code:`mu` in code.  The value of :code:`mu` gets updated every loop iteration.  It is in units of samples, and you can think of it as how much we have to shift by to be able to sample at the "perfect" time.  So if :code:`mu = 3.61` then that means we have to shift the input by 3.61 samples to sample at the right spot.  Because we have 8 samples per symbol, if :code:`mu` goes over 8 it will just wrap back around to zero.
+Il existe de nombreuses méthodes de récupération du temps, la plupart ressemblant à une PLL. La différence entre elles réside généralement dans l'équation utilisée pour effectuer la "correction" du décalage temporel, que nous désignons par :math:`\mu` ou :code:`mu` dans le code.  La valeur de :code:`mu` est mise à jour à chaque itération de la boucle.  Elle est exprimée en unités d'échantillons, et vous pouvez l'imaginer comme le décalage que nous devons faire pour pouvoir échantillonner au moment "parfait".  Ainsi, si :code:`mu = 3.61`, cela signifie que nous devons décaler l'entrée de 3.61 échantillons pour échantillonner au bon endroit.  Comme nous avons 8 échantillons par symbole, si :code:`mu` dépasse 8, il revient simplement à zéro.
 
-The following Python code implements the Mueller and Muller clock recovery technique.
+Le code Python suivant implémente la technique de récupération d'horloge de Mueller et Muller.
 
 .. code-block:: python
 
-    mu = 0 # initial estimate of phase of sample
+    mu = 0 # estimation initiale de la phase de l'échantillon
     out = np.zeros(len(samples) + 10, dtype=np.complex)
-    out_rail = np.zeros(len(samples) + 10, dtype=np.complex) # stores values, each iteration we need the previous 2 values plus current value
-    i_in = 0 # input samples index
-    i_out = 2 # output index (let first two outputs be 0)
+    out_rail = np.zeros(len(samples) + 10, dtype=np.complex) # stocke les valeurs, à chaque itération nous avons besoin des 2 valeurs précédentes plus la valeur actuelle.
+    i_in = 0 # index des échantillons d'entrée
+    i_out = 2 # indice de sortie (les deux premières sorties sont 0)
     while i_out < len(samples) and i_in+16 < len(samples):
-        out[i_out] = samples[i_in + int(mu)] # grab what we think is the "best" sample
+        out[i_out] = samples[i_in + int(mu)] # prendre ce que nous pensons être le "meilleur" échantillon.
         out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
         x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
         y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
         mm_val = np.real(y - x)
         mu += sps + 0.3*mm_val
-        i_in += int(np.floor(mu)) # round down to nearest int since we are using it as an index
-        mu = mu - np.floor(mu) # remove the integer part of mu
-        i_out += 1 # increment output index
-    out = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
-    samples = out # only include this line if you want to connect this code snippet with the Costas Loop later on
+        i_in += int(np.floor(mu)) # arrondir à l'entier le plus proche puisque nous l'utilisons comme un index
+        mu = mu - np.floor(mu) # supprimer la partie entière de mu
+        i_out += 1 # incrémenter l'indice de sortie
+    out = out[2:i_out] # supprimer les deux premiers, et tout ce qui suit i_out (qui n'a jamais été rempli)
+    samples = out # n'incluez cette ligne que si vous voulez connecter cet extrait de code avec la boucle Costas plus tard
 
-The timing recovery block is fed "received" samples, and it produces an output sample one at a time (note the :code:`i_out` being incremented by 1 each iteration of the loop).  The recovery block doesn't just use the "received" samples one after another because of the way the loop adjusts :code:`i_in`.  It will skip some samples in an attempt to pull the "correct" sample, which would be the one at the peak of the pulse.  As the loop processes samples it slowly synchronizes to the symbol, or at least it attempts to by adjusting :code:`mu`.  Given the code's structure, the integer part of :code:`mu` gets added to :code:`i_in`, and then removed from :code:`mu` (keep in mind that :code:`mm_val` can be negative or positive each loop).  Once it is fully synchronized, the loop should only pull the center sample from each symbol/pulse.  You can adjust the constant 0.3, which will change how fast the feedback loop reacts; a higher value will make it react faster, but with higher risk of stability issues.
+Le bloc de récupération du timing reçoit les échantillons "reçus" et produit un échantillon de sortie un par un (notez que :code:`i_out` est incrémenté de 1 à chaque itération de la boucle).  Le bloc de récupération n'utilise pas seulement les échantillons "reçus" l'un après l'autre à cause de la façon dont la boucle ajuste :code:`i_in`.  Elle sautera quelques échantillons pour essayer de tirer le "bon" échantillon, qui serait celui au pic de l'impulsion.  Au fur et à mesure que la boucle traite les échantillons, elle se synchronise lentement sur le symbole, ou du moins elle tente de le faire en ajustant :code:`mu`.  Étant donné la structure du code, la partie entière de :code:`mu` est ajoutée à :code:`i_in`, puis retirée de :code:`mu` (gardez à l'esprit que :code:`mm_val` peut être négatif ou positif à chaque boucle).  Une fois qu'elle est complètement synchronisée, la boucle ne devrait tirer que l'échantillon central de chaque symbole/impulsion.  Vous pouvez ajuster la constante 0.3, qui modifiera la vitesse de réaction de la boucle de rétroaction; une valeur plus élevée la fera réagir plus rapidement, mais avec un risque plus élevé de problèmes de stabilité.
 
-The next plot shows an example output where we have *disabled* the fractional time delay as well as the frequency offset.  We only show I because Q is all zeroes with the frequency offset disabled.  The three plots are stacked on top of each other to show how the bits align vertically.
+Le graphique suivant montre un exemple de sortie où nous avons *désactivé* le délai fractionnel ainsi que le décalage de fréquence.  Nous montrons seulement I parce que Q est tout à fait nul avec le décalage de fréquence désactivé.  Les trois graphiques sont empilés les uns sur les autres pour montrer comment les bits sont alignés verticalement.
 
-**Top Plot**
-    Original BPSK symbols, i.e., 1's and -1's.  Recall that there are zeroes in between because we want 8 samples per symbol.
-**Middle Plot**
-    Samples after pulse shaping but before the synchronizer.
-**Bottom plot**
-    Output of the symbol synchronizer, which provides just 1 sample per symbol.  That is these samples can be fed directly into a demodulator, which for BPSK is checking whether the value is greater than or less than 0.
+**Graphique du haut**
+    Symboles BPSK originaux, c'est-à-dire des 1 et des -1.  Rappelez-vous qu'il y a des zéros entre les deux car nous voulons 8 échantillons par symbole.
+**Graphique du milieu**
+    Echantillons après l'impulsion de mise en forme mais avant le synchronisation.
+**Graphique du bas**
+    Sortie de la synchronisation de symboles, qui fournit seulement 1 échantillon par symbole.  Cela signifie que ces échantillons peuvent être introduits directement dans un démodulateur, qui, pour la BPSK, vérifie si la valeur est supérieure ou inférieure à 0.
 
 .. image:: ../_images/time-sync-output.svg
    :align: center
    :target: ../_images/time-sync-output.svg
 
-Let's focus on the bottom plot, which is the output of the synchronizer.  It took nearly 30 symbols for the synchronization to lock into the right delay.  Due inevitably to the time it takes for synchronizers to lock in, many communications protocols use a preamble that contains a synchronization sequence: it acts as a way to announce that a new packet has arrived, and it gives the receiver time to sync to it.  But after these ~30 samples the synchronizer works perfectly.  We are left with perfect 1's and -1's that match the input data.  It helps that this example didn't have any noise added.  Feel free to add noise or time shifts and see how the synchronizer behaves.  If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.
+Concentrons-nous sur le graphique du bas, qui est la sortie de la synchronisation.  Il a fallu près de 30 symboles pour que la synchronisation se verrouille sur le bon délai.  En raison inévitablement du temps nécessaire aux synchroniseurs pour se verrouiller, de nombreux protocoles de communication utilisent un préambule contenant une séquence de synchronisation: il sert à annoncer l'arrivée d'un nouveau paquet et donne au récepteur le temps de se synchroniser sur celui-ci.  Mais après ces ~30 échantillons, la synchronisation fonctionne parfaitement.  Nous nous retrouvons avec des 1 et des -1 parfaits qui correspondent aux données d'entrée.  Il est utile que cet exemple n'ait pas eu de bruit ajouté.  N'hésitez pas à ajouter du bruit ou des décalages temporels et voyez comment la synchronisation se comporte.  Si nous utilisions la QPSK, nous aurions affaire à des nombres complexes, mais l'approche serait la même.
 
 ****************************************
-Time Synchronization with Interpolation
+Synchronisation du temps avec interpolation
 ****************************************
 
-Symbol synchronizers tend to interpolate the input samples by some number, e.g., 16, so that it's able to shift by a *fraction* of a sample.  The random delay caused by the wireless channel will unlikely be an exact multiple of a sample, so the peak of the symbol may not actually happen on a sample.  It is especially true in a case where there might only be 2 or 4 samples per symbol being received.  By interpolating the samples, it gives us the ability to sample "in between" actual samples, in order to hit the very peak of each symbol.  The output of the synchronizer is still only 1 sample per symbol. The input samples themselves are interpolated.
+Les synchroniseurs de symboles ont tendance à interpoler les échantillons d'entrée par un certain nombre, par exemple 16, afin de pouvoir se décaler d'une *fraction* d'échantillon.  Le retard aléatoire causé par le canal sans fil ne sera probablement pas un multiple exact d'un échantillon, de sorte que le pic du symbole peut ne pas se produire réellement sur un échantillon.  C'est particulièrement vrai dans le cas où il n'y aurait que 2 ou 4 échantillons par symbole reçu.  L'interpolation des échantillons nous permet d'échantillonner "entre" les échantillons réels, afin d'atteindre le pic de chaque symbole.  La sortie du synchroniseur n'est toujours qu'un échantillon par symbole. Les échantillons d'entrée sont eux-mêmes interpolés.
 
-Our time synchronization Python code we have implemented above did not include any interpolation.  To expand our code, enable the fractional time delay that we implemented at the beginning of this chapter so our received signal has a more realistic delay.  Leave the frequency offset disabled for now.  If you re-run the simulation, you'll find that the synchronizer fails to fully synchronize to the signal.  That's because we aren't interpolating, so the code has no way to "sample between samples" to compensate for the fractional delay.  Let's add in the interpolation.
+Le code Python de synchronisation temporelle que nous avons implémenté ci-dessus n'incluait pas d'interpolation.  Pour étendre notre code, activez le retard temporel fractionnaire que nous avons implémenté au début de ce chapitre afin que notre signal reçu ait un retard plus réaliste.  Laissez le décalage de fréquence désactivé pour le moment.  Si vous relancez la simulation, vous constaterez que la synchronisation ne parvient pas à se synchroniser complètement sur le signal.  C'est parce que nous n'interpolons pas, et que le code n'a aucun moyen "d'échantillonner entre les échantillons" pour compenser le retard fractionnel.  Ajoutons l'interpolation.
 
-A quick way to interpolate a signal in Python is to use scipy's :code:`signal.resample` or :code:`signal.resample_poly`.  These functions both do the same thing but work differently under the hood.  We will use the latter function because it tends to be faster.  Let's interpolate by 16, i.e., we will be inserting 15 extra samples between each sample.  It can be done in one line of code, and it should happen *before* we go to perform time synchronization (prior to the large code snippet above).  Let's also plot the before and after to see the difference:
+Un moyen rapide d'interpoler un signal en Python est d'utiliser :code:`signal.resample` ou :code:`signal.resample_poly` de scipy.  Ces deux fonctions font la même chose mais fonctionnent différemment.  Nous utiliserons la dernière fonction car elle a tendance à être plus rapide.  Interpolons par 16, c'est-à-dire que nous allons insérer 15 échantillons supplémentaires entre chaque échantillon.  Cela peut être fait en une ligne de code, et cela devrait se faire *avant* d'effectuer la synchronisation temporelle (avant le gros extrait de code ci-dessus).  Nous allons également tracer le graphique avant et après pour voir la différence:
 
 .. code-block:: python
 
  samples_interpolated = signal.resample_poly(samples, 16, 1)
  
- # Plot the old vs new
- plt.figure('before interp')
+ # Tracez l'ancien et le nouveau
+ plt.figure('avant interp')
  plt.plot(samples,'.-')
- plt.figure('after interp')
+ plt.figure('après interp')
  plt.plot(samples_interpolated,'.-')
  plt.show()
 
-If we zoom *way* in, we see that it's the same signal, just with 16x as many points:
+Si on zoome *beaucoup*, on voit que c'est le même signal, mais avec 16x plus de points :
 
 .. image:: ../_images/time-sync-interpolated-samples.svg
    :align: center
    :target: ../_images/time-sync-interpolated-samples.svg
 
-Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  In addition to calculating :code:`samples_interpolated`, we also have to modify one line of code in our time synchronizer.  We will change the first line inside the while loop to become:
+J'espère que la raison pour laquelle nous devons interpoler à l'intérieur du bloc de synchronisation temporelle devient claire.  Ces échantillons supplémentaires nous permettront de prendre en compte une fraction d'un échantillon de retard.  En plus de calculer :code:`samples_interpolated`, nous devons également modifier une ligne de code dans notre synchronisation temporelle.  Nous allons changer la première ligne à l'intérieur de la boucle *while* pour devenir:
 
 .. code-block:: python
 
  out[i_out] = samples_interpolated[i_in*16 + int(mu*16)]
 
-We did a couple things here.  First, we can't just use :code:`i_in` as the input sample index anymore.  We have to multiply it by 16 because we interpolated our input samples by 16.  Recall that the feedback loop adjusts the :code:`mu` variable.  It represents the delay that leads to us sampling at the right moment.  Also recall that after we calculated the new value of :code:`mu`, we added the integer part to :code:`i_in`.  Now we will use the remainder part, which is a float from 0 to 1, and it represents the fraction of a sample we need to delay by.  Before we weren't able to delay by a fraction of a sample, but now we are, at least in increments of 16ths of a sample.  What we do is multiply :code:`mu` by 16 to figure out how many samples of our interpolated signal we need to delay by.  And then we have to round that number, since the value in the brackets ultimately is an index and must be an integer.  If this paragraph didn't make sense, try to go back to the initial Mueller and Muller clock recovery code, and also read the comments next to each line of code.
+Nous avons fait plusieurs choses ici.  D'abord, nous ne pouvons plus utiliser :code:`i_in` comme index de l'échantillon d'entrée.  Nous devons le multiplier par 16 car nous avons interpolé nos échantillons d'entrée par 16.  Rappelez-vous que la boucle de rétroaction ajuste la variable :code:`mu`.  Elle représente le délai qui nous permet d'échantillonner au bon moment.  Rappelez-vous également qu'après avoir calculé la nouvelle valeur de :code:`mu`, nous avons ajouté la partie entière à :code:`i_in`.  Maintenant, nous allons utiliser la partie restante, qui est un flottant de 0 à 1, et qui représente la fraction d'échantillon que nous devons retarder.  Avant, nous n'étions pas capables de retarder d'une fraction d'échantillon, mais maintenant nous le pouvons, au moins par incréments de 16ème d'échantillon.  Il faut donc multiplier :code:`mu` par 16 pour savoir de combien d'échantillons de notre signal interpolé nous devons retarder.  Ensuite, nous devons arrondir ce nombre, car la valeur entre parenthèses est finalement un index et doit être un nombre entier.  Si ce paragraphe n'a pas eu de sens, essayez de revenir au code initial de récupération d'horloge de Mueller et Muller, et lisez également les commentaires à côté de chaque ligne de code.
 
-The actual plot output of this new code should look roughly the same as before.  All we really did was make our simulation more realistic by adding a fractional-sample delay, and then we added the interpolator to the synchronizer in order to compensate for that fractional sample delay.
+Le résultat du tracé de ce nouveau code devrait être à peu près le même que précédemment.  Tout ce que nous avons fait, c'est rendre notre simulation plus réaliste en ajoutant un retard d'échantillon fractionnaire, puis nous avons ajouté l'interpolateur à la synchronisation afin de compenser ce retard d'échantillon fractionnaire.
 
-Feel free to play around with different interpolation factors, i.e., change all the 16s to some other value.  You can also try enabling the frequency offset, or adding in white Gaussian noise to the signal before it gets received, to see how that impacts synchronization performance (hint: you might have to adjust that 0.3 multiplier).
+N'hésitez pas à jouer avec différents facteurs d'interpolation, c'est-à-dire à remplacer tous les 16 par une autre valeur.  Vous pouvez également essayer d'activer le décalage de fréquence, ou d'ajouter un bruit blanc gaussien au signal avant qu'il ne soit reçu, pour voir comment cela affecte les performances de synchronisation (indice : vous devrez peut-être ajuster le multiplicateur de 0.3).
 
-If we enable only the frequency offset using a frequency of 1 kHz, we get the following time sync performance.  We have to show both I and Q now that we added a frequency offset:
+Si nous activons uniquement le décalage de fréquence en utilisant une fréquence de 1kHz, nous obtenons les performances de synchronisation suivantes.  Nous devons montrer à la fois I et Q maintenant que nous avons ajouté un décalage de fréquence :
 
 .. image:: ../_images/time-sync-output2.svg
    :align: center
    :target: ../_images/time-sync-output2.svg
 
-It might be hard to see, but the time sync is still working just fine.  It takes about 20 to 30 symbols before it's locked in.  However, there's a sinusoid pattern because we still have a frequency offset, and we will learn how to deal with it in the next section.
+C'est peut-être difficile à voir, mais la synchronisation du temps fonctionne toujours très bien.  Il faut environ 20 à 30 symboles avant qu'elle ne soit verrouillée.  Cependant, il y a un motif sinusoïdal parce que nous avons encore un décalage de fréquence, et nous allons apprendre à le gérer dans la section suivante.
 
-Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization.  Remember you can plot samples on an IQ plot using a scatter plot: :code:`plt.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols.  They occurred before the time sync had finished.  The symbols left are all roughly on the unit circle due to the frequency offset.
+La figure ci-dessous montre le graphique IQ (aussi appelé constellation) du signal avant et après la synchronisation.  Rappelez-vous que vous pouvez tracer des échantillons sur un graphique IQ en utilisant un nuage de points : :code:`plt.plot(np.real(samples), np.imag(samples), '.')`.  Dans l'animation ci-dessous, nous avons spécifiquement laissé de côté les 30 premiers symboles.  Ils sont apparus avant la fin de la synchronisation temporelle.  Les symboles restants sont tous approximativement sur le cercle des unités en raison du décalage de fréquence.
 
 .. image:: ../_images/time-sync-constellation.svg
    :align: center
    :target: ../_images/time-sync-constellation.svg
     
-To gain even more insight, we can look at the constellation over time to discern what's actually happening to the symbols.  At the very beginning, for a short period of time, the symbols are not 0 or on the unit circle.  That is the period in which time sync is finding the right delay.  It's very quick, watch closely!  The spinning is just the frequency offset.  Frequency is a constant change in phase, so a frequency offset causes spinning of the BPSK (creating a circle in the static/persistent plot above).
+Pour en savoir encore plus, nous pouvons observer la constellation dans le temps afin de discerner ce qui arrive réellement aux symboles.  Au tout début, pendant une courte période de temps, les symboles ne sont pas à 0 ou sur le cercle unitaire.  C'est la période pendant laquelle la synchronisation temporelle trouve le bon délai.  C'est très rapide, regardez bien! La rotation est juste le décalage de fréquence.  La fréquence est un changement constant de la phase, donc un décalage de fréquence provoque une rotation de la BPSK (créant un cercle dans le tracé statique/persistant ci-dessus).
 
 .. image:: ../_images/time-sync-constellation-animated.gif
    :align: center 
 
-Hopefully by seeing an example of time sync actually happening, you have a feel for what it does and a general idea of how it works.  In practice, the while loop we created would only work on a small number of samples at a time (e.g., 1000).  You have to remember the value of :code:`mu` in between calls to the sync function, as well as the last couple values of :code:`out` and :code:`out_rail`.
+Nous espérons qu'en voyant un exemple de synchronisation temporelle, vous avez une idée de ce qu'elle fait et une idée générale de son fonctionnement.  En pratique, la boucle while que nous avons créée ne fonctionnerait que sur un petit nombre d'échantillons à la fois (par exemple, 1000).  Vous devez vous souvenir de la valeur de :code:`mu` entre les appels à la fonction sync, ainsi que des deux dernières valeurs de :code:`out` et :code:`out_rail`.
 
-Next we will survey frequency synchronization, which we split up into coarse and fine frequency sync.  Coarse usually comes before time sync, while fine comes after.
+Ensuite, nous allons étudier la synchronisation de la fréquence, que nous divisons en synchro de fréquence grossière et fine.  La synchronisation grossière vient généralement avant la synchronisation temporelle, tandis que la synchronisation fine vient après.
 
 
 
 **********************************
-Coarse Frequency Synchronization
+Synchronisation grossière des fréquences
 **********************************
 
-Even though we tell the transmitter and receiver to operate on the same center frequency, there is going to be a slight frequency offset between the two due to either imperfections in hardware (e.g., the oscillator) or a Doppler shift from movement.  This frequency offset will be tiny relative to the carrier frequency, but even a small offset can throw off a digital signal.  The offset will likely change over time, necessitating an always-running feedback loop to correct the offset.  As an example, the oscillator inside the Pluto has a max offset spec of 25 PPM.  That is 25 parts per million relative to the center frequency.  If you are tuned to 2.4 GHz, it would be +/- 60 kHz max offset.  The samples our SDR provides us are at baseband, making any frequency offset manifest in that baseband signal.  A BPSK signal with a small carrier offset will look something like the below time plot, which is obviously not great for demodulating bits.  We must remove any frequency offsets before demodulation.
+Même si nous demandons à l'émetteur et au récepteur de fonctionner sur la même fréquence centrale, il y aura un léger décalage de fréquence entre les deux en raison d'imperfections matérielles (par exemple, l'oscillateur) ou d'un décalage Doppler dû au mouvement.  Ce décalage de fréquence sera minuscule par rapport à la fréquence porteuse, mais même un petit décalage peut perturber un signal numérique.  Le décalage évoluera probablement dans le temps, ce qui nécessite une boucle de rétroaction permanente pour corriger le décalage.  Par exemple, l'oscillateur à l'intérieur du Pluto a une spécification de décalage maximale de 25 PPM.  C'est-à-dire 25 parties par million par rapport à la fréquence centrale.  Si vous êtes réglé sur 2.4 GHz, le décalage maximal serait de +/- 60 kHz.  Les échantillons que notre SDR nous fournit sont en bande de base, ce qui fait que tout décalage de fréquence se manifeste dans ce signal en bande de base.  Un signal BPSK avec un petit décalage de la porteuse ressemblera au tracé temporel ci-dessous, ce qui n'est évidemment pas idéal pour démoduler des bits.  Nous devons supprimer tout décalage de fréquence avant la démodulation.
 
 .. image:: ../_images/carrier-offset.png
    :scale: 60 % 
    :align: center 
 
-Frequency synchronization is usually broken down into coarse sync and fine sync, where coarse corrects large offsets on the order of kHz or more, while the fine sync corrects whatever is left.  Coarse happens before time sync, while fine happens after.
+La synchronisation de fréquence est généralement décomposée en synchronisation grossière et synchronisation fine, où la synchronisation grossière corrige les grands décalages de l'ordre du kHz ou plus, tandis que la synchronisation fine corrige ce qui reste.  La synchronisation grossière intervient avant la synchronisation temporelle, tandis que la synchronisation fine intervient après.
 
-Mathematically, if we have a baseband signal :math:`s(t)` and it is experiencing a frequency (a.k.a. carrier) offset of :math:`f_o` Hz, we can represent what is received as:
+Mathématiquement, si nous disposons d'un signal en bande de base :math:`s(t)` et qu'il subit un décalage de fréquence (aussi appelé porteuse) de :math:`f_o` Hz, nous pouvons représenter ce qui est reçu comme suit:
 
 .. math::
 
  r(t) = s(t) e^{j2\pi f_o t} + n(t)
 
-where :math:`n(t)` is the noise.  
+où :math:`n(t)` est le bruit.  
 
-The first trick we will learn, in order to perform coarse frequency offset estimation (if we can estimate the offset frequency, then we can undo it), is to take the square of our signal.  Let's ignore noise for now, to keep the math simpler:
+La première astuce que nous allons apprendre, afin d'effectuer une estimation grossière du décalage de fréquence (si nous pouvons estimer la fréquence de décalage, alors nous pouvons la compenser), est de prendre le carré de notre signal.  Ignorons le bruit pour l'instant, afin de garder les mathématiques plus simples :
 
 .. math::
 
  r^2(t) = s^2(t) e^{j4\pi f_o t}
 
-Let's see what happens when we take the square of our signal :math:`s(t)` by considering what QPSK would do.  Squaring complex numbers leads to interesting behavior, especially when we are talking about constellations like BPSK and QPSK.  The following animation shows what happens when you square QPSK, then square it again.  I specifically used QPSK instead of BPSK because you can see that when you square QPSK once, you essentially get BPSK.  And then after one more square it becomes one cluster.  (Thank you to http://ventrella.com/ComplexSquaring/ who created this neat webapp.)
+Voyons ce qui se passe lorsque nous prenons le carré de notre signal :math:`s(t)` en considérant ce que ferait la QPSK.  L'élévation au carré de nombres complexes donne lieu à un comportement intéressant, surtout lorsqu'il s'agit de constellations comme la BPSK et la QPSK.  L'animation suivante montre ce qui se passe lorsqu'on élève au carré une QPSK, puis si on l'élève encore une deuxième fois.  J'ai utilisé spécifiquement la QPSK au lieu de la BPSK parce que vous pouvez voir que lorsque vous érigez la QPSK une fois, vous obtenez essentiellement la BPSK.  Et après un autre carré, on obtient un cluster.  (Merci à http://ventrella.com/ComplexSquaring/ qui a créé cette belle application web).
 
 .. image:: ../_images/squaring-qpsk.gif
    :scale: 80 % 
    :align: center 
  
-Let's watch what happens when our QPSK signal has a small phase rotation and magnitude scaling applied to it, which is more realistic:
+Voyons ce qui se passe lorsqu'on applique à notre signal QPSK une petite rotation de phase et une mise à l'échelle de l'amplitude, ce qui est plus réaliste :
  
 .. image:: ../_images/squaring-qpsk2.gif
    :scale: 80 % 
    :align: center 
 
-It still becomes one cluster, just with a phase shift.  The main take-away here is that if you square QPSK twice (and BPSK once), it will merge all four clusters of points into one cluster.  Why is that useful?  Well by merging the clusters we are essentially removing the modulation!  If all points are now in the same cluster, that's like having a bunch of constants in a row.  It's as if there is no modulation anymore, and the only thing left is the sinusoid caused by the frequency offset (we also have noise but let's keep ignoring it for now).  It turns out that you have to square the signal N times, where N is the order of the modulation scheme used, which means that this trick only works if you know the modulation scheme ahead of time.  The equation is really:
+Il s'agit toujours d'un seul groupe, mais avec un déphasage.  Ce qu'il faut retenir, c'est que si vous mettez la QPSK au carré deux fois (et la BPSK une fois), les quatre groupes de points seront fusionnés en un seul groupe.  Pourquoi cela est-il utile?  En fusionnant les groupes, nous supprimons essentiellement la modulation!  Si tous les points sont maintenant dans le même groupe, c'est comme si on avait un tas de constantes dans une rangée.  C'est comme s'il n'y avait plus de modulation, et que la seule chose qui restait était la sinusoïde causée par le décalage de fréquence (nous avons aussi du bruit, mais ignorons-le pour l'instant).  Il s'avère que vous devez élever le signal au carré N fois, où N est l'ordre du schéma de modulation utilisé, ce qui signifie que cette astuce ne fonctionne que si vous connaissez le schéma de modulation à l'avance.  L'équation est en fait la suivante :
 
 .. math::
 
  r^N(t) = s^N(t) e^{j2N\pi f_o t}
 
-For our case of BPSK we have an order 2 modulation scheme, so we will use the following equation for our coarse frequency sync:
+Pour notre cas de BPSK, nous avons un schéma de modulation d'ordre 2, nous utiliserons donc l'équation suivante pour notre synchronisation grossière de la fréquence:
 
 .. math::
 
  r^2(t) = s^2(t) e^{j4\pi f_o t}
 
-We discovered what happens to the :math:`s(t)` portion of the equation, but what about the sinusoid part (a.k.a. complex exponential)?  As we can see, it is adding the :math:`N` term, which makes it equivalent to a sinusoid at a frequency of :math:`Nf_o` instead of just :math:`f_o`.  A simple method for figuring out :math:`f_o` is to take the FFT of the signal after we square it N times and seeing where the spike occurs.  Let's simulate it in Python.  We will return to generating our BPSK signal, and instead of applying a fractional-delay to it, we will apply a frequency offset by multiplying the signal by :math:`e^{j2\pi f_o t}` just like we did in chapter :ref:`filters-chapter` to convert a low-pass filter to a high-pass filter.
+Nous avons découvert ce qui arrive à la partie :math:`s(t)` de l'équation, mais qu'en est-il de la partie sinusoïde (alias exponentielle complexe)?  Comme on peut le voir, on ajoute le terme :math:`N`, ce qui la rend équivalente à une sinusoïde à une fréquence de :math:`Nf_o` au lieu de :math:`f_o`.  Une méthode simple pour déterminer :math:`nf_o` est de prendre la FFT du signal après l'avoir élevé au carré N fois et de voir où le pic se produit.  Faisons une simulation en Python.  Nous allons retourner à la génération de notre signal BPSK, et au lieu de lui appliquer un retard fractionnel, nous allons appliquer un décalage de fréquence en multipliant le signal par :math:`e^{j2\pi f_o t}` comme nous l'avons fait dans le chapitre :ref:`filters-chapter` pour convertir un filtre passe-bas en un filtre passe-haut.
 
-Using the code from the beginning of this chapter, apply a +13 kHz frequency offset to your digital signal.  It could happen right before or right after the fractional-delay is added; it doesn't matter which. Regardless, it must happen *after* pulse shaping but before we do any receive-side functions such as time sync.
+En utilisant le code du début de ce chapitre, appliquez un décalage de fréquence de +13 kHz à votre signal numérique.  Cela peut se produire juste avant ou juste après l'ajout du retard fractionné; cela n'a pas d'importance. Quoi qu'il en soit, cela doit se faire *après* l'impulsion de mise en forme, mais avant d'effectuer toute fonction côté réception, comme la synchronisation temporelle.
 
-Now that we have a signal with a 13 kHz frequency offset, let's plot the FFT before and after doing the squaring, to see what happens.  By now you should know how to do an FFT, including the abs() and fftshift() operation.  For this exercise it doesn't matter whether or not you take the log or whether you square it after taking the abs().
+Maintenant que nous avons un signal avec un décalage de fréquence de 13kHz, traçons la FFT avant et après la mise au carré, pour voir ce qui se passe. Vous devriez maintenant savoir comment effectuer une FFT, y compris les opérations abs() et fftshift(). Pour cet exercice, peu importe que vous preniez ou non le logarithme ou que vous éleviez au carré le signal après avoir effectué l'opération abs().
 
-First look at the signal before squaring (just a normal FFT):
+Regardez d'abord le signal avant de l'élever au carré (juste une FFT normale):
 
 .. code-block:: python
 
@@ -305,90 +305,91 @@ First look at the signal before squaring (just a normal FFT):
    :align: center
    :target: ../_images/coarse-freq-sync-before.svg
    
-We don't actually see any peak associated with the carrier offset.  It's covered up by our signal.
+On ne voit pas vraiment de pic associé au décalage de la porteuse.  Il est couvert par notre signal.
 
-Now with the squaring added (just a power of 2 because it's BPSK):
+Maintenant avec l'élévation au carré ajoutée (juste une puissance de 2 parce que c'est une BPSK) :
 
 .. code-block:: python
 
-    # Add this before the FFT line
+    # Ajoutez ceci avant la ligne FFT
     samples = samples**2
 
-We have to zoom way in to see which frequency the spike is on:
+Il faut zoomer pour voir sur quelle fréquence se trouve le pic :
 
 .. image:: ../_images/coarse-freq-sync.svg
    :align: center
    :target: ../_images/coarse-freq-sync.svg
 
-You can try increasing the number of symbols simulated (e.g., 1000 symbols) so that we have enough samples to work with.  The more samples that go into our FFT, the more accurate our estimation of the frequency offset will be.  Just as a reminder, the code above should come *before* the timing synchronizer.
+Vous pouvez essayer d'augmenter le nombre de symboles simulés (par exemple, 1000 symboles) afin d'avoir suffisamment d'échantillons pour travailler.  Plus il y a d'échantillons dans notre FFT, plus notre estimation du décalage de fréquence sera précise.  Pour rappel, le code ci-dessus doit venir *avant* la synchornisation de temps.
 
-The offset frequency spike shows up at :math:`Nf_o`.  We need to divide this bin (26.6 kHz) by 2 to find our final answer, which is very close to the 13 kHz frequency offset we applied at the beginning of the chapter!  If you had played with that number and it's no longer 13 kHz, that's fine.  Just make sure you are aware of what you set it to.
+Le pic de fréquence apparaît à :math:`Nf_o`.  Nous devons diviser cette valeur (26.6kHz) par 2 pour trouver notre réponse finale, qui est très proche du décalage de fréquence de 13kHz que nous avons appliqué au début du chapitre!  Si vous avez joué avec ce nombre et qu'il n'est plus de 13kHz, ce n'est pas grave.  Assurez-vous simplement que vous êtes conscient de ce que vous avez réglé.
 
-Because our sample rate is 1 MHz, the maximum frequencies we can see are -500 kHz to 500 kHz.  If we take our signal to the power of N, that means we can only "see" frequency offsets up to :math:`500e3/N`, or in the case of BPSK +/- 250 kHz.  If we were receiving a QPSK signal then it would only be +/- 125 kHz, and carrier offset higher or lower than that would be out of our range using this technique.  To give you a feel for Doppler shift, if you were transmitting in the 2.4 GHz band and either the transmitter or receiver was traveling at 60 mph (it's the relative speed that matters), it would cause a frequency shift of 214 Hz.  The offset due to a low quality oscillator will probably be the main culprit in this situation.
+Comme notre fréquence d'échantillonnage est de 1 MHz, les fréquences maximales que nous pouvons voir sont de -500kHz à 500kHz.  Si nous portons notre signal à la puissance N, cela signifie que nous ne pouvons "voir" les décalages de fréquence que jusqu'à :math:`500e3/N`, ou dans le cas de la BPSK +/- 250kHz.  Si nous recevions un signal QPSK, il ne serait que de +/- 125kHz, et un décalage de la porteuse supérieur ou inférieur à cette valeur serait hors de notre portée avec cette technique.  Pour vous donner une idée du décalage Doppler, si vous transmettez dans la bande des 2.4GHz et que l'émetteur ou le récepteur se déplace à 96km/h (c'est la vitesse relative qui compte), cela entraînera un décalage de fréquence de 214Hz.  Le décalage dû à un oscillateur de mauvaise qualité sera probablement le principal coupable dans cette situation.
 
-Actually correcting this frequency offset is done exactly how we simulated the offset in the first place: multiplying by a complex exponential, except with a negative sign since we want to remove the offset.
+En fait, la correction de ce décalage de fréquence se fait exactement comme nous avons simulé le décalage en premier lieu: en multipliant par une exponentielle complexe, mais avec un signe négatif puisque nous voulons supprimer le décalage.
 
 .. code-block:: python
 
     max_freq = f[np.argmax(psd)]
-    Ts = 1/fs # calc sample period
-    t = np.arange(0, Ts*len(samples), Ts) # create time vector
+    Ts = 1/fs # période d'échantillonnage
+    t = np.arange(0, Ts*len(samples), Ts) # vecteur de temps
     samples = samples * np.exp(-1j*2*np.pi*max_freq*t/2.0)
 
-It's up to you if you want to correct it or change the initial frequency offset we applied at the start to a smaller number (like 500 Hz) to test out the fine frequency sync we will now learn how to do.
+C'est à vous de décider si vous voulez le corriger ou modifier le décalage de fréquence initial que nous avons appliqué au début à un nombre plus petit (comme 500Hz) pour tester la synchronisation de fréquence fine que nous allons maintenant apprendre à faire.
 
 **********************************
-Fine Frequency Synchronization
+Synchronisation fine de la fréquence
 **********************************
 
-Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero and maintain it there, even if the offset changes over time.  We have to continuously track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time at the symbol level, so the code we discuss in this section will come *after* timing sync.
+Ensuite, nous allons passer à la synchronisation fine de la fréquence. L'astuce précédente est plutôt destinée à l'évanouissement grossier, et ce n'est pas une opération en boucle fermée (de type feedback).  Mais pour la synchronisation fine de la fréquence, nous aurons besoin d'une boucle de rétroaction par laquelle nous ferons passer des échantillons, ce qui sera une fois de plus une forme de PLL.  Notre objectif est de ramener le décalage de fréquence à zéro et de l'y maintenir, même si le décalage change au fil du temps.  Nous devons continuellement suivre le décalage.  Les techniques de synchronisation fine de la fréquence fonctionnent mieux avec un signal qui a déjà été synchronisé dans le temps au niveau du symbole, donc le code dont nous parlons dans cette section viendra *après* la synchronisation temporelle.
 
-We will use a technique called a Costas Loop.  It is a form of PLL that is specifically designed for carrier frequency offset correction for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950's, and it had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset while also fixing any phase offset.  The energy is aligned with the I axis.  Frequency is just a change in phase so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2s have been left out of the equations because they don't functionally matter).
+Nous allons utiliser une technique appelée boucle de Costas.  Il s'agit d'une forme de PLL spécialement conçue pour la correction du décalage de la fréquence de la porteuse pour les signaux numériques tels que BPSK et QPSK.  Elle a été inventée par John P. Costas chez General Electric dans les années 1950 et a eu un impact majeur sur les communications numériques modernes.  La boucle de Costas supprime le décalage de fréquence tout en fixant le décalage de phase.  L'énergie est alignée avec l'axe I.  La fréquence n'est qu'un changement de phase, ils peuvent donc être suivis comme un tout.  La boucle de Costas est résumée à l'aide du diagramme suivant (notez que les 1/2 ont été laissés de côté dans les équations car ils n'ont pas d'importance fonctionnelle).
 
 .. image:: ../_images/costas-loop.svg
    :align: center 
    :target: ../_images/costas-loop.svg
 
-The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case, since we are simulating a wireless channel, it isn't a voltage, but rather a level represented by a variable.  It determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This behavior is similar to how an SDR downconverts and creates the I and Q branches.
+L'oscillateur commandé en tension (ou VCO en anglais pour *voltage controlled oscillator*) est simplement un générateur d'ondes sin/cos qui utilise une fréquence basée sur l'entrée.  Dans notre cas, puisque nous simulons un canal sans fil, il ne s'agit pas d'une tension, mais plutôt d'un niveau représenté par une variable.  Elle détermine la fréquence et la phase des ondes sinus et cosinus générées.  Ce qu'il fait, c'est multiplier le signal reçu par une sinusoïde générée en interne, afin de tenter d'annuler le décalage de fréquence et de phase.  Ce comportement est similaire à celui d'une SDR qui effectue une conversion de fréquence et crée les branches I et Q.
 
 
-Below is the Python code that is our Costas Loop:
+Voici le code Python qui constitue notre boucle Costas:
+
 
 .. code-block:: python
 
     N = len(samples)
     phase = 0
     freq = 0
-    # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
+    # Ces deux paramètres suivants sont ce qu'il faut ajuster, pour rendre la boucle de rétroaction plus rapide ou plus lente (ce qui a un impact sur la stabilité).
     alpha = 0.132
     beta = 0.00932
     out = np.zeros(N, dtype=np.complex)
     freq_log = []
     for i in range(N):
-        out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
-        error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+        out[i] = samples[i] * np.exp(-1j*phase) # ajuster l'échantillon d'entrée par l'inverse du décalage de phase estimé
+        error = np.real(out[i]) * np.imag(out[i]) # Voici la formule d'erreur pour une boucle de Costas de 2ème ordre (par exemple pour BPSK)
         
-        # Advance the loop (recalc phase and freq offset)
+        # Avancer la boucle (recalculer la phase et le décalage de fréquence)
         freq += (beta * error)
-        freq_log.append(freq * fs / (2*np.pi)) # convert from angular velocity to Hz for logging
+        freq_log.append(freq * fs / (2*np.pi)) # convertir de la vitesse angulaire en Hz pour la journalisation
         phase += freq + (alpha * error)
         
-        # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
+        # Facultatif: Ajustez la phase de façon à ce qu'elle soit toujours entre 0 et 2pi, rappelez-vous que la phase s'enroule autour de chaque 2pi
         while phase >= 2*np.pi:
             phase -= 2*np.pi
         while phase < 0:
             phase += 2*np.pi
 
-    # Plot freq over time to see how long it takes to hit the right offset
+    # Tracez la fréquence en fonction du temps pour voir combien de temps il faut pour atteindre le bon décalage.
     plt.plot(freq_log,'.-')
     plt.show()
 
-There is a lot here so let's step through it.  Some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code.  They contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation.  We multiply the real part of the sample (I) by the imaginary part (Q), and because Q should be equal to zero for BPSK, the error function is minimized when there is no phase or frequency offset that causes energy to shift from I to Q.  For a 4th order Costas Loop, it's still relatively simple but not quite one line, as both I and Q will have energy even when there is no phase or frequency offset, for QPSK.  If you are curious what it looks like click below, but we won't be using it in our code for now.  The reason this works for QPSK is because when you take the absolute value of I and Q, you will get +1+1j, and if there is no phase or frequency offset then the difference between the absolute value of I and Q should be close to zero.
+Il y a beaucoup de choses ici, alors passons-les en revue.  Certaines lignes sont simples et d'autres sont super compliquées. :code:`samples` est notre entrée, et :code:`out` les échantillons de sortie. :code:`phase` et :code:`frequency` sont comme le :code:`mu` du code de synchronisation temporelle.  Ils contiennent les estimations du décalage actuel, et à chaque itération de la boucle, nous créons les échantillons de sortie en multipliant les échantillons d'entrée par :code:`np.exp(-1j*phase)`.  La variable :code:`error` contient la métrique d'erreur, et pour une boucle de Costas d'ordre 2, c'est une équation très simple.  Nous multiplions la partie réelle de l'échantillon (I) par la partie imaginaire (Q), et parce que Q devrait être égal à zéro pour la BPSK, la fonction d'erreur est minimisée lorsqu'il n'y a pas de décalage de phase ou de fréquence qui fait passer l'énergie de I à Q. Pour une boucle de Costas d'ordre 4, c'est encore relativement simple mais pas tout à fait une ligne, car I et Q auront de l'énergie même lorsqu'il n'y a pas de décalage de phase ou de fréquence, pour la QPSK.  Si vous êtes curieux de voir à quoi cela ressemble, cliquez ci-dessous, mais nous ne l'utiliserons pas dans notre code pour le moment.  La raison pour laquelle cela fonctionne pour la QPSK est que lorsque vous prenez la valeur absolue de I et Q, vous obtenez +1+1j, et s'il n'y a pas de décalage de phase ou de fréquence, la différence entre la valeur absolue de I et Q devrait être proche de zéro.
 
 .. raw:: html
 
    <details>
-   <summary>Order 4 Costas Loop Error Equation (for those curious)</summary>
+   <summary>Équation d'erreur de la boucle de Costas de l'ordre 4 (pour les curieux)</summary>
 
 .. code-block:: python
 
@@ -411,50 +412,50 @@ There is a lot here so let's step through it.  Some lines are simple and others 
 
    </details>
 
-The :code:`alpha` and :code:`beta` variables define how fast the phase and frequency update, respectively.  There is some theory behind why I chose those two values; however, we won't address it here.  If you are curious you can try tweaking :code:`alpha` and/or :code:`beta` to see what happens.
+Les variables :code:`alpha` et :code:`beta` définissent la vitesse de mise à jour de la phase et de la fréquence, respectivement.  Il y a une certaine théorie derrière le choix de ces deux valeurs, mais nous ne l'aborderons pas ici.  Si vous êtes curieux, vous pouvez essayer de modifier :code:`alpha` et/ou :code:`beta` pour voir ce qui se passe.
 
-We log the value of :code:`freq` each iteration so we can plot it at the end, to see how the Costas Loop converges on the correct frequency offset.  We have to multiply :code:`freq` by the sample rate and convert from angular frequency to Hz, by dividing by :math:`2\pi`.  Note that if you performed time sync prior to the Costas Loop, you will have to also divide by your :code:`sps` (e.g., 8), because the samples coming out of the time sync are at a rate equal to your original sample rate divided by :code:`sps`. 
+Nous enregistrons la valeur de :code:`freq` à chaque itération afin de pouvoir la tracer à la fin, pour voir comment la boucle de Costas converge vers le décalage de fréquence correct.  Nous devons multiplier :code:`freq` par la fréquence d'échantillonnage et convertir la fréquence angulaire en Hz, en la divisant par :math:`2\pi`.  Notez que si vous avez effectué une synchronisation temporelle avant la boucle Costas, vous devrez également diviser par votre facteur de suréchantillonnage :code:`sps` (par exemple, 8), car les échantillons provenant de la synchronisation temporelle sont à un taux égal à votre taux d'échantillonnage original divisé par :code:`sps`. 
 
-Lastly, after recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase between 0 and :math:`2 \pi`,  which wraps phase around.
+Enfin, après avoir recalculé la phase, nous ajoutons ou supprimons suffisamment de :math:`2 \pi`'s pour maintenir la phase entre 0 et :math:`2 \pi`'s, ce qui enroule la phase autour.
 
-Our signal before and after the Costas Loop looks like this:
+Notre signal avant et après la boucle de Costas ressemble à ceci:
 
 .. image:: ../_images/costas-loop-output.svg
    :align: center
    :target: ../_images/costas-loop-output.svg
 
-And the frequency offset estimation over time, settling on the correct offset (a -300 Hz offset was used in this example signal):
+Et l'estimation du décalage de fréquence au fil du temps, se stabilisant sur le décalage correct (un décalage de -300Hz a été utilisé dans cet exemple de signal) :
 
 .. image:: ../_images/costas-loop-freq-tracking.svg
    :align: center
    :target: ../_images/costas-loop-freq-tracking.svg
 
-It takes nearly 70 samples for the algorithm to fully lock it on the frequency offset.  You can see that in my simulated example there were about -300 Hz left over after the coarse frequency sync.  Yours may vary.  Like I mentioned before, you can disable the coarse frequency sync and set the initial frequency offset to whatever value you want and see if the Costas Loop figures it out.
+Il faut près de 70 échantillons pour que l'algorithme se verrouille complètement sur le décalage de fréquence.  Vous pouvez voir que dans mon exemple simulé, il restait environ -300 Hz après la synchronisation grossière de la fréquence.  Les vôtres peuvent varier.  Comme je l'ai déjà mentionné, vous pouvez désactiver la synchronisation grossière de la fréquence et définir le décalage initial de la fréquence à la valeur de votre choix et voir si la boucle de Costas s'en rend compte.
 
-The Costas Loop, in addition to removing the frequency offset, aligned our BPSK signal to be on the I portion, making Q zero again.  It is a convenient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator.  Now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1 because there may or may not be an inversion; there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play.  It removes the ambiguity because 1's and 0's are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK.  We would be adding a differential coding block right before modulation on the tx side and right after demodulation on the rx side.
+La boucle de Costas, en plus de supprimer le décalage de fréquence, a aligné notre signal BPSK pour qu'il soit sur la partie I, ce qui rend Q à nouveau nul.  Il s'agit d'un effet secondaire pratique de la boucle de Costas, et il permet à la boucle de Costas d'agir essentiellement comme notre démodulateur.  Maintenant, tout ce que nous avons à faire est de prendre I et de voir s'il est supérieur ou inférieur à zéro.  Nous ne saurons pas vraiment comment transformer un négatif et un positif en 0 et 1 parce qu'il peut y avoir ou non une inversion; il n'y a aucun moyen pour la boucle de Costas (ou notre synchronisation temporelle) de le savoir.  C'est là que le codage différentiel entre en jeu.  Il lève l'ambiguïté car les 1 et les 0 sont basés sur le fait que le symbole a changé ou non, et non sur le fait qu'il était +1 ou -1.  Si on ajoute le codage différentiel, on utilise toujours la BPSK.  Nous ajouterions un bloc de codage différentiel juste avant la modulation du côté Tx et juste après la démodulation du côté Rx.
 
-Below is an animation of the time sync plus frequency sync running, the time sync actually happens almost immediately but the frequency sync takes nearly the entire animation to fully settle, and this was because :code:`alpha` and :code:`beta` were set too low, to 0.005 and 0.001 respectively.  The code used to generate this animation can be found `here <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/costas_loop_animation.py>`_. 
+Vous trouverez ci-dessous une animation de la synchronisation temporelle et de la synchronisation de fréquence. La synchronisation temporelle se produit presque immédiatement, mais la synchronisation de fréquence prend presque toute l'animation pour s'installer complètement, et ce parce que :code:`alpha` et :code:`beta` ont été réglés trop bas, à 0.005 et 0.001 respectivement.  Le code utilisé pour générer cette animation peut être trouvé `ici <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/costas_loop_animation.py>`_. 
 
 .. image:: ../_images/costas_animation.gif
    :align: center 
 
 ***************************
-Frame Synchronization
+Synchronisation des trames
 ***************************
 
-We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  At the receiver we need to be able to identify when a new frame begins.  Customarily the frame header (at the MAC layer) contains how many bytes are in the frame.  We can use that information to know how long the frame is, e.g., in units samples or symbols.  Nonetheless, detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure.  Note how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.
+Nous avons vu comment corriger les décalages de temps, de fréquence et de phase dans notre signal reçu.  Mais la plupart des protocoles de communication modernes ne se contentent pas de transmettre des bits en continu à un taux d'utilisation de 100%.  Ils utilisent plutôt des paquets/trames.  Au niveau du récepteur, nous devons être en mesure d'identifier le début d'une nouvelle trame.  Habituellement, l'en-tête de trame (au niveau de la couche MAC) indique le nombre d'octets contenus dans la trame.  Nous pouvons utiliser cette information pour connaître la longueur de la trame, par exemple, en unités d'échantillons ou de symboles.  Néanmoins, la détection du début de la trame est une tâche totalement distincte.  Vous trouverez ci-dessous un exemple de structure de trame WiFi.  Notez que la toute première chose transmise est un en-tête de la couche PHY, et que la première moitié de cet en-tête est un "préambule".  Ce préambule contient une séquence de synchronisation que le récepteur utilise pour détecter le début des trames, et c'est une séquence connue d'avance par le récepteur.
 
 .. image:: ../_images/wifi-frame.png
    :scale: 60 % 
    :align: center 
 
-A common and straightforward method of detecting these sequences at the receiver is to cross-correlate the received samples with the known sequence.  When the sequence occurs, this cross-correlation resembles an autocorrelation (with noise added).  Typically the sequences chosen for preambles will have nice autocorrelation properties, such as the autocorrelation of the sequence creates a single strong spike at 0 and no other spikes.  One example is Barker codes, in 802.11/WiFi a length-11 Barker sequence is used for the 1 and 2 Mbit/sec rates:
+Une méthode courante et simple de détection de ces séquences au niveau du récepteur consiste à effectuer une corrélation croisée entre les échantillons reçus et la séquence connue.  Lorsque la séquence se produit, cette intercorrélation ressemble à une autocorrélation (avec du bruit ajouté).  Typiquement, les séquences choisies pour les préambules auront de belles propriétés d'autocorrélation, telles que l'autocorrélation de la séquence crée un seul pic fort à 0 et aucun autre pic.  Les codes de Barker en sont un exemple. Dans la norme 802.11/WiFi, une séquence de Barker de longueur 11 est utilisée pour les débits de 1 et 2Mbit/sec :
 
 .. code-block::
 
     +1 +1 +1 −1 −1 −1 +1 −1 −1 +1 −1
 
-You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of this sequence very easily in Python:
+On peut l'assimiler à 11 symboles BPSK.  Nous pouvons regarder l'autocorrélation de cette séquence très facilement en Python :
 
 .. code-block:: python
 
@@ -469,9 +470,9 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
    :align: center
    :target: ../_images/barker-code.svg
 
-You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  It works well for finding the start of a frame because it essentially integrates 11 symbols worth of energy in an attempt to create a 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of performing start-of-frame detection is figuring out a good threshold.  You don't want frames that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't consider here.  In deciding a threshold, you have to make a trade-off between probability of detection and probability of false alarms.  Remember that the frame header itself will have information, so some false alarms are OK; you will quickly find it is not actually a frame when you go to decode the header and the CRC inevitably fails (because it wasn't actually a frame).  Yet while some false alarms are OK, missing a frame detection altogether is bad.
+Vous pouvez voir qu'il y a 11 (longueur de la séquence) au centre, et -1 ou 0 pour tous les autres délais.  Il fonctionne bien pour trouver le début d'une trame car il intègre essentiellement 11 symboles d'énergie dans une tentative de créer un pic de 1 bit dans la sortie de la corrélation croisée.  En fait, la partie la plus difficile de la détection du début d'une trame est de trouver un bon seuil.  Vous ne voulez pas que des trames qui ne font pas réellement partie de votre protocole le déclenchent.  Cela signifie qu'en plus de la corrélation croisée, vous devez également effectuer une sorte de normalisation de la puissance, que nous n'examinerons pas ici.  En décidant d'un seuil, vous devez faire un compromis entre la probabilité de détection et la probabilité de fausses alarmes.  Rappelez-vous que l'en-tête de trame lui-même contiendra des informations, donc certaines fausses alarmes sont acceptables; vous découvrirez rapidement qu'il ne s'agit pas d'une trame lorsque vous décoderez l'en-tête et que le CRC échouera inévitablement (parce qu'il ne s'agissait pas d'une trame).  Cependant, si certaines fausses alarmes sont acceptables, manquer complètement la détection d'une trame est une mauvaise chose.
 
-Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE.  They have the benefit of being in sets; you can have multiple different sequences that all have good autocorrelation properties, but they won't trigger each other (i.e., also good cross-correlation properties, when you cross-correlate different sequences in the set).  Thanks to that feature, different cell towers will be assigned different sequences so that a phone can not only find the start of the frame but also know which tower it is receiving from.
+Les séquences de Zadoff-Chu, utilisées en LTE, sont une autre séquence présentant d'excellentes propriétés d'autocorrélation.  Elles ont l'avantage de se présenter sous forme d'ensembles; vous pouvez avoir plusieurs séquences différentes qui ont toutes de bonnes propriétés d'autocorrélation, mais elles ne se déclencheront pas les unes les autres (c'est-à-dire qu'elles ont également de bonnes propriétés de corrélation croisée, lorsque vous corrèlez différentes séquences de l'ensemble).  Grâce à cette fonctionnalité, des séquences différentes seront attribuées à différentes stations de bases, de sorte qu'un téléphone puisse non seulement trouver le début de la trame mais aussi savoir de quelle station il reçoit.
 
 
 

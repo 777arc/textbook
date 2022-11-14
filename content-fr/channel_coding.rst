@@ -1,36 +1,36 @@
 .. _channel-coding-chapter:
 
 #####################
-Channel Coding
+Codage Canal
 #####################
 
-In this chapter we introduce the basics of channel coding, a.k.a. forward error correction (FEC), the Shannon Limit, Hamming codes, Turbo codes, and LDPC codes.  Channel coding is an enormous area within wireless communications, and is a branch of "information theory", which is the study of the quantification, storage, and communication of information.
+Dans ce chapitre, nous présentons les bases du codage de canal, c'est-à-dire les codes correcteurs d'erreur (FEC pour *Forward Error Correction* en anglais), la limite de Shannon, les codes de Hamming, les turbo-codes et les codes LDPC.  Le codage de canal est un domaine énorme dans les communications sans fil, et est une branche de la "théorie de l'information", qui est l'étude de la quantification, du stockage et de la communication de l'information.
 
 ***************************
-Why We Need Channel Coding
+Pourquoi nous avons besoin du codage des canaux
 ***************************
 
-As we learned in the :ref:`noise-chapter` chapter, wireless channels are noisy, and our digital symbols won't reach the receiver perfectly.  If you have taken a networking course, you may already know about cyclic redundancy checks (CRCs), which **detect** errors at the receiving end.  The purpose of channel coding is to detect **and correct** errors at the receiver.  If we allow some room for error, then we can transmit at a higher order modulation scheme, for example, without having a broken link.  As a visual example, consider the following constellations showing QPSK (left) and 16QAM (right) under the same amount of noise.  QPSK provides 2 bits per symbol, while 16QAM is twice the data rate at 4 bits per symbol.  But note how in the QPSK constellation that the symbols tend to not pass the symbol decision boundary, or the x-axis and y-axis, which means the symbols will be received correctly.  Meanwhile in the 16QAM plot, there is overlap in the clusters, and, as a result, there will be many incorrectly received symbols.
+Comme nous l'avons appris dans le chapitre :ref:`noise-chapter`, les canaux sans fil sont bruyants, et nos symboles numériques n'atteindront pas parfaitement le récepteur.  Si vous avez suivi un cours des réseaux, vous connaissez peut-être déjà les contrôles de redondance cyclique (CRC pour *cyclic redundancy checks* en anglais), qui **détectent** les erreurs au niveau de la réception. L'objectif du codage de canal est de détecter **et de corriger** les erreurs au niveau du récepteur.  Si nous laissons une certaine marge d'erreur, nous pouvons transmettre avec un système de modulation d'ordre supérieur par exemple, sans que la liaison soit rompue.  À titre d'exemple visuel, considérez les constellations suivantes montrant une QPSK (à gauche) et une 16QAM (à droite) avec la même quantité de bruit.  La QPSK fournit 2 bits par symbole, tandis que la 16QAM offre un débit deux fois plus élevé avec 4 bits par symbole.  Mais notez comment dans la constellation QPSK, les symboles ont tendance à ne pas dépasse pas les frontières de décision des symboles, ou l'axe des x et l'axe des y, ce qui signifie que les symboles seront reçus correctement.  En revanche, dans le tracé de la constellation 16QAM, il y a un chevauchement des groupes de points et, par conséquent, de nombreux symboles seront mal reçus.
 
 .. image:: ../_images/qpsk_vs_16qam.png
    :scale: 90 % 
    :align: center 
    
-A failed CRC usually results in a retransmission, at least when using a protocol like TCP.  If Alice is sending a message to Bob, we would rather not have to make Bob send a message back to Alice requesting the information again.  The purpose of channel coding is to transmit **redundant** information. The redundancy is a failsafe that reduces the amount of erroneous packets, retransmissions, or dropped data.
+Un échec du CRC entraîne généralement une retransmission, du moins lorsqu'on utilise un protocole comme TCP.  Si Alice envoie un message à Bob, il est préférable que Bob n'ait pas à renvoyer un message à Alice pour demander à nouveau l'information.  Le but du codage de canal est de transmettre des informations **redondantes**. La redondance est une sécurité qui réduit le nombre de paquets erronés, de retransmissions ou de données perdues.
 
-We discussed why we need channel coding, so let's see where it occurs in the transmit-receive chain:
+Nous avons vu pourquoi nous avons besoin du codage de canal, voyons donc où il intervient dans la chaîne de transmission-réception :
 
 .. image:: ../_images/tx_rx_chain.svg
    :align: center 
    :target: ../_images/tx_rx_chain.svg
 
-Observe that there are multiple encoding steps in the transmit-receive chain. Source coding, our first step, is not the same as channel coding; source coding is meant to compress the data to be transmitted as much as possible, just like when you zip files to reduce the space taken.  Namely the output of the source encoding block should be **smaller** than the data input, but the output of channel encoding will be larger than its input because redundancy is added.
+Observez qu'il y a plusieurs étapes de codage dans la chaîne d'émission-réception. Le codage source, notre première étape, n'est pas la même que le codage du canal; le codagesource a pour but de compresser les données à transmettre autant que possible, tout comme lorsque vous zippez des fichiers pour réduire l'espace occupé.  En d'autres termes, la sortie du bloc de codage de la source doit être **plus petite** que l'entrée des données, mais la sortie du codage du canal sera plus grande que son entrée car la redondance est ajoutée.
 
 ***************************
-Types of Codes
+Types de Codes
 ***************************
 
-To perform channel coding we use an "error correction code".  This code tells us, given the bits we have to transmit, what bits do we actually transmit?  The most basic code is called "repetition coding", and it's when you simply repeat a bit N times in a row.  For repetition-3 code, one would transmit each bit three times:
+Pour effectuer le codage du canal, nous utilisons un "code de correction d'erreur".  Ce code nous dit, étant donné les bits que nous devons transmettre, quels sont les bits que nous transmettons réellement? Le code le plus élémentaire est appelé "code de répétition", et il consiste à répéter simplement un bit N fois de suite. Pour le code de répétition-3, on transmet chaque bit trois fois :
 
 .. role::  raw-html(raw)
     :format: html
@@ -38,138 +38,138 @@ To perform channel coding we use an "error correction code".  This code tells us
 - 0 :raw-html:`&rarr;` 000
 - 1 :raw-html:`&rarr;` 111
 
-The message 10010110 is transmitted as 111000000111000111111000 after channel encoding.
+Le message 10010110 est transmis sous la forme 111000000111000111111000 après codage du canal.
 
-Some codes work on "blocks" of input bits, while others use a stream approach. Codes that work on blocks, data of a definite length, are called "Block Codes", while codes that work on a stream of bits, where data length is arbitrary, are called "Convolutional Codes".  These are the two primary types of codes.  Our repetition-3 code is a block code where each block is three bits.
+Certains codes fonctionnent sur des "blocs" de bits d'entrée, tandis que d'autres utilisent une approche par flux continu. Les codes qui fonctionnent sur des blocs, c'est-à-dire des données d'une longueur définie, sont appelés "codes blocs", tandis que les codes qui fonctionnent sur un flux de bits, où la longueur des données est arbitraire, sont appelés "codes convolutifs".  Ce sont les deux principaux types de codes.  Notre code de répétition-3 est un code de bloc où chaque bloc est de trois bits.
 
-As an aside, these error correction codes are not solely used in channel coding for wireless links.  Ever store information to a hard drive or SSD and wonder how there are never bit errors when reading information back off?  Writing, then reading, from memory is similar to a communication system.  Hard drive/SSD controllers have error correction built in. It's transparent to the OS and can be proprietary since it's all onboard the hard drive/SSD.  For portable media like CDs, the error correction must be standardized.  Reed-Solomon codes were common in CD-ROMs.
-
-***************************
-Code-Rate
-***************************
-
-All error correction includes some form of redundancy.  That means if we want to transmit 100 bits of information, we will have to actually send **more than** 100 bits.  "Code-rate" is the ratio between the number of information bits and the total number of bits sent (i.e., information plus redundancy bits).  Returning to the repetition-3 coding example, if I have 100 bits of information then we can determine the following:
-
-- 300 bits are sent
-- Only 100 bits represent information
-- Code-rate = 100/300 = 1/3
-
-The code-rate will always be less than 1, as there is a trade-off between redundancy and throughput.  A lower code-rate means more redundancy and less throughput.
+Soit dit en passant, ces codes de correction d'erreurs ne sont pas uniquement utilisés dans le codage des canaux pour les liaisons sans fil.  Vous avez déjà stocké des informations sur un disque dur ou un SSD et vous vous êtes demandé comment il n'y avait jamais d'erreurs de bits lors de la relecture des informations?  L'écriture, puis la lecture, de la mémoire est similaire à un système de communication.  Les contrôleurs de disques durs et de disques SSD intègrent la correction d'erreurs. Elle est transparente pour le système d'exploitation et peut être propriétaire puisqu'elle est intégrée au disque dur/SSD. Pour les supports portables comme les CD, la correction d'erreurs doit être normalisée. Les codes Reed-Solomon étaient courants dans les CD-ROM.
 
 ***************************
-Modulation and Coding
+Rendement de Code
 ***************************
 
-In the :ref:`modulation-chapter` chapter we tackled noise in modulation schemes. At a low SNR you need a low-order modulation scheme (e.g., QPSK) to deal with the noise, and at a high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNRs, and at high SNRs you can use a code-rate of almost 1.  Modern communications systems have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme to be used at specific SNR levels.
+Toute correction d'erreur comprend une forme de redondance.  Cela signifie que si nous voulons transmettre 100 bits d'information, nous devrons en fait envoyer **plus que** 100 bits.  Le "débit de code" est le rapport entre le nombre de bits d'information et le nombre total de bits envoyés (c'est-à-dire les bits d'information plus les bits de redondance).  Pour en revenir à l'exemple du codage par répétition-3, si je dispose de 100 bits d'information, nous pouvons déterminer ce qui suit :
 
-Modern communications adaptively change the MCS in real-time based on the wireless channel conditions.  The receiver sends feedback about channel quality to the transmitter.  Feedback must be shared before the wireless channel quality changes, which could be on the order of ms.  This adaptive process leads to the highest throughput communications possible, and is used by modern technologies like LTE, 5G, and WiFi. Beneath is a visualization of a cell tower changing MCS during transmission as a user's distance to the cell changes.
+- 300 bits sont envoyés
+- Seuls 100 bits représentent une information
+- Taux de codage = 100/300 = 1/3
+
+Le taux de codage sera toujours inférieur à 1, car il existe un compromis entre la redondance et le débit.  Un taux de codage plus faible signifie plus de redondance et moins de débit.
+
+***************************
+Modulation et Codage
+***************************
+
+Dans le chapitre :ref:`modulation-chapter`, nous avons abordé le bruit dans les schémas de modulation. Pour un SNR (rapport signal à bruit) faible, vous avez besoin d'un schéma de modulation d'ordre faible (par exemple, QPSK) pour faire face au bruit, et pour un SNR élevé, vous pouvez utiliser une modulation comme 256QAM pour envoyer plus de bits par seconde.  Il en va de même pour le codage du canal: vous souhaitez des taux de codage plus faibles à des SNR faibles, et à des SNR élevés, vous pouvez utiliser un taux de codage proche de 1. Les systèmes de communication modernes disposent d'un ensemble de schémas de modulation et de codage combinés, appelés MCS (pour *modulations and coding schemes*) en anglais. Chaque MCS spécifie un schéma de modulation et un schéma de codage à utiliser à des niveaux de SNR spécifiques.
+
+Les communications modernes modifient de manière adaptative le MCS en temps réel en fonction des conditions du canal sans fil.  Le récepteur envoie un retour d'information sur la qualité du canal à l'émetteur.  Le retour d'information doit être partagé avant que la qualité du canal sans fil ne change, ce qui peut être de l'ordre de la ms.  Ce processus adaptatif permet d'obtenir le meilleur débit de communication possible et est utilisé par les technologies modernes telles que LTE, 5G et WiFi. Ci-dessous, une visualisation d'une tour cellulaire changeant de MCS pendant la transmission en fonction de la distance entre l'utilisateur et la cellule.
 
 .. image:: ../_images/adaptive_mcs.svg
    :align: center 
    :target: ../_images/adaptive_mcs.svg
 
-When using adaptive MCS, if you plot throughput over SNR, you get a staircase-shaped curve like the graph below.  Protocols like LTE often have a table indicating which MCS should be used at what SNR.
+Lorsque vous utilisez un MCS adaptatif, si vous tracez le débit en fonction du SNR, vous obtenez une courbe en forme d'escalier comme le graphique ci-dessous.  Les protocoles comme LTE ont souvent un tableau indiquant quel MCS doit être utilisé à quel SNR.
 
 .. image:: ../_images/adaptive_mcs2.svg
    :align: center 
    :target: ../_images/adaptive_mcs2.svg
 
 ***************************
-Hamming Code
+Code de Hamming
 ***************************
 
-Let's look at a simple error correcting codes.  Hamming Code was the first non-trivial code developed.  In the late 1940's Richard Hamming worked at Bell Labs, using an electromechanical computer that used punched paper tape.  When errors in the machine were detected, it would stop and operators would have to fix them. Hamming grew frustrated with having to restart his programs from scratch due to detected errors.  He said, "Damn it, if the machine can detect an error, why can't it locate the position of the error and correct it?"  He spent the next few years developing the Hamming Code so the computer could do exactly that.
+Examinons un simple code correcteur d'erreurs.  Le code de Hamming a été le premier code non trivial développé.  À la fin des années 1940, Richard Hamming travaillait aux Bell Labs et utilisait un ordinateur électromécanique qui utilisait des bandes de papier perforé.  Lorsque des erreurs étaient détectées dans la machine, celle-ci s'arrêtait et les opérateurs devaient les corriger. Hamming a été frustré de devoir recommencer ses programmes à partir de zéro à cause des erreurs détectées.  Il s'est dit : "Bon sang, si la machine peut détecter une erreur, pourquoi ne peut-elle pas localiser la position de l'erreur et la corriger?".  Il a passé les années suivantes à développer le code de Hamming pour que l'ordinateur puisse faire exactement cela.
 
-In Hamming Codes, extra bits, called parity bits or check bits, are added to information for redundancy.  All bit positions that are powers of two are parity bits: 1, 2, 4, 8, and etc. The other bit positions are for information. The table beneath this paragraph highlights parity bits in green.  Each parity bit "covers" all bits where the bitwise AND of the parity and the bit position is non-zero, marked with a red X below.  If we want to use a data bit, we need the parity bits that cover it.  To be able to go up to data bit d9, we need parity bit p8 and all the parity bits that come before it, so this table tells us how many parity bits we need for a certain number of bits.  This pattern continues indefinitely.
+Dans les codes de Hamming, des bits supplémentaires, appelés bits de parité ou bits de contrôle, sont ajoutés aux informations pour assurer la redondance. Toutes les positions binaires qui sont des puissances de deux sont des bits de parité: 1, 2, 4, 8, etc. Les autres positions binaires sont destinées à l'information. Le tableau situé sous ce paragraphe met en évidence les bits de parité en vert.  Chaque bit de parité "couvre" tous les bits où le ET binaire de la parité et de la position du bit est différent de zéro, marqué d'un X rouge ci-dessous.  Si nous voulons utiliser un bit de données, nous avons besoin des bits de parité qui le couvrent.  Pour pouvoir aller jusqu'au bit de données d9, nous avons besoin du bit de parité p8 et de tous les bits de parité qui le précèdent. Cette table nous indique donc le nombre de bits de parité dont nous avons besoin pour un certain nombre de bits.  Ce schéma se poursuit indéfiniment.
 
 .. image:: ../_images/hamming.svg
    :align: center 
    :target: ../_images/hamming.svg
 
-Hamming codes are block codes so they operate on N data bits at a time.  So with three parity bits we can operate on blocks of four data bits at a time.  We represent this error encoding scheme as Hamming(7,4), where the first argument is the total bits transmitted and the second argument is the bits of data.
+Les codes de Hamming sont des codes de bloc, ils fonctionnent donc sur N bits de données à la fois.  Ainsi, avec trois bits de parité, nous pouvons opérer sur des blocs de quatre bits de données à la fois.  Nous représentons ce schéma de codage d'erreur par Hamming(7,4), où le premier argument est le nombre total de bits transmis et le second argument est le nombre de bits de données.
 
 .. image:: ../_images/hamming2.svg
    :align: center 
    :target: ../_images/hamming2.svg
 
-The following are three important properties of Hamming codes:
+Voici trois propriétés importantes des codes de Hamming :
 
-- The minimal number of bit changes needed to go from any code word to any other code word is three
-- It can correct one-bit errors
-- It can detect but not correct two-bit errors
+- Le nombre minimal de changements de bits nécessaires pour passer d'un mot de code quelconque à un autre mot de code quelconque est de trois.
+- Il peut corriger les erreurs d'un bit
+- Il peut détecter mais pas corriger les erreurs de deux bits
 
-Algorithmically, the coding process can be done using a simple matrix multiply, using what is called the "generator matrix".  In the example below, the vector 1011 is the data to be encoded, i.e., the information we want to send to the receiver.  The 2D matrix is the generator matrix, and it defines the code scheme.  The result of the multiply provides the code word to transmit.
+D'un point de vue algorithmique, le processus de codage peut être réalisé à l'aide d'une simple multiplication matricielle, en utilisant ce que l'on appelle la "matrice génératrice".  Dans l'exemple ci-dessous, le vecteur 1011 représente les données à coder, c'est-à-dire les informations que nous voulons envoyer au récepteur.  La matrice 2D est la matrice génératrice, et elle définit le schéma de codage.  Le résultat de la multiplication fournit le mot de code à transmettre.
 
 .. image:: ../_images/hamming3.png
    :scale: 60 % 
    :align: center 
 
-The point of diving into Hamming codes was to give a taste of how error coding works.  Block codes tend to follow this type of pattern.  Convolutional codes work differently, but we won't get into it here; they often use Trellis-style decoding, which can be displayed in a diagram that looks like this:
+L'intérêt de se plonger dans les codes de Hamming était de donner un aperçu du fonctionnement du codage des erreurs.  Les codes en bloc ont tendance à suivre ce type de schéma.  Les codes convolutifs fonctionnent différemment, mais nous ne nous y attarderons pas ici ; ils utilisent souvent un décodage de type Trellis, qui peut être représenté par un diagramme ressemblant à celui-ci:
 
 .. image:: ../_images/trellis.svg
    :align: center 
 
 ***************************
-Soft vs Hard Decoding
+Décodage souple ou dur
 ***************************
 
-Recall that at the receiver demodulation occurs before decoding.  The demodulator can tell us its best guess as to which symbol was sent, or it can output the "soft" value.  For BPSK, instead of telling us 1 or 0, the demodulator can say 0.3423 or -1.1234, whatever the "soft" value of the symbol was.  Typically the decoding is designed to use hard or soft values.
+Rappelons qu'au niveau du récepteur, la démodulation intervient avant le décodage.  Le démodulateur peut nous dire quel symbole a été envoyé, ou il peut nous donner la valeur "souple".  Pour la BPSK, au lieu de nous dire 1 ou 0, le démodulateur peut dire 0.3423 ou -1.1234, quelle que soit la valeur "souple" du symbole. En général, le décodage est conçu pour utiliser des valeurs dures ou souples.
 
-- **Soft decision decoding** – uses the soft values
-- **Hard decision decoding** – uses only the 1's and 0's
+- **Décodage à décision souple** - utilise les valeurs souples.
+- **Décodage à décision dure** - utilise uniquement les 1 et les 0.
 
-Soft is more robust because you are using all of the information at your disposal, but soft is also much more complicated to implement.  The Hamming Codes we talked about used hard decisions, while convolutional codes tend to use soft.
+Les codes souples sont plus robustes parce que vous utilisez toutes les informations à votre disposition, mais ils sont aussi beaucoup plus compliqués à mettre en œuvre. Les codes de Hamming dont nous avons parlé utilisaient des décisions dures, alors que les codes convolutifs ont tendance à utiliser des décisions souples.
 
 ***************************
-Shannon Limit
+Limit de Shannon
 ***************************
 
-The Shannon limit or Shannon capacity is an incredible piece of theory that tell us how many bits per second of error-free information we can send:
+La limite de Shannon ou capacité de Shannon est un incroyable élément de théorie qui nous indique combien de bits par seconde d'informations sans erreur nous pouvons envoyer :
 
 .. math::
  C = B \cdot log_2 \left( 1 + \frac{S}{N}   \right)
 
-- C – Channel capacity [bits/sec]
-- B – Bandwidth of channel [Hz]
-- S – Average received signal power [watts]
-- N – Average noise power [watts]
+- C - Capacité du canal [bits/sec]
+- B - Largeur de bande du canal [Hz].
+- S - Puissance moyenne du signal reçu [watts].
+- N - Puissance moyenne du bruit [watts].
 
-This equation represents the best any MCS can do when operating at a high enough SNR to be error-free.  It makes more sense to plot the limit in bits/sec/Hz, i.e., bits/sec per amount of spectrum:
+Cette équation représente ce que tout schéma MCS peut faire de mieux lorsqu'il fonctionne à un rapport signal/bruit suffisamment élevé pour être exempt d'erreurs.  Il est plus logique de représenter la limite en bits/sec/Hz, c'est-à-dire en bits/sec par quantité de spectre:
 
 .. math::
  \frac{C}{B} = log_2 \left( 1 + \mathrm{SNR}   \right)
 
-with SNR in linear terms (not dB).  However, when plotting it, we usually represent SNR in dB for convenience:
+avec SNR en termes linéaires (et non en dB). Cependant, lors de la représentation graphique, nous représentons généralement le SNR en dB pour des raisons de commodité:
 
 .. image:: ../_images/shannon_limit.svg
    :align: center 
 
-If you see Shannon limit plots elsewhere that look a little different, they are probably using an x-axis of "energy per bit" or :math:`E_b/N_0`, which is just an alternative to working in SNR.
+Si vous voyez ailleurs des courbes de limites de Shannon qui ont l'air un peu différents, ils utilisent probablement un axe x en terme "d'énergie par bit" ou :math:`E_b/N_0`, qui est juste une alternative au SNR.
 
-It might help simplify things to realize when the SNR is fairly high (e.g., 10 dB or higher), the Shannon limit can be approximated as :math:`log_2 \left( \mathrm{SNR} \right)`, which is roughly :math:`\mathrm{SNR_{dB}}/3` (`explained here <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem#Bandwidth-limited_case>`_).  For example, at 24 dB SNR you're looking at 8 bits/sec/Hz, so if you have 1 MHz to use, that's 8 Mbps.  You might be thinking, "well that's just the theoretical limit", but modern communications get fairly close to that limit, so at a minimum it gives you a rough ballpark.  You can always cut that number in half to take into account packet/frame overhead and non-ideal MCS.
+Il pourrait aider à simplifier les choses de réaliser que lorsque le SNR est assez élevé (par exemple, 10 dB ou plus), la limite de Shannon peut être approximée comme :math:`log_2 \left( \mathrm{SNR} \right)`, qui est approximativement :math:`\mathrm{SNR_{dB}}/3` (`expliqué ici <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem#Bandwidth-limited_case>`_). Par exemple, avec un rapport signal à bruit de 24 dB, vous obtenez 8 bits/seconde/Hz, donc si vous avez 1 MHz à utiliser, cela représente 8 Mbps.  Vous vous dites peut-être que ce n'est qu'une limite théorique, mais les communications modernes sont assez proches de cette limite, ce qui vous donne au moins une idée approximative.  Vous pouvez toujours diviser ce chiffre par deux pour tenir compte de les champs additionnels dans les paquets/trames et d'un schéma MCS sous optimal.
 
-The max throughput of 802.11n WiFi operating in the 2.4 GHz band (which uses 20 MHz wide channels), according to the specs, is 300 Mbps.  Obviously you could sit right next to your router and get an extremely high SNR, maybe 60 dB, but to be reliable/practical the max throughput MCS (recall the staircase curve from above) is unlikely to require an SNR that high.  You can even take a look at the `MCS list for 802.11n <https://en.wikipedia.org/wiki/IEEE_802.11n-2009#Data_rates>`_.  802.11n goes up to 64-QAM, and combined with channel coding, it requires a SNR around 25 dB according to `this table <https://d2cpnw0u24fjm4.cloudfront.net/wp-content/uploads/802.11n-and-802.11ac-MCS-SNR-and-RSSI.pdf>`_.  That means, even at 60 dB SNR your WiFi will still use 64-QAM.  So at 25 dB the Shannon limit is roughly 8.3 bits/sec/Hz, which given 20 MHz of spectrum is 166 Mbps.  However, when you take into account MIMO, which we will cover in a future chapter, you can get four of those streams running in parallel, resulting in 664 Mbps.  Cut that number in half and you get something very close to the advertised max speed of 300 Mbps for 802.11n WiFi in the 2.4 GHz band.
+Le débit maximal du WiFi 802.11n fonctionnant dans la bande 2.4 GHz (qui utilise des canaux de 20 MHz de large), suivant les spécifications, est de 300 Mbps.  Il est évident que vous pourriez vous asseoir juste à côté de votre routeur et obtenir un rapport signal/bruit extrêmement élevé, peut-être 60 dB, mais pour être fiable/pratique, le débit maximal MCS (rappelez-vous la courbe en escalier ci-dessus) ne nécessitera probablement pas un rapport signal/bruit aussi élevé.  Vous pouvez même jeter un coup d'oeil à la liste `MCS pour 802.11n <https://en.wikipedia.org/wiki/IEEE_802.11n-2009#Data_rates>`_.  802.11n va jusqu'à 64-QAM, et combiné avec le codage de canal, il nécessite un SNR autour de 25 dB selon `ce tableau <https://d2cpnw0u24fjm4.cloudfront.net/wp-content/uploads/802.11n-and-802.11ac-MCS-SNR-and-RSSI.pdf>`_.  Cela signifie que, même avec un SNR de 60 dB, votre WiFi utilisera toujours la 64-QAM.  Donc, à 25 dB, la limite de Shannon est d'environ 8.3 bits/sec/Hz, ce qui, compte tenu de 20 MHz de spectre, représente 166 Mbps.  Cependant, si vous tenez compte de la technologie MIMO, que nous aborderons dans un prochain chapitre, vous pouvez obtenir quatre de ces flux en parallèle, ce qui donne 664 Mbps.  En divisant ce chiffre par deux, vous obtenez un résultat très proche de la vitesse maximale annoncée de 300 Mbps pour le WiFi 802.11n dans la bande 2.4 GHz.
 
-The proof behind the Shannon limit is pretty crazy; it involves math that looks like this:
+La preuve de la limite de Shannon est assez folle; elle implique des calculs qui ressemblent à ceci:
 
 .. image:: ../_images/shannon_limit_proof.png
    :scale: 70 % 
    :align: center
 
-For more information see `here <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem>`_.
+Pour plus d'informations, voir `ici <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem>`_.
 
 ***************************
-State of the Art Codes
+Codes de l'état de l'art
 ***************************
 
-Currently, the best channel coding schemes are:
+Actuellement, les meilleurs schémas de codage de canal sont :
 
-1. Turbo codes, used in 3G, 4G, NASA’s spacecraft.
-2. LDPC codes, used in DVB-S2, WiMAX, IEEE 802.11n.
+1. Les turbo-codes, utilisés en 3G, 4G, et dans les vaisseaux spatiaux de la NASA.
+2. Les codes LDPC, utilisés dans la DVB-S2, le WiMAX, l'IEEE 802.11n.
 
-Both of these codes approach the Shannon limit (i.e., almost hit it under certain SNRs).  Hamming codes and other simpler codes get nowhere near the Shannon limit.  From a research point of view, there is not much room left to improve in terms of the codes themselves.  Current research is focusing more on making the decoding more computationally efficient and adaptive to channel feedback.
+Ces deux codes s'approchent de la limite de Shannon (c'est-à-dire qu'ils l'atteignent presque sous certains SNR).  Les codes de Hamming et d'autres codes plus simples sont loin d'atteindre la limite de Shannon.  Du point de vue recherche, il n'y a plus beaucoup de possibilités d'amélioration des codes eux-mêmes.  La recherche actuelle se concentre davantage sur l'amélioration de l'efficacité du décodage en termes de complexité et sur l'adaptation avec un canal retour.
 
-Low-density parity-check (LDPC) codes are a class of highly efficient linear block codes.  They were first introduced by Robert G. Gallager in his PhD dissertation in 1960 at MIT.  Due to the computational complexity in implementing them, they were ignored until the 1990's!  He is 89 at the time of this writing (2020), is still alive, and has won many prizes for his work (decades after he did it).  LDPC is not patented and therefore free to use (unlike turbo codes), which is why it was used in many open protocols.
+Les codes à contrôle de parité à faible densité (LDPC pour *Low Density Parity Check*) sont une classe de codes en bloc linéaires très efficaces.  Ils ont été introduits pour la première fois par Robert G. Gallager dans sa thèse de doctorat en 1960 au MIT.  En raison de la complexité de leur mise en œuvre, ils ont été ignorés jusque dans les années 1990 !  À l'heure où nous écrivons ces lignes (2020), Gallager a 89 ans, est toujours en vie et a remporté de nombreux prix pour ses travaux (des décennies après les avoir réalisés).  Le code LDPC n'est pas breveté et est donc libre d'utilisation (contrairement aux turbo-codes), c'est pourquoi il a été utilisé dans de nombreux protocoles ouverts.
 
-Turbo codes are based on convolutional codes.  It's a class of code that combines two or more simpler convolutional codes and an interleaver.  The fundamental patent application for turbo codes was filed on April 23, 1991.  The inventors were French, so when Qualcomm wanted to use turbo codes in CDMA for 3G they had to create a fee-bearing patent license agreement with France Telecom.  The primary patent expired August 29, 2013. 
+Les turbo-codes sont basés sur les codes convolutifs.  Il s'agit d'une classe de codes qui combine deux ou plusieurs codes convolutifs plus simples et un entrelaceur.  La demande de brevet pour les turbo-codes a été déposée le 23 avril 1991.  Les inventeurs étant français, et lorsque Qualcomm a voulu utiliser les turbo-codes dans le CDMA pour la 3G, elle a dû conclure un accord de licence payante avec France Télécom.  Le brevet principal a expiré le 29 août 2013.
 

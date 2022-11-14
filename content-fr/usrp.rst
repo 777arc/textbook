@@ -1,40 +1,40 @@
 .. _usrp-chapter:
 
 ####################################
-USRP in Python
+USRP en Python
 ####################################
 
 .. image:: ../_images/usrp.png
    :scale: 50 % 
    :align: center 
    
-In this chapter we learn how to use the UHD Python API to control and receive/transmit signals with a `USRP <https://www.ettus.com/>`_ which is a series of SDRs made by Ettus Research (now part of NI).  We will discuss transmitting and receiving on the USRP in Python, and dive into USRP-specific topics including stream args, subdevices, channels, 10 MHz and PPS synchronization.  
+Dans ce chapitre, nous apprenons à utiliser l'API Python UHD pour contrôler et recevoir/transmettre des signaux avec un `USRP <https://www.ettus.com/>`_ qui est une série de SDRs fabriqués par Ettus Research (qui fait maintenant partie de NI).  Nous discuterons de la transmission et de la réception sur l'USRP en Python, et nous plongerons dans les sujets spécifiques à l'USRP, notamment les args de streams ou flux, les sous-devices, les canaux, la synchronisation 10 MHz et PPS.   
 
 ************************
-Software/Drivers Install
+Installation de logiciels/pilotes
 ************************
 
-While the Python code provided in this textbook should work under Windows, Mac, and Linux, we will only be providing driver/API install instructions specific to Ubuntu 20 (although the instructions below should work on most Debian-based distributions).  We will start by creating an Ubuntu 20 VirtualBox VM; feel free to skip the VM portion if you already have your OS ready to go.
+Bien que le code Python fourni dans ce manuel doive fonctionner sous Windows, Mac et Linux, nous ne fournirons que des instructions d'installation des pilotes/API spécifiques à Ubuntu 20 (bien que les instructions ci-dessous doivent fonctionner sur la plupart des distributions basées sur Debian).  Nous allons commencer par créer une VM Ubuntu 20 VirtualBox ; n'hésitez pas à sauter la partie VM si votre système d'exploitation est déjà prêt.
 
-Setting Up an Ubuntu 20 VM
+Configuration d'une VM Ubuntu 20
 ##########################
 
-(Optional)
+(Optionel)
 
-1. Download Ubuntu 20.04 Desktop .iso- https://ubuntu.com/download/desktop
-2. Install and open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
-3. Create a new VM.  For memory size, I recommend using 50% of your computer’s RAM.
-4. Create the virtual hard disk, choose VDI, and dynamically allocate size.  15 GB should be enough. If you want to be really safe you can use more.
-5. Start the VM. It will ask you for installation media. Choose the Ubuntu 20 desktop .iso file.  Choose “install ubuntu”, use default options, and a pop up will warn you about the changes you are about to make. Hit continue.  Choose name/password and then wait for the VM to finish initializing.  After finishing the VM will restart, but you should power off the VM after the restart.
-6. Go into the VM settings (the gear icon).
-7. Under system > processor > choose at least 3 CPUs.  If you have an actual video card then in display > video memory > choose something much higher.
-8. Start up your VM.
-9. For USB type USRPs you'll need to install VM guest additions. Within the VM go to Devices > Insert Guest Additions CD > hit run when a box pops up.  Follow the instructions. Restart the VM, then attempt to forward the USRP to the VM, assuming it shows up in the list under Devices > USB.  The shared clipboard can be enabled through Devices > Shared Clipboard > Bidirectional.
+1. Télécharger Ubuntu 20.04 Desktop .iso- https://ubuntu.com/download/desktop
+2. Installez et ouvrez `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
+3. Créez une nouvelle VM.  Pour la taille de la mémoire, je recommande d'utiliser 50% de la RAM de votre ordinateur.
+4. Créez le disque dur virtuel, choisissez VDI, et allouez dynamiquement la taille.  15 Go devraient suffire. Si vous voulez être vraiment sûr, vous pouvez utiliser plus.
+5. Démarrez la VM. Il vous demandera le support d'installation. Choisissez le fichier .iso du bureau Ubuntu 20.  Choisissez "install ubuntu", utilisez les options par défaut, et une fenêtre pop-up vous avertira des changements que vous êtes sur le point d'effectuer. Cliquez sur continuer.  Choisissez le nom/mot de passe et attendez que la VM finisse de s'initialiser.  Après avoir terminé, la VM va redémarrer, mais vous devez éteindre la VM après le redémarrage.
+6. Allez dans les paramètres de la VM (l'icône de l'engrenage).
+7. Sous système > processeur > choisissez au moins 3 processeurs.  Si vous avez une carte vidéo réelle, alors dans affichage > mémoire vidéo > choisissez quelque chose de beaucoup plus élevé.
+8. Démarrez votre VM.
+9. Pour les USRP de type USB, vous devrez installer des ajouts invités VM. Dans la VM, allez dans Périphériques > Insérer le CD Guest Additions > cliquez sur run quand une boîte apparaît.  Suivez les instructions. Redémarrez la VM, puis essayez de transférer l'USRP à la VM, en supposant qu'elle apparaisse dans la liste sous Périphériques > USB.  Le presse-papiers partagé peut être activé via Dispositifs > Presse-papiers partagé > Bidirectionnel.
 
-Installing UHD and Python API
+Installation de l'UHD et de l'API Python
 #############################
 
-The terminal commands below should build and install the latest version of UHD, including the Python API:
+Les commandes de terminal ci-dessous devraient compiler et installer la dernière version de UHD, y compris l'API Python :
 
 .. code-block:: bash
 
@@ -49,12 +49,12 @@ The terminal commands below should build and install the latest version of UHD, 
  sudo make install
  sudo ldconfig
 
-For more help see Ettus' official `Building and Installing UHD from source <https://files.ettus.com/manual/page_build_guide.html>`_ page.  Note that there are also methods of installing the drivers that don't require building from source.
+Pour plus d'aide, voir la page officielle d'Ettus `Building and Installing UHD from source <https://files.ettus.com/manual/page_build_guide.html>`_.  Notez qu'il existe également des méthodes d'installation des pilotes qui ne nécessitent pas de construire à partir des sources.
 
-Testing UHD Drivers and Python API
+Test des pilotes UHD et de l'API Python
 ###################################
 
-Open a new terminal and type the following commands:
+Ouvrez un nouveau terminal et tapez les commandes suivantes :
 
 .. code-block:: bash
 
@@ -64,15 +64,15 @@ Open a new terminal and type the following commands:
  samples = usrp.recv_num_samps(10000, 100e6, 1e6, [0], 50)
  print(samples[0:10])
 
-If no errors occur, you are good to go!
+Si aucune erreur ne se produit, vous êtes prêt à partir !
 
 
-Benchmarking USRP Speed in Python
+Analyse comparative de la vitesse de l'USRP en Python
 #################################
 
-(Optional)
+(Optionel)
 
-If you used the standard from-source install, the following command should benchmark the receive rate of your USRP using the Python API.  If using 56e6 caused many dropped samples or overruns, try lowering the number.  Dropped samples aren't necessarily going to ruin anything, but it's a good way to test the inefficiencies that might come with using a VM or older computer, for example.  If using a B 2X0, a fairly modern computer with a USB 3.0 port running properly should manage to do 56 MHz without dropped samples, especially with num_recv_frames set so high.
+Si vous avez utilisé l'installation standard, la commande suivante devrait évaluer le taux de réception de votre USRP en utilisant l'API Python.  Si l'utilisation de 56e6 a causé beaucoup d'échantillons perdus ou de dépassements, essayez de diminuer le nombre.  Les échantillons perdus ne vont pas nécessairement ruiner quoi que ce soit, mais c'est un bon moyen de tester les inefficacités qui peuvent venir de l'utilisation d'une VM ou d'un ordinateur plus ancien, par exemple.  Si vous utilisez un B 2X0, un ordinateur assez moderne avec un port USB 3.0 fonctionnant correctement devrait réussir à faire 56 MHz sans échantillons perdus, surtout avec num_recv_frames réglé aussi haut.
 
 .. code-block:: bash
 
@@ -80,29 +80,29 @@ If you used the standard from-source install, the following command should bench
 
 
 ************************
-Receiving
+Réception
 ************************
 
-Receiving samples off a USRP is extremely easy using the built-in convenience function "recv_num_samps()", below is Python code that tunes the USRP to 100 MHz, using a sample rate of 1 MHz, and grabs 10,000 samples off the USRP, using a receive gain of 50 dB:
+La réception d'échantillons à partir d'une USRP est extrêmement facile grâce à la fonction de commodité intégrée "recv_num_samps()". Le code Python ci-dessous accorde l'USRP à 100MHz, utilise une fréquence d'échantillonnage de 1MHz et prélève 10 000 échantillons à partir de l'USRP, en utilisant un gain de réception de 50dB :
 
 .. code-block:: python
 
  import uhd
  usrp = uhd.usrp.MultiUSRP()
- samples = usrp.recv_num_samps(10000, 100e6, 1e6, [0], 50) # units: N, Hz, Hz, list of channel IDs, dB
+ samples = usrp.recv_num_samps(10000, 100e6, 1e6, [0], 50) # unités: N, Hz, Hz, liste des canaux IDs, dB
  print(samples[0:10])
 
-The [0] is telling the USRP to use its first input port, and only receive one channel worth of samples (for a B210 to receive on two channels at once, for example, you could use [0, 1]).  
+Le [0] indique à l'USRP d'utiliser son premier port d'entrée et de ne recevoir qu'un seul canal d'échantillons (pour qu'un B210 reçoive sur deux canaux à la fois, par exemple, vous pourriez utiliser [0, 1]).   
 
-Here's a tip if you are trying to receive at a high rate but are getting overflows (O's are showing up in your console).  Instead of :code:`usrp = uhd.usrp.MultiUSRP()`, use:
+Voici une astuce si vous essayez de recevoir à un taux élevé mais que vous obtenez des débordements (des O s'affichent dans votre console).  Au lieu de :code:`usrp = uhd.usrp.MultiUSRP()`, utilisez :
 
 .. code-block:: python
 
  usrp = uhd.usrp.MultiUSRP("num_recv_frames=1000")
 
-which makes the receive buffer much larger (the default value is 32), helping to reduce overflows.   The actual size of the buffer in bytes depends on the USRP and type of connection, but simply setting :code:`num_recv_frames` to a value much higher than 32 tends to help.
+qui rend le tampon de réception beaucoup plus grand (la valeur par défaut est de 32), ce qui permet de réduire les débordements.   La taille réelle du tampon en octets dépend de l'USRP et du type de connexion, mais le simple fait de définir :code:`num_recv_frames` à une valeur bien supérieure à 32 permet d'aider.
 
-For more serious applications I recommend not using the convenience function recv_num_samps(), because it hides some of the interesting behavior going on under the hood, and there is some set up that happens each call that we might only want to do once at the beginning, e.g., if we want to receive samples indefinitely.  The following code has the same functionality as recv_num_samps(), in fact it's almost exactly what gets called when you use the convenience function, but now we have the option to modify the behavior:
+Pour des applications plus sérieuses, je recommande de ne pas utiliser la fonction recv_num_samps(), parce qu'elle cache une partie du comportement intéressant qui se passe sous le capot, et il y a une certaine configuration qui se produit à chaque appel que nous pourrions vouloir faire seulement une fois au début, par exemple, si nous voulons recevoir des échantillons indéfiniment.  Le code suivant a la même fonctionnalité que recv_num_samps(), en fait c'est presque exactement ce qui est appelé lorsque vous utilisez cette fonction, mais maintenant nous avons la possibilité de modifier le comportement :
 
 .. code-block:: python
 
@@ -111,7 +111,7 @@ For more serious applications I recommend not using the convenience function rec
  
  usrp = uhd.usrp.MultiUSRP()
  
- num_samps = 10000 # number of samples received
+ num_samps = 10000 # nombre d'échantillons reçus
  center_freq = 100e6 # Hz
  sample_rate = 1e6 # Hz
  gain = 50 # dB
@@ -120,37 +120,37 @@ For more serious applications I recommend not using the convenience function rec
  usrp.set_rx_freq(uhd.libpyuhd.types.tune_request(center_freq), 0)
  usrp.set_rx_gain(gain, 0)
  
- # Set up the stream and receive buffer
+ # Configurer le flux et le tampon de réception
  st_args = uhd.usrp.StreamArgs("fc32", "sc16")
  st_args.channels = [0]
  metadata = uhd.types.RXMetadata()
  streamer = usrp.get_rx_stream(st_args)
  recv_buffer = np.zeros((1, 1000), dtype=np.complex64)
  
- # Start Stream
+ # Démarrer le flux
  stream_cmd = uhd.types.StreamCMD(uhd.types.StreamMode.start_cont)
  stream_cmd.stream_now = True
  streamer.issue_stream_cmd(stream_cmd)
  
- # Receive Samples
+ # Recevoir des échantillons
  samples = np.zeros(num_samps, dtype=np.complex64)
  for i in range(num_samps//1000):
      streamer.recv(recv_buffer, metadata)
      samples[i*1000:(i+1)*1000] = recv_buffer[0]
  
- # Stop Stream
+ # Arrêter le flux
  stream_cmd = uhd.types.StreamCMD(uhd.types.StreamMode.stop_cont)
  streamer.issue_stream_cmd(stream_cmd)
  
  print(len(samples))
  print(samples[0:10])
 
-With num_samps set to 10,000 and the recv_buffer set to 1000, the for loop will run 10 times, i.e., there will be 10 calls to streamer.recv.  Note that we hard-coded recv_buffer to 1000 but you can find the maximum allowed value using :code:`streamer.get_max_num_samps()`, which is often around 3000-something.  Also note that recv_buffer must be 2d because the same API is used when receiving multiple channels at once, but in our case we just received one channel, so recv_buffer[0] gave us the 1D array of samples that we wanted.  You don't need to understand too much about how the stream starts/stops for now, but know that there are other options besides "continuous" mode, such as receiving a specific number of samples and having the stream stop automatically.  Although we don't process metadata in this example code, it contains any errors that occur, among other things, which you can check by looking at metadata.error_code at each iteration of the loop, if desired (errors tend to also show up in the console itself, as a result of UHD, so don't feel like you have to check for them within your Python code).  
+Avec num_samps fixé à 10 000 et le recv_buffer fixé à 1000, la boucle for sera exécutée 10 fois, c'est-à-dire qu'il y aura 10 appels à streamer.recv.  Notez que nous avons codé en dur le recv_buffer à 1000 mais vous pouvez trouver la valeur maximale autorisée en utilisant :code:`streamer.get_max_num_samps()`, qui se situe souvent autour de 3000 et quelques.  Notez également que recv_buffer doit être 2d car la même API est utilisée lors de la réception de plusieurs canaux à la fois, mais dans notre cas, nous n'avons reçu qu'un seul canal, donc recv_buffer[0] nous a donné le tableau 1D d'échantillons que nous voulions.  Pour l'instant, vous n'avez pas besoin d'en savoir trop sur la façon dont le flux démarre/arrête, mais sachez qu'il existe d'autres options que le mode "continu", comme recevoir un nombre spécifique d'échantillons et faire en sorte que le flux s'arrête automatiquement.  Bien que nous ne traitions pas les métadonnées dans cet exemple de code, elles contiennent toutes les erreurs qui se produisent, entre autres choses, que vous pouvez vérifier en regardant metadata.error_code à chaque itération de la boucle, si vous le souhaitez (les erreurs ont tendance à apparaître également dans la console elle-même, en raison de l'UHD, donc ne vous sentez pas obligé de les vérifier dans votre code Python). 
 
-Receive Gain
+Gain de réception
 ############
 
-The following list shows the gain range of the different USRPs, they all go from 0 dB to the number specified below.  Note that this is not dBm, it's essentially dBm combined with some unknown offset because these are not calibrated devices. 
+La liste suivante montre la gamme de gain des différents USRP, ils vont tous de 0dB au nombre spécifié ci-dessous.  Notez que ce n'est pas du dBm, c'est essentiellement du dBm combiné à un décalage inconnu car ce ne sont pas des appareils calibrés. 
 
 * B200/B210/B200-mini: 76 dB
 * X310/N210 with WBX/SBX/UBX: 31.5 dB
@@ -158,25 +158,25 @@ The following list shows the gain range of the different USRPs, they all go from
 * E310/E312: 76 dB
 * N320/N321: 60 dB
 
-You can also use the command :code:`uhd_usrp_probe` in a terminal and in the RX Frontend section it will mention the gain range.
+Vous pouvez également utiliser la commande :code:`uhd_usrp_probe` dans un terminal et dans la section RX Frontend il mentionnera la gamme de gain.
 
-When specifying the gain, you can use the normal set_rx_gain() function which takes in the gain value in dB, but you can also use set_normalized_rx_gain() which takes in a value from 0 to 1 and automatically converts it to the range of the USRP you're using.  This is convenient when making an app that supports different models of USRP.  The downside of using normalized gain is that you no longer have your units in dB, so if you want to increase your gain by 10 dB, for example, you now have to calculate the amount.
+Pour spécifier le gain, vous pouvez utiliser la fonction normale set_rx_gain() qui prend la valeur du gain en dB, mais vous pouvez aussi utiliser set_normalized_rx_gain() qui prend une valeur de 0 à 1 et la convertit automatiquement dans la gamme de l'USRP que vous utilisez.  Ceci est pratique lorsqu'on crée une application qui supporte différents modèles d'USRP.  L'inconvénient de l'utilisation du gain normalisé est que vous n'avez plus vos unités en dB, donc si vous voulez augmenter votre gain de 10dB, par exemple, vous devez maintenant calculer la quantité.
 
-Automatic Gain Control
+Contrôle automatique du gain
 ######################
 
-Some USRPs, including the B200 and E310 series, support automatic gain control (AGC) which will automatically adjust the receive gain in response to the received signal level, in an attempt to best "fill" the ADC's bits.  AGC can be turned on using:
+Certains USRP, y compris les séries B200 et E310, prennent en charge la commande automatique de gain (AGC pour *automatic gain controller*  en anglais) qui ajuste automatiquement le gain de réception en fonction du niveau du signal reçu, afin d'essayer de "remplir" au mieux les bits de l'ADC.  L'AGC peut être activé en utilisant :
 
 .. code-block:: python
 
- usrp.set_rx_agc(True, 0) # 0 for channel 0, i.e. the first channel of the USRP
+ usrp.set_rx_agc(True, 0) # 0 pour le canal 0, c'est-à-dire le premier canal de l'USRP
 
-If you have a USRP that does not implement an AGC, an exception will be thrown when running the line above.  With AGC on, setting the gain won't do anything. 
+Si vous avez une USRP qui n'implémente pas d'AGC, une exception sera levée lors de l'exécution de la ligne ci-dessus.  Avec l'AGC activé, le réglage du gain ne fera rien. 
 
-Stream Arguments
+Arguments relatifs aux flux
 ****************
 
-In the full example above you'll see the line :code:`st_args = uhd.usrp.StreamArgs("fc32", "sc16")`.  The first argument is the CPU data format, which is the data type of the samples once they are on your host computer.  UHD supports the following CPU data types when using the Python API:
+Dans l'exemple complet ci-dessus, vous verrez la ligne :code:`st_args = uhd.usrp.StreamArgs("fc32", "sc16")`.  Le premier argument est le format de données CPU, qui est le type de données des échantillons une fois qu'ils sont sur votre ordinateur hôte.  UHD supporte les types de données CPU suivants lors de l'utilisation de l'API Python :
 
 .. list-table::
    :widths: 15 20 30
@@ -192,37 +192,37 @@ In the full example above you'll see the line :code:`st_args = uhd.usrp.StreamAr
      - np.complex64
      - Complex-valued single-precision data
 
-You might see other options in documentation for the UHD C++ API, but these were never implemented within the Python API, at least at the time of this writing.
+Vous pouvez voir d'autres options dans la documentation de l'API UHD C++, mais elles n'ont jamais été implémentées dans l'API Python, du moins au moment de la rédaction de ce document.
 
-The second argument is the "over-the-wire" data format, i.e. the data type as the samples are sent over USB/Ethernet/SFP to the host.  For the Python API, the options are: "sc16", "sc12", and "sc8", with the 12 bit option only supported by certain USRPs.  This choice is important because the connection between the USRP and host computer is often the bottleneck, so by switching from 16 bits to 8 bits you might achieve a higher rate.  Also remember that many USRPs have ADCs limited to 12 or 14 bits, using "sc16" doesn't mean the ADC is 16 bits. 
+Le deuxième argument est le format de données "over-the-wire", c'est-à-dire le type de données lorsque les échantillons sont envoyés à l'hôte via USB/Ethernet/SFP.  Pour l'API Python, les options sont : "sc16", "sc12" et "sc8", l'option 12 bits n'étant prise en charge que par certains USRP.  Ce choix est important car la connexion entre l'USRP et l'ordinateur hôte est souvent le goulot d'étranglement, donc en passant de 16 bits à 8 bits, vous pouvez obtenir un taux plus élevé.  Rappelez-vous également que de nombreux USRP ont des ADC limités à 12 ou 14 bits, utiliser "sc16" ne signifie pas que l'ADC est de 16 bits. 
 
-For the channel portion of the :code:`st_args`, see the Subdevice and Channels subsection below.
+Pour la partie canal du :code:`st_args`, voir la sous-section Sous-dispositif and Channels ci-dessous.
 
 ************************
-Transmitting
+Transmettre
 ************************
 
-Similar to the recv_num_samps() convenience function, UHD provides the send_waveform() function to transmit a batch of samples, an example is shown below.  If you specify a duration (in seconds) longer than the provided signal, it will simply repeat it.  It helps to keep the values of samples between -1.0 and 1.0.
+Similaire à la fonction pratique recv_num_samps(), UHD fournit la fonction send_waveform() pour transmettre un lot d'échantillons, un exemple est montré ci-dessous.  Si vous spécifiez une durée (en secondes) plus longue que le signal fourni, il sera simplement répété.  Il est utile de garder les valeurs des échantillons entre -1.0 et 1.0.
 
 .. code-block:: python
 
  import uhd
  import numpy as np
  usrp = uhd.usrp.MultiUSRP()
- samples = 0.1*np.random.randn(10000) + 0.1j*np.random.randn(10000) # create random signal
- duration = 10 # seconds
+ samples = 0.1*np.random.randn(10000) + 0.1j*np.random.randn(10000) # créer un signal aléatoire
+ duration = 10 # secondes
  center_freq = 915e6
  sample_rate = 1e6
- gain = 20 # [dB] start low then work your way up
+ gain = 20 # [dB] Commencez doucement puis montez en grade
  usrp.send_waveform(samples, duration, center_freq, sample_rate, [0], gain)
 
-For details about how this convenience function works under the hood, see the source code `here <https://github.com/EttusResearch/uhd/blob/master/host/python/uhd/usrp/multi_usrp.py>`_. 
+Pour plus de détails sur la façon dont cette fonction pratique fonctionne sous le capot, voir le code source `ici <https://github.com/EttusResearch/uhd/blob/master/host/python/uhd/usrp/multi_usrp.py>`_. 
 
 
-Transmit Gain
+Gain d'émission
 #############
 
-Similar to the receive side, the transmit gain range varies based on USRP model, going from 0 dB to the specified number below:
+Comme pour la réception, la plage de gain d'émission varie en fonction du modèle USRP, allant de 0 dB au nombre spécifié ci-dessous :
 
 * B200/B210/B200-mini: 90 dB
 * N210 with WBX: 25 dB
@@ -230,74 +230,73 @@ Similar to the receive side, the transmit gain range varies based on USRP model,
 * E310/E312: 90 dB
 * N320/N321: 60 dB
 
-There is also a set_normalized_tx_gain() function if you would like to specify the transmit gain using the range 0 to 1. 
+Il existe également une fonction set_normalized_tx_gain() si vous souhaitez spécifier le gain d'émission en utilisant la plage 0 à 1. 
 
 ************************************************
-Transmitting and Receiving Simultaneously
+Transmettre et recevoir simultanément
 ************************************************
 
-If you want to transmit and receive using the same USRP at the same time, the key is to do it using multiple threads within the same process; the USRP can't span multiple processes.  For example, in the `txrx_loopback_to_file <https://github.com/EttusResearch/uhd/blob/master/host/examples/txrx_loopback_to_file.cpp>`_ C++ example a separate thread is created to run the transmitter, and the receiving is done in the main thread.  You can also just spawn two threads, one for transmit and one for receive, as is done in the `benchmark_rate <https://github.com/EttusResearch/uhd/blob/master/host/examples/python/benchmark_rate.py>`_ Python example.  A full example is not shown here, simply because it would be a fairly long example and Ettus' benchmark_rate.py can always act as a starting point for someone.
-
+Si vous voulez émettre et recevoir en utilisant la même USRP en même temps, la clé est de le faire en utilisant plusieurs threads dans le même processus ; l'USRP ne peut pas couvrir plusieurs processus.  Par exemple, dans l'exemple C++ `txrx_loopback_to_file <https://github.com/EttusResearch/uhd/blob/master/host/examples/txrx_loopback_to_file.cpp>`_ un thread séparé est créé pour exécuter l'émetteur, et la réception est faite dans le thread principal.  Vous pouvez aussi simplement créer deux threads, un pour l'émission et un pour la réception, comme cela est fait dans l'exemple Python `benchmark_rate <https://github.com/EttusResearch/uhd/blob/master/host/examples/python/benchmark_rate.py>`_.  Un exemple complet n'est pas montré ici, simplement parce que ce serait un exemple assez long et que le benchmark_rate.py d'Ettus peut toujours servir de point de départ à quelqu'un.
 
 *********************************
-Subdevice, Channels, and Antennas
+Sous-dispositif, canaux et antennes
 *********************************
 
-One common source of confusion when using USRPs is how to pick the right subdevice and channel ID.  You may have noticed in every example above we used channel 0, and did not specify anything related to subdev.  If you're using a B210 and just want to use RF:B instead of RF:A, all you have to do is choose channel 1 instead of 0.  But on USRPs like the X310 that have two daughterboard slots, you have to tell UHD whether you want to use slot A or B, and which channel on that daughterboard, for example:
+Une source fréquente de confusion lors de l'utilisation des USRP est de savoir comment choisir le bon ID de sous-dispositif et de canal.  Vous avez peut-être remarqué que dans tous les exemples ci-dessus, nous avons utilisé le canal 0, et n'avons rien spécifié concernant le subdev.  Si vous utilisez un B210 et que vous voulez juste utiliser RF:B au lieu de RF:A, tout ce que vous avez à faire est de choisir le canal 1 au lieu de 0. Mais sur les USRP comme le X310 qui ont deux slots pour carte fille, vous devez dire à UHD si vous voulez utiliser le slot A ou B, et quel canal sur cette carte fille, par exemple :
 
 .. code-block:: python
 
  usrp.set_rx_subdev_spec("B:0")
 
-If you want to use the TX/RX port instead of RX2 (the default), it's as simple as:
+Si vous voulez utiliser le port TX/RX au lieu de RX2 (par défaut), c'est aussi simple que cela :
 
 .. code-block:: python
 
- usrp.set_rx_antenna('TX/RX', 0) # set channel 0 to 'TX/RX'
+ usrp.set_rx_antenna('TX/RX', 0) # Réglez le canal 0 sur 'TX/RX'.
 
-which essentially just controls an RF switch onboard the USRP, to route from the other SMA connector.
+qui ne fait que contrôler un commutateur RF à bord de l'USRP, pour l'acheminer depuis l'autre connecteur SMA.
 
-To receive or transmit on two channels at once, instead of using :code:`st_args.channels = [0]` you provide a list, such as :code:`[0,1]`.  The receive samples buffer will have to be of size (2, N) in this case, instead of (1,N).  Just remember that with most USRPs, both channels share an LO, so you cant tune to different frequencies at once.
+Pour recevoir ou émettre sur deux canaux à la fois, au lieu d'utiliser :code:`st_args.channels = [0]` vous fournissez une liste, telle que :code:`[0,1]`.  Le tampon de réception des échantillons devra être de taille (2, N) dans ce cas, au lieu de (1,N).  Rappelez-vous qu'avec la plupart des USRP, les deux canaux partagent un LO, donc vous ne pouvez pas indiquer différentes fréquences en même temps.
 
 **************************
-Syncing to 10 MHz and PPS
+Synchronisation à 10 MHz et PPS
 **************************
 
-One of the huge advantages of using a USRP over other SDRs is their ability to synchronize to an external source or onboard `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_.  If you have connected an external 10 MHz and PPS source to your USRP, you will want to make sure to call these two lines after initializing your USRP:
+Un des énormes avantages de l'utilisation d'une USRP par rapport à d'autres SDR est leur capacité à se synchroniser à une source externe ou au `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_ embarqué.  Si vous avez connecté une source externe 10 MHz et PPS à votre USRP, vous voudrez vous assurer d'appeler ces deux lignes après avoir initialisé votre USRP :
 
 .. code-block:: python
 
  usrp.set_clock_source("external")
  usrp.set_time_source("external")
 
-If you are using an onboard GPSDO, you will instead use:
+Si vous utilisez un GPSDO embarqué, vous utiliserez plutôt :
 
 .. code-block:: python
 
  usrp.set_clock_source("gpsdo")
  usrp.set_time_source("gpsdo")
 
-On the frequency sync side there's not much else to do; the LO used in the USRP's mixer is now going to be tied to the external source or `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_.  But on the timing side, you may wish to command the USRP to start sampling exactly on the PPS, for example.  This can be done with the following code:
+Du côté de la synchronisation en fréquence, il n'y a pas grand chose d'autre à faire ; la LO utilisée dans le mélangeur de l'USRP va maintenant être liée à la source externe ou à `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_.  Mais du côté du timing, vous pouvez souhaiter commander à l'USRP de commencer à échantillonner exactement sur le PPS, par exemple.  Cela peut être fait avec le code suivant :
 
 .. code-block:: python
 
- # copy the receive example above, everything up until # Start Stream
+ # copier l'exemple de réception ci-dessus, tout jusqu'à # Start Stream
 
- # Wait for 1 PPS to happen, then set the time at next PPS to 0.0
+ # Attendez que 1 PPS se produise, puis réglez le temps au prochain PPS à 0.0
  time_at_last_pps = usrp.get_time_last_pps().get_real_secs()
  while time_at_last_pps == usrp.get_time_last_pps().get_real_secs():
-     time.sleep(0.1) # keep waiting till it happens- if this while loop never finishes then the PPS signal isn't there
+     time.sleep(0.1) # continuez à attendre jusqu'à ce que ça arrive - si cette boucle while ne se termine jamais alors le signal PPS n'est pas là.
  usrp.set_time_next_pps(uhd.libpyuhd.types.time_spec(0.0))
  
- # Schedule Rx of num_samps samples exactly 3 seconds from last PPS
+ # Planifie la réception des échantillons num_samps exactement 3 secondes après le dernier PPS.
  stream_cmd = uhd.types.StreamCMD(uhd.types.StreamMode.num_done)
  stream_cmd.num_samps = num_samps
  stream_cmd.stream_now = False
- stream_cmd.time_spec = uhd.libpyuhd.types.time_spec(3.0) # set start time (try tweaking this)
+ stream_cmd.time_spec = uhd.libpyuhd.types.time_spec(3.0) # définir l'heure de début (essayez de modifier cela)
  streamer.issue_stream_cmd(stream_cmd)
  
- # Receive Samples.  recv() will return zeros, then our samples, then more zeros, letting us know it's done
- waiting_to_start = True # keep track of where we are in the cycle (see above comment)
+ # Recevoir des échantillons. recv() retournera des zéros, puis nos échantillons, puis encore des zéros, pour nous dire que c'est terminé.
+ waiting_to_start = True # garder la trace de l'endroit où nous sommes dans le cycle (voir le commentaire ci-dessus)
  nsamps = 0
  i = 0
  samples = np.zeros(num_samps, dtype=np.complex64)
@@ -309,9 +308,9 @@ On the frequency sync side there's not much else to do; the LO used in the USRP'
          samples[i:i+nsamps] = recv_buffer[0][0:nsamps]
      i += nsamps
 
-If it seems like it's not working, but is not throwing any errors, try changing that 3.0 number from anything between 1.0 and 5.0.  You can also check the metadata after the call to recv(), simply check :code:`if metadata.error_code != uhd.types.RXMetadataErrorCode.none:`.  
-     
-For debugging sake, you can verify the 10 MHz signal is showing up to the USRP by checking the return of :code:`usrp.get_mboard_sensor("ref_locked", 0)`.  If the PPS signal isn't showing up, you'll know it because the first while loop in the code above will never finish.
+Si vous avez l'impression qu'il ne fonctionne pas, mais qu'il n'y a pas d'erreur, essayez de remplacer le chiffre 3.0 par un chiffre compris entre 1.0 et 5.0.  Vous pouvez également vérifier les métadonnées après l'appel à recv(), en vérifiant simplement :code:`if metadata.error_code != uhd.types.RXMetadataErrorCode.none:`. 
+
+Pour des raisons de débogage, vous pouvez vérifier que le signal 10MHz apparaît sur l'USRP en vérifiant le retour de :code:`usrp.get_mboard_sensor("ref_locked", 0)`.  Si le signal PPS n'apparaît pas, vous le saurez car la première boucle while du code ci-dessus ne se terminera jamais.
      
      
      

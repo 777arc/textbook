@@ -1,128 +1,131 @@
 .. _link-budgets-chapter:
 
 ##################
-Link Budgets
+Bilans de liaison
 ##################
 
-This chapter covers link budgets, a big portion of which is understanding transmit/receive power, path loss, antenna gain, noise, and SNR.  We finish by constructing an example link budget for ADS-B, which are signals transmitted by commercial aircraft to share their position and other information.  
+Ce chapitre couvre les bilans de liaison, dont une grande partie consiste à comprendre la puissance d'émission/réception, l'atténuation due au trajet, le gain d'antenne, le bruit et le rapport signal à bruit. Nous terminons par la construction d'un exemple de bilan de liaison pour l'ADS-B, qui sont des signaux transmis par les avions commerciaux pour partager entre autres leur position.
+
 
 *************************
 Introduction
 *************************
 
-A link budget is an accounting of all of the gains and losses from the transmitter to the receiver in a communication system.  Link budgets describe one direction of the wireless link.  Most communications systems are bidirectional, so there must be a separate uplink and downlink budget.  The "result" of the link budget will tell you roughly how much signal-to-noise ratio (abbreviated as SNR, which this textbook uses, or S/N) you should expect to have at your receiver.  Further analysis would be needed to check if that SNR is high enough for your application.
+Un bilan de liaison est une comptabilité de tous les gains et pertes de l'émetteur jusqu'au récepteur dans un système de communication.  Les bilans de liaison décrivent une direction de la liaison sans fil.  La plupart des systèmes de communication étant bidirectionnels, il doit y avoir un budget distinct pour la liaison montante et la liaison descendante.  Le "résultat" du bilan de liaison vous indique approximativement le rapport signal à bruit (abrégé RSB en français SNR pour "signal to noise ratio" en anglais) que vous devez vous attendre à avoir au niveau de votre récepteur.  Une analyse plus approfondie sera nécessaire pour vérifier si ce SNR est suffisamment élevé pour votre application.
 
-You study link budgets not for the purpose of being able to actually make a link budget for some situation, but to learn and develop a system-layer point of view of wireless communications.
 
-We will first cover the received signal power budget, then the noise power budget, and finally combine the two to find SNR (signal power divided by noise power).
+Nous étudions ici les bilans de liaison non pas dans le but d'être capable de réaliser un bilan de liaison pour une situation donnée, mais pour apprendre et développer une approche système des communications sans fil.
+
+Nous traiterons d'abord du bilan de puissance du signal reçu, puis du bilan de puissance du bruit, et enfin nous combinerons les deux pour trouver le SNR (puissance du signal divisée par la puissance du bruit).
 
 *************************
-Signal Power Budget
+bilan de puissance du signal
 *************************
 
-Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the *transmit* power; it is usually a setting in the transmitter.  How do we figure out the *received* power at the receiver?
+La figure ci-dessous montre le schéma le plus élémentaire d'une liaison sans fil générique.  Dans ce chapitre, nous nous concentrerons sur une direction, c'est-à-dire d'un émetteur (Tx) à un récepteur (Rx).  Pour un système donné, nous connaissons la puissance *d'émission* ; il s'agit généralement d'un paramètre de l'émetteur.  Comment déterminer la puissance *reçue* au niveau du récepteur ?
 
 .. image:: ../_images/tx_rx_system.svg
    :align: center 
    :target: ../_images/tx_rx_system.svg
 
-We need four system parameters to determine the received power, which are provided below with their common abbreviations. This chapter will delve into each of them.
+Nous avons besoin de quatre paramètres système pour déterminer la puissance reçue, qui sont indiqués ci-dessous avec leurs abréviations courantes. Ce chapitre examinera en détail chacun d'entre eux.
 
-- **Pt** - Transmit power
-- **Gt** - Gain of transmit antenna
-- **Gr** - Gain of receive antenna
-- **Lp** - Distance between Tx and Rx (i.e., how much wireless path loss)
+- **Pt** - puissance d'émission
+- **Gt** - Gain d'antenne d'émission
+- **Gr** - Gain d'antenne de réception
+- **Lp** - Distance entre la Tx et la Rx (c.-à-d., combien de perte dû au chemin sans fil)
 
 .. image:: ../_images/tx_rx_system_params.svg
    :align: center 
    :target: ../_images/tx_rx_system_params.svg
 
-Transmit Power
+Puissance d'émission :math:`P_{t}`
 #####################
 
-Transmit power is fairly straightforward; it will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  An analogy for transmit power would be the watt rating (power) of a light bulb: the higher the wattage, the more light transmitted by the bulb.  Here are examples of approximate transmit power for different technologies:
+La puissance d'émission est assez simple; il s'agit d'une valeur en watts, dBW ou dBm (rappelons que dBm est l'abréviation de dBmW).  Chaque émetteur possède un ou plusieurs amplificateurs, et la puissance d'émission est principalement fonction de ces amplificateurs.  Une analogie pour la puissance d'émission serait la puissance d'une ampoule électrique: plus cette puissace est élevée, plus l'ampoule transmet de lumière.  Voici des exemples de puissance d'émission approximative pour différentes technologies :
 
 ==================  =====  =======
 \                       Power    
 ------------------  --------------
 Bluetooth           10 mW  -20 dBW   
 WiFi                100mW  -10 dBW
-LTE base-station    1W     0 dBW
-FM station          10kW   40 dBW
+Station de base LTE 1W     0 dBW
+Station FM          10kW   40 dBW
 ==================  =====  =======
 
-Antenna Gains
+Gains d'antenne :math:`G_{t}` et :math:`G_{r}`
 #####################
 
-Transmit and receive antenna gains are crucial for calculating link budgets. What is the antenna gain, you might ask?  It indicates the directivity of the antenna.  You might see it referred to as antenna power gain, but don't let that mislead you, the only way for an antenna to have a higher gain is to direct energy in a more focused region.
+Les gains d'antenne d'émission et de réception sont cruciaux pour le calcul des bilans de liaison. Qu'est-ce que le gain d'antenne, me direz-vous?  Il indique la directivité de l'antenne.  Vous pouvez y faire référence en tant que gain de puissance de l'antenne, mais ne vous y trompez pas, la seule façon pour une antenne d'avoir un gain plus élevé est de diriger l'énergie dans une région plus ciblée.
 
-Gains will be depicted in dB (unit-less); feel free to learn or remind yourself why dB is unit-less for our scenario in the :ref:`noise-chapter` chapter.  Typically, antennas are either omnidirectional, meaning their power radiates in all directions, or directional, meaning their power radiates in a specific direction.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna will have a higher gain, usually 5 dB or higher, and anywhere up to 60 dB or so.
+Les gains seront représentés en dB (sans unité) ; n'hésitez pas à apprendre ou à vous rappeler pourquoi le dB est sans unité pour notre scénario dans le chapitre :ref:`noise-chapter`.  Généralement, les antennes sont soit omnidirectionnelles, ce qui signifie que leur puissance rayonne dans toutes les directions, soit directionnelles, ce qui signifie que leur puissance rayonne dans une direction spécifique.  Si elles sont omnidirectionnelles, leur gain sera de 0 dB à 3 dB.  Une antenne directionnelle aura un gain plus élevé, généralement 5 dB ou plus, et jusqu'à 60 dB environ.
 
 .. image:: ../_images/antenna_gain_patterns.png
    :scale: 80 % 
    :align: center 
 
-When a directional antenna is used, it must be either installed facing the correct direction or attached to a mechanical gimbal. It could also be a phased array, which can be electronically steered (i.e., by software).
+Lorsqu'une antenne directionnelle est utilisée, elle doit être soit installée dans la bonne direction, soit fixée à un cardan mécanique. Il peut également s'agir d'un réseau phasé, qui peut être piloté électroniquement (c'est-à-dire par un logiciel).
 
 .. image:: ../_images/antenna_steering.png
    :scale: 80 % 
    :align: center 
    
-Omnidirectional antennas are used when pointing in the right direction is not possible, like your cellphone and laptop.  In 5G, phones can operate in the higher frequency bands like 28 GHz (Verizon) and 39 GHz (AT&T) using an array of antennas and electronic beam steering.
+Les antennes omnidirectionnelles sont utilisées lorsque pointer dans la bonne direction n'est pas possible, comme votre téléphone cellulaire ou votre ordinateur portable.  Dans la 5G, les téléphones peuvent fonctionner dans les bandes de fréquences plus élevées, comme les 28 GHz (Verizon) et les 39 GHz (AT&T), à l'aide d'un réseau d'antennes et d'une orientation électronique du faisceau.
 
-In a link budget, we must assume that any directional antenna, whether transmit or receive, is pointed in the right direction.  If it's not pointed correctly then our link budget won't be accurate and there could be loss of communication, (e.g., the satellite dish on your roof gets hit by basketball and moves).  In general, our link budgets assume ideal circumstances while adding a miscellaneous loss to account for real-world factors.
+Dans un bilan de liaison, nous devons supposer que toute antenne directionnelle, qu'elle émette ou reçoive, est pointée dans la bonne direction.  Si elle n'est pas pointée correctement, notre budget de liaison ne sera pas précis et il pourrait y avoir une perte de communication (par exemple, l'antenne satellite sur votre toit est frappée par un ballon de basket et se déplace).  En général, nos budgets de liaison supposent des circonstances idéales tout en ajoutant une perte diverse pour tenir compte des facteurs du monde réel.
 
-Path Loss
+Perte due à la distance entre la Tx et la Rx :math:`L_{p}`
 #####################
 
-As a signal moves through the air (or vacuum), it reduces in strength.  Imagine holding a small solar panel in front of a light bulb.  The further away the solar panel is, the less energy it will absorb from the light bulb.  **Flux** is a term in physics and mathematics, defined as "how much stuff goes through your thing".  For us, it's the amount of electromagnetic field passing into our receive antenna.  We want to know how much power is lost, for a given distance.
+Lorsqu'un signal se déplace dans l'air (ou le vide), sa force diminue.  Imaginez que vous tenez un petit panneau solaire devant une ampoule électrique.  Plus le panneau solaire est éloigné, moins l'ampoule absorbera d'énergie.  **Le flux** est un terme de physique et de mathématiques, défini comme "la quantité de matière qui passe à travers votre objet".  Pour nous, c'est la quantité de champ électromagnétique qui passe dans notre antenne de réception.  Nous voulons savoir combien de puissance est perdue, pour une distance donnée.
 
 .. image:: ../_images/flux.png
    :scale: 80 % 
    :align: center 
 
-Free Space Path Loss (FSPL) tells us the path loss when there are no obstacles for a given distance.  In its general form, :math:`\mathrm{FSPL} = ( 4\pi d / \lambda )^2`. Google Friis transmission formula for more info.  (Fun fact: signals encounter 377 ohms impedance moving through free space.)  For generating link budgets, we can use this same equation but converted to dB:
+L'affaiblissement de trajectoire en espace libre (FSPL pour "Free Space Path Loss" en anglais) nous indique l'affaiblissement de trajectoire lorsqu'il n'y a pas d'obstacles pour une distance donnée.  Sous sa forme générale, :math:`\mathrm{FSPL} = ( 4\pi d / \lambda )^2`. Cherchez sur google la formule de transmission de Friis pour plus d'informations.  (Fait amusant : les signaux rencontrent une impédance de 377 ohms en se déplaçant dans l'espace libre.) Pour générer des budgets de liaison, nous pouvons utiliser cette même équation mais convertie en dB:
 
 .. math::
  \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ dB \right]
 
-In link budgets it will show up in dB, unit-less because it is a loss.  :math:`d` is in meters and is the distance between the transmitter and receiver.  :math:`f` is in Hz and is the carrier frequency.  There's only one problem with this simple equation; we won't always have free space between the transmitter and receiver.  Frequencies bounce a lot indoors (most frequencies can go through walls, just not metal or thick masonry). For these situations there are various non-free-space models. A common one for cities and suburban areas (e.g., cellular) is the Okumura–Hata model:
+Dans les bilans de liaison, elle sera exprimée en dB, sans unité car il s'agit d'une perte. :math:`d` est en mètres et représente la distance entre l'émetteur et le récepteur. :math:`f` est en Hz et représente la fréquence porteuse.  Il n'y a qu'un seul problème avec cette équation simple: nous n'aurons pas toujours un espace libre entre l'émetteur et le récepteur.  Les fréquences rebondissent beaucoup à l'intérieur (la plupart des fréquences peuvent traverser les murs, mais pas le métal ou la maçonnerie épaisse). Dans ces situations, il existe différents modèles de non-espace libre. Un modèle courant pour les villes et les banlieues (par exemple, pour les téléphones portables) est le modèle d'Okumura-Hata :
 
 .. math::
  L_{path} = 69.55 + 26.16 \log_{10} f - 13.82 \log_{10} h_B - C_H + \left[ 44.9 - 6.55 \log_{10} h_B \right] \log_{10} d
 
-where :math:`L_{path}` is the path loss in dB, :math:`h_B` is the height of the transmit antenna above ground level in meters, :math:`f` is the carrier frequency in MHz, :math:`d` is the distance between Tx and Rx in km, and :math:`C_H` is called the "antenna high correction factor" and is defined based on the size of city and carrier frequency range:
 
-:math:`C_H` for small/medium cities:
+où :math:`L_{path}` est l'affaiblissement sur le trajet en dB, :math:`h_B` est la hauteur de l'antenne d'émission au-dessus du sol en mètres, :math:`f` est la fréquence porteuse en MHz, :math:`d` est la distance entre Tx et Rx en km, et :math:`C_H` est appelé le "facteur de correction de la hauteur de l'antenne" et est défini en fonction de la taille de la ville et de la gamme de fréquences porteuses :
+
+:math:`C_H` pour les petites/moyennes villes:
 
 .. math::
  C_H = 0.8 + (1.1 \log_{10} f - 0.7 ) h_M - 1.56 \log_{10} f
 
-:math:`C_H` for large cities when :math:`f` is below 200 MHz:
+:math:`C_H` pour les grandes villes quand :math:`f` est en dessous de 200 MHz:
 
 .. math::
  C_H = 8.29 ( log_{10}(1.54 h_M))^2 - 1.1
  
-:math:`C_H` for large cities when :math:`f` is above 200 MHz but less than 1.5 GHz:
+:math:`C_H` pour les grandes villes quand :math:`f` est entre 200 MHz et 1.5 GHz:
 
 .. math::
  C_H = 3.2 ( log_{10}(11.75 h_M))^2 - 4.97
 
-where :math:`h_M` is the height of the receiving antenna above ground level in meters.
+où :math:`h_M` est la hauteur de l'antenne de réception au-dessus du sol, en mètres.
 
-Don't worry if the above Okumura–Hata model seemed confusing; it is mainly shown here to demonstrate how non-free-space path loss models are much more complicated than our simple FSPL equation.  The final result of any of these models is a single number we can use for the path loss portion of our link budget.  We'll stick to using FSPL for the rest of this chapter.
+Ne vous inquiétez pas si le modèle Okumura-Hata ci-dessus vous a semblé confus; il est principalement présenté ici pour démontrer comment les modèles de perte de chemin hors espace libre sont beaucoup plus compliqués que notre simple équation en FSPL.  Le résultat final de n'importe lequel de ces modèles est un nombre unique que nous pouvons utiliser pour la partie perte de chemin de notre budget de liaison.  Nous nous en tiendrons à l'équation FSPL pour le reste de ce chapitre.
 
-Miscellaneous Losses
+Pertes diverses :math:`L_{misc}`
 #####################
 
-In our link budget we also want to take into account miscellaneous losses.  We will lump these together into one term, usually somewhere between 1 – 3 dB.  Examples of miscellaneous losses:
+Dans notre budget de liaison, nous voulons également prendre en compte les pertes diverses.  Nous les regrouperons en un seul terme, généralement entre 1 et 3 dB.  Exemples de pertes diverses :
 
-- Cable loss
-- Atmospheric Loss
-- Antenna pointing imperfections
-- Precipitation
+- Perte de câble
+- Perte atmosphérique
+- Imperfections de pointage de l'antenne
+- Précipitations
 
-The plot below shows atmospheric loss in dB/km over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis, you'll see that short range communications below 40 GHz **and** less than 1 km have 1 dB or less of atmospheric loss, and thus we generally ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the atmosphere. 
+Le graphique ci-dessous montre la perte atmosphérique en dB/km en fonction de la fréquence (nous serons généralement < 40 GHz).  Si vous prenez le temps de comprendre l'axe des y, vous verrez que les communications à courte portée inférieures à 40 GHz **et** inférieures à 1 km présentent une perte atmosphérique de 1 dB ou moins, et que nous l'ignorons donc généralement.  Lorsque la perte atmosphérique entre vraiment en jeu, c'est dans le cas des communications par satellite, où le signal doit parcourir plusieurs kilomètres à travers l'atmosphère. 
 
 .. image:: ../_images/atmospheric_attenuation.svg
    :align: center 
@@ -131,12 +134,12 @@ The plot below shows atmospheric loss in dB/km over frequency (we will usually b
 Signal Power Equation
 #####################
 
-Now it's time to put all of these gains and losses together to calculate our signal power at the receiver, :math:`P_r`:
+Il est maintenant temps d'assembler tous ces gains et pertes pour calculer la puissance de notre signal au niveau du récepteur, :math:`P_r` :
 
 .. math::
  P_r = P_t + G_t + G_r - L_p - L_{misc} \quad \mathrm{dBW}
 
-Overall it's an easy equation. We add up the gains and losses. Some might not even consider it an equation at all.  We usually show the gains, losses, and total in a table, similar to accounting, like this:
+Globalement, c'est une équation facile. On additionne les gains et les pertes. Certains pourraient même ne pas considérer cela comme une équation du tout.  Nous montrons généralement les gains, les pertes et le total dans un tableau, comme en comptabilité, comme ceci :
 
 .. list-table::
    :widths: 15 10
@@ -157,61 +160,61 @@ Overall it's an easy equation. We add up the gains and losses. Some might not ev
 
 
 *************************
-Noise Power Budget
+Bilan de puissance du bruit
 *************************
 
-Now that we know the received signal power, let's change topic to received noise, since we need both to calculate SNR after all.  We can find received noise with a similar style power budget.
+Maintenant que nous connaissons la puissance du signal reçu, changeons de sujet pour parler du bruit reçu, puisque nous avons besoin des deux pour calculer le SNR.  Nous pouvons trouver le bruit reçu avec un bilan de puissance de style similaire.
 
-Now is a good time to talk about where noise enters our comms link.  Answer: **At the receiver!**  The signal is not corrupted with noise until we go to receive it.  It is *extremely* important to understand this fact! Many students don't quite internalize it, and they end up making a foolish error as a result.  There is not noise floating around us in the air. The noise comes from the fact that our receiver has an amplifier and other electronics that are not perfect and not at 0 degrees Kelvin (K).
+C'est le bon moment pour parler de l'endroit où le bruit entre dans notre liaison de communication.  Réponse : **Au niveau du récepteur!**.  Le signal n'est pas corrompu par le bruit jusqu'à ce que nous allions le recevoir.  Il est *extrêmement* important de comprendre ce fait! De nombreux étudiants ne l'intériorisent pas vraiment et finissent par commettre une erreur stupide.  Il n'y a pas de bruit qui flotte dans l'air autour de nous. Le bruit vient du fait que notre récepteur possède un amplificateur et d'autres composants électroniques qui ne sont pas parfaits et ne sont pas à 0 degré Kelvin (K).
 
-A popular and simple formulation for the noise budget uses the "kTB" approach:
+Une formulation populaire et simple pour le bilan de bruit utilise l'approche "kTB" :
 
 .. math::
- P_{noise} = kTB
+ P_{bruit} = kTB
 
-- :math:`k` – Boltzmann’s constant = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**.  For anyone curious, Boltzmann’s constant is a physical constant relating the average kinetic energy of particles in a gas with the temperature of the gas.
-- :math:`T` – System noise temperature in K (cryocoolers anyone?), largely based on our amplifier.  This is the term that is most difficult to find, and is usually very approximate.  You might pay more for an amplifier with a lower noise temperature. 
-- :math:`B` – Signal bandwidth in Hz, assuming you filter out the noise around your signal.  So an LTE downlink signal that is 10 MHz wide will have :math:`B` set to 10 MHz, or 70 dBHz.
+- :math:`k` - Constante de Boltzmann = 1,38 x 10-23 J/K = **-228,6 dBW/K/Hz**.  Pour les curieux, la constante de Boltzmann est une constante physique qui relie l'énergie cinétique moyenne des particules dans un gaz à la température du gaz.
+- :math:`T` - Température de bruit du système en K, largement basée sur notre amplificateur.  C'est le terme le plus difficile à trouver, et il est généralement très approximatif.  Vous payez en général plus pour un amplificateur avec une température de bruit plus basse. 
+- :math:`B` - Largeur de bande du signal en Hz, en supposant que vous filtrez le bruit autour de votre signal.  Ainsi, un signal de liaison descendante LTE d'une largeur de 10 MHz aura :math:`B` réglé sur 10 MHz, soit 70 dBHz.
 
-Multiplying out (or adding in dB) kTB gives our noise power, i.e., the bottom term of of our SNR equation.
+En multipliant (ou en ajoutant en dB) par kTB, on obtient la puissance du bruit, c'est-à-dire le dernier terme de notre équation SNR.
 
 *************************
 SNR
 *************************
 
-Now that we have both numbers, we can take the ratio to find SNR, (see the :ref:`noise-chapter` chapter for more information about SNR):
+Maintenant que nous avons les deux nombres, nous pouvons prendre le rapport pour trouver le SNR, (voir le chapitre :ref:`noise-chapter` pour plus d'informations sur le SNR):
 
 .. math::
-   \mathrm{SNR} = \frac{P_{signal}}{P_{noise}}
+   \mathrm{SNR} = \frac{P_{signal}}{P_{bruit}}
 
 .. math::
-   \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{noise\_dB}
+   \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{bruit\_dB}
 
-We typically shoot for an SNR > 10 dB, although it really depends on the application.  In practice, SNR can be verified by looking at the FFT of the received signal or by calculating the power with and without the signal present (recall variance = power).  The higher the SNR, the more bits per symbol you can manage without too many errors.
+Nous visons généralement un SNR > 10 dB, bien que cela dépende vraiment de l'application.  En pratique, le SNR peut être vérifié en regardant la FFT du signal reçu ou en calculant la puissance avec et sans le signal présent (rappelons que variance = puissance).  Plus le SNR est élevé, plus vous pouvez gérer de bits par symbole sans trop d'erreurs.
 
 ***************************
-Example Link Budget: ADS-B
+Exemple de bilan de liaison: ADS-B
 ***************************
 
-Automatic Dependent Surveillance-Broadcast (ADS-B) is a technology used by aircraft to broadcast signals that share their position and other status with air traffic control ground stations and other aircraft.  ADS–B is automatic in that it requires no pilot or external input; it depends on data from the aircraft's navigation system and other computers.  The messages are not encrypted (yay!).  ADS–B equipment is currently mandatory in portions of Australian airspace, while the United States requires some aircraft to be equipped, depending on the size.
+L'ADS-B (Automatic Dependent Surveillance-Broadcast) est une technologie utilisée par les avions pour diffuser des signaux qui permettent de partager leur position et d'autres informations avec les stations au sol de contrôle du trafic aérien et d'autres avions.  L'ADS-B est automatique en ce sens qu'il ne nécessite aucune intervention du pilote ou d'un tiers; il dépend des données du système de navigation de l'avion et d'autres calculateurs.  Les messages ne sont pas cryptés (youpi !).  L'équipement ADS-B est actuellement obligatoire dans certaines parties de l'espace aérien australien, tandis que les États-Unis exigent que certains avions soient équipés, en fonction de leur taille.
 
 .. image:: ../_images/adsb.jpg
    :scale: 120 % 
    :align: center 
    
-The Physical (PHY) Layer of ADS-B has the following characteristics:
+La couche physique (PHY) de l'ADS-B présente les caractéristiques suivantes :
 
-- Transmitted on 1,090 MHz
-- Signal has 50 kHz of bandwidth (which is very small)
-- PPM modulation
-- Messages carry 15 bytes of data each, so multiple messages are usually needed
-- Multiple access is achieved by having messages broadcast with a period that ranges randomly between 0.4 and 0.6 seconds.  This randomization is designed to prevent aircraft from having all of their transmissions on top of each other (some may still collide but that’s fine)
-- ADS-B antennas are vertically polarized
-- Transmit power varies, but should be in the ballpark of 100 W (20 dBW)
-- Transmit antenna gain is omnidirectional but only pointed downward, so let's say 3 dB
-- ADS-B receivers also have an omnidirectional antenna gain, so let's say 0 dB
+- Transmis sur 1 090 MHz
+- Le signal a une largeur de bande de 50 kHz (ce qui est très faible).
+- Modulation PPM
+- Les messages contiennent 15 octets de données chacun, ce qui nécessite généralement plusieurs messages.
+- L'accès multiple est obtenu en diffusant des messages dont la période varie aléatoirement entre 0.4 et 0.6 seconde.  Cette randomisation est conçue pour empêcher les aéronefs d'avoir toutes leurs transmissions les unes au-dessus des autres (certaines peuvent encore entrer en collision, mais ce n'est pas grave).
+- Les antennes ADS-B sont polarisées verticalement.
+- La puissance d'émission varie, mais devrait être de l'ordre de 100 W (20 dBW).
+- Le gain de l'antenne d'émission est omnidirectionnel mais seulement dirigé vers le bas, disons 3 dB.
+- Les récepteurs ADS-B ont également un gain d'antenne omnidirectionnel, disons 0 dB.
 
-The path loss depends on how far away the aircraft is from our receiver.  As an example, it's about 30 km between the University of Maryland (where the course that this textbook's content originated from was taught) and the BWI airport.  Let's calculate FSPL for that distance and a frequency of 1,090 MHz:
+L'affaiblissement dû au trajet dépend de la distance entre l'avion et notre récepteur.  À titre d'exemple, il y a environ 30 km entre l'Université du Maryland (où le cours dont est issu le contenu de ce manuel a été enseigné) et l'aéroport BWI.  Calculons le FSPL pour cette distance avec une fréquence de 1 090 MHz :
 
 .. math::
     \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55  \left[ \mathrm{dB} \right]
@@ -220,9 +223,9 @@ The path loss depends on how far away the aircraft is from our receiver.  As an 
 
     \mathrm{FSPL}_{dB} = 122.7 \left[ \mathrm{dB} \right]
 
-Another option is to leave :math:`d` as a variable in the link budget and figure out how far away we can hear signals based on a required SNR. 
+Une autre option est de laisser :math:`d` comme variable dans le budget de liaison et de déterminer à quelle distance nous pouvons entendre les signaux en fonction d'un SNR requis. 
 
-Now because we definitely won't have free space, let's add another 3 dB of miscellaneous loss.  We will make the miscellaneous loss 6 dB total, to take into account our antenna not being well matched and cable/connector losses.  Given all of this criteria, our signal link budget looks like:
+Maintenant, comme nous n'aurons certainement pas d'espace libre, ajoutons encore 3 dB de pertes diverses.  Nous ferons un total de 6 dB de pertes diverses, pour prendre en compte le fait que notre antenne n'est pas bien adaptée en plus des pertes de câbles/connecteurs.  Compte tenu de tous ces critères, notre bilan de liaison de signal ressemble à ceci :
 
 .. list-table::
    :widths: 15 10
@@ -241,18 +244,18 @@ Now because we definitely won't have free space, let's add another 3 dB of misce
    * - **Pr**
      - **-105.7 dBW**
 
-For our noise budget:
+Pour le bilan du bruit:
 
 - B = 50 kHz = 50e3 = 47 dBHz
-- T we have to approximate, let's say 300 K, which is 24.8 dBK.  It will vary based on quality of the receiver
-- k is always -228.6 dBW/K/Hz 
+- T nous devons faire une approximation, disons 300 K, ce qui correspond à 24,8 dBK.  Elle varie en fonction de la qualité du récepteur
+- k est toujours -228,6 dBW/K/Hz 
 
 .. math::
- P_{noise} = k + T + B = -156.8 \quad \mathrm{dBW}
+ P_{bruit} = k + T + B = -156.8 \quad \mathrm{dBW}
  
-Therefore our SNR is -105.7 - (-156.8) = **51.1 dB**.  It's not surprising it is a huge number, considering we are claiming to only be 30 km from the aircraft under free space.  If ADS-B signals couldn't reach 30 km then ADS-B wouldn't be a very effective system--no one would hear each other until they were very close.  Under this example we can easily decode the signals; pulse-position modulation (PPM) is fairly robust and does not require that high an SNR.  What's difficult is when you try to receive ADS-B while inside a classroom, with an antenna that is very poorly matched, and a strong FM radio station nearby causing interference.  Those factors could easily lead to 20-30 dB of losses.
+Par conséquent, notre SNR est de -105,7 - (-156,8) = **51,1 dB**.  Il n'est pas surprenant que ce soit un chiffre énorme, étant donné que nous prétendons être seulement à 30 km de l'avion en espace libre.  Si les signaux ADS-B ne pouvaient pas atteindre 30 km, alors l'ADS-B ne serait pas un système très efficace - personne ne s'entendrait avant d'être très proche.  Dans cet exemple, nous pouvons facilement décoder les signaux; la modulation par impulsions et positions (PPM) est assez robuste et ne nécessite pas un SNR aussi élevé.  Ce qui est difficile, c'est d'essayer de recevoir l'ADS-B à l'intérieur d'une salle de classe, avec une antenne très mal adaptée et une forte station de radio FM à proximité qui cause des interférences.  Ces facteurs peuvent facilement entraîner des pertes de 20 à 30 dB.
 
-This example was really just a back-of-the-envelope calculation, but it demonstrated the basics of creating a link budget and understanding the important parameters of a comms link. 
+Cet exemple n'était en fait qu'un calcul à l'aveuglette, mais il a permis de démontrer les bases de la création d'un bilan de liaisons et de comprendre les paramètres importants d'un lien de communication. 
 
 
 
