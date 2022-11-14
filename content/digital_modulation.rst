@@ -255,10 +255,10 @@ In many wireless (and wired) communications protocols you are likely to run into
 
 In its most basic form, which is what is used for BPSK, differential coding involves transmitting a 0 when the input bit is the same as the previous output bit, and transmitting a 1 when they differ.  So we still transmit the same number of bits (except one extra bit is needed at the beginning to start the output sequence), but now we don't have to worry about the 180 degree phase ambiguity.  To demonstrate how this works, consider transmitting the bit sequence [1, 1, 0, 0, 0, 1, 0] using BPSK.  Assume we start the output sequence with 1; it actually doesn't matter whether you use 1 or 0.  After applying differential coding, we would ultimately transmit [1, 0, 1, 1, 1, 1, 0, 0].  The 1's and 0's are still mapped to the positive and negative symbols we discussed earlier.  It might be easier to visualize the input and output sequences stacked like this:
 
-.. code-block:: python
+.. image:: ../_images/differential_coding.svg
+   :align: center
+   :target: ../_images/differential_coding.svg
 
-   [1,  1,  0,  0,  0,  1,  0]    # before differential coding (original data)
- [1,  0,  1,  1,  1,  1,  0,  0]  # after differential coding (what we transmit)
 
 The big downside to using differential coding is that if you have a bit error, it will lead to two bit errors.  The alternative to using differential coding for BPSK is to add pilot symbols periodically, which are symbols already known by the receiver, and it can use the known values to not only figure out which cluster is 1 and which is 0, but also reverse multipath caused by the channel.  One problem with pilot symbols is that the wireless channel can change very quickly, on the order of tens or hundreds of symbols if it's a moving receiver and/or transmitter, so you would need pilot symbols often enough to reflect the changing channel.  So if a wireless protocol is putting high emphasis on reducing the complexity of the receiver, such as RDS which we study in the :ref:`rds-chapter` chapter, it may choose to use differential coding.
 
