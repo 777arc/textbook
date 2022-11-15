@@ -113,7 +113,7 @@ Acquisition d'un signal
  sample_rate = 250e3
  center_freq = 99.5e6
 
-Nous avons lu notre enregistrement de test, qui a été échantillonné à 250 kHz et centré sur une station FM reçue à un SNR élevé.  Veillez à mettre à jour le chemin du fichier pour refléter votre système et l'endroit où vous avez sauvegardé l'enregistrement.  Si vous avez un SDR déjà configuré et fonctionnant depuis Python, n'hésitez pas à recevoir un signal en direct, bien qu'il soit utile d'avoir d'abord testé l'ensemble du code avec un `enregistrement de QI connu pour fonctionner<https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Tout au long de ce code, nous utiliserons :code:`x` pour stocker le signal à manipuler. 
+Nous avons lu notre enregistrement de test, qui a été échantillonné à 250 kHz et centré sur une station FM reçue à un SNR élevé.  Veillez à mettre à jour le chemin du fichier pour refléter votre système et l'endroit où vous avez sauvegardé l'enregistrement.  Si vous avez un SDR déjà configuré et fonctionnant depuis Python, n'hésitez pas à recevoir un signal en direct, bien qu'il soit utile d'avoir d'abord testé l'ensemble du code avec un `enregistrement de QI connu pour fonctionner <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Tout au long de ce code, nous utiliserons :code:`x` pour stocker le signal à manipuler. 
 
 ********************************
 Démodulation FM
