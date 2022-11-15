@@ -317,10 +317,10 @@ Dans le chapitre précédent, nous avons appris que nous pouvions convertir un s
 
 Mais pour trouver réellement la PSD d'un lot d'échantillons et la tracer, nous ne nous contentons pas d'effectuer une FFT. Nous devons effectuer les six opérations suivantes:
 
-1. Prenez la FFT de nos échantillons.  Si nous avons x échantillons, la taille de la FFT sera la longueur de x par défaut. Utilisons les 1024 premiers échantillons comme exemple pour créer une FFT de taille 1024. La sortie sera de 1024 flottants complexes.
-2. Prenez le module de la sortie de la FFT, ce qui nous donne 1024 flottants réels.
-3. Normalisez: divisez par la taille de la FFT (:math:`N`, ou 1024 dans ce cas).
-4. Elevez au carré le module résultante pour obtenir la puissance.
+1. Prenez la FFT de nos échantillons.  Si nous avons x échantillons, la taille de la FFT sera la longueur de x par défaut. Utilisons les 1024 premiers échantillons comme exemple pour créer une FFT de taille 1024.  La sortie sera de 1024 flottants complexes.
+2. Prenez la magnitude de la sortie de la FFT, ce qui nous donne 1024 flottants réels.
+3. Élevez au carré la magnitude résultante pour obtenir la puissance.
+4. Normaliser: diviser par la taille de la FFT (:math:`N`) et le taux d'échantillonnage (:math:`Fs`).
 5. Convertissez en dB en utilisant :math:`10 \log_{10}()` ; nous considérons toujours les PSD en échelle logarithmique.
 6. Effectuez un décalage FFT, abordé dans le chapitre précédent, pour déplacer " 0 Hz " au centre et les fréquences négatives à gauche du centre.
 
@@ -332,7 +332,7 @@ Ces six étapes en Python sont:
  # supposez que x contient votre tableau d'échantillons de QI
  N = 1024
  x = x[0:N] # nous ne prendrons que la FFT des 1024 premiers échantillons, voir le texte ci-dessous
- PSD = (np.abs(np.fft.fft(x))/N)**2
+ PSD = np.abs(np.fft.fft(x))**2 / (N*Fs)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
@@ -346,7 +346,7 @@ En option, nous pouvons appliquer une fenêtre, comme nous l'avons appris dans l
 Pour tracer cette PSD, nous devons connaître les valeurs de l'axe des abscisses.
 Comme nous l'avons appris au chapitre précédent, lorsque nous échantillonnons un signal, nous ne "voyons" que le spectre compris entre -Fs/2 et Fs/2, Fs étant notre fréquence d'échantillonnage.
 La résolution que nous obtenons dans le domaine fréquentiel dépend de la taille de notre FFT, qui par défaut est égale au nombre d'échantillons sur lesquels nous effectuons l'opération de FFT.
-Dans ce cas, notre axe des x est constitué de 1024 points équidistants entre -0,5 MHz et 0,5 MHz.
+Dans ce cas, notre axe x est constitué de 1024 points équidistants entre -0.5 MHz et 0.5 MHz.
 Si nous avions réglé notre SDR sur 2.4 GHz, notre fenêtre d'observation serait comprise entre 2.3995 GHz et 2.4005 GHz.
 En Python, le déplacement de la fenêtre d'observation ressemblera à ceci :
 
@@ -382,7 +382,7 @@ Voici un exemple de code complet qui inclut la génération d'un signal (exponen
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
- PSD = (np.abs(np.fft.fft(r))/N)**2
+ PSD = np.abs(np.fft.fft(r))**2 / (N*Fs)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
