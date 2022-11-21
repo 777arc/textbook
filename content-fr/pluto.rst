@@ -10,10 +10,9 @@ PlutoSDR en Python
    
 Dans ce chapitre, nous apprenons à utiliser l'API Python pour le `PlutoSDR <https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`_, qui est une radio SDR à faible coût d'Analog Devices.  Nous couvrirons les étapes d'installation du PlutoSDR afin de faire fonctionner les pilotes et le logiciel, puis nous discuterons de la transmission et de la réception avec le PlutoSDR en Python.
 
-
-*************************************************
+************************************************
 Installation de logiciels/pilotes
-*************************************************
+************************************************
 
 Configuration de la VM
 ##########################
@@ -31,7 +30,7 @@ Bien que le code Python fourni dans ce manuel devrait fonctionner sous Windows, 
 9. Je recommande d'installer des addons d'invités VM. Dans la VM, allez dans Devices > Insert Guest Additions CD > cliquez sur run quand une boîte apparaît.  Suivez les instructions. Redémarrez la VM.  Le presse-papiers partagé peut être activé via Dispositifs > Presse-papiers partagé > Bidirectionnel.
 
 Connecter la PlutoSDR
-######################
+################################
 
 1. Si vous utilisez OSX, dans OSX, et non dans la VM, dans les préférences système, activez "kernel extensions".  Puis installez HoRNDIS (vous devrez peut-être redémarrer après).
 2. Si vous utilisez Windows, installez ce pilote : https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
@@ -43,14 +42,13 @@ Connecter la PlutoSDR
 8. Notez l'adresse IP du Pluto car vous en aurez besoin lorsque nous commencerons à utiliser la Pluto en Python.
 
 Installation du pilote PlutoSDR
-###############################
+#######################################
 
 Les commandes de terminal ci-dessous devraient construire et installer la dernière version de :
 
 1. **libiio**, la bibliothèque "multiplateforme" d'Analog Device pour l'interfaçage du matériel.
 2. **libad9361-iio**, AD9361 est la puce RF spécifique du PlutoSDR.
 3. **pyadi-iio**, l'API Python du Pluto, *c'est notre objectif final*, mais il dépend des deux bibliothèques précédentes.
-
 
 
 .. code-block:: bash
@@ -173,6 +171,7 @@ Pour l'instant, nous n'allons rien faire d'intéressant avec ces échantillons, 
 
 Gain de réception
 ##################
+
 
 La Pluto peut être configuré pour avoir un gain de réception fixe ou automatique. Un contrôle automatique de gain (CAG) ajustera automatiquement le gain de réception pour maintenir un niveau de signal fort (-12dBFS pour ceux qui sont curieux).  L'AGC ne doit pas être confondu avec le convertisseur analogique-numérique (CAN) qui numérise le signal.  Techniquement parlant, l'AGC est un circuit de rétroaction en boucle fermée qui contrôle le gain de l'amplificateur en réponse au signal reçu.  Son objectif est de maintenir un niveau de puissance de sortie constant malgré un niveau de puissance d'entrée variable.  En général, le CAG ajuste le gain pour éviter de saturer le récepteur (c'est-à-dire d'atteindre la limite supérieure de la plage du CAN) tout en permettant au signal de "remplir" autant de bits CAN que possible.
 
@@ -345,6 +344,7 @@ Au lieu de vous fournir du code à exécuter, j'ai créé plusieurs exercices o�
 
 Exercice 1 : Déterminer le débit de votre USB
 ##############################################
+
 
 Essayons de recevoir des échantillons du PlutoSDR, et dans le processus, voyons combien d'échantillons par seconde nous pouvons pousser à travers la connexion USB 2.0.  
 

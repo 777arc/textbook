@@ -124,7 +124,6 @@ Si vous avez l'intention d'utiliser ce modèle de canal dans le cadre d'une simu
 
 Observez les évanouissements profonds qui se produisent brièvement, ainsi que la petite fraction de temps où le canal est de meilleur qualité que s'il n'y avait pas d'évanouissement du tout.  
 
-
 ********************************************************
 Atténuation de l'Evanouissement Multi-Trajets
 ********************************************************

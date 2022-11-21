@@ -31,7 +31,6 @@ La distribution gaussienne est également appelée distribution "normale" (rappe
 
 La distribution gaussienne possède deux paramètres: la moyenne et la variance.  Nous avons déjà discuté de la façon dont la moyenne peut être considérée comme nulle, car vous pouvez toujours supprimer la moyenne, ou le biais, si elle n'est pas nulle.  La variance modifie la "puissance" du bruit.  Une variance plus élevée se traduira par des nombres plus importants. C'est pour cette raison que la variance définit la puissance du bruit.
 
-
 La variance est égale à l'écart-type au carré (:math:`sigma^2`).
 
 ************************
