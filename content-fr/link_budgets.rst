@@ -44,14 +44,14 @@ Puissance d'émission :math:`P_{t}`
 
 La puissance d'émission est assez simple; il s'agit d'une valeur en watts, dBW ou dBm (rappelons que dBm est l'abréviation de dBmW).  Chaque émetteur possède un ou plusieurs amplificateurs, et la puissance d'émission est principalement fonction de ces amplificateurs.  Une analogie pour la puissance d'émission serait la puissance d'une ampoule électrique: plus cette puissace est élevée, plus l'ampoule transmet de lumière.  Voici des exemples de puissance d'émission approximative pour différentes technologies :
 
-==================  =====  =======
-\                       Power    
-------------------  --------------
-Bluetooth           10 mW  -20 dBW   
-WiFi                100mW  -10 dBW
-Station de base LTE 1W     0 dBW
-Station FM          10kW   40 dBW
-==================  =====  =======
+===================  =====  =======
+                        Power    
+-------------------  --------------
+Bluetooth            10 mW  -20 dBW   
+WiFi                 100mW  -10 dBW
+Station de base LTE  1W     0 dBW
+Station FM           10kW   40 dBW
+===================  =====  =======
 
 Gains d'antenne :math:`G_{t}` et :math:`G_{r}`
 ###############################################################

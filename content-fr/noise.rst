@@ -93,22 +93,22 @@ Il est également important de comprendre que le dB n'est pas techniquement une 
 
 Voici quelques conversions courantes que je vous recommande de mémoriser :
 
-======   =====
-Linéaire dB
-======   ===== 
-1x       0 dB 
-2x       3 dB 
-10x      10 dB 
-0.5x     -3 dB  
-0.1x     -10 dB
-100x     20 dB
-1000x    30 dB
-10000x   40 dB
-======   ===== 
+=========  =======
+Linéaire   dB
+=========  ======= 
+1x         0 dB 
+2x         3 dB 
+10x        10 dB 
+0.5x       -3 dB  
+0.1x       -10 dB
+100x       20 dB
+1000x      30 dB
+10000x     40 dB
+=========  ======= 
 
 Enfin, pour mettre ces chiffres en perspective, voici quelques exemples de niveaux de puissance, en dBm :
 
-=========== ===
+=========== ==============================================================================
 80 dBm      Puissance d'émission d'une station de radio FM rurale
 62 dBm      Puissance maximale d'un émetteur radio amateur
 60 dBm      Puissance d'un micro-ondes domestique typique
@@ -120,7 +120,7 @@ Enfin, pour mettre ces chiffres en perspective, voici quelques exemples de nivea
 -70 dBm     Exemple de puissance reçue pour un signal radio amateur
 -100 dBm    Puissance minimale reçue pour le WiFi
 -127 dBm    Puissance reçue typique des satellites GPS
-=========== ===
+=========== ==============================================================================
 
 
 **************************************************
