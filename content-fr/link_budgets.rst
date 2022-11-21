@@ -13,7 +13,6 @@ Introduction
 
 Un bilan de liaison est une comptabilité de tous les gains et pertes de l'émetteur jusqu'au récepteur dans un système de communication.  Les bilans de liaison décrivent une direction de la liaison sans fil.  La plupart des systèmes de communication étant bidirectionnels, il doit y avoir un budget distinct pour la liaison montante et la liaison descendante.  Le "résultat" du bilan de liaison vous indique approximativement le rapport signal à bruit (abrégé RSB en français SNR pour "signal to noise ratio" en anglais) que vous devez vous attendre à avoir au niveau de votre récepteur.  Une analyse plus approfondie sera nécessaire pour vérifier si ce SNR est suffisamment élevé pour votre application.
 
-
 Nous étudions ici les bilans de liaison non pas dans le but d'être capable de réaliser un bilan de liaison pour une situation donnée, mais pour apprendre et développer une approche système des communications sans fil.
 
 Nous traiterons d'abord du bilan de puissance du signal reçu, puis du bilan de puissance du bruit, et enfin nous combinerons les deux pour trouver le SNR (puissance du signal divisée par la puissance du bruit).
@@ -21,6 +20,7 @@ Nous traiterons d'abord du bilan de puissance du signal reçu, puis du bilan de 
 ****************************
 bilan de puissance du signal
 ****************************
+
 
 La figure ci-dessous montre le schéma le plus élémentaire d'une liaison sans fil générique.  Dans ce chapitre, nous nous concentrerons sur une direction, c'est-à-dire d'un émetteur (Tx) à un récepteur (Rx).  Pour un système donné, nous connaissons la puissance *d'émission* ; il s'agit généralement d'un paramètre de l'émetteur.  Comment déterminer la puissance *reçue* au niveau du récepteur ?
 
@@ -45,7 +45,7 @@ Puissance d'émission :math:`P_{t}`
 La puissance d'émission est assez simple; il s'agit d'une valeur en watts, dBW ou dBm (rappelons que dBm est l'abréviation de dBmW).  Chaque émetteur possède un ou plusieurs amplificateurs, et la puissance d'émission est principalement fonction de ces amplificateurs.  Une analogie pour la puissance d'émission serait la puissance d'une ampoule électrique: plus cette puissace est élevée, plus l'ampoule transmet de lumière.  Voici des exemples de puissance d'émission approximative pour différentes technologies :
 
 ===================  =====  =======
-\                        Power    
+                        Power    
 -------------------  --------------
 Bluetooth            10 mW  -20 dBW   
 WiFi                 100mW  -10 dBW
@@ -54,7 +54,7 @@ Station FM           10kW   40 dBW
 ===================  =====  =======
 
 Gains d'antenne :math:`G_{t}` et :math:`G_{r}`
-###############################################
+###############################################################
 
 Les gains d'antenne d'émission et de réception sont cruciaux pour le calcul des bilans de liaison. Qu'est-ce que le gain d'antenne, me direz-vous?  Il indique la directivité de l'antenne.  Vous pouvez y faire référence en tant que gain de puissance de l'antenne, mais ne vous y trompez pas, la seule façon pour une antenne d'avoir un gain plus élevé est de diriger l'énergie dans une région plus ciblée.
 
@@ -191,6 +191,7 @@ Maintenant que nous avons les deux nombres, nous pouvons prendre le rapport pour
    \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{bruit\_dB}
 
 Nous visons généralement un SNR > 10 dB, bien que cela dépende vraiment de l'application.  En pratique, le SNR peut être vérifié en regardant la FFT du signal reçu ou en calculant la puissance avec et sans le signal présent (rappelons que variance = puissance).  Plus le SNR est élevé, plus vous pouvez gérer de bits par symbole sans trop d'erreurs.
+
 
 **********************************
 Exemple de bilan de liaison: ADS-B

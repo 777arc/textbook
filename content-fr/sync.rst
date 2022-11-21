@@ -235,7 +235,6 @@ Nous espérons qu'en voyant un exemple de synchronisation temporelle, vous avez 
 Ensuite, nous allons étudier la synchronisation de la fréquence, que nous divisons en synchro de fréquence grossière et fine.  La synchronisation grossière vient généralement avant la synchronisation temporelle, tandis que la synchronisation fine vient après.
 
 
-
 **********************************************
 Synchronisation grossière des fréquences
 **********************************************

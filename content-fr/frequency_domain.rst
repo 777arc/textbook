@@ -23,7 +23,6 @@ Tout d'abord, pourquoi aimons-nous regarder les signaux dans le domaine des fré
 
 Comme vous pouvez le voir, dans le domaine temporel, ils ressemblent tous les deux à du bruit, mais dans le domaine fréquentiel, nous pouvons voir des caractéristiques différentes.  Dans le domaine temporel, tout se trouve sous sa forme *naturelle*; lorsque nous échantillonnons des signaux, nous le faisons dans le domaine temporel, car vous ne pouvez pas échantillonner *directement* un signal dans le domaine fréquentiel. Et pourtant, les choses les plus intéressantes se passent généralement dans le domaine des fréquences. 
 
-
 ***********************************
 Séries de Fourier
 ***********************************
@@ -49,10 +48,10 @@ Certains signaux nécessitent ainsi de sommer plus d'ondes sinusoïdales que d'a
 Pour comprendre comment décomposer un signal en somme de sinusoïdes, nous devons d'abord définir les trois paramètres d'une onde sinusoïdale :
 
 #. Amplitude
-#. Phase
 #. Fréquence
+#. Phase
 
-**L'amplitude** indique la "force" de l'onde, tandis que la **phase** est utilisée pour représenter la façon dont l'onde sinusoïdale est décalée dans le temps, de 0 à 360 degrés (ou de 0 à :math:`2\pi`).  La **fréquence** est le nombre d'ondulations par seconde.
+**L'amplitude** indique la "force" de l'onde, tandis que la **fréquence** est le nombre d'*ondulations* par seconde. **La phase** est utilisée pour représenter la façon dont l'onde sinusoïdale est décalée dans le temps, de 0 à 360 degrés (ou de 0 à :math:`2\pi`), mais elle doit être relative à quelque chose pour avoir un sens, comme deux signaux de même fréquence déphasés de 30 degrés l'un par rapport à l'autre.
 
 .. image:: ../_images/amplitude_phase_period.svg
    :align: center
@@ -144,7 +143,6 @@ Propriétés temps-fréquence
 Earlier we examined examples of how signals appear in the time domain and the frequency domain.  Now, we will cover five important "Fourier properties".  These are properties that tell us if we do ____ to our time domain signal, then ____ happens to our frequency domain signal.  It will give us an important insight into the type of Digital Signal Processing (DSP) we will perform on time domain signals in practice.
 
 Nous avons examiné précédemment des exemples de la manière dont les signaux apparaissent dans le domaine temporel et dans le domaine fréquentiel. Nous allons maintenant aborder cinq importantes "propriétés de Fourier".  Il s'agit de propriétés qui nous disent que si nous appliquons ____ à notre signal dans le domaine temporel, alors ____ s'appliquera à notre signal dans le domaine fréquentiel. Cela nous donnera un aperçu important du type de traitement numérique du signal (DSP) que nous effectuerons sur les signaux du domaine temporel dans la pratique.
-
 
 1. Propriété de linéarité:
 
@@ -256,7 +254,7 @@ En ce qui concerne l'intervalle de fréquence, chaque case correspond à :math:`
 Fréquences négatives
 ********************
 
-Mais qu'est-ce qu'une fréquence négative? Pour l'instant, sachez simplement qu'elle existe car nous utilions des nombres complexes (nombres imaginaires) - il n'existe pas vraiment de "fréquence négative" dans la pratique, c'est juste une représentation que nous utilisons. Voici une façon intuitive de la comprendre.  Imaginons que nous demandions à notre SDR de se régler sur 100 MHz (la bande radio FM) et d'échantillonner à une fréquence de 10 MHz. En d'autres termes, nous allons visualiser le spectre de 95 MHz à 105 MHz. Peut-être qu'il y a trois signaux présents dans cette bande:
+Qu'est-ce qu'une fréquence négative? Pour l'instant, sachez simplement qu'il s'agit de l'utilisation de nombres complexes (nombres imaginaires) - il n'existe pas vraiment de "fréquence négative" lorsqu'il s'agit de transmettre/recevoir des signaux RF, c'est juste une représentation que nous utilisons.  Voici une façon intuitive d'y penser. Imaginons que nous demandions à notre SDR de se régler sur 100 MHz (la bande radio FM) et d'échantillonner à une fréquence de 10 MHz.  En d'autres termes, nous allons visualiser le spectre de 95 MHz à 105 MHz.  Peut-être y a-t-il trois signaux présents:
 
 .. image:: ../_images/negative-frequencies2.svg
    :align: center
@@ -268,18 +266,19 @@ Maintenant, quand le SDR nous donne les échantillons, cela apparaîtra comme ce
    :align: center
    :target: ../_images/negative-frequencies3.svg
 
-Rappelez-vous que nous avons réglé le SDR sur 100 MHz.  Le signal qui était à environ 97,5 MHz apparaît donc à -2,5 MHz, ce qui est une fréquence négative.  En réalité, il s'agit simplement d'une fréquence inférieure à la fréquence centrale. Cela aura plus de sens lorsque nous en saurons plus sur l'échantillonnage et que nous utiliserons nos SDR.
+Rappelez-vous que nous avons réglé le SDR sur 100 MHz. Ainsi, le signal qui était à environ 97.5 MHz apparaît à -2.5 MHz lorsque nous le représentons numériquement, ce qui est techniquement une fréquence négative. En réalité, il s'agit simplement d'une fréquence inférieure à la fréquence centrale. Cela prendra tout son sens lorsque nous en saurons plus sur l'échantillonnage et que nous aurons acquis de l'expérience avec nos SDR.
 
 ********************************************************
 L'ordre dans le domaine temporel n'a pas d'importance
 ********************************************************
+
 Une dernière propriété avant de passer aux FFT. La fonction FFT "mélange" en quelque sorte le signal d'entrée pour former la sortie, qui a une échelle et des unités différentes. Après tout, nous ne sommes plus dans le domaine temporel. Une bonne façon de comprendre cette différence entre les domaines est de réaliser que le fait de changer l'ordre des choses dans le domaine temporel ne change pas les composantes de fréquence du signal.  Par exemple, la FFT des deux signaux suivants présentera les deux mêmes pics parce que le signal n'est que deux ondes sinusoïdales à des fréquences différentes. Le fait de changer l'ordre dans lequel les ondes sinusoïdales se produisent ne change pas le fait qu'il s'agit de deux ondes sinusoïdales à des fréquences différentes.
 
 .. image:: ../_images/fft_signal_order.png
    :scale: 50 % 
    :align: center 
    
-Techniquement, la phase de la FFT change en raison du décalage temporel des sinusoïdes. Cependant, dans 99% des cas, seule la magnitude de la FFT nous intéresse, comme nous allons l'apprendre sous peu.
+Techniquement, la phase des valeurs de la FFT change en raison du décalage temporel des sinusoïdes. Cependant, dans les premiers chapitres de ce manuel, nous nous intéresserons principalement à la magnitude de la FFT.
    
 *******************
 FFT en Python

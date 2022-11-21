@@ -1,5 +1,5 @@
 ===================================================
-PySDR: A Guide to SDR and DSP using Python (French)
+PySDR: Un guide de la radio logicielle (SDR) et du traitement du signal en utilisant Python
 ===================================================
 
 by :ref:`Dr. Marc Lichtman<author-chapter>`

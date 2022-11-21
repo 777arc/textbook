@@ -6,7 +6,6 @@ Filtres
 
 Dans ce chapitre, nous nous familiarisons avec les filtres numériques en utilisant Python.  Nous couvrons les types de filtres (FIR/IIR et passe-bas/passe-haut/passe-bande/coupe-bande), comment les filtres sont représentés numériquement et comment ils sont conçus.  Nous terminons par une introduction aux filtres de mise en forme, que nous approfondissons dans le chapitre :ref:`pulse-shaping-chapter`.
 
-
 ******************************
 Principes de Base des Filtres
 ******************************
@@ -479,7 +478,6 @@ Voyez comment la réponse en fréquence n'est pas très droite... elle ne corres
    :align: center 
 
 Les deux options ont fonctionné. Laquelle choisiriez-vous?  La deuxième méthode a permis d'obtenir plus de prises, mais la première méthode a permis d'obtenir une réponse en fréquence qui n'était pas très nette et dont le front descendant n'était pas très raide.  Il existe de nombreuses façons de concevoir un filtre, chacune ayant ses propres compromis. Beaucoup considèrent la conception de filtres comme un art.
-
 
 *********************************
 Introduction à la Mise en Forme

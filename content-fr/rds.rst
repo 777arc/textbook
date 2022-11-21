@@ -1,15 +1,14 @@
 .. _rds-chapter:
 
-#####################
+######################
 Exemple bout en bout
-#####################
+######################
 
 Dans ce chapitre, nous regroupons un grand nombre des concepts que nous avons appris précédemment et nous présentons un exemple complet de réception et de décodage d'un signal numérique réel.  Nous allons étudier le système de données radio (RDS pour *Radio Data System* en anglais), qui est un protocole de communication permettant d'intégrer de petites quantités d'informations dans les émissions de radio FM, comme le nom de la station et de la chanson.  Nous devrons démoduler la FM, décaler la fréquence, filtrer, décimer, rééchantillonner, synchroniser, décoder et analyser les octets.  Un exemple de fichier IQ est fourni à des fins de test ou si vous n'avez pas de SDR sous la main.
 
-
-************************************
+***************************************
 Introduction à la radio FM et au RDS
-************************************
+***************************************
 
 Pour comprendre le RDS, nous devons d'abord examiner les émissions de radio FM et la façon dont leurs signaux sont structurés.  Vous connaissez probablement la partie audio des signaux FM, qui sont simplement des signaux audio modulés en fréquence et transmis à des fréquences centrales correspondant au nom de la station, par exemple, "Sud Radio" est centré à exactement 101.8 MHz à Toulouse.  En plus de la partie audio, chaque émission FM contient d'autres composants qui sont modulés en fréquence en même temps que l'audio.  Au lieu de rechercher la structure du signal sur Google, examinons la densité spectrale de puissance (DSP) d'un exemple de signal FM, *après* la démodulation FM. Nous ne voyons que la partie positive car la sortie de la démodulation FM est un signal réel, même si l'entrée est complexe (nous verrons bientôt le code pour effectuer cette démodulation). 
 
@@ -69,7 +68,7 @@ Côté émission
 
 Les informations RDS à transmettre par la station FM (par exemple, le nom de la piste, etc.) sont codées en jeux de 8 octets.  Chaque ensemble de 8 octets, qui correspond à 64 bits, est combiné à 40 "bits de contrôle" pour former un seul "groupe".  Ces 104 bits sont transmis ensemble, mais il n'y a pas d'intervalle de temps entre les groupes. Ainsi, du point de vue du récepteur, il reçoit ces bits sans interruption et doit déterminer la limite entre les groupes de 104 bits. Nous verrons plus de détails sur le codage et la structure du message lorsque nous nous plongerons dans la partie réception.
 
-Pour transmettre ces bits sans fil, le RDS utilise la modulation par déplacement de phase (BPSK), qui, comme nous l'avons appris dans le chapitre :ref:`modulation-chapiter`, est un schéma de modulation numérique simple utilisé pour associer des 1 et des 0 à la phase d'une porteuse.  Comme de nombreux protocoles basés sur la BPSK, le RDS utilise le codage différentiel, ce qui signifie simplement que les 1 et les 0 des données sont codés dans les changements de 1 et de 0, ce qui vous permet de ne plus vous soucier de savoir si vous êtes déphasé de 180 degrés (nous y reviendrons plus tard).  Les symboles BPSK sont transmis à 1187,5 symboles par seconde, et comme la BPSK transporte un bit par symbole, cela signifie que le RDS a un débit de données brut d'environ 1,2 kbps (y compris l'overhead). Le RDS ne contient aucun codage de canal (ou correction d'erreur), bien que les paquets de données contiennent un contrôle de redondance cyclique (CRC) pour savoir si une erreur s'est produite. L'utilisateur expérimenté de la BPSK peut se demander pourquoi nous avons vu un signal en forme de double lobe dans la première DSP; la BPSK a généralement un lobe principal.  Il s'avère que RDS prend le signal BPSK et le duplique sur la fréquence centrale de 57 kHz, pour plus de robustesse.  Lorsque nous nous plongerons dans le code Python utilisé pour recevoir le RDS, l'une de nos étapes consistera à filtrer pour isoler un seul de ces signaux BPSK.
+Pour transmettre ces bits sans fil, le RDS utilise la modulation par déplacement de phase (BPSK), qui, comme nous l'avons appris dans le chapitre :ref:`modulation-chapitre`, est un schéma de modulation numérique simple utilisé pour associer des 1 et des 0 à la phase d'une porteuse.  Comme de nombreux protocoles basés sur la BPSK, le RDS utilise le codage différentiel, ce qui signifie simplement que les 1 et les 0 des données sont codés dans les changements de 1 et de 0, ce qui vous permet de ne plus vous soucier de savoir si vous êtes déphasé de 180 degrés (nous y reviendrons plus tard).  Les symboles BPSK sont transmis à 1187,5 symboles par seconde, et comme la BPSK transporte un bit par symbole, cela signifie que le RDS a un débit de données brut d'environ 1,2 kbps (y compris l'overhead). Le RDS ne contient aucun codage de canal (ou correction d'erreur), bien que les paquets de données contiennent un contrôle de redondance cyclique (CRC) pour savoir si une erreur s'est produite. L'utilisateur expérimenté de la BPSK peut se demander pourquoi nous avons vu un signal en forme de double lobe dans la première DSP; la BPSK a généralement un lobe principal.  Il s'avère que RDS prend le signal BPSK et le duplique sur la fréquence centrale de 57 kHz, pour plus de robustesse.  Lorsque nous nous plongerons dans le code Python utilisé pour recevoir le RDS, l'une de nos étapes consistera à filtrer pour isoler un seul de ces signaux BPSK.
 
 Le signal final "double BPSK" est ensuite décalé en fréquence jusqu'à 57 kHz et ajouté à toutes les autres composantes du signal FM, avant d'être modulé en FM et transmis sur les ondes à la fréquence de la station.  Les signaux radio FM sont transmis à une puissance extrêmement élevée par rapport à la plupart des autres communications sans fil, jusqu'à 80 kW!  C'est pourquoi de nombreux utilisateurs de la radio logicielle ont un filtre de rejet de la FM (c'est-à-dire un filtre coupe-bande) avec leur antenne, afin que la FM n'ajoute pas d'interférences à ce qu'ils essaient de recevoir.
 
@@ -77,6 +76,7 @@ Il ne s'agissait là que d'un bref aperçu de l'aspect transmission, mais nous e
 
 Côté récepteur
 ##############
+
 
 Afin de démoduler et de décoder le RDS, nous allons effectuer les étapes suivantes, dont beaucoup sont des étapes de transmission en sens inverse (pas besoin de mémoriser cette liste, nous allons parcourir chaque étape individuellement ci-dessous):
 
@@ -113,7 +113,7 @@ Acquisition d'un signal
  sample_rate = 250e3
  center_freq = 99.5e6
 
-Nous avons lu notre enregistrement de test, qui a été échantillonné à 250 kHz et centré sur une station FM reçue à un SNR élevé.  Veillez à mettre à jour le chemin du fichier pour refléter votre système et l'endroit où vous avez sauvegardé l'enregistrement.  Si vous avez un SDR déjà configuré et fonctionnant depuis Python, n'hésitez pas à recevoir un signal en direct, bien qu'il soit utile d'avoir d'abord testé l'ensemble du code avec un `enregistrement de QI connu pour fonctionner<https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Tout au long de ce code, nous utiliserons :code:`x` pour stocker le signal à manipuler. 
+Nous avons lu notre enregistrement de test, qui a été échantillonné à 250 kHz et centré sur une station FM reçue à un SNR élevé.  Veillez à mettre à jour le chemin du fichier pour refléter votre système et l'endroit où vous avez sauvegardé l'enregistrement.  Si vous avez un SDR déjà configuré et fonctionnant depuis Python, n'hésitez pas à recevoir un signal en direct, bien qu'il soit utile d'avoir d'abord testé l'ensemble du code avec un `enregistrement de QI connu pour fonctionner <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Tout au long de ce code, nous utiliserons :code:`x` pour stocker le signal à manipuler. 
 
 ********************************
 Démodulation FM
@@ -220,15 +220,15 @@ Synchronisation en temps (niveau symbole)
 
  # Synchronisation des symboles, en utilisant ce que nous avons fait dans le chapitre sur la synchronisation.
  samples = x # comme dans le chapitre de la synchronisation
- samples_interpolated = resample_poly(samples, 16, 1)
+ samples_interpolated = resample_poly(samples, 32, 1) # Nous utiliserons 32 comme facteur d'interpolation, choisi arbitrairement.
  sps = 16
  mu = 0.01 # estimation initiale de la phase de l'échantillon
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
  out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stocke les valeurs, à chaque itération nous avons besoin des 2 valeurs précédentes plus la valeur actuelle.
  i_in = 0 # index des échantillons d'entrée
  i_out = 2 # indice de sortie (les deux premières sorties sont 0)
- while i_out < len(samples) and i_in+16 < len(samples):
-     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # prendre ce que nous pensons être le "meilleur" échantillon
+ while i_out < len(samples) and i_in+32 < len(samples):
+     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] # prendre ce que nous pensons être le "meilleur" échantillon
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
@@ -645,7 +645,7 @@ L'exemple ci-dessous montre la sortie de l'étape d'analyse syntaxique pour une 
 Récapitulation et code final
 ********************************
 
-Vous avez réussi! Vous trouverez ci-dessous l'ensemble du code. Concaténé, il devrait fonctionner avec l'enregistrement de test disponible en téléchargement. Si vous trouvez que vous avez dû faire des ajustements pour le faire fonctionner avec votre propre enregistrement ou SDR en direct, faites-moi savoir ce que vous avez dû faire, vous pouvez le soumettre comme une PR GitHub à `la page GitHub du manuel <https://github.com/777arc/textbook>`_. Vous pouvez également trouver une version de ce code avec des dizaines de figures/affichages de débogage inclus, que j'ai utilisé à l'origine pour faire ce chapitre, `ici <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/rds_demo.py>`_.  
+Vous l'avez fait! Ci-dessous se trouve tout le code ci-dessus, concaténé, il devrait fonctionner avec `l'enregistrement radio FM test que vous pouvez trouver ici <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, bien que vous devriez être en mesure d'alimenter votre propre signal tant que son SNR reçu est assez élevé, il suffit de régler la fréquence centrale de la station et d'échantillonner à un taux de 250 kHz.  Si vous trouvez que vous avez dû faire des ajustements pour le faire fonctionner avec votre propre enregistrement ou SDR en direct, faites-moi savoir ce que vous avez dû faire, vous pouvez le soumettre comme un PR GitHub à `la page GitHub du manuel <https://github.com/777arc/textbook>`_.  Vous pouvez également trouver une version de ce code avec des dizaines de tracés/graphes de débogage inclus, que j'ai utilisé à l'origine pour faire ce chapitre, `ici <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/rds_demo.py>`_.   
 
 .. raw:: html
 
@@ -653,6 +653,10 @@ Vous avez réussi! Vous trouverez ci-dessous l'ensemble du code. Concaténé, il
    <summary>Final Code</summary>
    
 .. code-block:: python
+
+ import numpy as np
+ from scipy.signal import resample_poly, firwin, bilinear, lfilter
+ import matplotlib.pyplot as plt
 
  # Lire le signal
  x = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64)
@@ -686,15 +690,15 @@ Vous avez réussi! Vous trouverez ci-dessous l'ensemble du code. Concaténé, il
 
   # Synchronisation des symboles, en utilisant ce que nous avons fait dans le chapitre sur la synchronisation.
  samples = x # comme dans le chapitre de la synchronisation
- samples_interpolated = resample_poly(samples, 16, 1)
+ samples_interpolated = resample_poly(samples, 32, 1) # Nous utiliserons 32 comme facteur d'interpolation, choisi arbitrairement.
  sps = 16
  mu = 0.01 # estimation initiale de la phase de l'échantillon
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
  out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stocke les valeurs, à chaque itération nous avons besoin des 2 valeurs précédentes plus la valeur actuelle.
  i_in = 0 # index des échantillons d'entrée
  i_out = 2 # indice de sortie (les deux premières sorties sont 0)
- while i_out < len(samples) and i_in+16 < len(samples):
-     out[i_out] = samples_interpolated[i_in*16 + int(mu*16)] # prendre ce que nous pensons être le "meilleur" échantillon
+ while i_out < len(samples) and i_in+32 < len(samples):
+     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] # prendre ce que nous pensons être le "meilleur" échantillon
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])

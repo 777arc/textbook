@@ -6,7 +6,6 @@
 
 Dans ce chapitre, nous présentons un concept appelé échantillonnage IQ, ou échantillonnage complexe ou échantillonnage en quadrature.  Nous abordons également l'échantillonnage de Nyquist, les nombres complexes, les porteuses RF, les fréquences intermédiaires, et la densité spectrale de puissance.  L'échantillonnage IQ est la forme d'échantillonnage utilisée par la radio logicielle, ainsi que par de nombreux récepteurs (et émetteurs) numériques.  Il s'agit d'une version légèrement plus complexe de l'échantillonnage numérique ordinaire (jeu de mots), nous allons donc y aller doucement et, avec un peu de pratique, le concept va certainement faire tilt!
 
-
 **********************************
 Les bases de l'échantillonnage
 **********************************
@@ -221,9 +220,9 @@ Enfin, vous êtes peut-être curieux de savoir à quelle vitesse les signaux se 
 
 où :math:`c` est la vitesse de la lumière, généralement fixée à 3e8 lorsque :math:`f` est en Hz et :math:``lambda` en mètre.  Dans le domaine des communications sans fil, cette relation devient importante lorsqu'il s'agit d'antennes, car pour recevoir un signal à une certaine fréquence porteuse, :math:`f`, vous avez besoin d'une antenne qui correspond à sa longueur d'onde, :math:`\lambda`, généralement l'antenne a une longueur de :math:`\lambda/2` ou :math:`\lambda/4`.  Cependant, quelle que soit la fréquence/longueur d'onde, l'information transportée par ce signal se déplace toujours à la vitesse de la lumière, de l'émetteur au récepteur.  Pour calculer ce délai dans l'air, une règle empirique est que la lumière parcourt environ un 30 cm en une nanoseconde. Autre règle empirique : un signal se rendant à un satellite en orbite géostationnaire et en revenant prendra environ 0.25 seconde pour l'ensemble du trajet.
 
-********************************
+*****************************
 Architectures des récepteurs
-********************************
+*****************************
 
 La figure de la section "Côté récepteur" montre comment le signal d'entrée est converti et divisé en I et Q. Cet arrangement est appelé "conversion directe", car les fréquences RF sont directement converties en bande de base. Une autre option consiste à ne pas effectuer de conversion de fréquence du tout et à échantillonner très rapidement pour tout capturer de 0 Hz à la moitié de la fréquence d'échantillonnage. Cette stratégie est appelée "échantillonnage direct", et elle nécessite une puce CAN extrêmement coûteuse.  Une troisième architecture, populaire car c'est ainsi que fonctionnaient les anciennes radios, est connue sous le nom de "superhétérodyne". Elle implique une conversion vers le bas, mais pas jusqu'à 0 Hz. Elle place le signal d'intérêt à une fréquence intermédiaire, appelée "FI".  Un amplificateur à faible bruit (LNA pour *Low Noise Amplifier* en anglais) est simplement un amplificateur conçu pour des signaux de très faible puissance à l'entrée.  Voici les schémas fonctionnels de ces trois architectures, notez que des variations et des hybrides de ces architectures existent également :
 
@@ -233,6 +232,7 @@ La figure de la section "Côté récepteur" montre comment le signal d'entrée e
 *****************************************
 Signaux en Bande de Base et Passe-Bande
 *****************************************
+
 On dit d'un signal centré autour de 0 Hz qu'il est en "bande de base".  À l'inverse, on parle de "bande passante" lorsqu'un signal existe à une fréquence RF qui n'est pas proche de 0 Hz, mais qui a été décalée vers le haut dans le but d'une transmission sans fil.  Il n'y a pas de notion de "transmission en bande de base", car on ne peut pas transmettre quelque chose d'imaginaire.  Un signal en bande de base peut être parfaitement centré à 0 Hz, comme la partie droite de la figure de la section précédente. Il peut être *proche* de 0 Hz, comme les deux signaux illustrés ci-dessous. Ces deux signaux sont toujours considérés comme étant en bande de base. Vous trouverez également un exemple de signal passe-bande, centré sur une fréquence très élevée notée :math:`f_c`.
 
 .. image:: ../_images/baseband_bandpass.png
@@ -273,7 +273,6 @@ Il y a un problème: si nous voulons que notre signal soit centré à 100 MHz et
 
 Cette sous-section concernant les décalages DC est un bon exemple de ce qui différencie ce manuel des autres. Votre manuel DSP moyen abordera l'échantillonnage, mais il a tendance à ne pas inclure les obstacles à la mise en œuvre tels que les décalages DC, malgré leur importance dans la pratique.
 
-
 ****************************************
 Echantillonnage à l'aide de notre SDR
 ****************************************
@@ -309,18 +308,18 @@ Si votre signal a une moyenne approximativement nulle - ce qui est généralemen
 
 La raison pour laquelle la variance des échantillons calcule la puissance moyenne est assez simple: l'équation de la variance est :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2` où :math:`\mu` est la moyenne du signal. Cette équation semble familière! Si :math:`\mu` est égal à zéro, l'équation permettant de déterminer la variance des échantillons devient équivalente à l'équation de la puissance.  Vous pouvez également soustraire la moyenne des échantillons de votre fenêtre d'observation, puis calculer la variance. Sachez simplement que si la valeur moyenne n'est pas nulle, la variance et la puissance ne sont pas égales.
  
-**********************************************
+********************************************
 Calcul de la densité spectrale de puissance
-**********************************************
+********************************************
 
 Dans le chapitre précédent, nous avons appris que nous pouvions convertir un signal dans le domaine des fréquences à l'aide d'une FFT, et que le résultat était appelé densité spectrale de puissance (DSP), qu'on notera par la suite PSD (pour *Power Spectral Density*) et eviter ainsi toute confusion avec DSP de *Digitl Signal Processing*.
 
 Mais pour trouver réellement la PSD d'un lot d'échantillons et la tracer, nous ne nous contentons pas d'effectuer une FFT. Nous devons effectuer les six opérations suivantes:
 
-1. Prenez la FFT de nos échantillons.  Si nous avons x échantillons, la taille de la FFT sera la longueur de x par défaut. Utilisons les 1024 premiers échantillons comme exemple pour créer une FFT de taille 1024. La sortie sera de 1024 flottants complexes.
-2. Prenez le module de la sortie de la FFT, ce qui nous donne 1024 flottants réels.
-3. Normalisez: divisez par la taille de la FFT (:math:`N`, ou 1024 dans ce cas).
-4. Elevez au carré le module résultante pour obtenir la puissance.
+1. Prenez la FFT de nos échantillons.  Si nous avons x échantillons, la taille de la FFT sera la longueur de x par défaut. Utilisons les 1024 premiers échantillons comme exemple pour créer une FFT de taille 1024.  La sortie sera de 1024 flottants complexes.
+2. Prenez la magnitude de la sortie de la FFT, ce qui nous donne 1024 flottants réels.
+3. Élevez au carré la magnitude résultante pour obtenir la puissance.
+4. Normaliser: diviser par la taille de la FFT (:math:`N`) et le taux d'échantillonnage (:math:`Fs`).
 5. Convertissez en dB en utilisant :math:`10 \log_{10}()` ; nous considérons toujours les PSD en échelle logarithmique.
 6. Effectuez un décalage FFT, abordé dans le chapitre précédent, pour déplacer " 0 Hz " au centre et les fréquences négatives à gauche du centre.
 
@@ -332,7 +331,7 @@ Ces six étapes en Python sont:
  # supposez que x contient votre tableau d'échantillons de QI
  N = 1024
  x = x[0:N] # nous ne prendrons que la FFT des 1024 premiers échantillons, voir le texte ci-dessous
- PSD = (np.abs(np.fft.fft(x))/N)**2
+ PSD = np.abs(np.fft.fft(x))**2 / (N*Fs)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
@@ -346,7 +345,7 @@ En option, nous pouvons appliquer une fenêtre, comme nous l'avons appris dans l
 Pour tracer cette PSD, nous devons connaître les valeurs de l'axe des abscisses.
 Comme nous l'avons appris au chapitre précédent, lorsque nous échantillonnons un signal, nous ne "voyons" que le spectre compris entre -Fs/2 et Fs/2, Fs étant notre fréquence d'échantillonnage.
 La résolution que nous obtenons dans le domaine fréquentiel dépend de la taille de notre FFT, qui par défaut est égale au nombre d'échantillons sur lesquels nous effectuons l'opération de FFT.
-Dans ce cas, notre axe des x est constitué de 1024 points équidistants entre -0,5 MHz et 0,5 MHz.
+Dans ce cas, notre axe x est constitué de 1024 points équidistants entre -0.5 MHz et 0.5 MHz.
 Si nous avions réglé notre SDR sur 2.4 GHz, notre fenêtre d'observation serait comprise entre 2.3995 GHz et 2.4005 GHz.
 En Python, le déplacement de la fenêtre d'observation ressemblera à ceci :
 
@@ -382,7 +381,7 @@ Voici un exemple de code complet qui inclut la génération d'un signal (exponen
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
- PSD = (np.abs(np.fft.fft(r))/N)**2
+ PSD = np.abs(np.fft.fft(r))**2 / (N*Fs)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
