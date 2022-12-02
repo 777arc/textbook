@@ -17,13 +17,13 @@ Software/Drivers Install
 Setting up VM
 #############
 
-While the Python code provided in this textbook should work under Windows, Mac, and Linux, the install instructions below are specific to Ubuntu 18. If you have trouble installing the software on your OS following `the instructions provided by Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, I recommend installing an Ubuntu 18 VM and trying the instructions below.
+While the Python code provided in this textbook should work under Windows, Mac, and Linux, the install instructions below are specific to Ubuntu 22. If you have trouble installing the software on your OS following `the instructions provided by Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, I recommend installing an Ubuntu 22 VM and trying the instructions below.  Alternatively, if you're on Windows 11, Windows Subsystem for Linux (WSL) using Ubuntu 22 tends to run fairly well and supports graphics out-of-the-box. 
 
 1. Install and open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
 2. Create a new VM.  For memory size, I recommend using 50% of your computer’s RAM.
 3. Create the virtual hard disk, choose VDI, and dynamically allocate size.  15 GB should be enough. If you want to be really safe you can use more.
-4. Download Ubuntu 18 Desktop .iso- http://releases.ubuntu.com/18.04/
-5. Start the VM. It will ask you for installation media. Choose the Ubuntu 18 desktop .iso file.  Choose “install ubuntu”, use default options, and a pop up will warn you about the changes you are about to make. Hit continue.  Choose name/password and then wait for the VM to finish initializing.  After finishing the VM will restart, but you should power off the VM after the restart.
+4. Download Ubuntu 22 Desktop .iso- https://ubuntu.com/download/desktop
+5. Start the VM. It will ask you for installation media. Choose the Ubuntu 22 desktop .iso file.  Choose “install ubuntu”, use default options, and a pop up will warn you about the changes you are about to make. Hit continue.  Choose name/password and then wait for the VM to finish initializing.  After finishing the VM will restart, but you should power off the VM after the restart.
 6. Go into the VM settings (the gear icon).
 7. Under system > processor > choose at least 3 CPUs.  If you have an actual video card then in display > video memory > choose something much higher.
 8. Start up your VM.
@@ -101,7 +101,7 @@ Changing Pluto's IP Address
 If for some reason the default IP of 192.168.2.1 does not work because you already have a 192.168.2.0 subnet, or because you want multiple Pluto's connected at the same time, you can change the IP using these steps:
 
 1. Edit the config.txt file on the PlutoSDR mass storage device (i.e., the USB-drive looking thing that shows up after you plug in the Pluto).  Enter the new IP you want.
-2. Eject the mass storage device (don't unplug the Pluto!). In Ubuntu 18 there's an eject symbol next to the PlutoSDR device, when looking at the file explorer.
+2. Eject the mass storage device (don't unplug the Pluto!). In Ubuntu 22 there's an eject symbol next to the PlutoSDR device, when looking at the file explorer.
 3. Wait a few seconds, and then cycle power by unplugging the Pluto and plugging it back in.  Go back into the config.txt to determine if your change(s) saved.
 
 Note that this procedure is also used to flash a different firmware image onto the Pluto. For more details see https://wiki.analog.com/university/tools/pluto/users/firmware.
