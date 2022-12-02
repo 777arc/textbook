@@ -240,7 +240,6 @@ If you want to continuously transmit the same set of samples on repeat, instead 
 
 You would then transmit your samples like normal: :code:`sdr.tx(samples)` just one time, and the Pluto will keep transmitting the signal indefinitely, until the sdr object destructor is called.  To change the samples that are being continuously transmitted, you cannot simply call :code:`sdr.tx(samples)` again with a new set of samples, you have to first call :code:`sdr.tx_destroy_buffer()`, then call :code:`sdr.tx(samples)`.
 
-
 Transmitting Over the Air Legally
 #################################
 
@@ -335,6 +334,11 @@ You should see something that looks like this, assuming you have proper antennas
 
 It is a good exercise to slowly adjust :code:`sdr.tx_hardwaregain_chan0` and :code:`sdr.rx_hardwaregain_chan0` to make sure the received signal is getting weaker/stronger as expected.
 
+************************
+Reference API
+************************
+
+For the entire list of sdr properties and functions you can call, refer to the `pyadi-iio Pluto Python code (AD936X) <https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py>`_.
 
 ************************
 Python Exercises
