@@ -218,7 +218,7 @@ Time Synchronization (Symbol-Level)
 
  # Symbol sync, using what we did in sync chapter
  samples = x # for the sake of matching the sync chapter
- samples_interpolated = resample_poly(samples, 32, 1) # we'll use 32 as the interpolation factor, arbitrarily chosen
+ samples_interpolated = resample_poly(samples, 32, 1) # we'll use 32 as the interpolation factor, arbitrarily chosen, seems to work better than 16
  sps = 16
  mu = 0.01 # initial estimate of phase of sample
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
