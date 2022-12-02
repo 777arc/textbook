@@ -59,6 +59,12 @@ To split a filter in half you can take the square root of the frequency response
 .. math::
  X(f) = X_H(f) X_H(f) \quad \mathrm{where} \quad X_H(f) = \sqrt{X(f)}
 
+Below shows a simplified diagram of a transmit and receive chain, with a Raised Cosine (RC) filter being split into two Root Raised Cosine (RRC) filters; the one on the transmit side is the pulse shaping filter, and the one on the received side is the matched filter.  Together, they cause the pulses at the demodulator to appear as if they had been pulse shaped with a single RRC filter.
+
+.. image:: ../_images/splitting_rc_filter.svg
+   :align: center 
+   :target: ../_images/splitting_rc_filter.svg
+
 
 **********************************
 Specific Pulse Shaping Filters
