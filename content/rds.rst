@@ -94,7 +94,9 @@ In order to demodulate and decode RDS, we will perform the following steps, many
 
 While this may seem like a lot of steps, RDS is actually one of the simplest wireless digital communications protocols out there.  A modern wireless protocol like WiFi or 5G requires a whole textbook to cover just the high-level PHY/MAC layer information.
 
-We will now dive into the Python code used to receive RDS.  This code has been tested to work using an `FM radio recording you can find here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, although you should be able to feed in your own signal as long as its received at a high enough SNR, simply tune to the station's center frequency and sample at a rate of 250 kHz.  In this section we will present small portions of the code individually, with discussion, but the same code is provided at the end of this chapter in one large block.  Each section will present a block of code, and then explain what it is doing.
+We will now dive into the Python code used to receive RDS.  This code has been tested to work using an `FM radio recording you can find here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, although you should be able to feed in your own signal as long as its received at a high enough SNR, simply tune to the station's center frequency and sample at a rate of 250 kHz.  To maximize the received signal power (e.g., if you are indoors), it helps to use a half-wave dipole antenna of the correct length (~1.5 meters), not the 2.4 GHz antennas that come with the Pluto.  That being said, FM is a very loud signal, and if you are near a window or outside, the 2.4 GHz antennas will likely be enough to pick up the stronger radio stations.  
+
+In this section we will present small portions of the code individually, with discussion, but the same code is provided at the end of this chapter in one large block.  Each section will present a block of code, and then explain what it is doing.
 
 ********************************
 Acquiring a Signal
