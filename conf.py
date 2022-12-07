@@ -31,6 +31,7 @@ from datetime import datetime
 # ones.
 extensions = [
     'sphinx.ext.imgmath',
+    'sphinx.ext.autosectionlabel',
 ]
 imgmath_image_format = 'svg' # way better looking than pngs (its vectorized after all!)
 
@@ -101,7 +102,7 @@ release = u'0.1'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', 'index-fr.rst', 'content-fr/*']
+exclude_patterns = ['_build', 'index-fr.rst', 'content-fr/*', 'index-nl.rst', 'content-nl/*']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -132,7 +133,7 @@ pygments_style = 'sphinx'
 
 # Auto add Figure X to captions
 numfig = True
-numfig_format = {'figure': '- Figure %s', 
+numfig_format = {'figure': '%s', 
                  'table': 'Table %s', 
                  'code-block': 'Listing %s',
                  'section': 'Section %s'}
@@ -295,6 +296,7 @@ htmlhelp_basename = 'textbookdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
+    'extrapackages': r'\usepackage{siunitx}'
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
