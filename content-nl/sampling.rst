@@ -44,7 +44,7 @@ Wat als we bemonsteren op Fs = 1.5f:
 .. image:: ../_images/sampling_Fs_0.45.svg
    :align: center 
 
-Nog steeds niet genoeg! Volgens een stuk DSB-theorie waar we niet dieper op in gaan, moet je bemonsteren met tenminste **twee** keer de frequentie van het signaal om deze ambiguïteit te kunnen voorkomen:
+Nog steeds niet genoeg! Volgens een stuk DSP-theorie waar we niet dieper op in gaan, moet je bemonsteren met tenminste **twee** keer de frequentie van het signaal om deze ambiguïteit te kunnen voorkomen:
 
 .. image:: ../_images/sampling_Fs_0.6.svg
    :align: center 
@@ -56,7 +56,7 @@ Het bovenstaande signaal bestond slechts uit een sinus, meeste signalen bestaan 
 .. image:: ../_images/max_freq.svg
    :align: center 
    
-We moeten het hoogste frequentiecomponent vinden, verdubbelen, en op die snelheid of sneller monsters nemen. De minimale snelheid waarmee we kunnen bemonsteren wordt de Nyquist snelheid genoemd. In andere woorden, de Nyquist snelheid is de minimale snelheid waarop een signaal bemonstert moet worden om alle informatie te behouden. Deze eigenschap is een extreem belangrijk stuk theorie binnen de DSB en SDR en dient als een brug tussen continue en discrete signalen.
+We moeten het hoogste frequentiecomponent vinden, verdubbelen, en op die snelheid of sneller monsters nemen. De minimale snelheid waarmee we kunnen bemonsteren wordt de Nyquist snelheid genoemd. In andere woorden, de Nyquist snelheid is de minimale snelheid waarop een signaal bemonstert moet worden om alle informatie te behouden. Deze eigenschap is een extreem belangrijk stuk theorie binnen de DSP en SDR en dient als een brug tussen continue en discrete signalen.
 
 .. image:: ../_images/nyquist_rate.png
    :scale: 70% 
@@ -68,7 +68,7 @@ Wanneer we te langzaam bemonsteren krijgen we een effect genaamd aliasing (Neder
 Kwadratuurbemonstering
 *************************
 
-De term "kwadratuur" betekent veel, maar in de context van DSB en SDR verwijst het naar twee golven die 90 graden uit fase lopen. Waarom 90 graden uit fase? Denk eraan dat wanneer twee golven 180 graden uit fase lopen ze in feite dezelfde golf zijn maar vermenigvuldigt met -1. Door 90 graden uit fase te lopen worden de signalen orthogonaal, en er zijn een hoop coole dingen die je kunt doen met orthogonale functies. Voor het gemak gebruiken we een sinus en cosinus voor onze golven die 90 graden uit fase lopen.
+De term "kwadratuur" betekent veel, maar in de context van DSP en SDR verwijst het naar twee golven die 90 graden uit fase lopen. Waarom 90 graden uit fase? Denk eraan dat wanneer twee golven 180 graden uit fase lopen ze in feite dezelfde golf zijn maar vermenigvuldigt met -1. Door 90 graden uit fase te lopen worden de signalen orthogonaal, en er zijn een hoop coole dingen die je kunt doen met orthogonale functies. Voor het gemak gebruiken we een sinus en cosinus voor onze golven die 90 graden uit fase lopen.
 
 Laten we nu variabelen gebruiken om de **amplitude** van de sinus en cosinus aan te geven. We zullen :math:`I` voor de cos() en :math:`Q` voor sin() gebruiken:
 
@@ -368,7 +368,7 @@ Het resultaat is een prachtige PSD!
 
 Mocht je de PSD willen vinden van miljoenen monsters, neem dan niet een FFT van een miljoen punten, wat dat duurt voor eeuwig. Je zou dan een uitgang krijgen met een miljoen "frequentiepunten" (bins), dat is meer dan je op een plot kunt tonen.
 In plaats daarvan kun je betere meerdere smalle PSD's uitvoeren en het gemiddelde nemen, of weergeven in een spectrogramplot.
-Anderzijds, als je weet dat het signaal niet snel verandert, dan is het genoeg om een paar duizend monsters te nemen en daar de PSD van te vinden; binnen het tijdsbestek van een paar duizend monsters ontvang je waarschijnlijk genoeg van het signaal om een mooie representatie te krijgen.
+Anderzijds, als je weet dat het signaal niet snel verandert, dan is het genoeg om een paar duizend monsters te nemen en daar de PSD van te vinden; binnen het tijDSPestek van een paar duizend monsters ontvang je waarschijnlijk genoeg van het signaal om een mooie representatie te krijgen.
 
 Hieronder staat de volledige broncode inclusief het genereren van een signaal (complex exponent op 50 Hz) en ruis. Let op dat N, het aantal monsters van het signaal, ook de lengte is van de FFT. We nemen de FFT over het hele gesimuleerde signaal.
 
