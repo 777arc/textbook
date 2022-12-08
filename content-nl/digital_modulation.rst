@@ -290,7 +290,7 @@ De ontvanger zal nu proberen te synchroniseren en de BPSK uit te lijnen met de I
 
 .. 
    todo - this is confusing, talking about clusters the reader hasn't even encountered yet. Same with coherent receivers, this hasn't been mentioned yet before
-In plaats van absolute symbolen te versturen om aan te geven wat een 1 of 0 voorstelt, kan het kiezen om differentiële codering toe te passen en zich hier niet eens zorgen om te maken.
+In plaats van absolute symbolen te versturen om absolute aan te geven wat een 1 of 0 voorstelt, kan het kiezen om differentiële codering toe te passen en zich hier niet eens zorgen om te maken.
 
 ..
    De differentiële codering stelt ons ook in staat om niet-coherente ontvangers te gebruiken, welke simpeler zijn dan coherente ontvangers.
@@ -361,7 +361,7 @@ We gaan wat ruis toevoegen:
    :align: center
    :target: ../_images/qpsk_python2.svg
 
-De additieve witte Guassian ruis (AWGN) veroorzaakt een uniforme verdeling rondom elk constellatiepunt.
+De additieve witte Guassian ruis (AWGN) veroorzaakt een spreiding rondom elk constellatiepunt.
 Ruis wordt behandeld in het :ref:`gaussian noise` hoofdstuk.
 Het punt is, als er te veel ruis wordt toegevoegd dan zullen sommige symbolen/monsters over de grens (de vier kwadranten) gaan en incorrect geïnterpreteerd worden.
 Probeer dit zelf uit door het ruisvermogen toe te laten nemen.
