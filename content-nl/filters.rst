@@ -4,41 +4,114 @@
 Filters
 #############
 
-In this chapter we learn about digital filters using Python.  We cover types of filters (FIR/IIR and low-pass/high-pass/band-pass/band-stop), how filters are represented digitally, and how they are designed.  We finish with an introduction to pulse shaping, which we further explore in the :ref:`pulse-shaping-chapter` chapter.
+We gaan in dit hoofdstuk leren over digitale filters in Python.
+We zullen type filters behandelen (FIR/IIR en laag-doorlaat/hoog-doorlaat/band-doorlaat/band-stop), hoe ze digitaal eruit zien, en hoe ze ontworpen worden.
+Als laatste eindigen we met een introductie over 'pulse shaping' (Nederlands: pulsvorming), wat zal worden uitgediept in het :ref:`pulse-shaping-chapter` hoofdstuk.
 
 *************************
-Filter Basics
+Basis van Filters
 *************************
 
-Filters are used in many disciplines. For example, image processing makes heavy use of 2D filters, where the input and output are images.  You might use a filter every morning to make your coffee, which filters out solids from liquid.  In DSP, filters are primarily used for:
+Veel disciplines maken gebruik van filters.
+Beelverwerking maakt bijvoorbeeld uitvoerig gebruik van 2D filters waarbij de in- en uitgang figuren betreft.
+Wellicht gebruik je elke morgen een koffiefilter om de vaste en vloeibare stoffen te scheiden.
+Maar in DSP worden filters voornamelijk gebruikt voor het:
 
-1. Separation of signals that have been combined (e.g., extracting the signal you want)
-2. Removal of excess noise after receiving a signal
-3. Restoration of signals that have been distorted in some way (e.g., an audio equalizer is a filter)
+1. Scheiden van gecombineerde signalen (dus het gewenste signaal extraheren)
+2. Verwijderen van overbodige ruis na ontvangst van een signaal
+3. Herstellen van signalen die zijn vervormt (een audio equalizer is bijv. een filter)
 
-There are certainly other uses for filters, but this chapter is meant to introduce the concept rather than explain all the ways filtering can happen.
+Natuurlijk zijn er nog meer toepassingen, maar de bedoeling van dit hoofdstuk is om het concept te introduceren in plaats van alle filter toepassingen.
 
-You may think we only care about digital filters; this textbook explores DSP, after all. However, it's important to know that a lot of filters will be analog, like those in our SDRs placed before the analog-to-digital converter (ADC) on the receive side. The following image juxtaposes a schematic of an analog filter circuit with a flowchart representation of a digital filtering algorithm.
+Misschien denk je dat we alleen geintereseerd zijn in digitale filters; het is ten slotte een DSP boek.
+Het is echter belangrijk om te begrijpen dat veel filters analoog zullen zijn, zoals de filters die in jouw SDR voor de ADC's zijn gezet.
+Het volgende figuur plaatst een schema van een analoog filter tegenover het schematisch ontwerp van een digitaal filter.
 
-.. image:: ../_images/analog_digital_filter.png
-   :scale: 70 % 
-   :align: center 
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=1.5]{analog_digital_filter_nolabel.png}};
+   \begin{scope}[x={(image.south east)},y={(image.north west)}]
+      \node[] at (0.25,0.9) {Analoog filter};
+      \node[] at (0.75,0.9) {Digitaal filter};
+   \end{scope}
+  
+DSP's hebben signalen als in- en uitgangen. Een filter heeft een ingangsignaal en een uitgangsignaal:
+
+.. tikz:: [font=\sffamily\Large\bfseries, scale=2]
+   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
+   \node [draw,
+    color=white,
+    fill=babyblueeyes,
+    minimum width=4cm,
+    minimum height=2.4cm
+   ]  (filter) {Filter};
+   \draw[<-, very thick] (filter.west) -- ++(-2,0) node[left,align=center]{Ingang\\(tijddomein)} ;
+   \draw[->, very thick] (filter.east) -- ++(2,0) node[right,align=center]{Uitgang\\(tijddomein)};   
+   :libs: positioning
+
+.. .. image:: ../_images/filter.png
+..    :scale: 70 % 
+..    :align: center 
+
+Je kunt niet twee verschillende signalen in een enkel filter stoppen zonder ze eerst samen te voegen of een andere operatie uit te voeren.
+Op dezelfde manier zal de uitgang altijd een signaal betreffen, bijv. een 1D array van getallen.
+
+Er zijn vier basistypen van filters: laag-doorlaat, hoog-doorlaat, band-doorlaat en band-stop.
+Elke type bewerkt signalen zodanig dat de focus op verschillende gebieden aan frequenties ligt.
+De onderstaande grafieken laten voor elke van de typen zien hoe de frequenties worden gefilterd.
+
+.. raw:: html
+
+   <table><tbody><tr><td>
+
+.. tikz:: [font=\sffamily\Large\bfseries]    
+   \begin{axis}[xmax=9,ymax=9, samples=50, ymode=log, xmode=log]
+   \addplot[blue, ultra thick] (x,{(1)/(x*x + 2*x+1)});
+   \end{axis}
+
+.. raw:: html
+
+   </td><td>
+
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \begin{loglogaxis}[title=Hoog-doorlaat, xtick={\empty}, ytick={\empty}, grid=none]
+      \addplot[domain=1:100000]  {(60*x+10000)/(x*x + 60*x+10000)};      
+   \end{loglogaxis} 
+
+.. raw:: html
+
+   </td><td>
+
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \begin{loglogaxis}[title=Band-doorlaat, xtick={\empty}, ytick={\empty}, grid=none]
+      \addplot[domain=1:100000]  {(60*x+10000)/(x*x + 60*x+10000)};      
+   \end{loglogaxis} 
+
+.. raw:: html
+
+   </td><td>
+
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \begin{loglogaxis}[title=Band-stop, xtick={\empty}, ytick={\empty}, grid=none]
+      \addplot[domain=1:100000]  {(60*x+10000)/(x*x + 60*x+10000)};      
+   \end{loglogaxis}    
    
-In DSP, where the input and output are signals, a filter has one input signal and one output signal:
+.. raw:: html
 
-.. image:: ../_images/filter.png
-   :scale: 70 % 
-   :align: center 
+   </td></tr></tbody></table>
 
-You cannot feed two different signals into a single filter without adding them together first or doing some other operation.  Likewise, the output will always be one signal, i.e., a 1D array of numbers.
+test
 
-There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The graphs below demonstrate how frequencies in signals are filtered for each type.
+.. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+   -- (2,0);
+   :libs: arrows
 
 .. image:: ../_images/filter_types.png
    :scale: 70 % 
    :align: center 
 
-(ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
+.. 
+   (ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
+
 
 Each filter permits certain frequencies to remain from a signal while blocking other frequencies.  The range of frequencies a filter lets through is known as the "passband", and "stopband" refers to what is blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband.
 

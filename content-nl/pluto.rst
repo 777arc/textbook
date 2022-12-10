@@ -8,47 +8,48 @@ PlutoSDR in Python
    :scale: 50 % 
    :align: center 
    
-In this chapter we learn how to use the Python API for the `PlutoSDR <https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`_, which is a low-cost SDR from Analog Devices.  We will cover the PlutoSDR install steps to get the drivers/software running, and then discuss transmitting and receiving with the PlutoSDR in Python.
+Je zult in de hoofdstuk leren om de Python API voor de `PlutoSDR <https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`_ te gebruiken; een goedkope SDR van Analog Devices.  
+We zullen de stappen behandelen om de drivers/software voor de PlutoSDR te kunnen draaien, en behandelen hoe je kunt zenden en ontvangen met de PlutoSDR in Python.
 
-************************
-Software/Drivers Install
-************************
+****************************
+Software/Drivers Installatie
+****************************
 
-Setting up VM
-#############
+Een VM opzetten
+###############
+Terwijl de gegeven Python voorbeelden ook onder Windows, Mac en Linux zouden moeten werken, zijn de instructies in het specifiek geschreven voor Ubuntu 22. Als je moeite hebt om de software op jouw OS te installeren met behulp van `de instructies van Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, raad ik aan om een Ubuntu 22 VM te installeren volgens de instructies hieronder. Onder Windows 11 is een alternatieve route, Windows Subsystem for Linux (WSL) met Ubuntu 22. Dit draait vrij goed en ondersteund standaard al grafische linux applicaties. 
 
-While the Python code provided in this textbook should work under Windows, Mac, and Linux, the install instructions below are specific to Ubuntu 22. If you have trouble installing the software on your OS following `the instructions provided by Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, I recommend installing an Ubuntu 22 VM and trying the instructions below.  Alternatively, if you're on Windows 11, Windows Subsystem for Linux (WSL) using Ubuntu 22 tends to run fairly well and supports graphics out-of-the-box. 
+1. Installeer en open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
+2. Maak een nieuwe VM aan. Voor de geheugengrootte raad ik 50% van je RAM aan.
+3. Creeer een dynamisch groeiende virtuele hardeschijf, kies hiervoor VDI. 15 GB zou voldoende moeten zijn. Als je zeker wilt zijn kun je nog meer toekennen.
+4. Download de Ubuntu 22 Desktop .iso- https://ubuntu.com/download/desktop
+5. Start de VM. Kies het gedownloade .iso bestand als installatiemedium. Kies “install ubuntu”, met de standaard opties en klik op "continue" bij het venster wat je waarschuwt over de veranderingen. Kies een naam/wachtwoord en wacht op de VM om te installeren. Wanneer de installatie klaar is zal de VM herstarten. Schakel na de herstart de VM uit.
+6. Ga naar de VM instellingen (het tandwieltje).
+7. Onder system > processor > kies tenminste 3 processors. Als je een discrete video kaart hebt dan kun je meer videogeheugen toekennen onder display > video memory .
+8. Start jouw VM.
+9. Ik raad ook aan om de "VM guest additions" te installeren. Ga binnen de VM naar Devices > Insert Guest Additions CD > druk op "run" in het nieuwe venster en volg de instructies. Herstart de VM. Je kunt het klembord delen met de Host via  Devices > Shared Clipboard > Bidirectional.
 
-1. Install and open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
-2. Create a new VM.  For memory size, I recommend using 50% of your computer’s RAM.
-3. Create the virtual hard disk, choose VDI, and dynamically allocate size.  15 GB should be enough. If you want to be really safe you can use more.
-4. Download Ubuntu 22 Desktop .iso- https://ubuntu.com/download/desktop
-5. Start the VM. It will ask you for installation media. Choose the Ubuntu 22 desktop .iso file.  Choose “install ubuntu”, use default options, and a pop up will warn you about the changes you are about to make. Hit continue.  Choose name/password and then wait for the VM to finish initializing.  After finishing the VM will restart, but you should power off the VM after the restart.
-6. Go into the VM settings (the gear icon).
-7. Under system > processor > choose at least 3 CPUs.  If you have an actual video card then in display > video memory > choose something much higher.
-8. Start up your VM.
-9. I recommend installing VM guest additions. Within the VM go to Devices > Insert Guest Additions CD > hit run when a box pops up.  Follow the instructions. Restart the VM.  The shared clipboard can be enabled through Devices > Shared Clipboard > Bidirectional.
-
-Connecting PlutoSDR
+PlutoSDR verbinden
 ###################
 
-1. If running OSX, within OSX, not the VM, in system preferences, enable "kernel extensions".  Then install HoRNDIS (you may need to reboot after).
-2. If running Windows, install this driver: https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
-3. If running Linux you shouldn't have to do anything special.
-4. Plug Pluto into the host machine over USB. Make sure to use the middle USB port on Pluto because the other is for power only.  Plugging in Pluto should create a virtual network adapter, i.e., the Pluto appears like a USB ethernet adapter.
-5. On the host machine (not VM), open a terminal or your preferred ping tool and ping 192.168.2.1.  If that doesn't work, stop and debug the network interface.
-6. Within the VM, open a new terminal
-7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  While pinging, unplug your Pluto and make sure the pinging stalls out, if it keeps pinging then something else at that IP address is on the network, and you'll have to change the IP of the Pluto (or other device) before moving on.
-8. Write down the IP address of the Pluto because you'll need it when we start using the Pluto in Python.
+1. Drivers installeren
+ A. Voor MacOS, onder systeem voorkeuren, zet "kernel extensions" aan. Installeer vervolgens HoRNDIS (Misschien moet je herstarten).
+ B. Voor Windows kun je deze driver installeren: https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
+ C. Voor Linux zou je niets speciaals te hoeven doen.
+2. Plug je Pluto in de host machine via USB. Gebruik de middelste usb poort van de Pluto want de andere is alleen voor voeding. Na het inpluggen van de Pluto wordt een virtuele netwerkkaart aangemaakt, het verschijnt als een USB ethernet adapter.
+3. Op de host machine (niet de VM), open jouw favoriete tool en ping 192.168.2.1. Zorg er eerst voor dat dit werkt voordat je verder gaat.
+4. Open een nieuwe terminal binnen de VM
+5. Ping 192.168.2.1. Als dat niet werk, los dat eerst op. Wanneer je, tijdens het pingen, de Pluto uit de computer haalt zou de ping geen antwoord meer moeten geven. Als het gewoon door blijft gaan dan zit er waarschijnlijk een ander apparaat op hetzelfde ip-adres. Je zult het het adres van de pluto moeten aanpassen.
+6. Schrijf het juiste ip adres van de Pluto ergens op, want dit hebben we nodig om later verbinding te maken.
 
-Installing PlutoSDR Driver
-##########################
+PlutoSDR Driver installeren
+###########################
 
-The terminal commands below should build and install the latest version of:
+De onderstaande terminal commando's (op de VM) zou de volgende zaken moeten installeren:
 
-1. **libiio**, Analog Device’s “cross-platform” library for interfacing hardware
-2. **libad9361-iio**, AD9361 is the specific RF chip inside the PlutoSDR
-3. **pyadi-iio**, the Pluto's Python API, *this is our end goal*, but it depends on the previous two libraries
+1. **libiio**, Analog Device’s “cross-platform” bibliotheek
+2. **libad9361-iio**, AD9361 is de specifieke RF chip binnen de PlutoSDR
+3. **pyadi-iio**, de Pluto's Python API, *ons einddoel*, maar het is afhankelijk van de eerste twee
 
 
 .. code-block:: bash
@@ -80,47 +81,47 @@ The terminal commands below should build and install the latest version of:
  pip3 install -r requirements.txt
  sudo python3 setup.py install
 
-Testing PlutoSDR Drivers
+PlutoSDR Drivers testen
 ##########################
 
-Open a new terminal (in your VM) and type the following commands:
+Open een nieuwe terminal (in jouw VM) en type de volgende commando's:
 
 .. code-block:: bash
 
  python3
  import adi
- sdr = adi.Pluto('ip:192.168.2.1') # or whatever your Pluto's IP is
+ sdr = adi.Pluto('ip:192.168.2.1') # of wat jouw Pluto's IP ook is
  sdr.sample_rate = int(2.5e6)
  sdr.rx()
 
-If you get this far without an error, then continue with the next steps.
+Als je tot nu toe geen problemen ervaart dan kun je verder met de volgende stappen.
 
-Changing Pluto's IP Address
+Pluto's IP Adres aanpassen
 ####################################
 
-If for some reason the default IP of 192.168.2.1 does not work because you already have a 192.168.2.0 subnet, or because you want multiple Pluto's connected at the same time, you can change the IP using these steps:
+Mocht je om een of andere reden het standaard IP van 192.168.2.1 niet willen, dan kun je het IP met deze stappen aanpassen:
 
-1. Edit the config.txt file on the PlutoSDR mass storage device (i.e., the USB-drive looking thing that shows up after you plug in the Pluto).  Enter the new IP you want.
-2. Eject the mass storage device (don't unplug the Pluto!). In Ubuntu 22 there's an eject symbol next to the PlutoSDR device, when looking at the file explorer.
-3. Wait a few seconds, and then cycle power by unplugging the Pluto and plugging it back in.  Go back into the config.txt to determine if your change(s) saved.
+1. Bewerk het config.txt bestand op de PlutoSDR schijf (dus het USB-drive achtige ding wat tevoorschijn komt wanneer je de Pluto inplugt. Voer het nieuw IP adres in.
+2. Werp de schijf uit maar laat de Pluto in de computer zitten! In Ubuntu 22 is er een naast de PlutoSDR device een uitwerp symbool, binnen de verkenner.
+3. Wacht een paar seconden na het uitwerpen en plug daarna de Pluto uit en in de computer. Ga terug naar config.txt en verifieer dat de wijziging is opgeslagen.
 
-Note that this procedure is also used to flash a different firmware image onto the Pluto. For more details see https://wiki.analog.com/university/tools/pluto/users/firmware.
+Op dezelfde manier zou je de firmware van de Pluto kunnen updaten. Zie voor meer info https://wiki.analog.com/university/tools/pluto/users/firmware.
 
-"Hack" PlutoSDR to Increase RF Range
-####################################
+"Hack" de PlutoSDR voor een groter RF bereik
+############################################
 
-The PlutoSDR's ship with a limited center frequency range and sampling rate, but the underlying chip is capable of much higher frequencies.  Follow these steps to unlock the full frequency range of the chip.  Please bear in mind that this process is provided by Analog Devices, thus it is as low risk as you can get.  The PlutoSDR's frequency limitation has to do with Analog Devices "binning" the AD9364 based on strict performance requirements at the higher frequencies. .... As SDR enthusiasts and experimenters, we're not too concerned about said performance requirements.
+De PlutoSDR komt standaard met een beperkte frequentiebereik en bemonsteringsfrequentie, maar de onderliggende chip kan veel hogere frequenties aan. Volg deze stappen om het volle frequentiebereik aan te zeten. Dit proces wordt door Analog Devices zelf uitgelegd dus heeft minimale risico's. De restricties zijn door Analog Devices aangezet omdat de specifieke chips niet voldeden aan de strenge performance-eisen op deze hogere frequenties. Maar als SDR studenten maken we ons niet zo druk over die perfomance-eisen.
 
-Time to hack! Open a terminal (either host or VM, doesn't matter):
+Tijd om te hacken! Open een terminal (host of VM):
 
 .. code-block:: bash
 
  ssh root@192.168.2.1
 
-The default password is analog.
+Het wachtwoord is analog.
 
-You should see the PlutoSDR welcome screen. You have now SSHed into the ARM CPU on the Pluto itself!
-If you have a Pluto with firmware version 0.31 or lower, type the following commands in:
+Je zou een welkkomst 'scherm' moeten zien. Je hebt nu geSSHt naar de linux-omgeving van de Pluto zelf!
+Als je een Pluto firmwareversie van 0.31 of minder hebt, type dan de volgende commando's:
 
 .. code-block:: bash
 
@@ -128,22 +129,32 @@ If you have a Pluto with firmware version 0.31 or lower, type the following comm
  fw_setenv attr_val ad9364
  reboot
 
-And for 0.32 and higher use:
+Voor firmwares van 0.32 en hoger:
 
 .. code-block:: bash
  
  fw_setenv compatible ad9364
  reboot
 
-You should now be able to tune up to 6 GHz and down to 70 MHz, not to mention use a sample rate up to 56 MHz!  Yay!
+Nu moet het mogelijk zijn om af te stemmen op frequenties tussen de 70 MHz en 6 GHz, en een sample rat van 56 MHz! Joepie!
 
 ************************
-Receiving
+Ontvangen
 ************************
 
-Sampling using the PlutoSDR's Python API is straightforward.  With any SDR app we know we must tell it the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three parameters are necessary for the SDR to have enough information to receive samples.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will start to sample as soon as you initialize it. Once the SDR's internal buffer fills up, the oldest samples are dropped.  All SDR APIs have some sort of "receive samples" function, and for the Pluto it's rx(), which returns a batch of samples.  The specific number of samples per batch is defined by the buffer size set beforehand.
+Via de PlutoSDR's Python API is het simpel om monsters te ontvangen. 
+Voor elke SDR applicatie wil je weten wat de middenfrequentie, bemonsteringsfrequentie en versterking is, en of je eventueel automatic gain control (AGC) wilt gebruiken.
+Er zijn andere details, maar deze drie parameters zijn essentieel voor de SDR om te starten met monsters ontvangen.
+Sommige SDR's hebben een commando om te beginnen met het bemonsteren, en anderen zoals de Pluto beginnen zodra je hem initialiseert.
+Op het moment dat de interne buffers van de Pluto volzitten, dan zal het de oudste samples gaan verwijderen.
+Alle SDR API's hebben een "ontvang monsters" functie, en voor de Pluto is dit rx(), dat een stapel monsters teruggeeft.
+De hoeveelheid monsters dat het teruggeeft is gedefinieerd door de buffergrootte wat van tenvoren is ingesteld.
 
-The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, sets the center frequency to 100 MHz, and sets the gain to 70 dB with automatic gain control turned off.  Note it usually doesn't matter the order in which you set the center frequency, gain, and sample rate.  In the code snippet below, we tell the Pluto that we want it to give us 10,000 samples per call to rx().  We print out the first 10 samples.
+De onderstaande code gaat ervan uit dat je Pluto's Python API hebt geinstalleerd.
+Deze code initialiseert de Pluto, stelt de bemonsteringsfrequentie in op 1 MHz, stelt de middenfrequentie in op 100 MHz en stelt de versterking in op 70 dB met AGC uitgeschakeld.
+Het maakt meestal niets uit in welke volgorde je deze dingen doet.
+In de onderstaande code vragen we de Pluto om 10,000 monsters per rx() functieaanroep.
+We drukken de eerste 10 monsters af.
 
 .. code-block:: python
 
@@ -165,14 +176,16 @@ The code below assumes you have the Pluto's Python API installed.  This code ini
     samples = sdr.rx() # receive samples off Pluto
     print(samples[0:10])
 
+Voor nu doen we niets interessants met deze monsters, maar de rest van dit boek staat vol met Python code dat werkt met IQ-monsters zoals we zojuist hebben ontvangen.
 
-For now we aren't going to do anything interesting with these samples, but the rest of this textbook is filled with Python code that works on IQ samples just like what we received above.
+Ontvangstversterking
+####################
 
+De Pluto kan worden ingesteld op een vaste versterking of een automatische. Een automatische versterkingscontrole (AGC) zal automatisch de versterking van de ontvanger aanpassen om een sterk signaalniveau te behouden (-12dBFS om exact te zijn).
+AGC moet je niet verwarren met een analoog-naar-digitaal converter (ADC) dat het signaal digitaliseerd.
+Technisch gezien is de AGC een gesloten-lus feedbackschakeling dat de versterking beheert op basis van het ontvangen signaal met als doel om een constant vermogensniveau te behouden desondanks variërende ingangsvermogens.
+Typisch zorgt de AGC ervoor dat het signaal de ADC niet overstuurt maar wel zo goed mogelijk het volledige bereik van de ADC gebruikt.
 
-Receive Gain
-############
-
-The Pluto can be configured to either have a fixed receive gain or an automatic one. An automatic gain control (AGC) will automatically adjust the receive gain to maintain a strong signal level (-12dBFS for anyone who is curious).  AGC is not to be confused with the analog-to-digital converter (ADC) that digitizes the signal.  Technically speaking, AGC is a closed-loop feedback circuit that controls the amplifier's gain in response to the received signal.  Its goal is to maintain a constant output power level despite a varying input power level.  Typically, the AGC will adjust the gain to avoid saturating the receiver (i.e., hitting the upper limit of the ADC's range) while simultaneously allowing the signal to "fill in" as many ADC bits as possible.
 
 The radio-frequency integrated circuit, or RFIC, inside the PlutoSDR has an AGC module with a few different settings.  (An RFIC is a chip that functions as a transceiver: it transmits and receives radio waves.)  First, note that the receive gain on the Pluto has a range from 0 to 74.5 dB.  When in "manual" AGC mode, the AGC is turned off, and you must tell the Pluto what receive gain to use, e.g.:
 

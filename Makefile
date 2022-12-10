@@ -59,7 +59,7 @@ html:
 
 .PHONY: html-nl
 html-nl:
-	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/* -D master_doc=index-nl . $(BUILDDIR)/nl/
+	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/* -D master_doc=index-nl -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel,sphinxcontrib.tikz,sphinx_subfigure -D tikz_includegraphics_path=_images -D tikz_tikzlibraries=positioning . $(BUILDDIR)/nl/
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/nl/html."
 
