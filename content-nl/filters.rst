@@ -233,16 +233,20 @@ Natuurlijk hangt dit allemaal af van de toepassing en de hardware waarop het fil
 In het filtervoorbeeld hierboven hebben we een 3 kHz kantelfrequentie en een transitiebreedte van 1 kHz gebruikt. Het resulterende filter gebruikte 77 coefficienten.
 
 Terug naar de filteropbouw.
-
-Back to filter representation.  Even though we might show the list of taps for a filter, we usually represent filters visually in the frequency domain.  We call this the "frequency response" of the filter, and it shows us the behavior of the filter in frequency. Here is the frequency response of the filter we were just using:
+Ook al laten we een lijst van coefficienten zien voor een filter, meestal visualiseren we een filter in het frequentiedomein.
+Dit wordt de frequentierespontie genoemd van het filter en laat het gedrag in frequentie zien.
+Het is de frequentierespontie van het filter dat we zojuist gebruikten:
 
 .. image:: ../_images/filter_use_case5.png
    :scale: 100 % 
    :align: center 
 
-Note that what I'm showing here is *not* a signal--it's just the frequency domain representation of the filter.  That can be a little hard to wrap your head around at first, but as we look at examples and code, it will click.
+Let op dat wat hier getoond wordt *niet* een signaal is, het is de frequentierespontie van het filter.
+Misschien is dit moeilijk om je vinger op te leggen maar terwijl we voorbeelden en programma's bekijken zal het duidelijk worden.
 
-A given filter also has a time domain representation; it’s called the "impulse response" of the filter because it is what you see in the time domain if you take an impulse and put it through the filter. (Google "Dirac delta function" for more info about what an impulse is). For a FIR type filter, the impulse response is simply the taps themselves.  For that 77 tap filter we used earlier, the taps are:
+Een filter heeft ook een tijddomein-versie; dit heet de "impulsrespons" van het filter omdat dit de filteruitgang in de tijd is wanneer we een impuls aan de ingang geven. (Google de "dirac delta functie" voor meer informatie over zo'n impuls)
+Voor een geven FIR filter is de impulsrespons gelijk aan de coefficienten zelf.
+Voor dat filter met 77 coefficienten van eerder is dat:
 
 .. code-block:: python
 
@@ -273,7 +277,7 @@ A given filter also has a time domain representation; it’s called the "impulse
     0.000906112720258534, 0.0008378280326724052, 0.0005385575350373983,
     0.00013669139298144728, -0.00025604525581002235]
 
-And even though we haven't gotten into filter design yet, here is the Python code that generated that filter:
+Ook al hebben we nog niets geleerd over filterontwerp, hieronder kun je de code van dat filter vinden:
 
 .. code-block:: python
 
@@ -281,142 +285,192 @@ And even though we haven't gotten into filter design yet, here is the Python cod
     from scipy import signal
     import matplotlib.pyplot as plt
 
-    num_taps = 51 # it helps to use an odd number of taps
-    cut_off = 3000 # Hz
+    num_taps = 51 # aantal coefficiente
+    cut_off = 3000 # kantelfrequentie in Hz
     sample_rate = 32000 # Hz
 
-    # create our low pass filter
+    # laag-doorlaatfilter
     h = signal.firwin(num_taps, cut_off, nyq=sample_rate/2)
 
-    # plot the impulse response
+    # impulsrespons weergeven
     plt.plot(h, '.-')
     plt.show()
 
-Simply plotting this array of floats gives us the filter's impulse response:
+Wanneer we deze coefficienten in de tijd weergeven dan krijgen we de impulsrepons:
 
 .. image:: ../_images/impulse_response.png
    :scale: 100 % 
    :align: center 
 
-And here is the code that was used to produce the frequency response, shown earlier.  It's a little more complicated because we have to create the x-axis array of frequencies. 
+De code om de frequentierespontie te geven van eerder wordt hieronder getoond. 
+Dit is iets ingewikkelder omdat we een x-as voor de frequenties moeten opzetten.
 
 .. code-block:: python
 
-    # plot the frequency response
-    H = np.abs(np.fft.fft(h, 1024)) # take the 1024-point FFT and magnitude
-    H = np.fft.fftshift(H) # make 0 Hz in the center
-    w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
+    # Frequentierespontie
+    H = np.abs(np.fft.fft(h, 1024)) # neem een 1024-punten FFT met modulus
+    H = np.fft.fftshift(H) # frequenties op juiste plek zetten
+    w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x-as
     plt.plot(w, H, '.-')
     plt.show()
 
-Real vs. Complex Filters
-########################
+Reele vs Complexe filters
+#########################
 
-The filter I showed you had real taps, but taps can also be complex.  Whether the taps are real or complex doesn't have to match the signal you put through it, i.e., you can put a complex signal through a filter with real taps and vice versa.  When the taps are real, the filter's frequency response will be symmetrical around DC (0 Hz).  Typically we use complex taps when we need asymmetry, which does not happen too often.
+Voorzover hadden de filters reeele coefficienten maar de coefficienten kunnen ook complex zijn. 
+Of de coefficienten reeel of complex zijn heeft niets te maken met de ingang, je kunt een reeel signaal in een complex filter stoppen en andersom.
+Waneer de coëfficiënten reeel zijn dan is de frequentierespontie symetrisch rondom DC (0Hz).
+We gebruiken complexe coefficienten alleen wanneer we een asymmetrisch filter willen, wat niet vaak het geval is.
 
-.. image:: ../_images/complex_taps.png
-   :scale: 80 % 
-   :align: center 
 
-As an example of complex taps, let's go back to the filtering use-case, except this time we want to receive the other interfering signal (without having to re-tune the radio).  That means we want a band-pass filter, but not a symmetrical one. We only want to keep (a.k.a "pass") frequencies between around 7 kHz to 13 kHz (we don't want to also pass -13 kHz to -7 kHz):
+.. draw real vs complex filter
+.. tikz:: [font=\sffamily\Large,scale=2] 
+   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}   
+   \draw[->, thick] (-5,0) node[below]{$-\frac{f_s}{2}$} -- (5,0) node[below]{$\frac{f_s}{2}$};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,1);
+   \draw[babyblueeyes, smooth, line width=3pt] plot[tension=0.1] coordinates{(-5,0) (-1,0) (-0.5,2) (0.5,2) (1,0) (5,0)};
+   \draw[->,thick] (6,0) node[below]{$-\frac{f_s}{2}$} -- (16,0) node[below]{$\frac{f_s}{2}$};
+   \draw[->,thick] (11,-0.5) node[below]{0 Hz} -- (11,1);
+   \draw[babyblueeyes, smooth, line width=3pt] plot[tension=0] coordinates{(6,0) (11,0) (11,2) (11.5,2) (12,0) (16,0)};
+   \draw[font=\huge\bfseries] (0,2.5) node[above,align=center]{Een laagdoorlaatfilter met\\reële coëfficiënten};
+   \draw[font=\huge\bfseries] (11,2.5) node[above,align=center]{Een laagdoorlaatfilter met\\complexe coëfficiënten};
+
+.. .. image:: ../_images/complex_taps.png
+..    :scale: 80 % 
+..    :align: center 
+
+Als een voorbeeld voor complexe coëfficiënten kunnen we de eerder signalen er weer bij pakken, maar deze keer zullen we het andere signaal proberen te ontvangen zonder de SDR opnieuw in te stellen.
+Dit betekent dat we een banddoorlaatfilter willen gebruiken, maar niet een symetrische.
+We will alleen de frequenties rond 7 tot 13 kHz gebruiken, maar niet de frequenties van -13 tot -7 kHz:
 
 .. image:: ../_images/filter_use_case6.png
    :scale: 70 % 
    :align: center 
 
-One way to design this kind of filter is to make a low-pass filter with a cutoff of 3 kHz and then frequency shift it.  Remember that we can frequency shift x(t) (time domain) by multiplying it by :math:`e^{j2\pi f_0t}`.  In this case :math:`f_0` should be 10 kHz, which shifts our filter up by 10 kHz. Recall that in our Python code from above, :math:`h` was the filter taps of the low-pass filter.  In order to create our band-pass filter we just have to multiply those taps by :math:`e^{j2\pi f_0t}`, although it involves creating a vector to represent time based on our sample period (inverse of the sample rate):
+Een manier om dit filter te maken is om een laagdoorlaatfilter te nemen met een kantelfrequentie van 3 kHz en daarna op teschuiven in frequentie.
+We kunnen een frequentieverschuiving aan x(t) (tijddomein) geven door het te vermenigvuldigen met :math:`e^{j2\pi f_0t}`.  
+In dit geval moet dan :math:`f_0` 10 kHz zijn wat het filter 10 kHz zou opschuiven.
+In het bovenstaande voorbeeld beschreef :math:`h` de coëfficiënten van het laagdoorlaatfilter.
+Dus om ons banddoorlaatfilter te maken zullen we de coëfficiënten moeten vermenigvuldigen met :math:`e^{j2\pi f_0t}`, dit houdt in dat we aan elke monster (coëfficiënt) de juiste tijd moeten koppelen (de inverse van onze bemonsteringsfrequentie):
 
 .. code-block:: python
 
-    # (h was found using the first code snippet)
+    # (h staat in eerder gegeven code)
 
-    # Shift the filter in frequency by multiplying by exp(j*2*pi*f0*t)
-    f0 = 10e3 # amount we will shift
-    Ts = 1.0/sample_rate # sample period
-    t = np.arange(0.0, Ts*len(h), Ts) # time vector. args are (start, stop, step)
-    exponential = np.exp(2j*np.pi*f0*t) # this is essentially a complex sine wave
+    # Verschuif het filter in frequentie door te vermenigvuldigen met exp(j*2*pi*f0*t)
+    f0 = 10e3 # we verschuiven 10k
+    Ts = 1.0/sample_rate # bemonsteringsfrequentie
+    t = np.arange(0.0, Ts*len(h), Ts) # vector met tijden van monsters. (start, stop, stap)
+    exponential = np.exp(2j*np.pi*f0*t) # dit is een complexe sinus
 
-    h_band_pass = h * exponential # do the shift
+    h_band_pass = h * exponential # verschuiving uitvoeren
 
-    # plot impulse response
+    # impulsresponsie weergeven
     plt.figure('impulse')
     plt.plot(np.real(h_band_pass), '.-')
     plt.plot(np.imag(h_band_pass), '.-')
     plt.legend(['real', 'imag'], loc=1)
 
-    # plot the frequency response
-    H = np.abs(np.fft.fft(h_band_pass, 1024)) # take the 1024-point FFT and magnitude
-    H = np.fft.fftshift(H) # make 0 Hz in the center
-    w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x axis
+    # frequentieresponsie weergeven
+    H = np.abs(np.fft.fft(h_band_pass, 1024)) # 1024-punts FFT met modulus
+    H = np.fft.fftshift(H) # frequenties op juiste plek zetten
+    w = np.linspace(-sample_rate/2, sample_rate/2, len(H)) # x-as
     plt.figure('freq')
     plt.plot(w, H, '.-')
     plt.xlabel('Frequency [Hz]')
     plt.show()
 
-The plots of the impulse response and frequency response are shown below:
+De impuls- en frequentieresponsie worden hieronder weergeven:
 
-.. image:: ../_images/shifted_filter.png
-   :scale: 60 % 
-   :align: center 
+.. annotate filter spectrum image in tikz with text.
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{shifted_filter_nolabel.png}};
+   \begin{scope}[x={(image.south east)},y={(image.north west)}]
+      \draw 
+      (0.25, 0) node[align=center] {Tijddomein}
+      (0.25, 1) node[align=center] {Impulsresponsie}
+      (0.75, 1) node[align=center] {Frequentieresponsie};
+   \end{scope}
 
-Because our filter is not symmetrical around 0 Hz, it has to use complex taps. Therefore we need two lines to plot those complex taps.  What we see in the left-hand plot above is still the impulse response.  Our frequency response plot is what really validates that we created the kind of filter we were hoping for, where it will filter out everything except the signal centered around 10 kHz.  Once again, remember that the plot above is *not* an actual signal: it's just a representation of the filter.  It can be very confusing to grasp because when you apply the filter to the signal and plot the output in the frequency domain, in many cases it will look roughly the same as the filter's frequency response itself.
+.. .. image:: ../_images/shifted_filter.png
+..    :scale: 60 % 
+..    :align: center 
 
-If this subsection added to the confusion, don't worry, 99% of the time you'll be dealing with simple low pass filters with real taps anyway. 
+Omdat ons filter niet symmetrisch is rond 0 Hz moeten we complexe coëfficiënten gebruiken en hebben we twee lijnen nodig om het te weergeven.
+Wat aan de linkerkant van het bovenstaande figuur te zien is, is deze complexe impulsreponsie.
+De rechterkant valideert dat we inderdaad het gewenste filter hebben verkregen; het filtert alles weg, behalve de frequenties rondom 10 kHz.
+Let nogmaals op dat het bovenstaande signaal *geen* signaal is, maar de responsie van het filter.
+Dit kan lastig zijn om te vatten want we passen het filter toe op een signaal en weergeven de uitgang in het frequentiedomein wat in veel gevallen bijna overeenkomt met de frequentieresponse van het filter.
+
+Maak je geen zorgen als dit stuk nog meer verwarring heeft verzoorzaakt, 99% van de tijd gebruiken we alleen laagdoorlaatfilters met reële coëfficiënten.
 
 *************************
-Filter Implementation
+Filterimplementatie
 *************************
 
-We aren't going to dive too deeply into the implementation of filters. Rather, I focus on filter design (you can find ready-to-use implementations in any programming language anyway).  For now, here is one take-away:  to filter a signal with an FIR filter, you simply convolve the impulse response (the array of taps) with the input signal.  (Don't worry, a later section explains convolution.) In the discrete world we use a discrete convolution (example below).  The triangles labeled as b's are the taps.  In the flowchart, the squares labeled :math:`z^{-1}` above the triangles signify to delay by one time step.
+We zullen niet te diep in de stof van filterimplementatie duiken.
+Ik leg liever de nadruk op filterontwerp (je kunt toch bruikbare implementaties vinden voor elke taal).
+Voor nu draait het om een ding: Om een signaal met een FIR filter te filteren voer je convolutie uit tussen de impulsresponsie (de coefficienten) en het ingangssignaal.
+De de discrete wereld gebruiken we een digitale convolutie (voorbeeld hieronder).
+
+De driehoeken met een :math:`b_x` ernaast zijn de coefficienten en de driehoeken met :math:`z^{-1}` geven een vertraging aan van 1 tijdstap.
 
 .. image:: ../_images/discrete_convolution.png
    :scale: 80 % 
    :align: center 
 
-You might be able to see why we call them filter "taps" now, based on the way the filter itself is implemented. 
+Je ziet nu miscshien wel waarom de coefficienten in het engels "taps" worden genoemd, dit komt voort uit hoe het filter wordt geimplementeerd.
 
 FIR vs IIR
 ##############
 
-There are two main classes of digital filters: FIR and IIR
+Eer zijn grofweg twee verschillende typen filters: FIR en IIR
 
 1. Finite impulse response (FIR)
 2. Infinite impulse response (IIR)
 
-We won't get too deep into the theory, but for now just remember: FIR filters are easier to design and can do anything you want if you use enough taps.  IIR filters are more complicated with the potential to be unstable, but they are more efficient (use less CPU and memory for the given filter). If someone just gives you a list of taps, it's assumed they are taps for an FIR filter.  If they start mentioning "poles", they are talking about IIR filters.  We will stick with FIR filters in this textbook.
+We zullen niet diep op theorie gaan maar onthoud voor nu dat FIR filters gemakkelijker te ontwerpen zijn en alles kimmem doen wat je wilt als er maar genoeg coefficienten worden gegeven.
+IIR filters zijn efficienter en zouden hetzelfde kunnen bereiken met minder coefficienten maar met het risico dat het filter onstabiel wordt en niet goed werkt.
+Een gegeven lijst coefficienten zijn over het algemeen voor een FIR filter.
+Als er wordt gesproken over "polen" dan betreft het een IIR filter.
+In dit boek zullen we et bij FIR filters houden.
 
-Below is an example frequency response, comparing an FIR and IIR filter that do almost exactly the same filtering; they have a similar transition-width, which as we learned will determine how many taps are required.  The FIR filter has 50 taps and the IIR filter has 12 poles, which is like having 12 taps in terms of computations required.
+Het onderstaande figuur laat het verschil zien tussen een FIR en IIR filter. Ze hebben hetzelfde gedrag maar het FIR filter gebruikt 50 coefficienten en het IIR filter maar 12. Toch hebben ze beiden ongeveer dezelfde transitiebreedte.
 
 .. image:: ../_images/FIR_IIR.png
    :scale: 70 % 
    :align: center 
 
-The lesson is that the FIR filter requires vastly more computational resources than the IIR to perform roughly the same filtering operation.
+Wat je hieruit kunt leren is dat het FIR filter veel meer computerkracht vereist dan een IIR filter voor hetzelfde gedrag.
 
-Here are some real-world examples of FIR and IIR filters that you may have used before.
+Hieronder wat voorbeelden van FIR en IIR filters die je misschien in het echt al hebt gebruikt.
 
-If you perform a "moving average" across a list of numbers, that's just an FIR filter with taps of 1's:
-- h = [1 1 1 1 1 1 1 1 1 1] for a moving average filter with a window size of 10.  It also happens to be a low-pass type filter; why is that?  What's the difference between using 1's and using taps that decay to zero?
+Wanneer je een "moving average" (voortschrijdend gemiddelde) filter over een lijst getallen toepast, dan is dat gewoon een FIR filter met coefficienten van 1.  
+Het is ook een laagdoorlaatfilter; waarom? Wat is het verschil tussen 1'en en coefficienten die richting 0 vervallen?
 
 .. raw:: html
 
    <details>
-   <summary>Answers</summary>
+   <summary>Antwoorden</summary>
 
-A moving average filter is a low-pass filter because it smooths out "high frequency" changes, which is usually why people will use one.  The reason to use taps that decay to zero on both ends is to avoid a sudden change in the output, like if the signal being filtered was zero for a while and then suddenly jumped up.
+Een "moving average" filter is een laagdoorlaatfilter omdat het snelle veranderingen uitsmeert, de reden waarom mensen het willen gebruiken.
+Een reden om coeffcienten te gebruiken die richting 0 gaan aan beide kanten is om plotselinge verandering aan de uitgang te voorkomen, zoals zou gebeuren als de ingang een tijd nul is en dan plotseling omhoog springt.
 
 .. raw:: html
 
    </details>
 
-Now for an IIR example.  Have any of you ever done this: 
+Voor een IIR voorbeeld. Als je zoiets hebt gedaan:
 
     x = x*0.99 + new_value*0.01
 
-where the 0.99 and 0.01 represent the speed the value updates (or rate of decay, same thing).  It's a convenient way to slowly update some variable without having to remember the last several values.  This is actually a form of low-pass IIR Filter.  Hopefully you can see why IIR filters have less stability than FIR.  Values never fully go away!
+waar de 0.99 en 0.01 de snelheid aangeeft waarmee de waarde verandert.
+Dit is een handige manier om een variabele te veranderen zonder de vorige waarden te onthouden.
+Dit is een laagdoorlaat IIR filter (omdat het de vorige uitgang gebruikt).
+Hopelijk kun je zien waarom dit minder stabiel is. De waarden zullen nooit volledig verdwijnen!
 
 *************************
-Filter Design Tools
+Filterontwerptools
 *************************
 
 In practice, most people will use a filter designer tool or a function in code that designs the filter.  There are plenty of different tools, but for students I recommend this easy-to-use web app by Peter Isza that will show you impulse and frequency response: http://t-filter.engineerjs.com.  Using the default values, at the time of writing this at least, it's set up to design a low-pass filter with a passband from 0 to 400 Hz and stopband from 500 Hz and up.  The sample rate is 2 kHz, so the max frequency we can "see" is 1 kHz.
