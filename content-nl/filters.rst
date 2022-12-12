@@ -27,6 +27,7 @@ Misschien denk je dat we alleen geintereseerd zijn in digitale filters; het is t
 Het is echter belangrijk om te begrijpen dat veel filters analoog zullen zijn, zoals de filters die in jouw SDR voor de ADC's zijn gezet.
 Het volgende figuur plaatst een schema van een analoog filter tegenover het schematisch ontwerp van een digitaal filter.
 
+.. annotate image in tikz with text.
 .. tikz:: [font=\sffamily\Large\bfseries]
    \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=1.5]{analog_digital_filter_nolabel.png}};
    \begin{scope}[x={(image.south east)},y={(image.north west)}]
@@ -58,70 +59,79 @@ Op dezelfde manier zal de uitgang altijd een signaal betreffen, bijv. een 1D arr
 Er zijn vier basistypen van filters: laag-doorlaat, hoog-doorlaat, band-doorlaat en band-stop.
 Elke type bewerkt signalen zodanig dat de focus op verschillende gebieden aan frequenties ligt.
 De onderstaande grafieken laten voor elke van de typen zien hoe de frequenties worden gefilterd.
+We merken op dat onderstaande figuren ook de negatieve frequenties tonen. Zolang de filters "reeel" zijn, zullen ook de filters gespiegeld zijn rondom 0 Hz.
 
+.. the only way i could manage to get the tikz drawings next each other
+.. was to use a html table... In a pdf the pictures would be beneath each
+.. other
 .. raw:: html
 
    <table><tbody><tr><td>
 
-.. tikz:: [font=\sffamily\Large\bfseries]    
-   \begin{axis}[xmax=9,ymax=9, samples=50, ymode=log, xmode=log]
-   \addplot[blue, ultra thick] (x,{(1)/(x*x + 2*x+1)});
-   \end{axis}
+.. This draw the lowpass filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Laag-doorlaat}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-2.5,0.5) (-1.5,3) (1.5,3) (2.5,0.5) (5,0)};
 
 .. raw:: html
 
    </td><td>
 
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \begin{loglogaxis}[title=Hoog-doorlaat, xtick={\empty}, ytick={\empty}, grid=none]
-      \addplot[domain=1:100000]  {(60*x+10000)/(x*x + 60*x+10000)};      
-   \end{loglogaxis} 
+.. this draws the highpass filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Hoog-doorlaat}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-2.5,2.5) (-1.5,0.3) (1.5,0.3) (2.5,2.5) (5,3)};
 
 .. raw:: html
 
    </td><td>
 
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \begin{loglogaxis}[title=Band-doorlaat, xtick={\empty}, ytick={\empty}, grid=none]
-      \addplot[domain=1:100000]  {(60*x+10000)/(x*x + 60*x+10000)};      
-   \end{loglogaxis} 
+.. this draws the bandpass filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-doorlaat}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-4.5,0.3) (-3.5,3) (-2.5,3) (-1.5,0.3) (1.5, 0.3) (2.5,3) (3.5, 3) (4.5,0.3) (5,0)};
 
 .. raw:: html
 
    </td><td>
 
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \begin{loglogaxis}[title=Band-stop, xtick={\empty}, ytick={\empty}, grid=none]
-      \addplot[domain=1:100000]  {(60*x+10000)/(x*x + 60*x+10000)};      
-   \end{loglogaxis}    
+.. and finally the bandstop filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-stop}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-4.5,2.7) (-3.5,0.3) (-2.5,0.3) (-1.5,2.7) (1.5, 2.7) (2.5,0.3) (3.5, 0.3) (4.5,2.7) (5,3)};   
    
 .. raw:: html
 
    </td></tr></tbody></table>
 
-test
+.. .......................... end of filter plots in tikz
 
-.. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
-   -- (2,0);
-   :libs: arrows
+.. .. image:: ../_images/filter_types.png
+..    :scale: 70 % 
+..    :align: center 
 
-.. image:: ../_images/filter_types.png
-   :scale: 70 % 
-   :align: center 
+Elke filter laat sommige frequenties in een signaal door terwijl het andere frequenties blokkeert.
+Het bereik aan frequenties wat wordt doorgelaten heet de "doorlaatband", en wat wordt geblokkeert heet de "stopband".
+In het geval van een laag-doorlaat filter worden lage frequenties doorgelaten en hoge frequenties geblokkeert, dus 0Hz zal altijd in de doorlaatband vallen.
+Bij de hoog-doorlaat en band-doorlaat filters bevindt 0 Hz zich altijd in de stopband.
 
-.. 
-   (ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
-
-
-Each filter permits certain frequencies to remain from a signal while blocking other frequencies.  The range of frequencies a filter lets through is known as the "passband", and "stopband" refers to what is blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband.
-
-Do not confuse these filtering types with filter algorithmic implementation (e.g., IIR vs FIR).  The most common type by far is the low-pass filter (LPF) because we often represent signals at baseband.  LPF allows us to filter out everything "around" our signal, removing excess noise and other signals.
+Verwar deze filtertypes niet met de implementatietypes (dus IIR en FIR).
+Omdat we regelmatig signalen in de basisband gebruiken, wordt het laag-doorlaat filter (LPF) veruit het meeste gebruikt.
+Een LPF staat ons toe om alles "rond" ons signaal, zoals ruis en andere signalen, weg te filteren.
 
 *************************
-Filter Representation
+Filter opbouw
 *************************
 
-For most filters we will see (known as FIR, or Finite Impulse Response, type filters), we can represent the filter itself with a single array of floats.  For filters symmetrical in the frequency domain, these floats will be real (versus complex), and there tends to be an odd number of them.  We call this array of floats "filter taps".  We often use :math:`h` as the symbol for filter taps.  Here is an example of a set of filter taps, which define one filter:
+De meeste digitale filters die we tegen zullen komen (zoals FIR) kunnen we beschrijven met een array van floating point getallen.
+Filters die in het frequentiedomein symetrisch zijn hebben reeele getallen (ipv complex), en meestal zijn er een oneven aantal.
+We noemen deze array van getallen "coëfficienten" of in het Engels "taps".
+Meestal gebruiken we :math:`h` als symbol voor deze filter coefficienten/taps. 
+Hier zijn een aantal voorbeeld taps van een enkel filter:
 
 .. code-block:: python
 
@@ -139,47 +149,90 @@ For most filters we will see (known as FIR, or Finite Impulse Response, type fil
      -2.46268845e-03 -1.01714338e-03  1.64604862e-04  8.51595307e-04
       1.08410297e-03  9.92977939e-04]
 
-Example Use-Case
+Voorbeeldtoepassing
 ########################
 
-To learn how filters are used, let's look an an example where we tune our SDR to a frequency of an existing signal, and we want to isolate it from other signals.  Remember that we tell our SDR which frequency to tune to, but the samples that the SDR captures are at baseband, meaning the signal will display as centered around 0 Hz. We will have to keep track of which frequency we told the SDR to tune to.  Here is what we might receive:
+Om te leren hoe onze filters worden gebruikt gaan we kijken naar een voorbeeld waarin we onze SDR afstemmen op een frequentie van een bestaand signaal. Rondom dat signaal zijn andere signalen die we weg willen halen.
+Vergeet niet dat terwijl we onze SDR af stemmen op een RF frequentie, dat de monsters die de SDR teruggeeft in de basisband zitten. Dit betekent dat het signaal dus gecentreerd zal zijn rond de 0 Hz.
+We moeten zelf onthouden op welke frequentie we de SDR hadden ingesteld.
+Dit zouden we dan kunnen ontvangen:
 
-.. image:: ../_images/filter_use_case.png
-   :scale: 70 % 
-   :align: center 
+.. annotate filter spectrum image in tikz with text.
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{filter_use_case_nolabel.png}};
+   \begin{scope}[x={(image.south east)},y={(image.north west)}]
+      \draw[red, ->] (0.3, 0.7) node[above left, align=center]{Gewenste\\signaal} -- (0.45, 0.6);
+      \draw[red, ->] (0.9, 0.8) node[above right, align=center]{Ongewenst\\signaal} -- (0.8, 0.7);
+      \draw[red, ->] (0.25, 0.2) node[below, align=center]{Ruisvloer} -- (0.3, 0.4);      
+   \end{scope}
 
-Because our signal is already centered at DC (0 Hz), we know we want a low-pass filter.  We must choose a "cutoff frequency" (a.k.a. corner frequency), which will determine when the passband transitions to stopband.  Cutoff frequency will always be in units of Hz.  In this example, 3 kHz seems like a good value:
+.. .. image:: ../_images/filter_use_case_nolabel.png
+..    :scale: 40 % 
+..    :align: center 
 
-.. image:: ../_images/filter_use_case2.png
-   :scale: 70 % 
-   :align: center 
+We weten dat we een laagdoorlaatfilter nodig hebben Omdat ons signaal al rond DC (0 Hz) is gecentreerd.
+We moeten de "kantelfrequentie" (engels "cutoff") kiezen waar de doorlaatband overgaat in de stopband.
+De kantelfrequentie wordt altijd in Hz gegeven.
+In dit voorbeeld lijkt 3 kHz wel een goede waarde:
 
-However, the way most low-pass filters work, the negative frequency boundary will be -3 kHz as well.  I.e., it’s symmetrical around DC (later on you will see why).  Our cutoff frequencies will look something like this (the passband is the area in between):
+.. annotate filter spectrum image in tikz with text.
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{filter_use_case_nolabel.png}};
+   \begin{scope}[x={(image.south east)},y={(image.north west)}]
+      \draw[red, ->] (0.3, 0.7) node[above left, align=center]{Gewenste\\signaal} -- (0.45, 0.6);
+      \draw[red, ->] (0.9, 0.8) node[above right, align=center]{Ongewenst\\signaal} -- (0.8, 0.7);
+      \draw[red, ->] (0.25, 0.2) node[below, align=center]{Ruisvloer} -- (0.3, 0.4); 
+      \draw[red, dashed, very thick] (0.62, 0.1) -- (0.62,0.7);
+   \end{scope}
 
-.. image:: ../_images/filter_use_case3.png
-   :scale: 70 % 
-   :align: center 
+Maar, gezien hoe de meeste laagdoorlaatfilters werken, zal de negatieve kantelfrequentie ook op (-)3 kHz liggen.
+Het is dus symetrisch rond DC (later zien we waarom).
+Onze kantelfrequenties zijn er dan ongeveer zo uit (de doorlaatband ligt tussen):
 
-After creating and applying the filter with a cutoff freq of 3 kHz, we now have:
+.. annotate filter spectrum image in tikz with text.
+.. tikz:: [font=\sffamily\Large\bfseries]
+   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{filter_use_case_nolabel.png}};
+   \begin{scope}[x={(image.south east)},y={(image.north west)}]
+      \draw[red, ->] (0.3, 0.7) node[above left, align=center]{Gewenste\\signaal} -- (0.45, 0.6);
+      \draw[red, ->] (0.9, 0.8) node[above right, align=center]{Ongewenst\\signaal} -- (0.8, 0.7);
+      \draw[red, ->] (0.25, 0.2) node[below, align=center]{Ruisvloer} -- (0.3, 0.4); 
+      \draw[red, dashed, very thick] (0.622, 0.1) -- (0.622,0.7);
+      \draw[red, dashed, very thick] (0.455, 0.1) -- (0.455,0.7);
+   \end{scope}
+
+Na het maken en toepassen van een filter met een kantelfrequentie van 3 kHz krijgen we:
 
 .. image:: ../_images/filter_use_case4.png
    :scale: 70 % 
    :align: center 
 
-This filtered signal will look confusing until you recall that our noise floor *was* at the green line around -65 dB.  Even though we can still see the interfering signal centered at 10 kHz, we have *severely* decreased the power of that signal. It's now below where the noise floor was!  We also removed most of the noise that existed in the stopband.
 
-In addition to cutoff frequency, the other main parameter of our low-pass filter is called the "transition width".  Transition width, also measured in Hz, instructs the filter how quickly it has to go between the passband and stopband since an instant transition is impossible.
+Dit gefilterde signaal ziet er misschien verwarrend uit todat je beseft dat de ruisvloer rond de groene lijn *zat* op -70 dB.
+Ook al zien het signaal rond de 10 kHz nog steeds, het is *sterk* in vermogen afgenomen.
+Het is zelfs zwakker geworden dan de oude ruisvloer!
+Daarnaast hebben we dus ook de meeste ruis in de stopband verwijdert. 
 
-Let's visualize transition width.  In the diagram below, the :green:`green` line represents the ideal response for transitioning between a passband and stopband, which essentially has a transition width of zero.  The :red:`Red` line demonstrates the result of a realistic filter, which has some ripple and a certain transition width.
+Naast de kantelfrequetie  is een ander belangrijke instelling van ons laagdoorlaatfilter de transitiebreedte (Engels: "Transition width").
+Dit wordt uitgedrukt in Hz en het verteld het filter hoe *snel* het moet overgaan van de doorlaatband naar de stopband, want een directe overgang is onmogelijk.
+
+Laten we de transitiebreedte weergeven.
+In het onderstaande figuur laat de :green:`groene` lijn de ideale filterrespontie zien met een transitiebreedte van 0 Hz.
+De :red:`rode` lijn laat een realistisch filter zien, met een golvend gedrag in de doorlaat- en stopband en met een bepaalde transitiebreedte.
+De frequentie in dit figuur is genormaliseerd met de bemonsteringsfrequentie.
 
 .. image:: ../_images/realistic_filter.png
    :scale: 100 % 
    :align: center 
 
-You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations--we will see why shortly.  A 50-tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
-Typically we use a filter designer tool, then see how many taps it outputs, and if it's way too many (e.g., more than 100) we increase the transition width.  It all depends on the application and hardware running the filter, of course.
+Nu vraag je je misschien af waarom we niet gewoon een zo'n kleine transitiebreedte als mogelijk kiezen. 
+De reden daarvoor is voornamelijk dat een kleinere breedte zal resulteren in meer coefficienten, en hoe meer coefficienten hoe intensiever het wordt om te berekenen. 
+Een filter met 50 coefficienten kan heel de dag draaien en nog geen 1% CPU kracht gebruiken op een Raspberry Pi, terwijl een filter met 50000 coefficienten de CPU doet ontploffen!
+Meestal gebruiken we een filter ontwerpprogramma om te zien over hoe veel coefficienten het gaat. Als dit veel te veel is (bijv. meer dan 100) dan verbreden we de transitie. 
+Natuurlijk hangt dit allemaal af van de toepassing en de hardware waarop het filter draait.
 
-In the filtering example above, we had used a cutoff of 3 kHz and a transition width of 1 kHz (it's hard to actually see the transition width just looking at these screenshots).  The resulting filter had 77 taps.
+In het filtervoorbeeld hierboven hebben we een 3 kHz kantelfrequentie en een transitiebreedte van 1 kHz gebruikt. Het resulterende filter gebruikte 77 coefficienten.
+
+Terug naar de filteropbouw.
 
 Back to filter representation.  Even though we might show the list of taps for a filter, we usually represent filters visually in the frequency domain.  We call this the "frequency response" of the filter, and it shows us the behavior of the filter in frequency. Here is the frequency response of the filter we were just using:
 
