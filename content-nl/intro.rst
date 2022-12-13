@@ -72,3 +72,10 @@ Bedankt aan iedereen die dit boek heeft gelezen en van feedback heeft voorzien, 
 - Tarik Benaddi voor het `vertalen van PySDR naar het Frans <https://pysdr.org/fr/index-fr.html>`_
 
 
+**********************
+Nederlandse vertaling
+**********************
+
+Bij het vertalen van dit boek heb ik de bewuste keuze gemaakt om een aantal termen in Engelse vorm te gebruiken. De belangrijkste hiervan is "sample". Een "sample" nemen heet in het Nederlands een "monster" nemen. Wanneer we het echter gaan hebben over dingen als bemonsteringsfrequentie dan gaan we in mijn mening het doel voorbij van dingen duidelijk overbrengen. Sample-frequentie is leesbaarder en herkenbaar uit vele online bronnen. Om deze reden heb ik "sample" i.p.v. "monster" aangehouden.
+
+Ook hou ik de standaard afkortingen aan zoals DSP, FIR, IIR, LPF etc. Ik geef de Nederlandse vertaling van de termen waarna ik vervolgens de Engelse afkortingen gebruik.

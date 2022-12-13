@@ -177,7 +177,7 @@ We kunnen dit zelf bewijzen door in Python wat ruis te genereren en daarna de FF
  import numpy as np
  import matplotlib.pyplot as plt
  
- N = 1024 # aantal monsters om te simuleren, kies zelf een waarde
+ N = 1024 # aantal samples om te simuleren, kies zelf een waarde
  x = np.random.randn(N)
  plt.plot(x, '.-')
  plt.show()

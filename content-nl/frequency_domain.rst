@@ -11,7 +11,7 @@ Een van de coolste gevolgen van het leren over DSP en draadloze communicatie is 
 .. image:: ../_images/audio_equalizer.webp
    :align: center
 
-Wanneer je dit hoofdstuk hebt afgerond zul je begrijpen wat het frequentiedomein echt betekent, hoe je kunt schakelen tussen tijd en frequentie (en wat er gebeurt als we dit doen) en wat interessante principes die we zullen gebruiken door ons onderzoek naar BSN en SDR. Wanneer je dit boek hebt afgerond zul je een master zijn in het werken in het frequentiedomein. Gegarandeerd!
+Wanneer je dit hoofdstuk hebt afgerond zul je begrijpen wat het frequentiedomein echt betekent, hoe je kunt schakelen tussen tijd en frequentie (en wat er gebeurt als we dit doen) en wat interessante principes die we zullen gebruiken door ons onderzoek naar DSP en SDR. Wanneer je dit boek hebt afgerond zul je een master zijn in het werken in het frequentiedomein. Gegarandeerd!
 
 Als eerste, waarom willen we naar signalen kijken in het frequentiedomein? Nou, hieronder staan twee voorbeelden, weergeven in beide het tijd- en frequentiedomein.
 
@@ -19,7 +19,7 @@ Als eerste, waarom willen we naar signalen kijken in het frequentiedomein? Nou, 
    :scale: 40 %
    :align: center   
 
-Zoals je ziet, in het tijddomein lijken beide figuren op ruis, maar in het frequentiedomein kunnen we verschillende eigenschappen van de signalen onderscheiden. Alles is van nature in het tijddomein; wanneer we signalen bemonsteren, doen we dit in het tijddomein, want je kunt een signaal niet *direct* bemonsteren in het frequentiedomein.
+Zoals je ziet, in het tijddomein lijken beide figuren op ruis, maar in het frequentiedomein kunnen we verschillende eigenschappen van de signalen onderscheiden. Alles is van nature in het tijddomein; wanneer we signalen samplen, doen we dit in het tijddomein, want je kunt een signaal niet *direct* samplen in het frequentiedomein.
 
 ***************
 Fourierreeks
@@ -37,13 +37,14 @@ Hier is nog een voorbeeld; de rode curve in de animatie benadert een zaagtandsig
    :scale: 70 %   
    :align: center  
 
-Sommige signalen hebben meer sinussen nodig dan andere, en sommige een oneindig aantal, maar ze kunnen altijd benaderd worden met een beperkt aantal. Hier is nog een voorbeeld van een signaal wat wordt opgebouwd door een reeks van sinussen.
+Sommige signalen hebben meer sinussen nodig dan andere, en sommige een oneindig aantal, maar ze kunnen altijd worden benaderd met een beperkt aantal. Hier is nog een voorbeeld van een signaal wat wordt opgebouwd door een reeks van sinussen.
 
 .. image:: ../_images/fourier_series_arbitrary_function.gif
    :scale: 70 %   
    :align: center  
 
 Om te begrijpen hoe een signaal kan worden opgebroken in sinussen, of sinusoïden, moeten we eerst de drie eigenschappen van een sinus bekijken:
+
 #. Amplitude
 #. Frequentie
 #. Fase
@@ -58,13 +59,13 @@ Je hebt nu waarschijnlijk door dat een "signaal" in feite een functie is "van de
 
 Wanneer een signaal wordt opgebroken in een sommatie van sinussen, dan zal elke een eigen **amplitude**, **fase** en **frequentie** hebben. De **amplitude** van elke sinus verteld ons hoe sterk deze **frequentie** aanwezig was in het originele signaal. Het enige wat je voor nu over **fase** moet beseffen is dat het verschil tussen een sin() en cos() een faseverschuiving (tijdverschuiving) is.
 
-Het is belangrijker om de onderliggende concepten te begrijpen van de Fourierreeks, dan de vergelijkingen om het op te lossen. Maar voor hen die geïnteresseerd zijn verwijs ik je naar de beknopte uitleg van Wolfram: https://mathworld.wolfram.com/FourierSeries.html.  
+Het is belangrijker om de onderliggende concepten van de Fourierreeks te begrijpen, dan de vergelijkingen op te kunnen lossen. Maar voor hen die geïnteresseerd zijn verwijs ik je naar de beknopte uitleg van Wolfram: https://mathworld.wolfram.com/FourierSeries.html.  
 
 *********************
 Tijd-Frequentie paren
 *********************
 We hebben vastgesteld dat signalen voorgesteld kunnen worden door een reeks sinussen, die een aantal attributen hebben. 
-Laten we nu leren hoe we deze signalen kunnen tonen in het frequentiedomein.
+Laten we nu leren hoe we deze signalen kunnen weergeven in het frequentiedomein.
 Terwijl het tijddomein laat zien hoe het signaal varieert over de tijd, laat het frequentiedomein zien hoe sterk het signaal aanwezig is in welke frequenties. 
 De x-as stelt dan geen tijd, maar frequentie voor. 
 We kunnen een signaal beide in het tijddomein *en* frequentiedomein tonen.
@@ -290,30 +291,30 @@ De FFT is een functie met een in- en uitgang. Het zet een signaal om van tijd na
    :align: center
    :target: ../_images/fft-block-diagram.svg
    
-In dit boek zullen we alleen 1-dimensionale FFT's gebruiken (2D wordt bijvoorbeeld toegepast voor beeldverwerking). Voor ons doel, behandel de FFT als iets met een ingang: een vector van monsters (samples), en een output: de frequentiedomein-versie van die vector met monsters. 
+In dit boek zullen we alleen 1-dimensionale FFT's gebruiken (2D wordt bijvoorbeeld toegepast voor beeldverwerking). Voor ons doel, behandel de FFT als iets met een ingang: een vector van samples (samples), en een output: de frequentiedomein-versie van die vector met samples. 
 De lengte van de uitgang is altijd gelijk aan de ingang. 
-Als ik 1024 monsters in de FFT stop, krijg ik er 1024 uit. Het verwarrende is dat de uitgang altijd in het frequentiedomein zit, dus het "bereik" van de frequentie-as verandert niet met het aantal monsters van de tijddomein-ingang. We kunnen dit visualiseren door de in- en uitgangsvectoren en de eenheid van de elementen te bekijken:
+Als ik 1024 samples in de FFT stop, krijg ik er 1024 uit. Het verwarrende is dat de uitgang altijd in het frequentiedomein zit, dus het "bereik" van de frequentie-as verandert niet met het aantal samples van de tijddomein-ingang. We kunnen dit visualiseren door de in- en uitgangsvectoren en de eenheid van de elementen te bekijken:
 
 .. image:: ../_images/fft-io.svg
    :align: center
    :target: ../_images/fft-io.svg
 
-Omdat de uitgang in het frequentiedomein zit, is het bereik van de frequentie-as gebaseerd op de bemonsteringsfrequentie (sample rate). Dit zal volgend hoofdstuk behandeld worden. 
-Als we meer monsters gebruiken voor de ingangsvector dan krijgen we een hogere resolutie in het frequentiedomein (en we behandelen meer monsters per keer). We zien niet "meer" (een groter bereik aan) frequenties wanneer we de ingang groter maken. 
-De enige manier om dat te bereiken is door de bemonsteringsfrequentie te verhogen (en de periodetijd :math:`\Delta t` te verlagen).
+Omdat de uitgang in het frequentiedomein zit, is het bereik van de frequentie-as gebaseerd op de sample-frequentie (sample rate). Dit zal volgend hoofdstuk behandeld worden. 
+Als we meer samples gebruiken voor de ingangsvector dan krijgen we een hogere resolutie in het frequentiedomein (en we behandelen meer samples per keer). We zien niet "meer" (een groter bereik aan) frequenties wanneer we de ingang groter maken. 
+De enige manier om dat te bereiken is door de sample-frequentie te verhogen (en de periodetijd :math:`\Delta t` te verlagen).
 
-Hoe tonen we de uitgang? 
-Ga er als voorbeeld van uit dat de bemonsteringsfrequentie 1 miljoen monsters per seconde was (1 MHz). Zoals we volgend hoofdstuk zullen leren betekent dit, dat we enkel signalen tot een 0.5 MHz zullen zien, onafhankelijk van de hoeveelheid monsters aan de ingang van de FFT. 
+Hoe kunnen we de uitgang weergeven? 
+Ga er als voorbeeld van uit dat de sample-frequentie 1 miljoen samples per seconde was (1 MHz). Zoals we volgend hoofdstuk zullen leren betekent dit, dat we enkel signalen tot een 0.5 MHz zullen zien, onafhankelijk van de hoeveelheid samples aan de ingang van de FFT. 
 We kunnen de uitgang als volgt representeren:
 
 .. image:: ../_images/negative-frequencies.svg
    :align: center
    :target: ../_images/negative-frequencies.svg
 
-Dit is altijd het geval; de uitgang van de FFT zal :math:`\text{-} f_s/2` tot :math:`f_s/2` laten zien, waar :math:`f_s` de bemonsteringsfrequentie is.  
+Dit is altijd het geval; de uitgang van de FFT zal :math:`\text{-} f_s/2` tot :math:`f_s/2` laten zien, waar :math:`f_s` de sample-frequentie is.  
 Dat betekent dat de uitgang altijd een positief en negatief deel heeft. Als de ingang complex is dan zijn beide helften verschillend, als de ingang reëel is dan zijn de helften identiek.
 
-Over het bereik van frequenties; elk equidistant punt (Engels: bin) komt overeen met :math:`f_s/N` Hz, d.w.z., meer monsters aan de ingang geven zal leiden tot een hogere resolutie/kleinere stapjes aan de uitgang. 
+Over het bereik van frequenties; elk equidistant punt (Engels: bin) komt overeen met :math:`f_s/N` Hz, d.w.z., meer samples aan de ingang geven zal leiden tot een hogere resolutie/kleinere stapjes aan de uitgang. 
 Een klein detail wat je kunt negeren als je nieuw bent: wiskundig gezien hoort het laatste element niet *precies* bij :math:`f_s/2`, maar bij :math:`f_s/2 - f_s/N` wat voor grote :math:`N` gelijk wordt aan :math:`f_s/2`.
 
 *********************
@@ -323,7 +324,7 @@ Negatieve Frequenties
 Wat is nu weer een negatieve frequentie? Voor nu heeft dit te maken met complexe (imaginaire) getallen, er is niet zoiets als "negatieve frequentie" bij het verzenden/ontvangen van RF-signalen. 
 Het is slechts hoe we dingen weergeven. 
 Hier is een intuïtieve manier om erover na te denken. 
-Stel voor dat we onze SDR instellen op een middenfrequentie van 100 MHz (de FM-radio band) en dit bemonsteren op een frequentie van 10 MHz. 
+Stel voor dat we onze SDR instellen op een middenfrequentie van 100 MHz (de FM-radio band) en dit samplen op een frequentie van 10 MHz. 
 In andere woorden, we bekijken het spectrum van 95 MHz tot 105 MHz. 
 Misschien zijn er drie signalen aanwezig:
 
@@ -331,7 +332,7 @@ Misschien zijn er drie signalen aanwezig:
    :align: center
    :target: ../_images/negative-frequencies2.svg
    
-Wanner de SDR ons de monsters teruggeeft ziet het er zo uit:
+Wanner de SDR ons de samples teruggeeft ziet het er zo uit:
 
 .. image:: ../_images/negative-frequencies3.svg
    :align: center
@@ -340,7 +341,7 @@ Wanner de SDR ons de monsters teruggeeft ziet het er zo uit:
 Vergeet niet dat we de SDR op 100 MHz hebben ingesteld. 
 Dus het signaal dat op ongeveer 97.5 MHz zat, is wanneer we het digitaal bekijken, te zien op -2.5 MHz, wat technisch gezien een negatieve frequentie is. 
 Reëel gezien is dit gewoon een frequentie die lager is dan de middenfrequentie. 
-Dit wordt logischer wanneer we meer over bemonsteren leren en ervaring opdoen met onze SDR's.
+Dit wordt logischer wanneer we meer over samplen leren en ervaring opdoen met onze SDR's.
 
 **********************************
 Volgorde in de tijd maakt niet uit
@@ -365,7 +366,7 @@ FFT in Python
 
 Nu we hebben gezien wat een FFT is en hoe de uitgang eruit ziet, zullen we gaan kijken naar wat Python code en NumPy's FFT functie, :code:`np.fft.fft()`, toepassen. Het wordt aangeraden dat je een Python console/IDE op je computer gebruikt, maar eventueel zou je ook de online Python console kunnen gebruiken dat je onderaan de linker navigatiebalk kunt vinden.
 
-Eerst moeten we een signaal maken in het tijddomein. Voel je vrij om zelf met de Python console mee te doen. Om dingen eenvoudig te houden maken we een enkele sinus op 0.15 Hz. We nemen ook een bemonsteringsfrequentie van 1 Hz, wat betekent dat we monsters nemen op 0, 1, 2, 3 seconden, etc.
+Eerst moeten we een signaal maken in het tijddomein. Voel je vrij om zelf met de Python console mee te doen. Om dingen eenvoudig te houden maken we een enkele sinus op 0.15 Hz. We nemen ook een sample-frequentie van 1 Hz, wat betekent dat we samples nemen op 0, 1, 2, 3 seconden, etc.
 
 .. code-block:: python
 
@@ -373,7 +374,7 @@ Eerst moeten we een signaal maken in het tijddomein. Voel je vrij om zelf met de
  t = np.arange(100)
  s = np.sin(0.15*2*np.pi*t)
 
-Als we :code:`s` tonen lijkt dit op:
+Als we :code:`s` plotten lijkt dit op:
 
 .. image:: ../_images/fft-python1.png
    :scale: 70 % 
@@ -391,7 +392,7 @@ Als we de inhoud van :code:`S` bekijken, zien we dat het een array is van comple
 
     S =  array([-0.01865008 +0.00000000e+00j, -0.01171553 -2.79073782e-01j,0.02526446 -8.82681208e-01j,  3.50536075 -4.71354150e+01j, -0.15045671 +1.31884375e+00j, -0.10769903 +7.10452463e-01j, -0.09435855 +5.01303240e-01j, -0.08808671 +3.92187956e-01j, -0.08454414 +3.23828386e-01j, -0.08231753 +2.76337148e-01j, -0.08081535 +2.41078885e-01j, -0.07974909 +2.13663710e-01j,...
 
-Hint: Wat je ook aan het doen bent, als je ooit complexe getallen tegenkomt, bereken dan de modulus en fase en bekijk of dat er logischer uitziet. Laten we dat doen en de modulus en fase tonen. In de meeste talen geeft de abs()-functie de modulus van een complex getal. De functie om de fase te bepalen varieert, maar in Python kan dit met :code:`np.angle()`.
+Hint: Wat je ook aan het doen bent, als je ooit complexe getallen tegenkomt, bereken dan de modulus en fase en bekijk of dat er logischer uitziet. Laten we dat doen en de modulus en fase weergeven. In de meeste talen geeft de abs()-functie de modulus van een complex getal. De functie om de fase te bepalen varieert, maar in Python kan dit met :code:`np.angle()`.
 
 .. code-block:: python
 
@@ -426,7 +427,7 @@ Voor ons gemak heeft Numpy een FFT-shift functie :code:`np.fft.fftshift()`.  Ver
 
  S = np.fft.fftshift(np.fft.fft(s))
 
-Nu moeten we nog de x-as waardes/label uitvogelen. We hebben een bemonsteringsfrequentie van 1 Hz gebruikt om dingen simpel te houden. Dat betekent dat de linker kant van de frequentiedomein-plot -0.5 Hz zal zijn en de rechter kant 0.5 Hz. Als dat nu nog niet logisch klinkt, wordt dat duidelijker in het hoofdstuk over :ref:`sampling-chapter`.  Laten we ervan uitgaan dat onze bemonsteringsfrequentie 1 Hz is en de modulus en fase tonen van de uitgang van de FFT. Hier is de volledige versie van dit Python voorbeeld:
+Nu moeten we nog de x-as waardes/label uitvogelen. We hebben een sample-frequentie van 1 Hz gebruikt om dingen simpel te houden. Dat betekent dat de linker kant van de frequentiedomein-plot -0.5 Hz zal zijn en de rechter kant 0.5 Hz. Als dat nu nog niet logisch klinkt, wordt dat duidelijker in het hoofdstuk over :ref:`sampling-chapter`.  Laten we ervan uitgaan dat onze sample-frequentie 1 Hz is en de modulus en fase tonen van de uitgang van de FFT. Hier is de volledige versie van dit Python voorbeeld:
 
 .. code-block:: python
 
@@ -436,7 +437,7 @@ Nu moeten we nog de x-as waardes/label uitvogelen. We hebben een bemonsteringsfr
  Fs = 1 # Hz
  N = 100 # aantal punten om te simuleren, en onze FFT lengte
  
- t = np.arange(N) # want de bemonsteringsfrequentie is 1 Hz
+ t = np.arange(N) # want de sample-frequentie is 1 Hz
  s = np.sin(0.15*2*np.pi*t)
  S = np.fft.fftshift(np.fft.fft(s))
  S_mod = np.abs(S)
@@ -452,13 +453,13 @@ Nu moeten we nog de x-as waardes/label uitvogelen. We hebben een bemonsteringsfr
    :scale: 80 % 
    :align: center 
 
-We zien onze piek op 0.15 Hz, de frequentie die we gebruikten voor onze sinus. Dit betekent dat onze FFT werkt! Als we de code dat onze sinus genereert niet hadden, maar wel een lijst met monsters, dan zouden we de FFT kunnen gebruiken om de frequentie te bepalen! De reden dat we ook een piek zien op -0.15 Hz is omdat we werken met een reëel signaal, niet complex. Daar gaan we later dieper op in. 
+We zien onze piek op 0.15 Hz, de frequentie die we gebruikten voor onze sinus. Dit betekent dat onze FFT werkt! Als we de code dat onze sinus genereert niet hadden, maar wel een lijst met samples, dan zouden we de FFT kunnen gebruiken om de frequentie te bepalen! De reden dat we ook een piek zien op -0.15 Hz is omdat we werken met een reëel signaal, niet complex. Daar gaan we later dieper op in. 
 
 **************
 Vensterfunctie
 **************
 
-Wanneer we een FFT gebruiken om de frequenties in ons signaal te bepalen, gaat de FFT ervan uit dat de ingang een *periodiek* signaal bevat. Het gedraagt zich alsof het signaal dat we geven zich oneindig herhaald. Het is alsof het laatste monster verbonden is aan het eerste monster. Dit vindt zijn basis in de theorie achter de Fouriertransformatie. Het betekent ook dat we plotselinge overgangen willen voorkomen tussen het eerste en laatste monster, want plotselinge veranderingen lijken op een boel frequenties. In werkelijkheid verbindt ons laatste monster niet met het eerste. Simpel gezegd: Wanneer we een FFT uitvoeren van 100 monsters met :code:`np.fft.fft(x)`, willen we dat :code:`x[0]` en :code:`x[99]` (bijna) gelijk zijn.
+Wanneer we een FFT gebruiken om de frequenties in ons signaal te bepalen, gaat de FFT ervan uit dat de ingang een *periodiek* signaal bevat. Het gedraagt zich alsof het signaal dat we geven zich oneindig herhaald. Het is alsof het laatste sample verbonden is aan het eerste sample. Dit vindt zijn basis in de theorie achter de Fouriertransformatie. Het betekent ook dat we plotselinge overgangen willen voorkomen tussen het eerste en laatste sample, want plotselinge veranderingen lijken op een boel frequenties. In werkelijkheid verbindt ons laatste sample niet met het eerste. Simpel gezegd: Wanneer we een FFT uitvoeren van 100 samples met :code:`np.fft.fft(x)`, willen we dat :code:`x[0]` en :code:`x[99]` (bijna) gelijk zijn.
 
 We kunnen aan deze cyclische eigenschap voldoen met behulp van een "venster". Net voor de FFT vermenigvuldigen we het signaal met een vensterfunctie. Dit is een functie dat aan beide kanten naar 0 gaat. Dit zal ervoor zorgen dat het deel van het signaal zal beginnen en eindigen bij 0, en dus zal verbinden. Veel voorkomende vensterfuncties zijn Hamming, Hanning, Blackman en Kaiser. Wanneer je geen venster toepast heet het een "rechthoekig" venster want het is alsof je het vermenigvuldigt met een array vol enen. Dit is hoe diverse vensterfuncties eruitzien:
 
@@ -478,7 +479,7 @@ Niet bang zijn om het verkeerde venster te kiezen. Het verschil tussen Hamming, 
 FFT grootte
 ***********
 
-Het laatste om te behandelen is de FFT-grootte. Vanwege de manier waarop de FFT is geïmplementeerd is de beste lengte van de FFT altijd een macht van 2. Je kunt wel een andere lengte gebruiken, maar dat is langzamer. Veelgebruikte lengtes zijn tussen de 128 en 4096, maar het kan zeker langer zijn. In de praktijk moeten we signalen verwerken die misschien wel miljoenen of miljarden monsters lang zijn, en dus moeten opbreken in vele FFT’s. Dit betekent dat we ook vele uitgangen krijgen. We kunnen al die uitgangen middelen of tonen over de tijd (zeker wanneer het signaal verandert over de tijd). Je hoeft niet *elk* monster van een signaal in de FFT te stoppen om een goede voorstelling te krijgen van de frequentiedomein-versie van dat signaal. Je zou bijvoorbeeld een 1024 FFT kunnen uitvoeren op elke 100e3 monsters in een signaal en het zal er waarschijnlijk nog steeds goed uitzien, zolang het signaal altijd aan blijft.
+Het laatste om te behandelen is de FFT-grootte. Vanwege de manier waarop de FFT is geïmplementeerd is de beste lengte van de FFT altijd een macht van 2. Je kunt wel een andere lengte gebruiken, maar dat is langzamer. Veelgebruikte lengtes zijn tussen de 128 en 4096, maar het kan zeker langer zijn. In de praktijk moeten we signalen verwerken die misschien wel miljoenen of miljarden samples lang zijn, en dus moeten opbreken in vele FFT’s. Dit betekent dat we ook vele uitgangen krijgen. We kunnen al die uitgangen middelen of weergeven over de tijd (zeker wanneer het signaal verandert over de tijd). Je hoeft niet *elk* sample van een signaal in de FFT te stoppen om een goede voorstelling te krijgen van de frequentiedomein-versie van dat signaal. Je zou bijvoorbeeld een 1024 FFT kunnen uitvoeren op elke 100e3 samples in een signaal en het zal er waarschijnlijk nog steeds goed uitzien, zolang het signaal altijd aan blijft.
 
 ********************
 Spectrogram/Waterval
@@ -490,7 +491,7 @@ Een spectrogram is een plot dat de frequentieverandering over de tijd laat zien.
    :scale: 120 % 
    :align: center 
 
-Probeer als oefening de Python code te schrijven waarmee we zo'n spectrogram kunnen maken. Bedenk dat het slechts rijen van FFT’s zijn die op elkaar zijn gestapeld. Elke rij is 1 FFT. Zorg ervoor dat je het tijdsignaal opbreekt in delen van jouw FFT-grootte (bijv. 1024 monsters per deel). Om dingen simpel te houden kun je een reëel signaal invoeren en simpelweg het negatieve deel van de frequenties weggooien voordat je het spectrogram plot. Je kunt het volgende signaal als voorbeeld gebruiken, een enkele toon met witte ruis:
+Probeer als oefening de Python code te schrijven waarmee we zo'n spectrogram kunnen maken. Bedenk dat het slechts rijen van FFT’s zijn die op elkaar zijn gestapeld. Elke rij is 1 FFT. Zorg ervoor dat je het tijdsignaal opbreekt in delen van jouw FFT-grootte (bijv. 1024 samples per deel). Om dingen simpel te houden kun je een reëel signaal invoeren en simpelweg het negatieve deel van de frequenties weggooien voordat je het spectrogram plot. Je kunt het volgende signaal als voorbeeld gebruiken, een enkele toon met witte ruis:
 
 .. code-block:: python
 
@@ -504,7 +505,7 @@ Probeer als oefening de Python code te schrijven waarmee we zo'n spectrogram kun
  f = 50e3 # freq van toon
  x = np.sin(2*np.pi*f*t) + 0.2*np.random.randn(len(t))
 
-Zo ziet het eruit in het tijddomein (de eerste 200 monsters):
+Zo ziet het eruit in het tijddomein (de eerste 200 samples):
 
 .. image:: ../_images/spectrogram_time.svg
    :align: center

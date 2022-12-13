@@ -298,9 +298,11 @@ htmlhelp_basename = 'textbookdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 #tikz_latex_preamble = r'\usepackage{subcaption}'
+#imgmath_latex_preamble = r'\usepackage{siunitx}'
+
 
 latex_elements = {
-#    'extrapackages': r'\usepackage{subcaption}',
+#    'extrapackages': r'\usepackage{siunitx}',
 #    'passoptionstopackages': r'\PassOptionsToPackage{svgnames}{xcolor}',
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',

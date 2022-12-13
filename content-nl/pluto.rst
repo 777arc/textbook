@@ -110,7 +110,7 @@ Op dezelfde manier zou je de firmware van de Pluto kunnen updaten. Zie voor meer
 "Hack" de PlutoSDR voor een groter RF bereik
 ############################################
 
-De PlutoSDR komt standaard met een beperkte frequentiebereik en bemonsteringsfrequentie, maar de onderliggende chip kan veel hogere frequenties aan. Volg deze stappen om het volle frequentiebereik aan te zeten. Dit proces wordt door Analog Devices zelf uitgelegd dus heeft minimale risico's. De restricties zijn door Analog Devices aangezet omdat de specifieke chips niet voldeden aan de strenge performance-eisen op deze hogere frequenties. Maar als SDR studenten maken we ons niet zo druk over die perfomance-eisen.
+De PlutoSDR komt standaard met een beperkte frequentiebereik en sample-frequentie, maar de onderliggende chip kan veel hogere frequenties aan. Volg deze stappen om het volle frequentiebereik aan te zeten. Dit proces wordt door Analog Devices zelf uitgelegd dus heeft minimale risico's. De restricties zijn door Analog Devices aangezet omdat de specifieke chips niet voldeden aan de strenge performance-eisen op deze hogere frequenties. Maar als SDR studenten maken we ons niet zo druk over die perfomance-eisen.
 
 Tijd om te hacken! Open een terminal (host of VM):
 
@@ -142,19 +142,19 @@ Nu moet het mogelijk zijn om af te stemmen op frequenties tussen de 70 MHz en 6 
 Ontvangen
 ************************
 
-Via de PlutoSDR's Python API is het simpel om monsters te ontvangen. 
-Voor elke SDR applicatie wil je weten wat de middenfrequentie, bemonsteringsfrequentie en versterking is, en of je eventueel automatic gain control (AGC) wilt gebruiken.
-Er zijn andere details, maar deze drie parameters zijn essentieel voor de SDR om te starten met monsters ontvangen.
-Sommige SDR's hebben een commando om te beginnen met het bemonsteren, en anderen zoals de Pluto beginnen zodra je hem initialiseert.
+Via de PlutoSDR's Python API is het simpel om samples te ontvangen. 
+Voor elke SDR applicatie wil je weten wat de middenfrequentie, sample-frequentie en versterking is, en of je eventueel automatic gain control (AGC) wilt gebruiken.
+Er zijn andere details, maar deze drie parameters zijn essentieel voor de SDR om te starten met samples ontvangen.
+Sommige SDR's hebben een commando om te beginnen met het samplen, en anderen zoals de Pluto beginnen zodra je hem initialiseert.
 Op het moment dat de interne buffers van de Pluto volzitten, dan zal het de oudste samples gaan verwijderen.
-Alle SDR API's hebben een "ontvang monsters" functie, en voor de Pluto is dit rx(), dat een stapel monsters teruggeeft.
-De hoeveelheid monsters dat het teruggeeft is gedefinieerd door de buffergrootte wat van tenvoren is ingesteld.
+Alle SDR API's hebben een "ontvang samples" functie, en voor de Pluto is dit rx(), dat een stapel samples teruggeeft.
+De hoeveelheid samples dat het teruggeeft is gedefinieerd door de buffergrootte wat van tenvoren is ingesteld.
 
 De onderstaande code gaat ervan uit dat je Pluto's Python API hebt geinstalleerd.
-Deze code initialiseert de Pluto, stelt de bemonsteringsfrequentie in op 1 MHz, stelt de middenfrequentie in op 100 MHz en stelt de versterking in op 70 dB met AGC uitgeschakeld.
+Deze code initialiseert de Pluto, stelt de sample-frequentie in op 1 MHz, stelt de middenfrequentie in op 100 MHz en stelt de versterking in op 70 dB met AGC uitgeschakeld.
 Het maakt meestal niets uit in welke volgorde je deze dingen doet.
-In de onderstaande code vragen we de Pluto om 10,000 monsters per rx() functieaanroep.
-We drukken de eerste 10 monsters af.
+In de onderstaande code vragen we de Pluto om 10,000 samples per rx() functieaanroep.
+We drukken de eerste 10 samples af.
 
 .. code-block:: python
 
@@ -176,7 +176,7 @@ We drukken de eerste 10 monsters af.
     samples = sdr.rx() # receive samples off Pluto
     print(samples[0:10])
 
-Voor nu doen we niets interessants met deze monsters, maar de rest van dit boek staat vol met Python code dat werkt met IQ-monsters zoals we zojuist hebben ontvangen.
+Voor nu doen we niets interessants met deze samples, maar de rest van dit boek staat vol met Python code dat werkt met IQ-samples zoals we zojuist hebben ontvangen.
 
 Ontvangstversterking
 ####################
@@ -186,36 +186,54 @@ AGC moet je niet verwarren met een analoog-naar-digitaal converter (ADC) dat het
 Technisch gezien is de AGC een gesloten-lus feedbackschakeling dat de versterking beheert op basis van het ontvangen signaal met als doel om een constant vermogensniveau te behouden desondanks variërende ingangsvermogens.
 Typisch zorgt de AGC ervoor dat het signaal de ADC niet overstuurt maar wel zo goed mogelijk het volledige bereik van de ADC gebruikt.
 
-
-The radio-frequency integrated circuit, or RFIC, inside the PlutoSDR has an AGC module with a few different settings.  (An RFIC is a chip that functions as a transceiver: it transmits and receives radio waves.)  First, note that the receive gain on the Pluto has a range from 0 to 74.5 dB.  When in "manual" AGC mode, the AGC is turned off, and you must tell the Pluto what receive gain to use, e.g.:
+Het RFIC, binnen de PlutoSDR, heeft een AGC module met een paar verschillende instellingen. 
+(Een RFIC is een transceiver chip; het stuurt en ontvangt radiogolven.) 
+Als eerste merken we op dat de Pluto ontvangstversterking een bereik heeft van 0 tot 74.5 dB.
+In de "manual" of handmatige modus is de AGC uitgeschakeld, en moet je zelf instellen welke versterking de Pluto moet gebruiken. Bijv.:
 
 .. code-block:: python
 
   
-  sdr.gain_control_mode_chan0 = "manual" # turn off AGC
-  gain = 50.0 # allowable range is 0 to 74.5 dB
-  sdr.rx_hardwaregain_chan0 = gain # set receive gain
+  sdr.gain_control_mode_chan0 = "manual" # zet AGC uit
+  gain = 50.0 # toegestane bereik is 0 tot 74.5 dB
+  sdr.rx_hardwaregain_chan0 = gain # stel ontvangstversterking in
 
-If you want to enable the AGC, you must choose from one of two modes:
+Wanneer je de AGC wilt gebruiken kun je kiezen tussen twee modi:
 
 1. :code:`sdr.gain_control_mode_chan0 = "slow_attack"`
 2. :code:`sdr.gain_control_mode_chan0 = "fast_attack"`
 
-And with AGC enabled you don't provide a value to :code:`rx_hardwaregain_chan0`. It will get ignored because the Pluto itself adjusts the gain for the signal. The Pluto has two modes for AGC: fast attack and slow attack, as shown in the code snipped above. The difference between the two is intuitive, if you think about it. Fast attack mode reacts quicker to signals.  In other words, the gain value will change faster when the received signal changes level.  Adjusting to signal power levels can be important, especially for time-division duplex (TDD) systems that use the same frequency to transmit and receive. Setting the gain control to fast attack mode for this scenario limits signal attenuation.  With either mode, if there is no signal present and only noise, the AGC will max out the gain setting; when a signal does show up it will saturate the receiver briefly, until the AGC is able to react and ramp down the gain.  You can always check the current gain level in realtime with:
+En wanneer de AGC is aangezet hoef je geen waarde te geven voor :code:`rx_hardwaregain_chan0`. 
+Deze waarde wordt genegeert omdat dan de Pluto zelf de versterking voor het signaal regelt.
+De Pluto heeft twee modi voor de AGC: fast attack (snel reageren) en slow attack (langzaam reageren).
+Wanneer je er over nadenk is het verschil intuitief.
+Fast attack modus reageert sneller op de signalen.
+In andere woorden, de versterkingsfactor zal sneller veranderen wanneer het ingangssignaal verandert.
+Het ingangsvermogen aanpassen is belangrijk, in het specifiek voor tijd-divisie duplex (TDD) systemen dat dezelfde frequentie gebruiken voor zenden en ontvangen.
+Als je voor deze situatie de AGC op fast attack zet dan wordt signaal demping gelimiteerd.
+Met beide modi, wanneer er geen signaal maar alleen ruis aanwezig is, zal de AGC de versterking maximaal maken; wanneer een signaal tevoorschijn komt, zal het de ontvanger kort satureren tot de AGC kan reageren en de versterking doet zakken. Je kunt de huidige versterkingsfactor in realtime bekijken met:
 
 .. code-block:: python
  
  sdr._get_iio_attr('voltage0','hardwaregain', False)
 
-For more details about the Pluto's AGC, such as how to change the advanced AGC settings, refer to `the "RX Gain Control" section of this page <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361>`_.
+Voor meer informatie over de AGC binnen de Pluto referen we naar de `RX Gain Control sectie van deze pagina: <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361>`_.
 
 ************************
-Transmitting
+Zenden
 ************************
 
-Before you transmit any signal with your Pluto, make sure to connect a SMA cable between the Pluto's TX port, and whatever device will be acting as the receiver.  It's important to always start by transmitting over a cable, especially while you are learning *how* to transmit, to make sure the SDR is behaving how you intend.  Always keep your transmit power extremely low, as to not overpower the receiver, since the cable does not attenuate the signal like the wireless channel does.  If you own an attenuator (e.g. 30 dB), now would be a good time to use it.  If you do not have another SDR or a spectrum analyzer to act as the receiver, in theory you can use the RX port on the same Pluto, but it can get complicated.  I would recommend picking up a $10 RTL-SDR to act as the receiving SDR.
+Zorg, voordat je een signaal gaat versturen met jouw Pluto, ervoor dat je een SMA kabel tussen de TX en ontvanger hebt gestopt.
+Het is belangrijk dat je als beginner altijd eerst zend over een kabel om zeker te zijn dat de SDR doet wat je wilt. Hou in dit geval het zendvermogen extreem laag om te verkomen dat je de ontvanger sloopt. Een kabel heeft immers niet zoveel demping als een draadloos kanaal.
+Mocht je een attenuator (demper) hebben (bijv. 30 dB), dan is dit een goed moment om het te gebruiken.
+Als je niet een andere SDR of spectrum analyzer als ontvanger tot je beschikking hebt, dan zou je in theorie de RX poort van dezelfde Pluto kunnen gebruiken, maar dat kan ingewikkeld worden.
+Ik raad aan om een RTL-SDR van 10€ als ontvanger te gebruiken.
 
-Transmitting is very similar to receiving, except instead of telling the SDR to receive a certain number of samples, we will give it a certain number of samples to transmit.  Instead of :code:`rx_lo` we will be setting :code:`tx_lo`, to specify what carrier frequency to transmit on.  The sample rate is shared between the RX and TX, so we will be setting it like normal.  A full example of transmitting is shown below, where we generate a sinusoid at +100 kHz, then transmit the complex signal at a carrier frequency of 915 MHz, causing the receiver to see a carrier at 915.1 MHz.  There is really no practical reason to do this, we could have just set the center_freq to 915.1e6 and transmitted an array of 1's, but we wanted to generate complex samples for demonstration purposes. 
+Zenden werkt bijna hetzelfde als ontvangen. In plaats dat we de SDR vertellen om samples to ontvangen, zullen we een bepaalde hoeveelheid samples geven om uit te zenden.
+We stellen i.p.v. de :code:`rx_lo` de :code:`tx_lo` in, om aan tegeven welke zendfrequentie we willen gebruiken.
+De sample rate is hetzelfde voor de RX en TX, dus die instelling blijft gelijk.
+Een volledig voorbeeld waarin wordt gezonden is beneden te zien. Hier genereren we een sinusoide van +100 kHz, en zenden het complexe signaal op een draaggolf van 915 MHz. De ontvanger ziet dan een draaggolf op 915.1 MHz. 
+Er is geen praktische reden om dit zo te doen, we hadden een array van 1'en kunnen versturen op een zendfrequentie van 915.1e6 Hz. We wouden echter complexe samples genereren als voorbeeld.
 
 .. code-block:: python
     
@@ -227,43 +245,54 @@ Transmitting is very similar to receiving, except instead of telling the SDR to 
 
     sdr = adi.Pluto("ip:192.168.2.1")
     sdr.sample_rate = int(sample_rate)
-    sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
+    sdr.tx_rf_bandwidth = int(sample_rate) # filter kantelfrequentie, stel in gelijk aan sample rate
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain_chan0 = -50 # Increase to increase tx power, valid range is -90 to 0 dB
+    sdr.tx_hardwaregain_chan0 = -50 # tx demping, bereik is -90 tot 0 dB
 
-    N = 10000 # number of samples to transmit at once
+    N = 10000 # aantal samples om te versturen
     t = np.arange(N)/sample_rate
-    samples = 0.5*np.exp(2.0j*np.pi*100e3*t) # Simulate a sinusoid of 100 kHz, so it should show up at 915.1 MHz at the receiver
-    samples *= 2**14 # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
+    samples = 0.5*np.exp(2.0j*np.pi*100e3*t) # simuleer een sinusoide van 100 kHz, dan ziet de ontvanger het op 915.1 MHz
+    samples *= 2**14 # De PlutoSDR verwacht samples met waarden tussen -2^14 en +2^14, niet -1 en +1
 
-    # Transmit our batch of samples 100 times, so it should be 1 second worth of samples total, if USB can keep up
+    # Stuur de samples 100 keer, dus 1 seconde totaal, als USB het kan bijhouden
     for i in range(100):
-        sdr.tx(samples) # transmit the batch of samples once
+        sdr.tx(samples) # stuurt de N samples een keer
 
-Here are some notes about this code.  First, you want to simulate your IQ samples so that they are between -1 and 1, but then before transmitting them we have to scale by 2^14 due to how Analog Devices implemented the :code:`tx()` function.  If you are not sure what your min/max values are, simply print them out with :code:`print(np.min(samples), np.max(samples))` or write an if statement to make sure they never go above 1 or below -1 (assuming that code comes before the 2^14 scaling).  As far as transmit gain, the range is -90 to 0 dB, so 0 dB is the highest transmit power.  We always want to start at a low transmit power, and then work our way up if needed, so we have the gain set to -50 dB by default which is towards the low end.  Don't simply set it to 0 dB just because your signal is not showing up; there might be something else wrong, and you don't want to fry your receiver. 
+Nog wat opmerkingen over de code. 
+Eerst wil je de IQ samples tussen -1 en 1 simuleren, maar voor het versturen moeten we het vermenigvuldigen met 2^14 vanwege hoe Analog Devices de :code:`tx()` functie heeft geïmplementeerd.
+Als je niet zeker weet wat de min/max waardes van je signaal zijn, kun je ze afdrukken met :code:`print(np.min(samples), np.max(samples))` of je schrijft een statement om zeker te zijn dat de samples nooit boven 1 of onder -1 komen (dit komt dan voor de 2^14 vermenigvuldiging).
+De demping op het zendvermogen heeft een bereik van -90 tot 0 dB, waar 0 dB dus het hoogste zendvermogen oplevert.
+We willen altijd bij een laag zendvermogen beginnen en daarna, wanneer nodig, het laten toenemen.
+De standaard waarde van -50 dB is aan de lage kant.
+Zet de waarde niet zomaar op 0 dB omdat je niets ziet bij de ontvanger, er kunnen andere redenen zijn waarom dit zo is, en je wilt niet je ontvanger slopen.
 
-Transmitting Samples on Repeat
-##############################
+Oneindig samples versturen
+###############################
 
-If you want to continuously transmit the same set of samples on repeat, instead of using a for/while loop within Python like we did above, you can tell the Pluto to do so using just one line:
+Als je voortdurend dezelfde set samples wilt versturen kun je, i.p.v. een for/while loop, de Pluto instrueren om dit te doen met een regel code:
 
 .. code-block:: python
 
- sdr.tx_cyclic_buffer = True # Enable cyclic buffers
+ sdr.tx_cyclic_buffer = True # Zet cyclic buffers aan
 
-You would then transmit your samples like normal: :code:`sdr.tx(samples)` just one time, and the Pluto will keep transmitting the signal indefinitely, until the sdr object destructor is called.  To change the samples that are being continuously transmitted, you cannot simply call :code:`sdr.tx(samples)` again with a new set of samples, you have to first call :code:`sdr.tx_destroy_buffer()`, then call :code:`sdr.tx(samples)`.
+Hierna kun je op dezelfde manier samples versturen: :code:`sdr.tx(samples)` waarna de Pluto het oneindig blijft versturen, totdat het sdr object wordt weggegooid.
+Om een nieuwe set aan samples te versturen moet je dan eerst :code:`sdr.tx_destroy_buffer()` aanroepen, en daarna :code:`sdr.tx(samples)`.
 
-Transmitting Over the Air Legally
+Legaal door de lucht zenden
 #################################
+Onderstaande vertaling gaat over de regels in de VS. Voor Nederland is er de `telecommunicatiewet <https://wetten.overheid.nl/BWBR0009950/2022-05-01/>`_ met naar mijn weten vrijwel dezelfde conclusie als de rest van dit stuk. Er is wel de amateur zendband rond 433-435 MHz waar je met licentie mag zenden, `zie <https://wetten.overheid.nl/BWBR0036375/2021-06-18#Bijlagen>`_.
 
-Countless times I have been asked by students what frequencies they are allowed to transmit on with an antenna (in the United States).  The short answer is none, as far as I am aware.  Usually when people point to specific regulations that talk about transmit power limits, they are referring to `the FCC's "Title 47, Part 15" (47 CFR 15) regulations <https://www.ecfr.gov/cgi-bin/text-idx?SID=7ce538354be86061c7705af3a5e17f26&mc=true&node=pt47.1.15&rgn=div5>`_.  But those are regulations for manufacturers building and selling devices that operate in the ISM bands, and the regulations discuss how they should be tested.  A Part 15 device is one where an individual does not need a license to operate the device in whatever spectrum it's using, but the device itself must be authorized/certified to show they are operating following FCC regulations before they are marketed and sold.  The Part 15 regulations do specify maximum transmit and received power levels for the different pieces of spectrum, but none of it actually applies to a person transmitting a signal with an SDR or their home-built radio.  The only regulations I could find related to radios that aren't actually products being sold were specific to operating a low-power AM or FM radio station in the AM/FM bands.  There is also a section on "home-built devices", but it specifically says it doesn't apply to anything constructed from a kit, and it would be a stretch to say a transmit rig using an SDR is a home-built device.  In summary, the FCC regulations aren't as simple as "you can transmit at these frequencies only below these power levels", but rather they are a huge set of rules meant for testing and compliance.
+Een veelvoorkomende vraag van studenten is op welke frequenties ze mogen zenden met een antenne (in de VS). Het korte antwoord is niet, zover ik weet. Meestal wordt er verwezen naar de wetten die zendvermogen beperken, `de FCC's "Title 47, Part 15" (47 CFR 15) regulations <https://www.ecfr.gov/cgi-bin/text-idx?SID=7ce538354be86061c7705af3a5e17f26&mc=true&node=pt47.1.15&rgn=div5>`_. 
 
-Another way to look at it would be to say "well, these aren't Part 15 devices, but let's follow the Part 15 rules as if they were".  For the 915 MHz ISM band, the rules are that "The field strength of any emissions radiated within the specified frequency band shall not exceed 500 microvolts/meter at 30 meters. The emission limit in this paragraph is based on measurement instrumentation employing an average detector."  So as you can see, it's not as simple as a maximum transmit power in watts.
+Maar die regulaties zijn voor producenten die apparaten bouwen en verkopen die opereren in de ISM banden, de regulaties beschrijven hoe ze getest mogen worden. Een "Part 15" apparaat is er een waar je geen licentie voor nodig hebt om het te gebruiken, maar het apparaat zelf moet wel gecertificeerd zijn om te laten zien dat het aan de FCC regels voldoet.
 
-Now, if you have your amateur radio (ham) license, the FCC allows you to use certain bands set aside for amateur radio.  There are still guidelines to follow and maximum transmit powers, but at least these numbers are specified in watts of 
-effective radiated power.  `This info-graphic <http://www.arrl.org/files/file/Regulatory/Band%20Chart/Band%20Chart%20-%2011X17%20Color.pdf>`_ shows which bands are available to use depending on your license class (Technician, General and Extra).  I would recommend anyone interested in transmitting with SDRs to get their ham radio license, see `ARRL's Getting Licensed page <http://www.arrl.org/getting-licensed>`_ for more info. 
+De wetten in "Part 15" specificeren wel een maximaal zend- en ontvangstvermogen voor de verschillende gebieden van het spectrum, maar niets slaat op een persoon die zend met een SDR of zelfgebouwde zenders. De enige wet die ik kon vinden over niet-commericiele zenders gaat over lage vermogenszenders voor AM en FM in de AM/FM banden. Er is ook een sectie over "zelfgebouwde" apparaten maar er wordt specifiek gezegd dat dit niet geldt voor iets wat een kit gebruikt. Samenvattend, de FCC wetten zijn niet zop simpel als "je mag op deze frequenties zenden maar onder deze vermogen", maar zijn het meer wetten voor het testen van producten.
 
-If anyone has more details about what is allowed and not allowed, please email me.
+Een andere manier om ernaar te kijken is om te zeggen "Nou, dit voldoet niet aan Part 15 maar laten we toch die regels volgen". Voor de 915 MHz ISM band zijn de regels dat "De veldsterkte van een uitstraling binnen de gespecificeerde frequentieband zal niet boven de 500 microvolt/meter op 30 meter afstand komen.". Dus, zoals je kunt zien is het niet zo simpel als maximaal zendvermogen in Watt.
+
+Als je een amateur radio (ham) licentie hebt, dan mag je van de FCC bepaalde banden gebruiken voor amateur radio. Er zijn nog steeds regels om te volgen, en maximale zendvermogens, maar die zijn tenminste uitgedrukt in Watt van effectief uitgestraald vermogen. `Dit info-graphic <http://www.arrl.org/files/file/Regulatory/Band%20Chart/Band%20Chart%20-%2011X17%20Color.pdf>`_ laat zien welke banden beschikbaar zijn afhankelijk van je licentietype. Iedereen die geinteresseerd is in zenden met SDR's raad ik aan om hun HAM licentie te halen.
+
+Als iemand meer details heeft over wat er wel en niet is toegestaan, email me alsjeblieft.
 
 ************************************************
 Transmitting and Receiving Simultaneously

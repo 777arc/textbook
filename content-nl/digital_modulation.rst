@@ -100,14 +100,14 @@ Vraag: Hoeveel symbolen kun je in het signaal hierboven onderscheiden? Hoeveel b
    </details>
 
 Hoe kunnen we eigenlijk dit signaal met code creëren? 
-Het enige wat we hoeven te doen, is een vector van N monsters per symbool maken, en dat vermenigvuldigen met een sinusoïde. 
+Het enige wat we hoeven te doen, is een vector van N samples per symbool maken, en dat vermenigvuldigen met een sinusoïde. 
 Dit moduleert ons signaal op de draaggolf (de sinusoïde is die draaggolf). Het voorbeeld hieronder laat 2-ASK zien met 10 symbolen per seconde.
 
 .. image:: ../_images/ask3.svg
    :align: center
    :target: ../_images/ask3.svg
 
-Het bovenste figuur laat de discrete monsters zien als rode punten, dus ons digitale signaal. Het onderste figuur laat zien hoe het resulterende gemoduleerde signaal eruitziet, dit zou verzonden kunnen worden door de lucht. In echte systemen is de frequentie van de draaggolf veel hoger dan de snelheid waarmee de symbolen afwisselen. In ons voorbeeld zijn er maar 3 perioden van de draaggolf per symbool, maar in de praktijk zouden er duizenden kunnen zijn, afhankelijk van hoe hoog in het spectrum het verzonden wordt.
+Het bovenste figuur laat de discrete samples zien als rode punten, dus ons digitale signaal. Het onderste figuur laat zien hoe het resulterende gemoduleerde signaal eruitziet, dit zou verzonden kunnen worden door de lucht. In echte systemen is de frequentie van de draaggolf veel hoger dan de snelheid waarmee de symbolen afwisselen. In ons voorbeeld zijn er maar 3 perioden van de draaggolf per symbool, maar in de praktijk zouden er duizenden kunnen zijn, afhankelijk van hoe hoog in het spectrum het verzonden wordt.
 
 ************************
 Phase Shift Keying (PSK)
@@ -151,7 +151,7 @@ Het laat de draaggolf niet zien, dus je kunt dit zien als een basisband-symbolen
 Wanneer we voor een modulatieschema de mogelijke set van symbolen laten zien, noemen we dat de "constellatie". 
 Vele modulatieschema’s kunnen door hun constellaties worden gedefinieerd.
 
-Om BPSK te ontvangen en decoderen kunnen we IQ-bemonstering toepassen, zoals we hebben geleerd in het vorige hoofdstuk, en bekijken waar de punten terechtkomen in het IQ-diagram.
+Om BPSK te ontvangen en decoderen kunnen we IQ-sampling toepassen, zoals we hebben geleerd in het vorige hoofdstuk, en bekijken waar de punten terechtkomen in het IQ-diagram.
 Door het draadloze kanaal zal er echter wel een willekeurige faserotatie plaatsvinden, want het signaal loopt een willekeurige vertraging op wanneer het door de lucht voortplant tussen de antennes.
 Verschillende methodes waar we later over leren kunnen deze willekeurige faserotatie tenietdoen. 
 Hier zijn een paar voorbeelden van hoe het BPSK-signaal eruit zou kunnen zien bij de ontvanger (zonder ruis).
@@ -363,7 +363,7 @@ We gaan wat ruis toevoegen:
 
 De additieve witte Guassian ruis (AWGN) veroorzaakt een spreiding rondom elk constellatiepunt.
 Ruis wordt behandeld in het :ref:`gaussian noise` hoofdstuk.
-Het punt is, als er te veel ruis wordt toegevoegd dan zullen sommige symbolen/monsters over de grens (de vier kwadranten) gaan en incorrect geïnterpreteerd worden.
+Het punt is, als er te veel ruis wordt toegevoegd dan zullen sommige symbolen/samples over de grens (de vier kwadranten) gaan en incorrect geïnterpreteerd worden.
 Probeer dit zelf uit door het ruisvermogen toe te laten nemen.
 
 Je zou ook de faseruis kunnen simuleren, wat zou kunnen ontstaan door variaties in de lokale oscillator (LO), door :code:`r` te vervangen met:
@@ -384,8 +384,8 @@ Je zou zelfs AWGN kunnen combineren met de faseruis om het probleem volledig te 
    :target: ../_images/phase_jitter_awgn.svg
 
 We gaan op dit punt stoppen.
-Als we de tijddomein-versie van het QPSK-signaal zouden willen zien dan zouden we meerdere monsters per symbool moeten genereren (in dit voorbeeld was het 1 monster per symbool).
-Wanneer we het over pulsvorming gaan hebben zul je leren hoe je meerdere monsters per symbool genereert.
+Als we de tijddomein-versie van het QPSK-signaal zouden willen zien dan zouden we meerdere samples per symbool moeten genereren (in dit voorbeeld was het 1 sample per symbool).
+Wanneer we het over pulsvorming gaan hebben zul je leren hoe je meerdere samples per symbool genereert.
 Het Python-voorbeeld in het :ref:`pulse-shaping-chapter` hoofdstuk zal verder gaan waar we nu zijn gestopt.
 
 *******************
