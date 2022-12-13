@@ -280,7 +280,7 @@ Om een nieuwe set aan samples te versturen moet je dan eerst :code:`sdr.tx_destr
 
 Legaal door de lucht zenden
 #################################
-Onderstaande vertaling gaat over de regels in de VS. Voor Nederland is er de `telecommunicatiewet <https://wetten.overheid.nl/BWBR0009950/2022-05-01/>`_ met naar mijn weten vrijwel dezelfde conclusie als de rest van dit stuk. Er is wel de amateur zendband rond 433-435 MHz waar je met licentie mag zenden, `zie <https://wetten.overheid.nl/BWBR0036375/2021-06-18#Bijlagen>`_.
+Onderstaande vertaling gaat over de regels in de VS. Voor Nederland is er de `telecommunicatiewet <https://wetten.overheid.nl/BWBR0009950/2022-05-01/>`_ met naar mijn weten vrijwel dezelfde conclusie als de rest van dit stuk. Er is ook de amateur zendband rond 433-435 MHz waar je met licentie mag zenden, `zie <https://wetten.overheid.nl/BWBR0036375/2021-06-18#Bijlagen>`_.
 
 Een veelvoorkomende vraag van studenten is op welke frequenties ze mogen zenden met een antenne (in de VS). Het korte antwoord is niet, zover ik weet. Meestal wordt er verwezen naar de wetten die zendvermogen beperken, `de FCC's "Title 47, Part 15" (47 CFR 15) regulations <https://www.ecfr.gov/cgi-bin/text-idx?SID=7ce538354be86061c7705af3a5e17f26&mc=true&node=pt47.1.15&rgn=div5>`_. 
 
@@ -295,11 +295,10 @@ Als je een amateur radio (ham) licentie hebt, dan mag je van de FCC bepaalde ban
 Als iemand meer details heeft over wat er wel en niet is toegestaan, email me alsjeblieft.
 
 ************************************************
-Transmitting and Receiving Simultaneously
+Tegelijk zenden en ontvangen
 ************************************************
 
-Using the tx_cyclic_buffer trick you can easily receive and transmit at the same time, by kicking off the transmitter, then receiving. 
-The following code shows a working example of transmitting a QPSK signal in the 915 MHz band, receiving it, and plotting the PSD.
+De tx_cyclic_buffer truuk staat je toe om tegelijkertijd te zenden en te ontvangen door eerst de zender te starten, en daarna te gaan ontvangen. De volgende stuk code geeft een werkend voorbeeld waarin een QPSK signaal wordt verstuurd in de 915 MHz band, wordt ontvangen en de PSD ervan weergeeft.
 
 .. code-block:: python
 
@@ -309,95 +308,94 @@ The following code shows a working example of transmitting a QPSK signal in the 
 
     sample_rate = 1e6 # Hz
     center_freq = 915e6 # Hz
-    num_samps = 100000 # number of samples per call to rx()
+    num_samps = 100000 # aantal samples voor een aanroep van rx()
 
     sdr = adi.Pluto("ip:192.168.2.1")
     sdr.sample_rate = int(sample_rate)
 
     # Config Tx
-    sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
+    sdr.tx_rf_bandwidth = int(sample_rate) # filter kantelfrequentie, gelijk aan samplerate
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain_chan0 = -50 # Increase to increase tx power, valid range is -90 to 0 dB
+    sdr.tx_hardwaregain_chan0 = -50 # demping op zendvermogen
 
     # Config Rx
     sdr.rx_lo = int(center_freq)
     sdr.rx_rf_bandwidth = int(sample_rate)
     sdr.rx_buffer_size = num_samps
     sdr.gain_control_mode_chan0 = 'manual'
-    sdr.rx_hardwaregain_chan0 = 0.0 # dB, increase to increase the receive gain, but be careful not to saturate the ADC
+    sdr.rx_hardwaregain_chan0 = 0.0 # dB, maakt dit groter voor sterker ontvangst, kijk uit dat je de ADC niet overstuurt
 
-    # Create transmit waveform (QPSK, 16 samples per symbol)
+    # Maak de symboolreeks om te versturen (QPSK, 16 samples per symbool)
     num_symbols = 1000
-    x_int = np.random.randint(0, 4, num_symbols) # 0 to 3
-    x_degrees = x_int*360/4.0 + 45 # 45, 135, 225, 315 degrees
-    x_radians = x_degrees*np.pi/180.0 # sin() and cos() takes in radians
-    x_symbols = np.cos(x_radians) + 1j*np.sin(x_radians) # this produces our QPSK complex symbols
-    samples = np.repeat(x_symbols, 16) # 16 samples per symbol (rectangular pulses)
-    samples *= 2**14 # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
+    x_int = np.random.randint(0, 4, num_symbols) # 0 tot 3
+    x_degrees = x_int*360/4.0 + 45 # 45, 135, 225, 315 graden
+    x_radians = x_degrees*np.pi/180.0 # sin() en cos() werken in radialen
+    x_symbols = np.cos(x_radians) + 1j*np.sin(x_radians) # dit geeft de complexe QPSK symbolen
+    samples = np.repeat(x_symbols, 16) # 16 samples per symbool (blokgolf)
+    samples *= 2**14 # versterken voor de Pluto
 
-    # Start the transmitter
-    sdr.tx_cyclic_buffer = True # Enable cyclic buffers
-    sdr.tx(samples) # start transmitting
+    # Zender starten
+    sdr.tx_cyclic_buffer = True # cyclic buffers aanzetten
+    sdr.tx(samples) # start met zenden
 
-    # Clear buffer just to be safe
+    # Voor de zekerheid buffer leegmaken
     for i in range (0, 10):
         raw_data = sdr.rx()
         
-    # Receive samples
+    # samples ontvangen
     rx_samples = sdr.rx()
     print(rx_samples)
 
-    # Stop transmitting
+    # Stop zender
     sdr.tx_destroy_buffer()
 
-    # Calculate power spectral density (frequency domain version of signal)
+    # Bereken de power spectral density (frequentiedomein van ons signaal)
     psd = np.abs(np.fft.fftshift(np.fft.fft(rx_samples)))**2
     psd_dB = 10*np.log10(psd)
     f = np.linspace(sample_rate/-2, sample_rate/2, len(psd))
 
-    # Plot time domain
+    # Plot tijddomein
     plt.figure(0)
     plt.plot(np.real(rx_samples[::100]))
     plt.plot(np.imag(rx_samples[::100]))
-    plt.xlabel("Time")
+    plt.xlabel("Tijd")
 
-    # Plot freq domain
+    # Plot freqdomein
     plt.figure(1)
     plt.plot(f/1e6, psd_dB)
-    plt.xlabel("Frequency [MHz]")
+    plt.xlabel("Frequentie [MHz]")
     plt.ylabel("PSD")
     plt.show()
 
-
-You should see something that looks like this, assuming you have proper antennas or a cable connected:
+Met een goede antenne of kabel zou je zo iets moeten zien:
 
 .. image:: ../_images/pluto_tx_rx.svg
    :align: center 
 
-It is a good exercise to slowly adjust :code:`sdr.tx_hardwaregain_chan0` and :code:`sdr.rx_hardwaregain_chan0` to make sure the received signal is getting weaker/stronger as expected.
+Een goede oefening is om :code:`sdr.tx_hardwaregain_chan0` en :code:`sdr.rx_hardwaregain_chan0` langzaam te veranderen om zeker van te zijn dat je ontvanger signaal sterker of zwakker wordt zoals verwacht. 
 
 ************************
-Reference API
+Referentie API
 ************************
 
-For the entire list of sdr properties and functions you can call, refer to the `pyadi-iio Pluto Python code (AD936X) <https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py>`_.
+Voor de volledige lijst van functies en instellingen die je kunt aanroepen kun je `pyadi-iio Pluto Python code (AD936X) <https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py>`_ raadplegen.
 
 ************************
-Python Exercises
+Python Oefeningen
 ************************
 
-Instead of providing you code to run, I have created multiple exercises where 95% of the code is provided and the remaining code is fairly straightforward Python for you to create.  The exercises aren't meant to be difficult. They are missing just enough code to get you to think.
+In plaats van de volledige code te geven, heb ik meerdere opdrachten gemaakt waar 99% van de code al is gegeven en de overige code simpel is voor je om te maken. De opdrachten zijn niet bedoeld om moeilijk te zijn. Ze missen net genoeg code om je na te laten denken.
 
-Exercise 1: Determine Your USB Throughput
-#########################################
+Opdracht 1: Bepaal de doorvoersnelheid van je USB verbinding
+############################################################
 
-Let's try receiving samples from the PlutoSDR, and in the process, see how many samples per second we can push through the USB 2.0 connection.  
+We gaan samples proberen te ontvangen en tegelijkertijd gaan we kijken hoeveel samples per seconde we door de USB 2.0 connectie kunnen duwen.
 
-**Your task is to create a Python script that determines the rate samples are received in Python, i.e., count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer_size's to see how it impacts the highest achievable rate.**
+**Het is jouw taak om een Python script te schrijven dat bepaalt hoesnel de samples in Python binnen komen. Dus tel het aantal samples wat binnenkomt en hou de tijd bij om de sample rate te bepalen. Probeer daarna andere sample_rate's en buffer_size's te gebruiken om te zien wat de hoogste haalbare snelheid is.**
 
-Keep in mind, if you receive fewer samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's. The Pluto only uses USB 2.0.
+Vergeet niet dat wanneer je minder samples per seconde binnen krijgt dan de ingestelde sample rate, je samples aan het verliezen bent, wat hoogstwaarschijnlijk gebeurt op hoge snelheden. De Pluto gebruikt immers maar USB 2.0.
 
-The following code will act as a starting point yet contains the instructions you need to accomplish this task.
+Het volgende stuk code is een mooi beginpunt maar bevat ook de benodigde instructies om deze opdracht af te ronden.
 
 .. code-block:: python
 
@@ -416,7 +414,7 @@ The following code will act as a starting point yet contains the instructions yo
  sdr.rx_buffer_size = 1024 # this is the buffer the Pluto uses to buffer samples
  samples = sdr.rx() # receive samples off Pluto
 
-Additionally, in order to time how long something takes, you can use the following code:
+Om hiernaast bij te houden hoeveel tijd iets in beslag neemt kun je het volgende stukje code gebruiken:
 
 .. code-block:: python
 
@@ -425,35 +423,36 @@ Additionally, in order to time how long something takes, you can use the followi
  end_time = time.time()
  print('seconds elapsed:', end_time - start_time)
 
-Here are several hints to get you started.
+Nog wat hints om je op weg te helpen.
 
-Hint 1: You'll need to put the line "samples = sdr.rx()" into a loop that runs many times (e.g., 100 times). You must count how many samples you get each call to sdr.rx() while tracking how much time has elapsed.
+Hint 1: Je zult de regel "samples = sdr.rx()" in een loop meerdere keer moeten aanroepen (bijv., 100 keer). Telkens moet je tellen hoeveel samples je terugkrijgt en hoeveel tijd is verlopen.
 
-Hint 2: Just because you are calculating samples per second, that doesn't mean you have to perform exactly 1 second's worth of receiving samples. You can divide the number of samples you received by the amount of time that passed.
+Hint 2: Ook al probeer je het aantal samples per seconde te berekenen, dat betekent niet dat je ook precies 1 seconde aan samples moet ontvangen. Je kunt ook het aantal ontvangen samples delen door de verlopen tijd.
 
-Hint 3: Start at sample_rate = 10e6 like the code shows because this rate is way more than USB 2.0 can support. You will be able to see how much data gets through.  Then you can tweak rx_buffer_size. Make it a lot larger and see what happens.  Once you have a working script and have fiddled with rx_buffer_size, try adjusting sample_rate. Determine how low you have to go until you are able to receive 100% of samples in Python (i.e., sample at a 100% duty cycle).
+Hint 3: Begin met een sample_rate = 10e6 zoals de code laat zien, want dit is veel meer dan de USB 2.0 verbinding aan kan. Je kunt zient hoeveel data erdoorheen komt. Daarna kun je de rx buffer grootte aanpassen om te zien wat er gebeurt. Op het moment dat je een werkend script hebt en je hebt gespeeld met de rx_buffer_size dan kun je proberen de sample_rate aan te passen. Bepaal hoever je de sample rate moet verlagen om 100% van de samples te kunnen ontvangen in Python.
 
-Hint 4: In your loop where you call sdr.rx(), try to do as little as possible so that it doesn't add extra delay in execution time. Don't do anything intensive like print from inside the loop.
+Hint 4: In de loop waarin je sdr.rx() uitvoert wil je zo min mogelijk vertraging toevoegen. Ga geen intensieve functies aanroepen zoals print() binnen de loop.
 
-As part of this exercise you will get an idea for the max throughput of USB 2.0. You can look up online to verify your findings.
+Als resultaat krijg je een goed idee van de maximale doorvoersnelheid van USB 2.0. Je kunt online kijken om je bevindingen te verifieren.
 
-As a bonus, try changing the center_freq and rx_rf_bandwidth to see if it impacts the rate you can receive samples off the Pluto.
+Als bonus: probeer eens de center_freq en rx_rf_bandwidth aan te passen om te zien hoe dat de snelheid beinvloed.
 
 
-Exercise 2: Create a Spectrogram/Waterfall
+Opdracht 2: Maak een Spectrogram/Waterval
 ##########################################
 
-For this exercise you will create a spectrogram, a.k.a. waterfall, like we learned about at the end of the :ref:`freq-domain-chapter` chapter.  A spectrogram is simply a bunch of FFT's displayed stacked on top of each other. In other words, it's an image with one axis representing frequency and the other axis representing time.
+Voor deze opdracht zul je een spectrogram of watervaldiagram moeten maken zoals besproken in het :ref:`freq-domain-chapter` hoofdstuk.  
+Een spectrogram is niets meer dan een hoop FFT's die je op elkaar gestapeld weergeeft. In andere woorden, het is een figuur waar een as de frequentie weergeeft en de andere as tijd.
 
-In the :ref:`freq-domain-chapter` chapter we learned the Python code to perform an FFT.  For this exercise you can use code snippets from the previous exercise, as well as a little bit of basic Python code.
+In het :ref:`freq-domain-chapter` hoofdstuk hebben we de Python code gegeven om een FFT uit te voeren. Voor deze opdracht kun je de codevoorbeelden uit dat hoofdstuk en uit de vorige opdracht gebruiken.
 
 Hints:
 
-1. Try setting sdr.rx_buffer_size to the FFT size so that you always perform 1 FFT for each call to `sdr.rx()`.
-2. Build a 2d array to hold all the FFT results where each row is 1 FFT.  A 2d array filled with zeros can be created with: `np.zeros((num_rows, fft_size))`.  Access row i of the array with: `waterfall_2darray[i,:]`.
-3. `plt.imshow()` is a convenient way to display a 2d array. It scales the color automatically.
+1. Maak sdr.rx_buffer_size gelijk aan de lengte van de FFT zodat je altijd 1 FFT uitvoert voor elke aanroep naar `sdr.rx()`.
+2. Bouw een 2D array om alle FFT resultaten in te bewaren. Dus 1 FFT per rij. Je kunt zo'n array met nullem vullen met: `np.zeros((num_rows, fft_size))`.  Je kunt rij i van de array benaderen met: `waterfall_2darray[i,:]`.
+3. `plt.imshow()` is een handige manier om een 2D array te weergeven in een figuur. De kleur wordt automatisch bepaalt aan de hand van de waarden.
 
-As a stretch goal, make the spectrogram update live.
+Als een extra uitdaging kun je de spectrogram live laten updaten.
 
 
 
