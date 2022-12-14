@@ -297,7 +297,7 @@ html_show_sourcelink = False
 htmlhelp_basename = 'textbookdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
-#tikz_latex_preamble = r'\usepackage{subcaption}'
+tikz_latex_preamble = r'\usepackage{circuitikz}'
 #imgmath_latex_preamble = r'\usepackage{siunitx}'
 
 

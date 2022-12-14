@@ -166,7 +166,6 @@ De index :math:`k` loopt van 0 tot N-1.
 Het geeft niet als deze vergelijkingen voor jou niets betekenen. 
 We hoeven ze eigenlijk niet eens direct te gebruiken om coole dingen te doen met DSP en SDR's!
 
-:: _time-freq-props:
 *****************************
 Tijd-Frequentie Eigenschappen
 *****************************

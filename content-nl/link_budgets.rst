@@ -4,115 +4,189 @@
 Link Budgets
 ##################
 
-This chapter covers link budgets, a big portion of which is understanding transmit/receive power, path loss, antenna gain, noise, and SNR.  We finish by constructing an example link budget for ADS-B, which are signals transmitted by commercial aircraft to share their position and other information.  
+In dit hoofdstuk gaan we het hebben over "link budgetten". Een groot deel hiervan is het begrip van zend- en ontvangstvermogen, transmissieverlies, antenneversterking, ruis en signaal-ruisverhouding (SNR). We zullen eindigen met een voorbeeldbudget voor ADS-B, een signaal wat door commerciele vliegtuigen wordt uitgezonden om hun positie en overige informatie door te geven.
 
 *************************
-Introduction
+Introductie
 *************************
 
-A link budget is an accounting of all of the gains and losses from the transmitter to the receiver in a communication system.  Link budgets describe one direction of the wireless link.  Most communications systems are bidirectional, so there must be a separate uplink and downlink budget.  The "result" of the link budget will tell you roughly how much signal-to-noise ratio (abbreviated as SNR, which this textbook uses, or S/N) you should expect to have at your receiver.  Further analysis would be needed to check if that SNR is high enough for your application.
+Een "link" budget is een opsomming van alle winsten en verliezen tussen de zender en ontvanger van een communicatiesysteem.
+Het beschrijft een richting van een draadloos kanaal.
+De meeste communicatiesystemen zijn echter bidirectioneel en hebben dus aparte up- en downlink budgetten.
+Het resultaat van zo'n budget geeft je een grove inschatting van de signaal-ruisverhouding (SNR) die je kunt verwachten bij de ontvanger.
+Na verdere analyse kun je dan besluiten of de SNR hoog genoeg is voor jouw doel.
 
-You study link budgets not for the purpose of being able to actually make a link budget for some situation, but to learn and develop a system-layer point of view of wireless communications.
+We bestuderen linkbudgetten niet zodat je er zelf een op kunt stellen, maar meer om een beeld te krijgen van draadloze communicatie op systeem-niveau.
 
-We will first cover the received signal power budget, then the noise power budget, and finally combine the two to find SNR (signal power divided by noise power).
+Eerst zullen we het budget van het ontvangen signaal beschouwen, dan het ruisvermogen budget en als laatste zullen we die combineren om de SNR te vinden (Signaalvermogen gedeeld door ruisvermogen).
 
 *************************
-Signal Power Budget
+Signaalvermogensbudget
 *************************
 
-Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the *transmit* power; it is usually a setting in the transmitter.  How do we figure out the *received* power at the receiver?
+Hieronder zie je het meest simpele diagram wat je zou kunnen opstellen voor een algemene draadloze keten.
+In dit hoofdstuk zullen we een richting behandelen, namelijk vanaf de zender (Tx) naar ontvanger (Rx).
+We weten voor een gegeven systeem wat het zendvermogen is; dit is meestal een instelling bij de zender.
+Maar hoe bepalen we het vermogen wat aankomt bij de ontvanger?
 
-.. image:: ../_images/tx_rx_system.svg
-   :align: center 
-   :target: ../_images/tx_rx_system.svg
+.. tikz:: [auto, node distance=2cm,>=latex',font=\sffamily]
+  \tikzset{block/.style = {draw, fill=white, rectangle,
+                    minimum height=3em, minimum width=2cm},
+          input/.style = {coordinate},
+          output/.style = {coordinate},
+          pinstyle/.style = {pin edge={to-,t,black}}
+      }
+  \node[block](tx)                          {zender};
+  \node[antenna](txant) at (tx.north) {};
+  \draw[snake=expanding waves] (txant.north east) -- ++(1,0);
+  \node[block,right = 6cm of tx](rx)        {ontvanger};
+  \node[antenna,xscale=-1] at (rx.north) {};
+  :libs: positioning,shapes,arrows,snakes
+  :xscale: 80
 
-We need four system parameters to determine the received power, which are provided below with their common abbreviations. This chapter will delve into each of them.
+.. .. image:: ../_images/tx_rx_system.svg
+..    :align: center 
+..    :target: ../_images/tx_rx_system.svg
 
-- **Pt** - Transmit power
-- **Gt** - Gain of transmit antenna
-- **Gr** - Gain of receive antenna
-- **Lp** - Distance between Tx and Rx (i.e., how much wireless path loss)
+We hebben vier systeemparameters nodig om het ontvangenvermogen te bepalen. Deze zijn hieronder opgesomt samen met de meestgebruikte (Engelstalige) afkortingen.
+We zullen ieder apart behandelen in dit hoofdstuk.
 
-.. image:: ../_images/tx_rx_system_params.svg
-   :align: center 
-   :target: ../_images/tx_rx_system_params.svg
+- **Pt** - Vermogen van zender (Power transmitter)
+- **Gt** - Antenneversterking zender (Gain transmitter)
+- **Gr** - Antenneversterking ontvanger (Gain receiver)
+- **Lt** - Afstande tussen zender en ontvanger dus hoeveelheid transmissieverlies (Path Loss)
 
-Transmit Power
+.. tikz:: [auto, node distance=2cm,>=latex',font=\sffamily\small]
+  \tikzset{block/.style = {draw, fill=white, rectangle,
+                    minimum height=3em, minimum width=2cm},
+          input/.style = {coordinate},
+          output/.style = {coordinate},
+          pinstyle/.style = {pin edge={to-,t,black}}
+      }
+  \node[block](tx)                            {zender};
+  \node[block,right = 6cm of tx](rx)          {ontvanger};
+  \node[antenna](txant) at (tx.north) {};
+  \node[antenna,xscale=-1](rxant) at (rx.north) {};
+  \draw[snake=expanding waves] 
+    (txant.east) -- ++(1,0) coordinate(begin);
+  \draw[ultra thick,gray] 
+    (begin) -- ++(2,0) coordinate(midden);
+  \draw[->,ultra thick, gray] 
+    (midden) -- ++(2,0) node[right,align=center]  {Ontvangen\\vermogen \textbf{Pr}};
+  \draw (midden) node[align=center, below]        {transmissieverlies\\\textbf{Lp}};
+  \node[above=1cm of txant.north,align=center]    {Antenneversterking\\zender \textbf{Gt}};
+  \node[above=1cm of rxant.north,align=center]    {Antenneversterking\\ontvanger \textbf{Gr}};
+  \node[above right = 1 cm of txant.east,align=center]     {Zendvermogen\\\textbf{Gt}};
+  :libs: positioning,shapes,arrows,snakes
+  :xscale: 100
+
+.. .. image:: ../_images/tx_rx_system_params.svg
+..    :align: center 
+..    :target: ../_images/tx_rx_system_params.svg
+
+Zendvermogen
 #####################
 
-Transmit power is fairly straightforward; it will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  An analogy for transmit power would be the watt rating (power) of a light bulb: the higher the wattage, the more light transmitted by the bulb.  Here are examples of approximate transmit power for different technologies:
+Zendvermogen is vrij simpel; het is uitgedrukt in Watt, dBW or dBm (dBm is een afkorting voor dBmW).
+Elke zender heeft een of meerdere versterkers,  het zendvermogen is voornamelijk een eigenschap van die versterkers.
+Een analogie voor zendvermogen is het vermogen van een lamp: hoe meer vermogen in Watt, hoe meer licht wordt uitgezonden door de lamp.
+Hieronder staan wat gemiddelde vermogens van verschillende technologien:
 
 ==================  =====  =======
 \                       Power    
 ------------------  --------------
 Bluetooth           10 mW  -20 dBW   
 WiFi                100mW  -10 dBW
-LTE base-station    1W     0 dBW
+LTE station         1W     0 dBW
 FM station          10kW   40 dBW
 ==================  =====  =======
 
-Antenna Gains
+Antenneversterking
 #####################
 
-Transmit and receive antenna gains are crucial for calculating link budgets. What is the antenna gain, you might ask?  It indicates the directivity of the antenna.  You might see it referred to as antenna power gain, but don't let that mislead you, the only way for an antenna to have a higher gain is to direct energy in a more focused region.
+De antenneversterking van zend- en ontvangstantenne's zijn een cruciaal onderdeel van linkbudgetten.
+Maar wat is antenneversterking?
+Het is een indicatie van de richtingskarakteristiek.
+Soms wordt het vermogensversterking genoemd, maar laat je niet misleiden, de enige manier voor een antenne om een hogere versterking te hebben is door de energie/straling te bundelen in een kleiner gebied.
 
-Gains will be depicted in dB (unit-less); feel free to learn or remind yourself why dB is unit-less for our scenario in the :ref:`noise-chapter` chapter.  Typically, antennas are either omnidirectional, meaning their power radiates in all directions, or directional, meaning their power radiates in a specific direction.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna will have a higher gain, usually 5 dB or higher, and anywhere up to 60 dB or so.
+Versterkingsfactoren worden uitgedrukt in dB (zonder eenheid), zie het :ref:`noise-chapter` hoofdstuk voor een opfriscursus.
+Antennes zijn of omnidirectioneel (omni-antenne), dus het vermogen straalt in alle richtingen, of directioneel (richtantenne), het vermogen straalt een specifieke kant op.
+Omni-antennes hebben een versterking tussen 0 dB en 3 dB.
+Een richtantenne heeft een hogere versterking van 5 dB tot ongeveer 60 dB.
 
 .. image:: ../_images/antenna_gain_patterns.png
    :scale: 80 % 
    :align: center 
 
-When a directional antenna is used, it must be either installed facing the correct direction or attached to a mechanical gimbal. It could also be a phased array, which can be electronically steered (i.e., by software).
+Wanneer een richtantenne wordt toegepast zal het de juiste kant op moeten wijzen.
+Als het een fase gestuurde antenne is dan kan het ook elektronish worden gericht (dus met software).
 
 .. image:: ../_images/antenna_steering.png
    :scale: 80 % 
    :align: center 
-   
-Omnidirectional antennas are used when pointing in the right direction is not possible, like your cellphone and laptop.  In 5G, phones can operate in the higher frequency bands like 28 GHz (Verizon) and 39 GHz (AT&T) using an array of antennas and electronic beam steering.
 
-In a link budget, we must assume that any directional antenna, whether transmit or receive, is pointed in the right direction.  If it's not pointed correctly then our link budget won't be accurate and there could be loss of communication, (e.g., the satellite dish on your roof gets hit by basketball and moves).  In general, our link budgets assume ideal circumstances while adding a miscellaneous loss to account for real-world factors.
+Omni-antennes worden gebruikt wanneer je niet de richting aan kunt geven, zoals voor een mobiele telefoon of laptop.
+Bij 5G kan een telefoon op hogere frequentiebanden werken zoals 26 GHz met een array van antennes en het elektronisch regelen van de bundelrichting.
 
-Path Loss
-#####################
+Bij het opstellen van een linkbudget moeten we ervan uit gaan dat een richtantenne (zender of ontvanger) de juiste richting opwijst.
+Als het niet de juiste kant opwijst dan is ons budget niet precies en vindt er verlies van communicatie plaats (wanneer bijvoorbeeld de tv-schotel verdraait door een bal).
+Over het algemeen gaat ons linkbudget van een ideale situatie uit terwijl we de verliezen van zoveel mogelijke echte factoren meenemen.
 
-As a signal moves through the air (or vacuum), it reduces in strength.  Imagine holding a small solar panel in front of a light bulb.  The further away the solar panel is, the less energy it will absorb from the light bulb.  **Flux** is a term in physics and mathematics, defined as "how much stuff goes through your thing".  For us, it's the amount of electromagnetic field passing into our receive antenna.  We want to know how much power is lost, for a given distance.
+Transmissieverlies (Path Loss)
+##############################
+
+Wanneer een signaal zich door de lucht (of vaccuum) beweegt, verliest het kracht.
+Stel je voor dat je een klein zonnepaneel voor een lamp houdt.
+Hoe verder je van de lamp afstaat, hoe minder energie het kan absorberen.
+In de natuur- en wiskunde wordt **flux** gebruikt om aan te geven hoeveel "spul door je ding" gaat.
+We willen bepalen hoeveel vermogen we kwijtraken voor een gegeven afstand.
 
 .. image:: ../_images/flux.png
    :scale: 80 % 
    :align: center 
 
-Free Space Path Loss (FSPL) tells us the path loss when there are no obstacles for a given distance.  In its general form, :math:`\mathrm{FSPL} = ( 4\pi d / \lambda )^2`. Google Friis transmission formula for more info.  (Fun fact: signals encounter 377 ohms impedance moving through free space.)  For generating link budgets, we can use this same equation but converted to dB:
+Free Space Path Loss (FSPL) of transmissieverlies in vrije ruimte verteld ons het verlies wanneer er geen obstakels tussen zender en ontvanger staan.
+In het algemeen :math:`\mathrm{FSPL} = ( 4\pi d / \lambda )^2`. 
+Google Friis transmissieformule voor meer informatie.
+(Leuk weetje: signalen ervaren 377 ohm aan impedantie wanneer ze door de vrije ruimte bewegen.)
+Bij het opstellen van ons linkbudget kunnen we dezelfde formule toepassen, maar omgezet naar dB:
 
 .. math::
  \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ dB \right]
 
-In link budgets it will show up in dB, unit-less because it is a loss.  :math:`d` is in meters and is the distance between the transmitter and receiver.  :math:`f` is in Hz and is the carrier frequency.  There's only one problem with this simple equation; we won't always have free space between the transmitter and receiver.  Frequencies bounce a lot indoors (most frequencies can go through walls, just not metal or thick masonry). For these situations there are various non-free-space models. A common one for cities and suburban areas (e.g., cellular) is the Okumura–Hata model:
+Dit wordt uigedrukt in de eenheidsloze vorm dB omdat het een verlies betreft.
+:math:`d` is de afstand tussen zender en ontvanger in meters.
+:math:`f` is de draaggolffrequentie in Hz.
+Er is alleen een probleem met deze vergelijking; er staan bijna altijd obstakels tussen zender en ontvanger.
+Binnenshuis stuiteren signalen ook nog eens (de meeste frequenties gaan door gipsmuren heen, maar niet (goed) door metaal of dikke baksteen muren).
+In deze situaties worden andere modellen gebruikt.
+Een veelgebruikt model voor steden en bewoonde gebieden is het Okumura–Hata model:
 
 .. math::
  L_{path} = 69.55 + 26.16 \log_{10} f - 13.82 \log_{10} h_B - C_H + \left[ 44.9 - 6.55 \log_{10} h_B \right] \log_{10} d
 
-where :math:`L_{path}` is the path loss in dB, :math:`h_B` is the height of the transmit antenna above ground level in meters, :math:`f` is the carrier frequency in MHz, :math:`d` is the distance between Tx and Rx in km, and :math:`C_H` is called the "antenna high correction factor" and is defined based on the size of city and carrier frequency range:
+Hierbij is :math:`L_{path}` het transmissieverlies in dB, :math:`h_B` is de hoogte van de antenne boven de grond in meters, :math:`f` is de draaggolffrequentie in MHz, :math:`d` is de afstand tussen zender en ontvanger in km en :math:`C_H` wordt de "antenne correctiefactor" genoemd en wordt gedefinieerd aan de hand van het frequentiebereik en de grootte van de stad:
 
-:math:`C_H` for small/medium cities:
+:math:`C_H` voor dorpen:
 
 .. math::
  C_H = 0.8 + (1.1 \log_{10} f - 0.7 ) h_M - 1.56 \log_{10} f
 
-:math:`C_H` for large cities when :math:`f` is below 200 MHz:
+:math:`C_H` voor steden met :math:`f` onder 200 MHz:
 
 .. math::
  C_H = 8.29 ( log_{10}(1.54 h_M))^2 - 1.1
  
-:math:`C_H` for large cities when :math:`f` is above 200 MHz but less than 1.5 GHz:
+:math:`C_H` voor steden met :math:`f` tussen 200 MHz en 1.5 GHz:
 
 .. math::
  C_H = 3.2 ( log_{10}(11.75 h_M))^2 - 4.97
 
-where :math:`h_M` is the height of the receiving antenna above ground level in meters.
+waarbij :math:`h_M` de hoogte van de ontvangstantenne is boven de grond in meters.
 
-Don't worry if the above Okumura–Hata model seemed confusing; it is mainly shown here to demonstrate how non-free-space path loss models are much more complicated than our simple FSPL equation.  The final result of any of these models is a single number we can use for the path loss portion of our link budget.  We'll stick to using FSPL for the rest of this chapter.
+Maak je geen zorgen als dit allemaal verwarrend is; het wordt hier getoond om te laten zien dat het model met obstakels veel ingewikkelder is dan de simpele FSPL vergelijking. Het resultaat van deze modellen is een enkel getal dat we kunnen gebruiken in ons linkbudget. We blijven FSPL gebruiken voor de rest van dit hoofdstuk.
 
-Miscellaneous Losses
+Overige verliezen
 #####################
 
 In our link budget we also want to take into account miscellaneous losses.  We will lump these together into one term, usually somewhere between 1 – 3 dB.  Examples of miscellaneous losses:
