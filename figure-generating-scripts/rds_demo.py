@@ -25,7 +25,7 @@ if False:
     PSD = PSD - np.max(PSD)
     f = np.linspace(sample_rate/-2, sample_rate/2, len(PSD))/1e3
     plt.plot(f, PSD)
-    plt.axis([-125, 125, -5.5, 1])
+    plt.axis([-125, 125, -55, 1])
     plt.xlabel("Frequency [kHz]")
     plt.ylabel("PSD Before FM Demod [dB]")
     plt.show()
@@ -42,7 +42,7 @@ if False:
     PSD = PSD - np.max(PSD)
     f = np.linspace(0, sample_rate/2, len(PSD))/1e3
     plt.plot(f, PSD)
-    plt.axis([0, 125, -5.5, 1])
+    plt.axis([0, 125, -55, 1])
     plt.xlabel("Frequency [kHz]")
     plt.ylabel("PSD After FM Demod [dB]")
     plt.show()
@@ -82,12 +82,6 @@ sample_rate = 25e3
 x = resample_poly(x, 19, 25) 
 sample_rate = 19e3
 
-# Matched Filter?  rrc_taps_manchester, no decimation
-#rrc_taps = firdes.root_raised_cosine(1, 19e3, 19e3/8, 1, 151) # gain, samp_rate, symbol_rate, alpha, n_taps
-#taps = [rrc_taps[n] - rrc_taps[n+8] for n in range(len(rrc_taps)-8)] # make it a bandpass filter because of RDS having redundant BPSKs
-taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
-x = np.convolve(x, taps, 'valid')
-
 # Filters time/freq response
 if False:
     plt.plot(taps,'.-')
@@ -106,12 +100,6 @@ if False:
 
 
 # TODO use https://github.com/wavewalkerdsp/blogDownloads/blob/main/srrcDesign.py or another to make RRC filter and freq shift it like in filters chapter
-
-
-
-# TODO At this point shouldn't there be a freq shift of like 1 kHz to center the RDS BPSK we isolated with the bandpass filter?
-
-
 
 
 # Normalize signal, to emulate AGC, this isn't actually required for any future step, they all scale to amplitude just fine
