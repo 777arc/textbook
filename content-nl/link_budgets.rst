@@ -48,13 +48,13 @@ Maar hoe bepalen we het vermogen wat aankomt bij de ontvanger?
 ..    :align: center 
 ..    :target: ../_images/tx_rx_system.svg
 
-We hebben vier systeemparameters nodig om het ontvangen vermogen te bepalen. Deze zijn hieronder opgesomd samen met de mees gebruikte (Engelstalige) afkortingen.
+We hebben vier systeemparameters nodig om het ontvangen vermogen te bepalen. Deze zijn hieronder opgesomd samen met de meest gebruikte (Engelstalige) afkortingen.
 We zullen ieder apart behandelen in dit hoofdstuk.
 
 - **Pt** - Vermogen van zender (Power transmitter)
 - **Gt** - Antenneversterking zender (Gain transmitter)
 - **Gr** - Antenneversterking ontvanger (Gain receiver)
-- **Lt** - Afstande tussen zender en ontvanger dus hoeveelheid transmissieverlies (Path Loss)
+- **Lt** - Afstand tussen zender en ontvanger dus hoeveelheid transmissieverlies (Path Loss)
 
 .. tikz:: [auto, node distance=2cm,>=latex',font=\sffamily\small]
   \tikzset{block/.style = {draw, fill=white, rectangle,
@@ -125,7 +125,7 @@ Als het een fase gestuurde antenne is dan kan het ook elektronisch worden gerich
    :scale: 80 % 
    :align: center 
 
-Omni-antennes worden gebruikt wanneer je niet de richting aan kunt geven, zoals voor een mobiele telefoon of laptop.
+Wanneer er geen specifieke richting is, worden omni-antennes toegepast, zoals voor een mobiele telefoon of laptop.
 Bij 5G kan een telefoon op hogere frequentiebanden werken zoals 26 GHz met een array van antennes en het elektronisch regelen van de bundelrichting.
 
 Bij het opstellen van een linkbudget moeten we ervan uit gaan dat een richtantenne (zender of ontvanger) de juiste richting op wijst.
@@ -198,7 +198,7 @@ Voorbeelden van verliezen die hieronder vallen:
 - Het weer (regen, sneeuw etc.)
 
 De onderstaande grafiek laat zien wat de verliezen zijn in de atmosfeer voor bepaalde frequenties, uitgedrukt in dB/km.
-Als je het figuur bestudeert zie je dat communicatie bij een afstand korter dan 1km en een frequentie kleiner dan 40 GHz er een verlies van slechts 1 dB plaatsvindt. In dit geval negeren we vaak het verlies. Waar de atmosfeer echt invloed gaat hebben is in het geval van satellietcommunicatie, waar de signalen vele kilometers door de atmosfeer afleggen.
+Als je het figuur bestudeert zie je dat communicatie bij een afstand korter dan 1km en een frequentie kleiner dan 40 GHz er een verlies van maximaal 1 dB plaatsvindt. In dit geval negeren we vaak het verlies. Waar de atmosfeer echt invloed gaat hebben is in het geval van satellietcommunicatie, waar de signalen vele kilometers door de atmosfeer afleggen.
 
 .. image:: ../_images/atmospheric_attenuation.svg
    :align: center 
@@ -239,19 +239,18 @@ Ruisvermogen
 Nu we het signaalvermogen hebben gaan we overschakelen naar het ruisvermogen, we moeten immers de signaal-ruisverhouding bepalen.
 Het bepalen van het ruisvermogen gaan we op een vergelijkbare manier doen als het signaalvermogen.
 
-Het is nu een goed moment om te bespreken waar ruis ons kanaal binnenkomt. Antwoord: **Bij de ontvanger!**.
+Het is nu een goed moment om te bespreken waar ruis ons kanaal binnenkomt. Antwoord: **Bij de ontvanger**!
 Het signaal wordt niet verpest door de ruis totdat we het gaan ontvangen. Het is *extreem* belangrijk om dit te begrijpen.
 Veel student maken dit zich niet eigen en maken daardoor domme fouten.
 Er zweeft geen ruis door de lucht. 
 De ruis ontstaat doordat onze ontvanger een versterker en andere elektronica heeft die niet perfect zijn en ook niet op 0 Kelvin werken.
 
-Een populaire vergelijking voor het ruisbudget gebruikt de "kTB" aanpak:
+Een populaire vergelijking voor het ruisbudget maakt gebruik van de "kTB" aanpak:
 
 .. math::
  P_{noise} = kTB
 
-- :math:`k` – Boltzmann’s constante = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**.  
-De Bolzmann constante, voor de nieuwsgieren onder ons, is een fysische constante wat de gemiddelde energie van deeltjes in een gas relateert aan de temperatuur van het gas.
+- :math:`k` – Boltzmann’s constante = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**. De Bolzmann constante, voor de nieuwsgieren onder ons, is een fysische constante wat de gemiddelde energie van deeltjes in een gas relateert aan de temperatuur van het gas.
 
 - :math:`T` – Is de temperatuur van het systeem in Kelvin (cryocoolers anyone?), voornamelijk veroorzaakt door de versterker. Deze term is moeilijk te vinden en wordt meestal alleen benadert. Je betaald meer voor een versterker die een lage temperatuur kan behouden voor hetzelfde vermogen.
 
@@ -310,8 +309,9 @@ We kunnen dan de FSPL voor die afstand en een frequentie van 1090 MHz berekenen:
 
 We zouden ook de FSPL als functie van de afstand :math:`d` kunnen beschrijven. Dan zouden we de maximale afstand kunnen berekenen voor een gegeven signaal-ruisverhouding.
 
-Omdat we zeker geen open ruimte hebben kunnen we een 3 dB toevoegen voor aan de verliezen.
-We maken de overige verliezen echter 6 dB vanwege een imperfecte antenne, kabels en connectoren. Uiteindelijk ziet ons budget er zo uit:
+Omdat we zeker geen open ruimte hebben kunnen we 3 dB toevoegen aan de verliezen.
+We voegen nog een extra 3 dB aan de verliezen toe vanwege een imperfecte antenne, kabels en connectoren. 
+Uiteindelijk ziet ons budget er zo uit:
 
 .. list-table::
    :widths: 15 10
@@ -325,7 +325,7 @@ We maken de overige verliezen echter 6 dB vanwege een imperfecte antenne, kabels
      - 0 dB
    * - Lp
      - -122.7 dB
-   * - Lmisc
+   * - Loverige
      - -6 dB
    * - **Pr**
      - **-105.7 dBW**
