@@ -67,9 +67,9 @@ Transmit Side
 
 The RDS information to be transmitted by the FM station (e.g., track name, etc.) is encoded into sets of 8 bytes.  Each set of 8 bytes, which corresponds to 64 bits, is combined with 40 "check bits" to make a single "group".  These 104 bits are transmitted together, although there is no gap of time between groups, so from the receiver's perspective it receives these bits nonstop and must determine the boundary between the groups of 104 bits.   We will see more details on the encoding and message structure once we dive into the receive side.
 
-To transmit these bits wirelessly, RDS uses BPSK, which as we learned in the :ref:`modulation-chapter` chapter is a simple digital modulation scheme used to map 1's and 0's to the phase of a carrier.  Like many BPSK-based protocols, RDS uses differential coding, which simply means the 1's and 0's of data are encoded in changes of 1's and 0's instead, which lets you no longer care whether you are 180 degrees out of phase (more on this later).  The BPSK symbols are transmitted at 1187.5 symbols per second, and because BPSK carries one bit per symbol, that means RDS has a raw data rate of roughly 1.2 kbps (including overhead).  RDS does not contain any channel coding (a.k.a. forward error correction), although the data packets do contain a cyclic redundancy check (CRC) to know when an error occurred.   The experienced BPSK-er may be wondering why we saw a double-lobe shaped signal in the first PSD; BPSK usually has one main lobe.  It turns out RDS takes the BPSK signal and duplicates/mirrors it across the 57 kHz center frequency, for robustness through redundancy.  When we dive into the Python code used to receive RDS, one of our steps will involve filtering to isolate just one of these BPSK signals.
+To transmit these bits wirelessly, RDS uses BPSK, which as we learned in the :ref:`modulation-chapter` chapter is a simple digital modulation scheme used to map 1's and 0's to the phase of a carrier.  Like many BPSK-based protocols, RDS uses differential coding, which simply means the 1's and 0's of data are encoded in changes of 1's and 0's instead, which lets you no longer care whether you are 180 degrees out of phase (more on this later).  The BPSK symbols are transmitted at 1187.5 symbols per second, and because BPSK carries one bit per symbol, that means RDS has a raw data rate of roughly 1.2 kbps (including overhead).  RDS does not contain any channel coding (a.k.a. forward error correction), although the data packets do contain a cyclic redundancy check (CRC) to know when an error occurred.
 
-The final "double BPSK" signal is then frequency shifted up to 57 kHz and added to all the other components of the FM signal, before being FM modulated and transmitted over the air at the station's frequency.  FM radio signals are transmitted at an extremely high power compared to most other wireless communications, up to 80 kW!  This is why many SDR users have an FM-reject filter (i.e., a band-stop filter) in-line with their antenna; so FM does not add interference to what they are trying to receive.
+The final BPSK signal is then frequency shifted up to 57 kHz and added to all the other components of the FM signal, before being FM modulated and transmitted over the air at the station's frequency.  FM radio signals are transmitted at an extremely high power compared to most other wireless communications, up to 80 kW!  This is why many SDR users have an FM-reject filter (i.e., a band-stop filter) in-line with their antenna; so FM does not add interference to what they are trying to receive.
 
 While this was only a brief overview of the transmit side, we will be diving into more details when we discuss receiving RDS.
 
@@ -81,10 +81,9 @@ In order to demodulate and decode RDS, we will perform the following steps, many
 #. Receive an FM radio signal centered at the station's frequency (or read in an IQ recording), usually at a sample rate of 250 kHz
 #. Demodulate the FM using what is called "quadrature demodulation"
 #. Frequency shift by 57 kHz so the RDS signal is centered at 0 Hz
-#. Low-pass filter, to filter out everything besides RDS
+#. Low-pass filter, to filter out everything besides RDS (also acts as matched filter)
 #. Decimate by 10 so that we can work at a lower sample rate, since we filtered out the higher frequencies anyway
 #. Resample to 19 kHz which will give us an integer number of samples per symbol
-#. Isolate one of the two RDS BPSK signals with a band-pass filter
 #. Symbol-level time synchronization, using Mueller and Muller in this example
 #. Fine frequency synchronization using a Costas loop
 #. Demodulate the BPSK to 1's and 0's
@@ -156,6 +155,8 @@ Filter to Isolate RDS
 
 Now we must filter out everything besides RDS. Since we have RDS centered at 0 Hz, that means a low-pass filter is the one we want.  We use :code:`firwin()` to design an FIR filter (i.e., find the taps), which just needs to know how many taps we want the filter to be, and the cutoff frequency.  The sample rate must also be provided or else the cutoff frequency doesn't make sense to firwin.  The result is a symmetric low-pass filter, so we know the taps are going to be real numbers, and we can apply the filter to our signal using a convolution.  We choose :code:`'valid'` to get rid of the edge effects of doing convolution, although in this case it doesn't really matter because we are feeding in such a long signal that a few weird samples on either edge isn't going to throw anything off.
 
+Side note: At some point I will update the filter above to use a proper matched filter (root-raised cosine I believe is what RDS uses), for conceptual sake, but I got the same error rates using the firwin() approach as GNU Radio's proper matched filter, so it's clearly not a strict requirement.
+
 ********************************
 Decimate by 10
 ********************************
@@ -189,28 +190,6 @@ Finding the best sample rate to resample to comes down to how many samples per s
 To resample from 25 kHz to 19 kHz, we use :code:`resample_poly()` which upsamples by an integer value, filters, then downsamples by an integer value.  This is convenient because instead of entering in 25000 and 19000 we can use 25 and 19.  If we had used 13 samples per symbol by using a sample rate of 15437.5 Hz, we wouldn't be able to use :code:`resample_poly()` and the resampling process would be much more complicated.
 
 Once again, always remember to update your :code:`sample_rate` variable when performing an operation that changes it.
-
-********************************
-Band-Pass Filter
-********************************
-
-.. code-block:: python
-
- # Bandpass filter to isolate one RDS BPSK signal
- taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
- x = np.convolve(x, taps, 'valid')
-
-Recall that RDS contains two identical BPSK signals, hence the shape we saw in the PSD at the beginning.  We have to choose one, so we will arbitrarily decide to keep the positive one with a band-pass filter.  We use :code:`firwin()` again, but note the :code:`pass_zero=False` which is how you indicate you want it to be a band-pass filter instead of low-pass, and there are two cutoff frequencies to define the band.  The signal is from roughly 0 Hz to 2 kHz but you can't specify a 0 Hz starting frequency so we use 0.05 kHz.  Lastly, we need to increase our number of taps, to get a steeper frequency response.  We can verify that these numbers worked by looking at our filter in the time domain (by plotting taps) and frequency domain (by taking FFT of taps).  Note how in the frequency domain, we reach near-zero response at about 0 Hz.
-
-.. image:: ../_images/bandpass_filter_taps.svg
-   :align: center 
-   :target: ../_images/bandpass_filter_taps.svg
-
-.. image:: ../_images/bandpass_filter_freq.svg
-   :align: center 
-   :target: ../_images/bandpass_filter_freq.svg
-
-Side note: At some point I will update the filter above to use a proper matched filter (root-raised cosine I believe is what RDS uses), for conceptual sake, but I got the same error rates using the firwin() approach as GNU Radio's proper matched filter, so it's clearly not a strict requirement.
 
 ***********************************
 Time Synchronization (Symbol-Level)
@@ -683,10 +662,6 @@ You did it!  Below is all of the code above, concatenated, it should work with t
  # Resample to 19kHz
  x = resample_poly(x, 19, 25) # up, down
  sample_rate = 19e3
-
- # Bandpass filter (TODO: make it a proper matched filter with RRC, even though it's not required to function)
- taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
- x = np.convolve(x, taps, 'valid')
 
  # Symbol sync, using what we did in sync chapter
  samples = x # for the sake of matching the sync chapter
