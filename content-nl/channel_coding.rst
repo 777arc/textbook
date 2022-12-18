@@ -4,33 +4,46 @@
 Channel Coding
 #####################
 
-In this chapter we introduce the basics of channel coding, a.k.a. forward error correction (FEC), the Shannon Limit, Hamming codes, Turbo codes, and LDPC codes.  Channel coding is an enormous area within wireless communications, and is a branch of "information theory", which is the study of the quantification, storage, and communication of information.
+Dit hoofdstuk introduceert de basis van kanaalcodering, bekend als voorwaardse foutcorrectie (Forward Error Correction: FEC), de Shannon Limiet, Hamming codes, Turbo en LDPC codes.
+Kanaalcodering is een enorm gebied binnen de draadloze communicatie. Het is een tak van de "informatie theorie" wat de studie is over kwantificatie, opslag en communicatie van informatie.
 
-***************************
-Why We Need Channel Coding
-***************************
+*************************************
+Waarom we kanaalcodering nodig hebben
+*************************************
 
-As we learned in the :ref:`noise-chapter` chapter, wireless channels are noisy, and our digital symbols won't reach the receiver perfectly.  If you have taken a networking course, you may already know about cyclic redundancy checks (CRCs), which **detect** errors at the receiving end.  The purpose of channel coding is to detect **and correct** errors at the receiver.  If we allow some room for error, then we can transmit at a higher order modulation scheme, for example, without having a broken link.  As a visual example, consider the following constellations showing QPSK (left) and 16QAM (right) under the same amount of noise.  QPSK provides 2 bits per symbol, while 16QAM is twice the data rate at 4 bits per symbol.  But note how in the QPSK constellation that the symbols tend to not pass the symbol decision boundary, or the x-axis and y-axis, which means the symbols will be received correctly.  Meanwhile in the 16QAM plot, there is overlap in the clusters, and, as a result, there will be many incorrectly received symbols.
+Zoals we hebben geleerd in het :ref:`noise-chapter` hoofdstuk, hebben draadloze kanalen last van ruis en komen onze symbolen dus niet perfect bij de ontvanger aan.
+Mocht je een cursus over netwerken hebben gedaan dan weet je waarschijnlijk al iets over cyclic redundancy checks (CRC) wat fouten **detecteert** bij de ontvanger.
+Het doel van kanaalcodering is niet alleen om bij de ontvanger fouten te herkennen, maar ook te **repareren**.
+Als we wat fouten toelaten dan is het mogelijk om een hogere order modulatieschema toe te passen zonder de verbinding te breken. 
+Bekijk, voor een visueel voorbeeld, eens de onderstaande constellatiediagrammen voor QPSK (links) en 16QAM (rechts) met dezelfde hoeveelheid ruis.
+QPSK geeft 2 bits per symbool, terwijl 16QAM en dubbele datasnelheid heeft van 4 bits per symbool. Maar zie hoe bij het QPSK diagram de symbolen niet de beslissingsgrens (x- en y-as) overlappen en dus de symbolen correct worden ontvangen. Tegelijkertijd in het 16QAM-diagram overlappen de clusters wel, met als resultaat dat er een hoop verkeerde symbolen worden ontvangen.
 
 .. image:: ../_images/qpsk_vs_16qam.png
    :scale: 90 % 
    :align: center 
-   
-A failed CRC usually results in a retransmission, at least when using a protocol like TCP.  If Alice is sending a message to Bob, we would rather not have to make Bob send a message back to Alice requesting the information again.  The purpose of channel coding is to transmit **redundant** information. The redundancy is a failsafe that reduces the amount of erroneous packets, retransmissions, or dropped data.
 
-We discussed why we need channel coding, so let's see where it occurs in the transmit-receive chain:
+Een CRC fout resulteert meestal in het opnieuw verzenden van een pakket, bij een protocol als TCP.
+Als Alice een bericht stuurt naar Bob we zouden we liever niet Bob nog een bericht naar Alice laten sturen om de informatie opnieuw aan te vragen.   
+Het doel van kanaalcodering is om overtollige of **redundante** informatie te sturen.
+Door redundante data mee te sturen bouwen we een failsafe in om foute pakketten, hertransmissies en verloren data te kunnen voorkomen. 
+
+Nu we weten waarom het nodig is, laten we kijken waar het wordt toegepast inde communicatieketen:
 
 .. image:: ../_images/tx_rx_chain.svg
    :align: center 
    :target: ../_images/tx_rx_chain.svg
 
-Observe that there are multiple encoding steps in the transmit-receive chain. Source coding, our first step, is not the same as channel coding; source coding is meant to compress the data to be transmitted as much as possible, just like when you zip files to reduce the space taken.  Namely the output of the source encoding block should be **smaller** than the data input, but the output of channel encoding will be larger than its input because redundancy is added.
+Er vinden meerdere stappen van codering plaats in de keten. Broncodering , de eerste stap, is het hetzelfde als kanaalcodering; broncodering heeft als doel de data zoveel mogelijk te comprimeren voordat het verzonden wordt, net als een bestandje zippen voordat je het emailt.
+In andere woorden, de uitgang van de broncodering zal **kleiner** zijn dan de dataingang, maar de uitgabg van kanaalcodering zal langer zijn dan de ingang want er is overtollige informatie toegevoegd.
 
 ***************************
-Types of Codes
+Typen Codes
 ***************************
 
-To perform channel coding we use an "error correction code".  This code tells us, given the bits we have to transmit, what bits do we actually transmit?  The most basic code is called "repetition coding", and it's when you simply repeat a bit N times in a row.  For repetition-3 code, one would transmit each bit three times:
+Oom kanaalcodering uit te voeren moeten we een "foutcorrectiecode" gebruiken. 
+Deze code vertelt ons, gegeven de te versturen bits, welke bits we echt moeten versturen.
+De meest simpele vorm wordt een "herhalingscode" genoemd; we herhalen een bit N keer op een rij.
+Voor een herhalings-3 code zouden we elk bit driemaal versturen:
 
 .. role::  raw-html(raw)
     :format: html
@@ -38,37 +51,45 @@ To perform channel coding we use an "error correction code".  This code tells us
 - 0 :raw-html:`&rarr;` 000
 - 1 :raw-html:`&rarr;` 111
 
-The message 10010110 is transmitted as 111000000111000111111000 after channel encoding.
 
-Some codes work on "blocks" of input bits, while others use a stream approach. Codes that work on blocks, data of a definite length, are called "Block Codes", while codes that work on a stream of bits, where data length is arbitrary, are called "Convolutional Codes".  These are the two primary types of codes.  Our repetition-3 code is a block code where each block is three bits.
+Het bericht 10010110  wordt na de kanaalcodering dan verstuurt als 111000000111000111111000.
 
-As an aside, these error correction codes are not solely used in channel coding for wireless links.  Ever store information to a hard drive or SSD and wonder how there are never bit errors when reading information back off?  Writing, then reading, from memory is similar to a communication system.  Hard drive/SSD controllers have error correction built in. It's transparent to the OS and can be proprietary since it's all onboard the hard drive/SSD.  For portable media like CDs, the error correction must be standardized.  Reed-Solomon codes were common in CD-ROMs.
+Sommige van de codes werken op blokken van bits terwijl anderen op een stroom van bits werken.
+De de codes die op blokken werken worden "blokcodes" genoemd, de codes die op stromen werken heten "convolutionele codes". Dit zijn de twee primaire codes. Onze herhalings-3 code is een blokcode dat werkt op blokken van drie bits.
 
-***************************
-Code-Rate
-***************************
-
-All error correction includes some form of redundancy.  That means if we want to transmit 100 bits of information, we will have to actually send **more than** 100 bits.  "Code-rate" is the ratio between the number of information bits and the total number of bits sent (i.e., information plus redundancy bits).  Returning to the repetition-3 coding example, if I have 100 bits of information then we can determine the following:
-
-- 300 bits are sent
-- Only 100 bits represent information
-- Code-rate = 100/300 = 1/3
-
-The code-rate will always be less than 1, as there is a trade-off between redundancy and throughput.  A lower code-rate means more redundancy and less throughput.
+Trouwens, deze codes worden niet alleen voor draadloze kanalen gebruikt. Ooit eens data op een harde schijf of SSD gezet en afgevraagd waarom dat altijd goed gaat? Geheugen schrijven en dan lezen is vergelijkbaar met een communicatiesysteem. Harde schijf/SSD controllers hebben foutcorrectie ingebouwd. Dit is volledig onzichtbaar voor het OS omdat het in de controller zit ingebouwd. CD-ROMs gebruikten de gestandaardiseerde Reed-Solomon codes .
 
 ***************************
-Modulation and Coding
+Code-snelheid
 ***************************
 
-In the :ref:`modulation-chapter` chapter we tackled noise in modulation schemes. At a low SNR you need a low-order modulation scheme (e.g., QPSK) to deal with the noise, and at a high SNR you can use modulation like 256QAM to get more bits per second.  Channel coding is the same; you want lower code-rates at low SNRs, and at high SNRs you can use a code-rate of almost 1.  Modern communications systems have a set of combined modulation and coding schemes, called MCS.  Each MCS specifies a modulation scheme and a coding scheme to be used at specific SNR levels.
+Elke fourcorrectiecode bevat een vorm  van redundantie. Dit betekent dat wanneer we 100 bits aan informatie willen versturen dat we eigenlijk **meer dan** 100 bits nodig hebben.
+De snelheid is dan de verhouding tussen de informatiebits en het totale aantal bits dat is verzonden (dus informatie plus de redundante bits).
+Als we teruggaan naar ons voorbeeld van herhaling-3, als ik 100 bits aan informatie verstuur, dan kunnen we de snelheid als volgt bepalen:
 
-Modern communications adaptively change the MCS in real-time based on the wireless channel conditions.  The receiver sends feedback about channel quality to the transmitter.  Feedback must be shared before the wireless channel quality changes, which could be on the order of ms.  This adaptive process leads to the highest throughput communications possible, and is used by modern technologies like LTE, 5G, and WiFi. Beneath is a visualization of a cell tower changing MCS during transmission as a user's distance to the cell changes.
+- 300 bits worden verstuurt
+- Slechts 100 bits aan informatie
+- Code-snelheid = 100/300 = 1/3
+
+De code-snelheid zal altijd minder zijn dan 1; er is een afweging tussen redundantie en doorvoersnelheid.
+Een lagere code-snelheid betekent meer redundantie maar minder doorvoer.
+
+***************************
+Modulatie en codering
+***************************
+
+In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschemas bekeken. Bij een lage signaalruisverhouding heb je lagere order van modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schame als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere code-snelheid bij lage signaal-ruis verhoudingen en bij hoge signaal-ruis verhoudingen wil je een code-snelheid van bijna 1 gebruiken. Moderne communicatiesystemen hebben een combinaties van modulatie- en codeschemas, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
+
+Moderne systemen passen de MCS real-time aan op basis van de draadloze kanaalcondities. De ontvanger geeft feedback aan de zender over de kanaalkwaliteit.
+Deze feedback moet gegeven worden voordat de de kwaliteit van het draadloze kanaal verandert, wat in ms kan gebeuren.
+Deze adaptieve aanpak leid tot de hoogste doorvoersnelheid mogelijk, en wordt gebruikt door moderne technologien zoals LTE, 5G and wifi.
+Hieronder zie je hoe een telefoontoren de MCS aanpast op basis van de afstand tot de gebruiker.
 
 .. image:: ../_images/adaptive_mcs.svg
    :align: center 
    :target: ../_images/adaptive_mcs.svg
 
-When using adaptive MCS, if you plot throughput over SNR, you get a staircase-shaped curve like the graph below.  Protocols like LTE often have a table indicating which MCS should be used at what SNR.
+Wanneer MCS wordt aangepast, als je dit uitzet tegenover de SNR, dan krijg je een stapvormige grafiek zoals het figuur hieronder. Protocollen zoals LTE hebben vaak een tabel wat aangeeft welke MCS gebruikt zou moeten worden bij welke SNR.
 
 .. image:: ../_images/adaptive_mcs2.svg
    :align: center 
@@ -78,7 +99,18 @@ When using adaptive MCS, if you plot throughput over SNR, you get a staircase-sh
 Hamming Code
 ***************************
 
-Let's look at a simple error correcting codes.  Hamming Code was the first non-trivial code developed.  In the late 1940's Richard Hamming worked at Bell Labs, using an electromechanical computer that used punched paper tape.  When errors in the machine were detected, it would stop and operators would have to fix them. Hamming grew frustrated with having to restart his programs from scratch due to detected errors.  He said, "Damn it, if the machine can detect an error, why can't it locate the position of the error and correct it?"  He spent the next few years developing the Hamming Code so the computer could do exactly that.
+Laten we eens kijken naar simpele foutcorrectiecodes. De Hamming-code was de eerste niet-triviale code dat werkt ontwikkeld.
+Aan het einde van 1940, bij Bell Laboratories, werkte Richard Hamming met een electromechanische computer die ponskaarten gebruikte.
+Maar als er fouten werden gevonden dan moest de computer stoppen en de bedienden moesten de kaarten repareren.
+Hamming raakte gefrustreerd dat zijn programma telkens bij een fout opnieuw opgestart moest worden.
+Hij zei, "Damn it, als de machine een fout kan detecteren, waarom kan hij de fout niet vinden en ongedaan maken?".
+De volgende paar jaren spendeerde hij tijd om de Hamming-code te ontwikkelen die precies dat voor elkaar kreeg.
+
+In Hamming-code worden extra bits toegevoegd, pariteits- of controlebits, om redundantie in te bouwen.
+Alle bitposities op machten van 2 zijn pariteitbits: 1,2,4,8, etc.
+De andere bitposities bevatten de informatie.
+De onderstaande tabel laat de pariteitsbits in het groen zien.
+Elke pariteistbit 
 
 In Hamming Codes, extra bits, called parity bits or check bits, are added to information for redundancy.  All bit positions that are powers of two are parity bits: 1, 2, 4, 8, and etc. The other bit positions are for information. The table beneath this paragraph highlights parity bits in green.  Each parity bit "covers" all bits where the bitwise AND of the parity and the bit position is non-zero, marked with a red X below.  If we want to use a data bit, we need the parity bits that cover it.  To be able to go up to data bit d9, we need parity bit p8 and all the parity bits that come before it, so this table tells us how many parity bits we need for a certain number of bits.  This pattern continues indefinitely.
 
