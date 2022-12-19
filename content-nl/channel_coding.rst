@@ -40,7 +40,7 @@ In andere woorden, de uitgang van de broncodering zal **kleiner** zijn dan de da
 Typen Codes
 ***************************
 
-Oom kanaalcodering uit te voeren moeten we een "foutcorrectiecode" gebruiken. 
+Om kanaalcodering uit te voeren moeten we een "foutcorrectiecode" gebruiken. 
 Deze code vertelt ons, gegeven de te versturen bits, welke bits we echt moeten versturen.
 De meest simpele vorm wordt een "herhalingscode" genoemd; we herhalen een bit N keer op een rij.
 Voor een herhalings-3 code zouden we elk bit driemaal versturen:
@@ -110,27 +110,38 @@ In Hamming-code worden extra bits toegevoegd, pariteits- of controlebits, om red
 Alle bitposities op machten van 2 zijn pariteitbits: 1,2,4,8, etc.
 De andere bitposities bevatten de informatie.
 De onderstaande tabel laat de pariteitsbits in het groen zien.
-Elke pariteistbit 
-
-In Hamming Codes, extra bits, called parity bits or check bits, are added to information for redundancy.  All bit positions that are powers of two are parity bits: 1, 2, 4, 8, and etc. The other bit positions are for information. The table beneath this paragraph highlights parity bits in green.  Each parity bit "covers" all bits where the bitwise AND of the parity and the bit position is non-zero, marked with a red X below.  If we want to use a data bit, we need the parity bits that cover it.  To be able to go up to data bit d9, we need parity bit p8 and all the parity bits that come before it, so this table tells us how many parity bits we need for a certain number of bits.  This pattern continues indefinitely.
+Elke pariteistbit :math:`p_x` is *verantwoordelijk* voor alle databits :math:`d_n` waarbij de bitpositie van de databits en de bitwise AND operatie met de pariteitsbit, een getal oplevert ongelijk aan 0.
+Dit is met een rode X hieronder aangegeven.
+Wanneer we dan een databit willen gebruiken, dan hebben we de pariteitsbits nodig die hier verantwoordelijk voor zijn. 
+Om databit :math:`d_{11}` te gebruiken zouden we pariteitsbit :math:`p_8` ,en alle pariteitsbits die daarvoor kwamen, nodig hebben. 
+De tabel verteld ons dan hoeveel pariteitsbits we nodig hebben voor elke databit. Dit patroon gaat oneindig door.
 
 .. image:: ../_images/hamming.svg
    :align: center 
    :target: ../_images/hamming.svg
 
-Hamming codes are block codes so they operate on N data bits at a time.  So with three parity bits we can operate on blocks of four data bits at a time.  We represent this error encoding scheme as Hamming(7,4), where the first argument is the total bits transmitted and the second argument is the bits of data.
+De hamming-code is een blokcode wat opereert op N databits per keer.
+Met 3 pariteitsbits kunnen we opereren op een blok van 4 databits per keer.
+Dit schema zouden we aangeven als Hamming(7,4), waarbij het eerste getal aangeeft hoeveel bits in totaal worden overgestuurd en het tweede getal hoeveel databits daarin zitten.
 
 .. image:: ../_images/hamming2.svg
    :align: center 
    :target: ../_images/hamming2.svg
 
-The following are three important properties of Hamming codes:
+Hier volgen belangrijke eigenschappen van de Hamming-code:
 
-- The minimal number of bit changes needed to go from any code word to any other code word is three
-- It can correct one-bit errors
-- It can detect but not correct two-bit errors
+- Het kan een bitfout repareren
+- Het kan twee fouten detecteren maar niet repararen
 
-Algorithmically, the coding process can be done using a simple matrix multiply, using what is called the "generator matrix".  In the example below, the vector 1011 is the data to be encoded, i.e., the information we want to send to the receiver.  The 2D matrix is the generator matrix, and it defines the code scheme.  The result of the multiply provides the code word to transmit.
+Het proces van databits coderen met de hamming-code kan worden gaan door een matrixvermenigvuldiging met de "generator matrix".
+In het onderstaande voorbeeld is 1011 de databit-vector dat we willen coderen en naar de ontvanger sturen.
+De 2D matrix is de "generator matrix" dat het codeschema definitieert. Het resultaat van de vermenigvuldiging is een *code-woord* dat we willen versturen.
+
+:math:`\vec{x}=\vec{a}G
+=\begin{pmatrix}1&0&1&1\end{pmatrix}
+\begin{pmatrix}1&0&0&0&1&1&0\\0&1&0&0&1&0&1\\0&0&1&0&0&1&1\\0&0&0&1&1&1&1\end{pmatrix}
+=\begin{pmatrix}1&0&1&1&2&3&2\end{pmatrix}
+=\begin{pmatrix}1&0&1&1&0&1&0\end{pmatrix}`
 
 .. image:: ../_images/hamming3.png
    :scale: 60 % 
