@@ -4,33 +4,37 @@
 Pulse Shaping
 #######################
 
-This chapter covers pulse shaping, inter-symbol-interference, matched filtering, and raised-cosine filters.  At the end we use Python to add pulse shaping to BPSK symbols.  You can consider this section Part II of the Filters chapter, where we take a deeper dive into pulse shaping.
+Dit hoofdstuk gaat over pulsvorming, inter-symbool-interferentie, matched filters, en raised-cosine filters.
+We zullen uiteindelijk Python gebruiken om pulsvorming toe te passen op BPSK symbolen.
+Je kunt dit hoofdstuk als deel 2 van het Filters hoofdstuk opvatten, waarin we een duik nemen in het vormgeven van pulsen.
 
 **********************************
-Inter-Symbol-Interference (ISI)
+Inter-Symbool-Interferentie (ISI)
 **********************************
 
-In the :ref:`filters-chapter` chapter we learned that blocky-shaped symbols/pulses use an excess amount of spectrum, and we can greatly reduce the amount of spectrum used by "shaping" our pulses.  However, you can't  use just any low-pass filter or you might get inter-symbol-interference (ISI), where symbols bleed into and interfere with each other.
+In het :ref:`filters-chapter` hoofdstuk hebben we geleerd dat blokvormige symbolen/pulsen een overbodige hoeveelheid van het spectrum gebruiken, en dat we het gebruik van het spectrum drastisch kunnen verminderen door gebruik het *vormgeven* van onze pulsen.
+Maar, je kunt niet zomaar elk laagdoorlaatfilter toepassen want dan krijg je last van inter-symbool-interferentie (ISI). Dit is wanneer symbolen elkaar storen en overspoelen.
 
-When we transmit digital symbols, we transmit them back-to-back (as opposed to waiting some time between them).  When you apply a pulse-shaping filter, it elongates the pulse in the time domain (in order to condense it in frequency), which causes adjacent symbols to overlap with each other.  The overlap is fine, as long as your pulse-shaping filter meets this one criterion: all of the pulses must add up to zero at every multiple of our symbol period :math:`T`, except for one of the pulses.  The idea is best understood through the following visualization:
+Wanneer we digitale symbolen versturen, dan versturen we ze zij-aan-zij (i.t.t. een bepaalde tijd te wachten tussen pulsen). Wanneer je een pulsvormend filter toepast worden deze pulsen uitgerekt in het tijddomein (om het te samen te drukken in frequentie), waardoor aangrenzende symbolen elkaar gaan overlappen. Dit overlappen is niet erg zolang het pulsvormende filter aan een eis voldoet: alle pulsen behalve een, moeten optellen tot 0 op elke veelvoud van de symboolperiode :math:`T`. Dit is het beste te begrijpen door een figuur:
 
 .. image:: ../_images/pulse_train.svg
    :align: center 
    :target: ../_images/pulse_train.svg
 
-As you can see at every interval of :math:`T`, there is one peak of a pulse while rest of the pulses are at 0 (they cross the x-axis).  When the receiver samples the signal, it does so at the perfect time (at the peak of the pulses), meaning that is the only point in time which matters.  Usually there is a symbol synchronization block at the receiver that ensures the symbols are sampled at the peaks.
+Zoals je ziet is op elke interval van :math:`T` er maar een pulse hoog, terwijl alle andere pulsen 0 zijn en de x-as kruisen. Wanneer de ontvanger het signaal sampled doet het dit op het perfecte moment (wanner de puls het hoogst is), dus alleen dat moment in tijd is belangrijk. Meestal vindt er nog een vorm van symboolsynchronisatie plaats bij de ontvanger om ervoor te zorgen dat de symbolen inderdaad bij de toppen wordt gesampled.
 
 **********************************
 Matched Filter
 **********************************
 
-One trick we use in wireless communications is called matched filtering.  To understand matched filtering you must first understand these two points:
+Een truc dat in draadloze communicatie wordt toegepast heet matched filters (op elkaar afgestemde filters).
+Om deze afstemming van filters te begrijpen zul je eerste deze twee punten moeten snappen:
 
-1. The pulses we discussed above only have to be aligned perfectly *at the receiver* prior to sampling.  Until that point it doesn't really matter if there is ISI, i.e., the signals can fly through the air with ISI and it's OK.
+1. De pulsen zoals hierboven besproken hoeven *alleen bij de ontvanger* perfect uitgelijnd te zijn voor het samplen. Tot dat punt maakt het niet uit of er ISI plaatsvindt, de signalen kunnen door het luchtruim vliegen met ISI zonder problemen.
 
-2. We want a low-pass filter in our transmitter to reduce the amount of spectrum our signal uses.  But the receiver also needs a low-pass filter to eliminate as much noise/interference next to the signal as possible.  As a result, we have a low-pass filter at the transmitter (Tx) and another at the receiver (Rx), then sampling occurs after both filters (and the wireless channel's effects).
+2. We willen een laagdoorlaatfilter bij de zender om te voorkomen dat ons signaal teveel van het spectrum gebruikt. De ontvanger heeft echter ook een laagdoorlaatfilter nodig om zoveel mogelijk ruis/interferentie op on signaal weg te filteren. Dit resulteert in een laagdoorlaatfilter bij zender (Tx) alsmede de ontvanger (Rx). De ontvanger sampled het signaal dan na beide filters (en natuurlijk de effecten van het draadloze kanaal).
 
-What we do in modern communications is split the pulse shaping filter equally between the Tx and Rx.  They don't *have* to be identical filters, but, theoretically, the optimal linear filter for maximizing the SNR in the presence of AWGN is to use the *same* filter at both the Tx and Rx.  This strategy is called the "matched filter" concept.
+Wat we in moderne communicatie doen, is het opsplitsen van het vormgevende filter tussen Tx en Rx. Ze *moeten* niet identiek zijn, maar, theoretisch gezien, is het *optimaal* om identieke filters te gebruiken om de SNR te maximaliseren bij de aanwezigheid van AWGN. Deze vorm van filteren heet het "matched filter" concept.
 
 Another way of thinking about matched filters is that the receiver correlates the received signal with the known template signal.  The template signal is essentially the pulses the transmitter sends, irrespective of the phase/amplitude shifts applied to them.  Recall that filtering is done by convolution, which is basically correlation (in fact they are mathematically the same when the template is symmetrical).  This process of correlating the received signal with the template gives us our best chance at recovering what was sent, and it is why it's theoretically optimal.  As an analogy, think of an image recognition system that looks for faces using a template of a face and a 2D correlation:
 
