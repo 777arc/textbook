@@ -1,16 +1,16 @@
 .. _sync-chapter:
 
 ################
-Synchronization
+Synchronisatie
 ################
 
-This chapter covers wireless signal synchronization in both time and frequency, to correct for carrier frequency offsets and perform timing alignment at the symbol and frame level.  We will utilize the Mueller and Muller clock recovery technique, and the Costas Loop, in Python. 
+Dit hoofdstuk gaat over het synchroniseren van draadloze signalen in tijd en frequentie. Hiermee corrigeren we frequentieafwijking en stellen het moment van samplen af op symbool niveau. We zullen de klokhersteltechniek van Mueller en Muller en de Costas Loop gebruiken in Python.
 
 ***************************
 Introduction
 ***************************
 
-We have discussed how to transmit digitally over the air, utilizing a digital modulation scheme like QPSK and by applying pulse shaping to limit the signal bandwidth.  Channel coding can be used to deal with noisy channels, such as when you have low SNR at the receiver.  Filtering out as much as possible before digitally processing the signal always helps.  In this chapter we will investigate how synchronization is performed on the receiving end.  Synchronization is a set of processing that occurs *before* demodulation and channel decoding.  The overall tx-channel-rx chain is shown below, with the blocks discussed in this chapter highlighted in yellow.  (This diagram is not all-encompassing--most systems also include equalization and multiplexing).
+We hebben besproken hoe je digitale signalen draadloos kunt versturen met een digitaal modulatieschema zoals QPSK, en door het toepassen van vormgevende filters om de bandbreedte te beperken. We kunnen kanaalcodering toepassen bij slechte signaalruisverhoudingen. Zoveel mogelijk filteren voordat we een signaal gaan verwerken helpt altijd. In dit hoofdstuk zullen we onderzoeken hoe synchronisatie wordt uitgevoerd aan de ontvangende kant. Synchronisatie is een reeks bewerkingen die plaatsvindt *vóór* demodulatie en kanaaldecodering. Hieronder zie je de totale zender-kanaal-ontvanger keten waarbij de blokken die we in dit hoofdstuk zullen behandelen, geel zijn gemaakt. (Dit diagram is niet allesomvattend - de meeste systemen bevatten ook egalisatie en multiplexing).
 
 .. image:: ../_images/sync-diagram.svg
    :align: center 
