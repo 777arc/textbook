@@ -135,57 +135,68 @@ Hier volgen belangrijke eigenschappen van de Hamming-code:
 
 Het proces van databits coderen met de hamming-code kan worden gaan door een matrixvermenigvuldiging met de "generator matrix".
 In het onderstaande voorbeeld is 1011 de databit-vector dat we willen coderen en naar de ontvanger sturen.
-De 2D matrix is de "generator matrix" dat het codeschema definitieert. Het resultaat van de vermenigvuldiging is een *code-woord* dat we willen versturen.
+De 2D matrix is de "generator matrix" dat het codeschema definieert. Het resultaat van de vermenigvuldiging is een *code-woord* dat we willen versturen.
 
-:math:`\vec{x}=\vec{a}G
-=\begin{pmatrix}1&0&1&1\end{pmatrix}
-\begin{pmatrix}1&0&0&0&1&1&0\\0&1&0&0&1&0&1\\0&0&1&0&0&1&1\\0&0&0&1&1&1&1\end{pmatrix}
-=\begin{pmatrix}1&0&1&1&2&3&2\end{pmatrix}
-=\begin{pmatrix}1&0&1&1&0&1&0\end{pmatrix}`
+.. This equals the picture. 
+.. math::
 
-.. image:: ../_images/hamming3.png
-   :scale: 60 % 
-   :align: center 
+   \vec{x}=\vec{a}G
+   =\begin{pmatrix}1&0&1&1\end{pmatrix}
+   \begin{pmatrix}1&0&0&0&1&1&0\\0&1&0&0&1&0&1\\0&0&1&0&0&1&1\\0&0&0&1&1&1&1\end{pmatrix}
+   =\begin{pmatrix}1&0&1&1&2&3&2\end{pmatrix}
+   =\begin{pmatrix}1&0&1&1&0&1&0\end{pmatrix}
 
-The point of diving into Hamming codes was to give a taste of how error coding works.  Block codes tend to follow this type of pattern.  Convolutional codes work differently, but we won't get into it here; they often use Trellis-style decoding, which can be displayed in a diagram that looks like this:
+.. .. image:: ../_images/hamming3.png
+..    :scale: 60 % 
+..    :align: center 
+
+De laatste vector is verkregen door modulo-2 uit te voeren.
+De reden waarom we even in Hamming-codes zijn gedoken is om even te proeven hoe foutcodering werkt.
+De blokcodes volgen ditzelfde concept.
+Convolutionele codes werken anders, maar daar zullen we niet dieper op in gaan; meestal gebruiken ze Trellis-stijl decodering wat kan worden weergeven in zo'n soort diagram:
 
 .. image:: ../_images/trellis.svg
    :align: center 
 
 ***************************
-Soft vs Hard Decoding
+Soft vs Hard Decodering
 ***************************
 
-Recall that at the receiver demodulation occurs before decoding.  The demodulator can tell us its best guess as to which symbol was sent, or it can output the "soft" value.  For BPSK, instead of telling us 1 or 0, the demodulator can say 0.3423 or -1.1234, whatever the "soft" value of the symbol was.  Typically the decoding is designed to use hard or soft values.
+Demodulatie gebeurt bij de ontvanger voor het decoderen. De demodulator kan zijn beste inschatting over welk symbool was verzonden geven, of het geeft een "zachte" waarde. Voor BPSK, in plaats van 1 of 0, zou het bijvoorbeeld 0.23345 of -1.75634 kunnen geven, of wat de zachte waarde ook was.
+Er wordt nu onderscheid gemaakt tussen het hard of zacht decoderen:
 
-- **Soft decision decoding** – uses the soft values
-- **Hard decision decoding** – uses only the 1's and 0's
+- **zachte beslissingsdecodering** – gebruik de zachte waarden
+- **Harde beslissingsdecodering** – gebruikt alleen de 1'en en 0'en
 
-Soft is more robust because you are using all of the information at your disposal, but soft is also much more complicated to implement.  The Hamming Codes we talked about used hard decisions, while convolutional codes tend to use soft.
+Zachte decodering is robuuster omdat we alle informatie tot onze beschikking hebben, maar tegelijkertijd is het ook complexe om te implementeren.
+De hamming codes van eerder gebruiken harde beslissingen, convolutionele codes gebruiken meesteal zachte beslissingen.
 
 ***************************
-Shannon Limit
+Shannon Limiet
 ***************************
 
-The Shannon limit or Shannon capacity is an incredible piece of theory that tell us how many bits per second of error-free information we can send:
+De limiet van Shannon , of de capaciteit van Shannon, is een ongelofelijk stuk theorie dat ons verteld hoeveel bits-per-seconde foutvrij kan worden verzonden:
 
 .. math::
  C = B \cdot log_2 \left( 1 + \frac{S}{N}   \right)
 
-- C – Channel capacity [bits/sec]
-- B – Bandwidth of channel [Hz]
-- S – Average received signal power [watts]
-- N – Average noise power [watts]
+- C – Kanaalcapaciteit [bits/sec]
+- B – Bandbreedte kanaal [Hz]
+- S – Gemiddelde signaalvermogen ontvanger [watts]
+- N – Gemiddelde ruisvermogen [watts]
 
-This equation represents the best any MCS can do when operating at a high enough SNR to be error-free.  It makes more sense to plot the limit in bits/sec/Hz, i.e., bits/sec per amount of spectrum:
+Deze vergelijking geeft het beste aan wat een MCS zou kunnen bereiken bij een SNR dat hoog genoeg is om fout-vrij te zenden.
+Het zou iets logischer zijn om de limiet in bits/sec/Hz uit te drukken i.p.v. bits/sec per spectrumdeel:
 
 .. math::
  \frac{C}{B} = log_2 \left( 1 + \mathrm{SNR}   \right)
 
-with SNR in linear terms (not dB).  However, when plotting it, we usually represent SNR in dB for convenience:
+Hierbij is de SNR lineair gegeven (niet dB). 
+Maar bij het plotten geven we voor het gemakt de SNR meestal wel in dB:
 
 .. image:: ../_images/shannon_limit.svg
    :align: center 
+
 
 If you see Shannon limit plots elsewhere that look a little different, they are probably using an x-axis of "energy per bit" or :math:`E_b/N_0`, which is just an alternative to working in SNR.
 
