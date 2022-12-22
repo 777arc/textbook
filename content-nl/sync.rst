@@ -10,24 +10,28 @@ Dit hoofdstuk gaat over het synchroniseren van draadloze signalen in tijd en fre
 Introduction
 ***************************
 
-We hebben besproken hoe je digitale signalen draadloos kunt versturen met een digitaal modulatieschema zoals QPSK, en door het toepassen van vormgevende filters om de bandbreedte te beperken. We kunnen kanaalcodering toepassen bij slechte signaalruisverhoudingen. Zoveel mogelijk filteren voordat we een signaal gaan verwerken helpt altijd. In dit hoofdstuk zullen we onderzoeken hoe synchronisatie wordt uitgevoerd aan de ontvangende kant. Synchronisatie is een reeks bewerkingen die plaatsvindt *vóór* demodulatie en kanaaldecodering. Hieronder zie je de totale zender-kanaal-ontvanger keten waarbij de blokken die we in dit hoofdstuk zullen behandelen, geel zijn gemaakt. (Dit diagram is niet allesomvattend - de meeste systemen bevatten ook egalisatie en multiplexing).
+We hebben besproken hoe je digitale signalen draadloos kunt versturen met een digitaal modulatieschema zoals QPSK en het toepassen van vormgevende filters om de bandbreedte te beperken. We kunnen kanaalcodering toepassen bij slechte signaalruisverhoudingen. 
+Het zal sowieso helpen om zoveel mogelijk te filteren voordat we het signaal verwerken.
+In dit hoofdstuk zullen we onderzoeken hoe synchronisatie wordt uitgevoerd aan de ontvangende kant. 
+Synchronisatie is een reeks bewerkingen die plaatsvindt *vóór* demodulatie en kanaaldecodering.
+Hieronder zie je de totale zender-kanaal-ontvanger keten waarbij de blokken die we in dit hoofdstuk zullen behandelen, geel zijn gemaakt. (Dit diagram is niet allesomvattend - de meeste systemen bevatten ook egalisatie en multiplexing).
 
 .. image:: ../_images/sync-diagram.svg
    :align: center 
    :target: ../_images/sync-diagram.svg
 
 ***************************
-Simulating Wireless Channel
+Draadloos kanaal simuleren
 ***************************
 
-Before we learn how to implement time and frequency synchronization, we need to make our simulated signals more realistic.  Without adding some random time delay, the act of synchronizing in time is trivial.  In fact, you only need to take into account the sample delay of any filters you use.  We also want to simulate a frequency offset because, as we will discuss, oscillators are not perfect; there will always be some offset between the transmitter and receiver's center frequency.
+We zullen een realistischer kanaalmodel moeten gaan gebruiken voordat we het over synchronisatie gaan hebben. Zolang er geen willekeurige vertraging plaatsvindt is er namelijk geen synchronisatie nodig, of tenminste is het erg simpel om te synchroniseren (met de sampleklok). Je zou in dat geval alleen maar rekening hoeven houden met de vertraging die jouw filters introduceren. Naast een tijdsvertraging zullen we ook een frequentieafwijking simuleren; oscillators zijn immers niet perfect, er zal altijd een verschil zijn tussen de middenfrequentie van de zender en ontvanger.
 
-Let's examine Python code for simulating a non-integer delay and a frequency offset.  The Python code in this chapter will start from the code we wrote during the pulse shaping Python exercise (click below if you need it); you can consider it the starting point of the code in this chapter, and all new code will come after.
+We zullen eerst wat Python code gaan bekijken waarmee we een vertraging en frequentieafwijking kunnen simuleren. De code zal verder gaan waar het :ref:`pulse-shaping-chapter` is geeindigt; alle code uit dit hoofdstuk kun je erachter toevoegen. Voor het gemak is de code hier ook te vinden:
 
 .. raw:: html
 
    <details>
-   <summary>Python Code from Pulse Shaping</summary>
+   <summary>Python Code van het vorige hoofdstuk</summary>
 
 .. code-block:: python
 
@@ -36,52 +40,53 @@ Let's examine Python code for simulating a non-integer delay and a frequency off
     from scipy import signal
     import math
 
-    # this part came from pulse shaping exercise
+    # symbolen genereren
     num_symbols = 100
     sps = 8
-    bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
+    bits = np.random.randint(0, 2, num_symbols) # De te verzenden bits
     pulse_train = np.array([])
     for bit in bits:
         pulse = np.zeros(sps)
-        pulse[0] = bit*2-1 # set the first value to either a 1 or -1
-        pulse_train = np.concatenate((pulse_train, pulse)) # add the 8 samples to the signal
+        pulse[0] = bit*2-1 # alleen eerste waarde gelijk aan bitwaarde
+        pulse_train = np.concatenate((pulse_train, pulse)) # de 8 samples toevoegen aan x
 
-    # Create our raised-cosine filter
+    # het RC filter bouwen
     num_taps = 101
     beta = 0.35
-    Ts = sps # Assume sample rate is 1 Hz, so sample period is 1, so *symbol* period is 8
-    t = np.arange(-51, 52) # remember it's not inclusive of final number
+    Ts = sps # sample rate is 1 Hz, periodetijd is 1, *symbool*periodetijd is 8
+    t = np.arange(-51, 52) # neemt laatste nummer niet mee
     h = np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
 
-    # Filter our signal, in order to apply the pulse shaping
+    # signaal x filteren.
     samples = np.convolve(pulse_train, h)
 
 .. raw:: html
 
    </details>
 
-We will leave out the plotting-related code because by now you have probably learned how to plot any signal you want.  Making the plots look pretty, as they often do in this textbook, requires a lot of extra code that is not necessary to understand.
+De code die te maken heeft met het weergeven van de figuren hebben we weg gelaten, we gaan ervan uit dat je nu hebt geleerd hoe je dat moet doen.
+Om de figuren extra mooi te maken zoals in dit boek heb je veel extra code nodig, wat niet het leerdoel is.
 
 
-Adding a Delay
-##############
+Vetraging toevoegen
+###################
 
-We can easily simulate a delay by shifting samples, but it only simulates a delay that is an integer multiple of our sample period.  In the real world the delay will be some fraction of a sample period.  We can simulate the delay of a fraction of a sample by making a "fractional delay" filter, which passes all frequencies but delays the samples by some amount that isn't limited to the sample interval.  You can think of it as an all-pass filter that applies the same phase shift to all frequencies.  (Recall that a time delay and phase shift are equivalent.)  The Python code to create this filter is shown below:
+We zouden makkelijk het signaal kunnen vertragen door de samples te verschuiven, maar dit simuleert alleen een vertraging dat een veelvoud is van onze sampletijd. Realistisch gezien zal de vertraging nooit exact gelijk zijn aan de sampletijd. We kunnen een willekeurige vertraging geven met een speciaal filter dat alle frequenties doorlaat maar de samples wel vertraagt met een fractie van de sampletijd. Je kunt het zien als een alles-doorlaatfiler dat een faseverschuiving introduceert op alle frequenties. (Een tijdsvertraging en faseverschuiving zijn immers hetzelfde!) De Python code van dit filter staat hieronder:
 
 .. code-block:: python
 
-    # Create and apply fractional delay filter
-    delay = 0.4 # fractional delay, in samples
-    N = 21 # number of taps
+    # filter maken en toepassen
+    delay = 0.4 # fractie van de sampletijd
+    N = 21 # aantal coefficienten
     n = np.arange(-N//2, N//2) # ...-3,-2,-1,0,1,2,3...
-    h = np.sinc(n - delay) # calc filter taps
-    h *= np.hamming(N) # window the filter to make sure it decays to 0 on both sides
-    h /= np.sum(h) # normalize to get unity gain, we don't want to change the amplitude/power
-    samples = np.convolve(samples, h) # apply filter
+    h = np.sinc(n - delay) # coefficienten berekenen
+    h *= np.hamming(N) # venster toepassen om beide kanten naar 0 te latten gaan
+    h /= np.sum(h) # normaliseren zodat de versterking 1 is en we het signaal niet dempen
+    samples = np.convolve(samples, h) # filter toepassen.
 
-As you can see, we are calculating the filter taps using a sinc() function.  A sinc in the time domain is a rectangle in the frequency domain, and our rectangle for this filter spans the entire frequency range of our signal.  This filter does not reshape the signal, it just delays it in time.  In our example we are delaying by 0.4 of a sample.  Keep in mind that applying *any* filter delays a signal by half of the filter taps minus one, due to the act of convolving the signal through the filter.
+Zoals je ziet berekenen we de filtercoefficienten met behulp van de sinc() functie. Een sinc in het tijddomein is een rechthoek in het frequentiedomein en de rechthoek voor dit filter reikt over het hele frequentiebereik van ons signaal. Er is geen vervoming, alleen een vertraging. In dit voorbeeld is dat :math:`0.4*T_s`. Hou in je achterhoofd dat *elk* filter een vertraging toevoegt gelijk aan het aantal coefficienten/2 -1 vanwege de convolutieoperatie.
 
-If we plot the "before" and "after" of filtering a signal, we can observe the fractional delay.  In our plot we zoom into only a couple of symbols.  Otherwise, the fractional delay is not viewable.
+De vertraging is te zien wanneer we de in en uitgang van het filter weergeven. Als je alleen een paar symbolen bekijkt is het goed zichtbaar.
 
 .. image:: ../_images/fractional-delay-filter.svg
    :align: center
@@ -89,82 +94,88 @@ If we plot the "before" and "after" of filtering a signal, we can observe the fr
 
 
 
-Adding a Frequency Offset
-##########################
+Frequentieafwijking introduceren
+################################
 
-To make our simulated signal more realistic, we will apply a frequency offset.  Let's say that our sample rate in this simulation is 1 MHz (it doesn't actually matter what it is, but you'll see why it makes it easier to choose a number).  If we want to simulate a frequency offset of 13 kHz (some arbitrary number), we can do it via the following code:
+Om het ontvangen signaal nog realistcher te maken kunnen we een frequentieafwijking toepassen. Stel we hebben een samplerate van 1 MHz gebruikt (dit is niet belangrijk maar maakt het vervolg wat makkelijker). Mochten we een frequentieverschuiving van 13 kHz (willekeurig gekozen) willen toepassen dan kan dat met deze code:
 
 .. code-block:: python
 
-    # apply a freq offset
-    fs = 1e6 # assume our sample rate is 1 MHz
-    fo = 13000 # simulate freq offset
-    Ts = 1/fs # calc sample period
-    t = np.arange(0, Ts*len(samples), Ts) # create time vector
-    samples = samples * np.exp(1j*2*np.pi*fo*t) # perform freq shift
+   # freq afwijking
+   fs = 1e6 # samplerate van 1 MHz
+   fo = 13000 # offset 13 khz
+   Ts = 1/fs # sampletijd
+   t = np.arange(0, Ts*len(samples), Ts) # tijdvector
+   samples = samples * np.exp(1j*2*np.pi*fo*t) # verschuiving
  
-Below demonstrates the signal before and after the frequency offset is applied.
+Dit figuur laat het signaal voor en na de frequentieverschuiving zien.
  
 .. image:: ../_images/sync-freq-offset.svg
    :align: center
    :target: ../_images/sync-freq-offset.svg
 
-We have not been graphing the Q portion since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
+Tot nu toe konden we alleen het reele I-deel weergeve omdat we BPSK gebruiken. Maar nu we een frequentieverschuiving hebben geintroduceerd om een draadloos kanaal te simuleren verspreidt de energie zich over het I en Q deel. Dus vanaf nu moeten we beide delen weergeven. Voel je vrij een andere frequentieverschuiving te kiezen. Bij een verschuiving van 1 kHz zul je ook een sinusoide kunnen herkennen in de omlijning van het signaal; het varieert dan langzaam genoeg om een paar symbolen te overspannen.
 
-As far as picking an arbitrary sample rate, if you scrutinize the code you will notice what matters is the ratio of :code:`fo` to :code:`fs`.
+Als je de code bestudeert zul je zien dat de samplerate niet helemaal arbitrair is, het is afhankelijk van het ratio tussen :code:`fo` en :code:`fs`.
 
-You can pretend that the two code blocks presented earlier simulate a the wireless channel.  The code should come after the transmit-side code (what we did in the pulse shaping chapter) and before the receive-side code, which is what we will explore the rest of this chapter.
+Voor nu kun je de code beschouwen als de simulatie van een draadloos kanaal. De code komt na de zender maar voor de ontvanger. De kan van de ontvanger gaan we verder bestuderen in dit hoofdstuk.
 
 ***************************
-Time Synchronization
+Tijdsynchronisatie
 ***************************
 
-When we transmit a signal wirelessly, it arrives at the receiver with a random phase shift due to time traveled.  We cannot just start sampling the symbols at our symbol rate because we are unlikely to sample it at the right spot in the pulse, as discussed at the end of the :ref:`pulse-shaping-chapter` chapter.  Review the three figures at the end of that chapter if you are not following.
+Wanneer een signaal draadloos wordt verzonden ervaart het een willekeurige faseverschuiving vanwege de reistijd. We kunnen niet zomaar beginnen te samplen op onze samplefrequentie want dan zitten we hoogstwaarschijnlijk naast het juiste samplemoment zoals aan het eind van :ref:`pulse-shaping-chapter` is besproken. Bekijk de laatste drie figuren van dat hoofdstuk eens als je dit niet kunt volgen. Het doel is dus om origenele samplefrequentie en fase terug te vinden. Het wordt ook "clock-recovery" (herstellen van de klok) genoemd.
 
-Most timing synchronization techniques take the form of a phase lock loop (PLL); we won't study PLLs here but it's important to know the term, and you can read about them on your own if you are interested.  PLLs are closed-loop systems that use feedback to continuously adjust something; in our case, a time shift permits us to sample at the peak of the digital symbols.
+De meeste synchronisatietechnieken zijn gebaseerd op de phase locked loop (PLL); we zullen PLLs hier niet bespreken maar het is goed om te weten en je kunt er zelf informatie over opzoeken als je geinteresseerd bent. PLL's zijn closed-loop systemen die feedback gebruiken om voortdurend wat bij te stellen; in dit geval een tijdsvertraging om op de pieken te kunnen samplen.
 
-You can picture timing recovery as a block in the receiver, which accepts a stream of samples and outputs another stream of samples (similar to a filter).  We program this timing recovery block with information about our signal, the most important being the number of samples per symbol (or our best guess at it, if we are not 100% sure what was transmitted).  This block acts as a "decimator", i.e., our sample output will be a fraction of the number of samples in.  We want one sample per digital symbol, so the decimation rate is simply the samples per symbol.  If the transmitter transmits at 1M symbols per second, and we sample at 16 Msps, we will receive 16 samples per symbol.  That will be the sample rate going into the timing sync block.  The sample rate coming out of the block will be 1 Msps because we want one sample per digital symbol.
+Je kunt de synchronisatie zien als een blok welk een stroom aan samples ontvangt en uitstuurt, net als een filter. Dit blok wordt ingesteld met informatie over ons signaal, met name het aantal samples per symbool (onze beste inschatting). Het blok werkt als een decimator, de samplefrequnetie aan de uitgang is lager dan aan de ingang. We willen maar 1 sample per symbool hebben dus de factor is gelijk aan het aantal samples per symbool.
+Als we 1M symbolen per seconde zenden, en het signaal bij de ontvanger samplen met 16 MHz, dan krijgen we 16 samples per symbool.
+De ingangsfrequentie van het blok is dan 16 MHz maar de uitgang 1 MHz, gezien we maar 1 sample per symbool willen.
 
-Most timing recovery methods rely on the fact that our digital symbols rise and then fall, and the crest is the point at which we want to sample the symbol. To put it another way, we sample the maximum point after taking the absolute value:
+De meeste algoritmes leunen op het feit dat digitale symbolen stijgen en dalen en de overgang is het moment waarop we willen samplen. Anders verwoord, als we de absolute versie van ons signaal nemen dan willen we op de pieken samplen:
 
 .. image:: ../_images/symbol_sync2.png
    :scale: 40 % 
    :align: center 
 
-There are many timing recovery methods, most resembling a PLL.  Generally the difference between them is the equation used to perform "correction" on the timing offset, which we denote as :math:`\mu` or :code:`mu` in code.  The value of :code:`mu` gets updated every loop iteration.  It is in units of samples, and you can think of it as how much we have to shift by to be able to sample at the "perfect" time.  So if :code:`mu = 3.61` then that means we have to shift the input by 3.61 samples to sample at the right spot.  Because we have 8 samples per symbol, if :code:`mu` goes over 8 it will just wrap back around to zero.
+De meeste algoritmen zijn op een PLL gebaseerd en het verschil tussen ze is de vergelijking die de afwijking in de tijd (:math:`\mu`) probeert te corrigeren. De waarde van :code:`mu` wordt in elke iteratie van de loop geüpdatet. Je kunt het bekijken als de waarde die verteld hoeveel samples we het signaal moeten verschuiven om het "perfecte" samplemoment te vinden. Dus met een waard van :code:`mu = 3.61` zouden we de ingang 3.61 samples moeten verschuiven om correct te kunen samplen. Omdat we 8 samples per symbool hebben zou een :code:`mu>8` gewoon weer terugvouwen naar 0.
 
-The following Python code implements the Mueller and Muller clock recovery technique.
+Het volgende stuk code implementeert het Mueller en Muller klokherstel algoritme. Je kunt het testen zolang je de frequentieverschuiving 0 laat; dit corrigeert alleen een faseverschuiving:
 
 .. code-block:: python
 
-    mu = 0 # initial estimate of phase of sample
-    out = np.zeros(len(samples) + 10, dtype=np.complex)
-    out_rail = np.zeros(len(samples) + 10, dtype=np.complex) # stores values, each iteration we need the previous 2 values plus current value
+    mu = 0 # Eerste inschatting
+    out = np.zeros(len(samples) + 10, dtype=complex)
+    out_rail = np.zeros(len(samples) + 10, dtype=complex) # stores values, each iteration we need the previous 2 values plus current value
     i_in = 0 # input samples index
-    i_out = 2 # output index (let first two outputs be 0)
+    i_out = 2 # output index (eerste twee zijn 0)
     while i_out < len(samples) and i_in+16 < len(samples):
-        out[i_out] = samples[i_in + int(mu)] # grab what we think is the "best" sample
-        out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
+        out[i_out] = samples[i_in + int(mu)] # probeer het "beste" sample.
+        out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0) #90,45,-45 of -90
         x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
         y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
         mm_val = np.real(y - x)
         mu += sps + 0.3*mm_val
-        i_in += int(np.floor(mu)) # round down to nearest int since we are using it as an index
-        mu = mu - np.floor(mu) # remove the integer part of mu
-        i_out += 1 # increment output index
-    out = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
-    samples = out # only include this line if you want to connect this code snippet with the Costas Loop later on
+        i_in += int(np.floor(mu)) # het is een index dus afronden
+        mu = mu - np.floor(mu) # getal achter de punt bepalen
+        i_out += 1 # index uitgang ophogen
+    out = out[2:i_out] # eerste 2 verwijderen, alles na i_out is niet gebruikt
+    samples = out # samples zijn de uitgang
 
-The timing recovery block is fed "received" samples, and it produces an output sample one at a time (note the :code:`i_out` being incremented by 1 each iteration of the loop).  The recovery block doesn't just use the "received" samples one after another because of the way the loop adjusts :code:`i_in`.  It will skip some samples in an attempt to pull the "correct" sample, which would be the one at the peak of the pulse.  As the loop processes samples it slowly synchronizes to the symbol, or at least it attempts to by adjusting :code:`mu`.  Given the code's structure, the integer part of :code:`mu` gets added to :code:`i_in`, and then removed from :code:`mu` (keep in mind that :code:`mm_val` can be negative or positive each loop).  Once it is fully synchronized, the loop should only pull the center sample from each symbol/pulse.  You can adjust the constant 0.3, which will change how fast the feedback loop reacts; a higher value will make it react faster, but with higher risk of stability issues.
+Het blok wordt de "ontvangen" samples gevoerd en geeft aan de uitgang 1 sample per keer (:code:`i_out` wordt telkens opgehoogd).
+Het gebruikt niet alle ontvangen samples achter elkaar, maar slaat samples over in een poging het juiste sample te vinden, op de piek van de puls.
+Tijdens de herhaling probeert het langzaam met het symbool te synchroniseren door :code:`mu` aan te passen.
+Als de synchronisatie volledig is zou de uitgang alleen samples moeten bevatten die op de juiste momenten zijn genomen.
+De snelheid waarmee de lus reageert wordt bepaald door de 0.3 constante; een hogere waarde reageert heftiger met de kans op instabiliteit.
 
-The next plot shows an example output where we have *disabled* the fractional time delay as well as the frequency offset.  We only show I because Q is all zeroes with the frequency offset disabled.  The three plots are stacked on top of each other to show how the bits align vertically.
+De volgende grafiek toont een voorbeelduitvoer waarbij we zowel de fractionele tijdvertraging als de frequentieoffset *uitgeschakeld* hebben. We tonen alleen I omdat Q allemaal nullen bevat omdat de frequentieoffset is uitgeschakeld. De drie plots zijn op elkaar gestapeld om te laten zien hoe de bits verticaal zijn uitgelijnd.
 
 **Top Plot**
-    Original BPSK symbols, i.e., 1's and -1's.  Recall that there are zeroes in between because we want 8 samples per symbol.
+    De originele BPSK symbolen, i.e., 1'en end -1'en.  Er zitten nullen tussen vanwege de 8 samples per symbool.
 **Middle Plot**
-    Samples after pulse shaping but before the synchronizer.
+    Na het vormgeven van de pulsen.
 **Bottom plot**
-    Output of the symbol synchronizer, which provides just 1 sample per symbol.  That is these samples can be fed directly into a demodulator, which for BPSK is checking whether the value is greater than or less than 0.
+    Na het uitvoeren van de Tijdsynchronisatie blijft er 1 sample per symbool over. Deze samples worden direct in de demodulator gestopt wat voor BPSK een vergelijking met 0 betekent.
 
 .. image:: ../_images/time-sync-output.svg
    :align: center
