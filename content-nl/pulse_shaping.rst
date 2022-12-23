@@ -200,7 +200,7 @@ We zullen een RC-filter bouwen met een :math:`\beta` van 0.35 en 101 coëfficië
 De RC vergelijking vraagt om een periodetijd met een tijdvector, maar voor het gemak zullen we uitgaan van een periodetijd van 1 seconde.
 Dit betekent dat onze symboolperiode :math:`T_s` dan 8 is omdat we 8 samples per symbool hebben gebruikt.
 Onze tijdvector zal dan gewoon een oplopende lijst van gehele getalen zijn.
-Met de manier waarop de filtervergelijking werkt willen we het tijdstip 0 in het midden hebben. De 101 coëfficiënten zullen dan starten bij -50 en eindigen bij +51.
+Met de manier waarop de filtervergelijking werkt willen we het tijdstip 0 in het midden hebben. De 101 coëfficiënten zullen dan starten bij -51 en eindigen bij +52.
 
 .. code-block:: python
 
@@ -208,7 +208,7 @@ Met de manier waarop de filtervergelijking werkt willen we het tijdstip 0 in het
     num_taps = 101
     beta = 0.35
     Ts = sps # sample rate is 1 Hz, periodetijd is 1, *symbool*periodetijd is 8
-    t = np.arange(-50, 51) # neemt laatste nummer niet mee
+    t = np.arange(-51, 52) # neemt laatste nummer niet mee
     h = sps/Ts*np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
     plt.figure(1)
     plt.plot(t, h, '.')

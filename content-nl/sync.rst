@@ -163,12 +163,12 @@ Het volgende stuk code implementeert het Mueller en Muller klokherstel algoritme
     samples = out # samples zijn de uitgang
 
 Het blok wordt de "ontvangen" samples gevoerd en geeft aan de uitgang 1 sample per keer (:code:`i_out` wordt telkens opgehoogd).
-Het gebruikt niet alle ontvangen samples achter elkaar, maar slaat samples over in een poging het juiste sample te vinden, op de piek van de puls.
+Het gebruikt niet alle ontvangen samples achter elkaar, maar slaat samples over in een poging sneller het juiste sample te vinden, op de piek van de puls.
 Tijdens de herhaling probeert het langzaam met het symbool te synchroniseren door :code:`mu` aan te passen.
 Als de synchronisatie volledig is zou de uitgang alleen samples moeten bevatten die op de juiste momenten zijn genomen.
-De snelheid waarmee de lus reageert wordt bepaald door de 0.3 constante; een hogere waarde reageert heftiger met de kans op instabiliteit.
+De snelheid waarmee de lus reageert wordt bepaald door de 0.3 constante; een hogere waarde reageert heftiger of sneller, maar kan het systeem instabiel maken.
 
-De volgende grafiek toont een voorbeelduitvoer waarbij we zowel de fractionele tijdvertraging als de frequentieoffset *uitgeschakeld* hebben. We tonen alleen I omdat Q allemaal nullen bevat omdat de frequentieoffset is uitgeschakeld. De drie plots zijn op elkaar gestapeld om te laten zien hoe de bits verticaal zijn uitgelijnd.
+De volgende grafiek toont een voorbeelduitvoer waarbij we zowel de fractionele tijdvertraging als de frequentieverschuiving *uitgeschakeld* hebben. We tonen alleen I omdat Q nu uit nullen bestaat vanwege het gebrek aan frequentieverschuiving. De drie plots zijn op elkaar gestapeld om te laten zien hoe de bits verticaal zijn uitgelijnd.
 
 **Top Plot**
     De originele BPSK symbolen, i.e., 1'en end -1'en.  Er zitten nullen tussen vanwege de 8 samples per symbool.
@@ -181,17 +181,17 @@ De volgende grafiek toont een voorbeelduitvoer waarbij we zowel de fractionele t
    :align: center
    :target: ../_images/time-sync-output.svg
 
-Let's focus on the bottom plot, which is the output of the synchronizer.  It took nearly 30 symbols for the synchronization to lock into the right delay.  Due inevitably to the time it takes for synchronizers to lock in, many communications protocols use a preamble that contains a synchronization sequence: it acts as a way to announce that a new packet has arrived, and it gives the receiver time to sync to it.  But after these ~30 samples the synchronizer works perfectly.  We are left with perfect 1's and -1's that match the input data.  It helps that this example didn't have any noise added.  Feel free to add noise or time shifts and see how the synchronizer behaves.  If we were using QPSK then we would be dealing with complex numbers, but the approach would be the same.
+Als we kijken naar de uitgang van het synchronisatieblok in het onderste figuur, dan zien we dat het bijna 30 symbolen duurde voordat de juiste tijdvertraging was gevonden. Omdat een feedback-systeem altijd tijd nodig heeft om te reageren maken vele communicatieprotocolen gebruik van een "preamble" (Nederlands: reeks aan bits die het signaal voorgaan). Deze preamble bevat een synchronisatiesequentie: het verkondigt dat een nieuw pakketje is aangekomen, en geeft de ontvanger de tijd om te synchroniseren. Maar na ~30 symbolen werkt het perfect (in het figuur). Wat we over houden zijn perfecte 1'en en -1'en die overeenkomen met de verzonden data. Natuurlijk helpt het dat dit voorbeeld geen ruis had. Voel je vrij het ruisniveau en de tijdsvertraging aan te passen om te kijken hoe de synchronisatie werkt. In geval van QPSK zouden we met complexe getallen werken, maar de aanpak blijft hetzelfde.
 
 ****************************************
-Time Synchronization with Interpolation
+Tijdsynchronisatie met interpolatie
 ****************************************
 
-Symbol synchronizers tend to interpolate the input samples by some number, e.g., 16, so that it's able to shift by a *fraction* of a sample.  The random delay caused by the wireless channel will unlikely be an exact multiple of a sample, so the peak of the symbol may not actually happen on a sample.  It is especially true in a case where there might only be 2 or 4 samples per symbol being received.  By interpolating the samples, it gives us the ability to sample "in between" actual samples, in order to hit the very peak of each symbol.  The output of the synchronizer is still only 1 sample per symbol. The input samples themselves are interpolated.
+Meestal interpoleren synchronisatieblokken de ingangssamples door een bepaald nummer, bijv. 16, zodanig dat het signaal ook een fractie van de sampletijd verschoven kan worden. De willekeurige vertraging dat een draadloos kanaal introduceert, is hoogstwaarschijnlijk niet perfect gelijk aan een veelvoud van de sampletijd. Dit zal helemaal niet het geval zijn wanneer we 2 of 4 samples per symbool ontvangen. Door de samples te interpoleren geeft het ons de mogelijkheid om "tussen" de samples te samplen om de uiterste piek van het symbool te vinden. De uitgang zal nog steeds 1 sample per symbool bevatten, het is de ingang dat geïnterpoleerd wordt.
 
-Our time synchronization Python code we have implemented above did not include any interpolation.  To expand our code, enable the fractional time delay that we implemented at the beginning of this chapter so our received signal has a more realistic delay.  Leave the frequency offset disabled for now.  If you re-run the simulation, you'll find that the synchronizer fails to fully synchronize to the signal.  That's because we aren't interpolating, so the code has no way to "sample between samples" to compensate for the fractional delay.  Let's add in the interpolation.
+De Python code voor tijdsynchronisatie dat we hierboven gebruikten bevat geen interpolatie. Om de code uit te breiden kun je de fractionele tijdvertraging aanzetten dat we aan het begin van dit hoofdstuk hebben geimplementeerd, dit geeft een realistischer beeld. Laat de frequentieverschuiving uit staan. Wanneer je de simulatie opnieuw uitrvoert zul je zien dat er nooit volledig gesynchroniseerd wordt met het signaal. Dit komt omdat we niet interpoleren en het dus niet mogelijk is om tussen de samples in te samplen. Laten we interpolatie toevoegen.
 
-A quick way to interpolate a signal in Python is to use scipy's :code:`signal.resample` or :code:`signal.resample_poly`.  These functions both do the same thing but work differently under the hood.  We will use the latter function because it tends to be faster.  Let's interpolate by 16 (this is arbitrarily chose, you can try different values), i.e., we will be inserting 15 extra samples between each sample.  It can be done in one line of code, and it should happen *before* we go to perform time synchronization (prior to the large code snippet above).  Let's also plot the before and after to see the difference:
+De snelste en makkelijkste manier om met Python een signaal te interpoleren is door gebruik te maken van scipy's :code:`signal.resample` of :code:`signal.resample_poly`. Beide functies bereiken hetzelfde, maar werken iets anders. We zullen de tweede functie toepassen omdat deze wat sneller is. We gaan een interpolatiefactor van 16 gebruiken, dus we voegen 15 extra samples tussen elke sample toe. Dit kan worden toegepast in 1 regel code en moet *voor* de tijdsynchronisatie worden toegevoegd. Het synchronisatie-algoritme moet ook iets aangepast worden. We kunnen het verschil bekijken:
 
 .. code-block:: python
 
@@ -204,82 +204,84 @@ A quick way to interpolate a signal in Python is to use scipy's :code:`signal.re
  plt.plot(samples_interpolated,'.-')
  plt.show()
 
-If we zoom *way* in, we see that it's the same signal, just with 16x as many points:
+Als we het *heel erg* vergroten dan zien we dat het hetzelfde signaal is, maar met 16x zoveel punten:
 
 .. image:: ../_images/time-sync-interpolated-samples.svg
    :align: center
    :target: ../_images/time-sync-interpolated-samples.svg
 
-Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  In addition to calculating :code:`samples_interpolated`, we also have to modify one line of code in our time synchronizer.  We will change the first line inside the while loop to become:
+Hopelijk is de reden achter het interpoleren duidelijk aan het worden. De extra samples staan ons toe om ook een fractie van de sampletijd te kunnen zien. Naar het interpoleren van de samples zullen we ook twee regels van het synchronisatieblok moeten aanpassen. De eerste twee regels van de while loop worden dan:
 
 .. code-block:: python
 
- out[i_out] = samples_interpolated[i_in*16 + int(mu*16)]
+ while i_out < len(samples) and i_in*16+16 < len(samples):
+   out[i_out] = samples[i_in*16 + int(mu*16)] # probeer het "beste" sample.
 
-We did a couple things here.  First, we can't just use :code:`i_in` as the input sample index anymore.  We have to multiply it by 16 because we interpolated our input samples by 16.  Recall that the feedback loop adjusts the :code:`mu` variable.  It represents the delay that leads to us sampling at the right moment.  Also recall that after we calculated the new value of :code:`mu`, we added the integer part to :code:`i_in`.  Now we will use the remainder part, which is a float from 0 to 1, and it represents the fraction of a sample we need to delay by.  Before we weren't able to delay by a fraction of a sample, but now we are, at least in increments of 16ths of a sample.  What we do is multiply :code:`mu` by 16 to figure out how many samples of our interpolated signal we need to delay by.  And then we have to round that number, since the value in the brackets ultimately is an index and must be an integer.  If this paragraph didn't make sense, try to go back to the initial Mueller and Muller clock recovery code, and also read the comments next to each line of code.
+We hebben een aantal dingen aangepast. Als eerste kunnen we :code:`i_in` niet meer gebruiken als de sampleindex. We hebben nu 16 keer zoveel samples dus we moeten de index met 16 vermenigvuldigen. De loop past :code:`mu` aan. Dit stelt de vertraging voor dat we nodig hebben om correct te samplen. 
+Eerder kon we niet een fractie van de sampletijd wachten, maar nu wel, in stappen van een 16e van de sampletijd. 
+We vermenigvuldigen :code:`\mu` dus met 16 om uit te vogelen met hoeveel samples we ons geinterpoleerde signaal moeten vertragen.
+Als deze paragraaf niet duidelijk is, probeer dan de initiele code met het commentaar nogmaals door te lezen.
+Het is niet heel belangrijk dat je het algoritme snapt, maar wel de limitaties ervan.
 
-The actual plot output of this new code should look roughly the same as before.  All we really did was make our simulation more realistic by adding a fractional-sample delay, and then we added the interpolator to the synchronizer in order to compensate for that fractional sample delay.
+Voel je vrij om met eigen interpolatiefactoren te spelen. Je kunt ook proberen om de frequentieverschuiving nu toe te passen, of ruis toe te voegen, om te zien hoe het synchronisatiealgoritme dit aanpakt (hint: misschien moet je die 0.3 factor ook aanpassen).
 
-Feel free to play around with different interpolation factors, i.e., change all the 16s to some other value.  You can also try enabling the frequency offset, or adding in white Gaussian noise to the signal before it gets received, to see how that impacts synchronization performance (hint: you might have to adjust that 0.3 multiplier).
-
-If we enable only the frequency offset using a frequency of 1 kHz, we get the following time sync performance.  We have to show both I and Q now that we added a frequency offset:
+Als de een frequentieverschuiving toepassen van 1 kHz dan zie je de volgende reactie. We zullen beide I en Q moeten weergeven omdat een frequentieverschuiving toe hebben gevoegd (door een complex exponent):
 
 .. image:: ../_images/time-sync-output2.svg
    :align: center
    :target: ../_images/time-sync-output2.svg
 
-It might be hard to see, but the time sync is still working just fine.  It takes about 20 to 30 symbols before it's locked in.  However, there's a sinusoid pattern because we still have a frequency offset, and we will learn how to deal with it in the next section.
+Het is nu iets lastiger te zien maar de tijdsynchronisatie werkt nog steeds prima. Er is nu een sinusoide zichtbaar omdat we een frequentieverschuiving hebben geintroduceerd. In het volgende deel leren we hier mee om te gaan.
 
-Below shows the IQ plot (a.k.a. constellation plot) of the signal before and after synchronization.  Remember you can plot samples on an IQ plot using a scatter plot: :code:`plt.plot(np.real(samples), np.imag(samples), '.')`.  In the animation below we have specifically left out the first 30 symbols.  They occurred before the time sync had finished.  The symbols left are all roughly on the unit circle due to the frequency offset.
+Het IQ-diagram (constellatie-diagram) is hieronder te zien van voor en na synchronisatie. Mocht je het zijn vergeten; je kunt een IQ-diagram maken d.m.v. een "scatter plot": :code:`plt.plot(np.real(samples), np.imag(samples), '.')`. In de animatie hebben we bewust de eerste en laatste 30 symbolen niet meegenomen omdat het algoritme toen nog niet klaar was met synchroniseren. De symbolen die overblijven zijn allemaal rond de eenheidscirkel verdeelt vanwege de frequentieverschuiving.
 
 .. image:: ../_images/time-sync-constellation.svg
    :align: center
    :target: ../_images/time-sync-constellation.svg
     
-To gain even more insight, we can look at the constellation over time to discern what's actually happening to the symbols.  At the very beginning, for a short period of time, the symbols are not 0 or on the unit circle.  That is the period in which time sync is finding the right delay.  It's very quick, watch closely!  The spinning is just the frequency offset.  Frequency is a constant change in phase, so a frequency offset causes spinning of the BPSK (creating a circle in the static/persistent plot above).
+
+We kunnen nog meer leren wanneer we de constellatie over de tijd uitzetten. Aan het begin zie zijn de symbolen eventjes niet 0 of op de eenheidscirkel. Dat is de tijd die het synchronisatiealgoritme nodig heeft om de juiste tijdsvertraging te vinden. Het gebeurt in een korte tijd dus kijk goed! Het ronddraaien komt door de frequentieverschuiving. Frequentie is een constante verandering in de fase, dus een frequentieverschuiving resulteert in het ronddraaien van het BPSK-diagram, wat leid tot een cirkel in het statische diagram van hierboven.
 
 .. image:: ../_images/time-sync-constellation-animated.gif
    :align: center 
 
-Hopefully by seeing an example of time sync actually happening, you have a feel for what it does and a general idea of how it works.  In practice, the while loop we created would only work on a small number of samples at a time (e.g., 1000).  You have to remember the value of :code:`mu` in between calls to the sync function, as well as the last couple values of :code:`out` and :code:`out_rail`.
+Hopelijk heb je dankzij de animatie een beter beeld van wat er echt gebeurt , en een gevoel voor hoe het werkt. In de praktijk werkt de while loop alleen op een beperkt aantal samples (bijv. 1000) en zul je het herhaaldelijk moeten aanroepen. Tussen de aanroepen in moet je de waarde van :code:`mu` , en de laatste paar waarden van :code:`out` en :code:`out_rail` , moeten onthouden.
 
-Next we will survey frequency synchronization, which we split up into coarse and fine frequency sync.  Coarse usually comes before time sync, while fine comes after.
-
-
+Nu gaan we ons druk maken over frequentiesynchronisatie, opgedeelt in grove en fijne synchronisatie. Meestal doen we eerst de grove en daarna de fijne.
 
 **********************************
-Coarse Frequency Synchronization
+Grove Frequentiesynchronisatie
 **********************************
 
-Even though we tell the transmitter and receiver to operate on the same center frequency, there is going to be a slight frequency offset between the two due to either imperfections in hardware (e.g., the oscillator) or a Doppler shift from movement.  This frequency offset will be tiny relative to the carrier frequency, but even a small offset can throw off a digital signal.  The offset will likely change over time, necessitating an always-running feedback loop to correct the offset.  As an example, the oscillator inside the Pluto has a max offset spec of 25 PPM.  That is 25 parts per million relative to the center frequency.  If you are tuned to 2.4 GHz, it would be +/- 60 kHz max offset.  The samples our SDR provides us are at baseband, making any frequency offset manifest in that baseband signal.  A BPSK signal with a small carrier offset will look something like the below time plot, which is obviously not great for demodulating bits.  We must remove any frequency offsets before demodulation.
+Ook al stellen we de zender en ontvanger in op dezelfde frequentie, er zal altijd een klein frequentieverschil zijn vanwege imperfecte hardware (de oscillator) of het Doppler-effect vanwege beweging. Het frequentieverschil zal minimaal zijn vergeleken met de draaggolf, maar zelfs een klein verschil kan een digitaal signaal verpesten. De oscillator binnen de Pluto heeft bijvoorbeeld een nauwkeurigheid van 25 PPM. Dus als je op 2.4 GHz afstelt, dan zou dat er maximaal +/- 60 kHz naast kunnen zitten. De samples die we van de SDR krijgen zitten in de basisband, we zien dan het frequentieverschil ook in de basisband. Een BPSK signaal met een klein verschil in draaggolf ziet er ongeveer als het onderstaande figuur uit, wat duidelijk niet zo handig is voor de demodulatie. We zullen dus elke frequentieverschuiving moeten verwijderen voordat we demoduleren.
 
 .. image:: ../_images/carrier-offset.png
    :scale: 60 % 
    :align: center 
 
-Frequency synchronization is usually broken down into coarse sync and fine sync, where coarse corrects large offsets on the order of kHz or more, while the fine sync corrects whatever is left.  Coarse happens before time sync, while fine happens after.
+Frequentiesynchronisatie wordt meestal opgedeeld in de grove en fijne sync, waar de grove synchronisatie grote verschillen, van een kHz of meer, kan corrigeren, en de fijne sync corrigeert het overgebleven verschil. Grove correctie gebeurt voor tijdsynchronisatie en fijne correctie erna.
 
-Mathematically, if we have a baseband signal :math:`s(t)` and it is experiencing a frequency (a.k.a. carrier) offset of :math:`f_o` Hz, we can represent what is received as:
+Wiskundig gezien, als een basisband signaal :math:`s(t)` een frequentie(draaggolf)verschuiving ervaar van :math:`f_o` Hz, dan is het ontvangen signaal :math:`r(t)` uit te drukken als:
 
 .. math::
 
  r(t) = s(t) e^{j2\pi f_o t} + n(t)
 
-where :math:`n(t)` is the noise.  
+Waar :math:`n(t)` de ruis is.
 
-The first trick we will learn, in order to perform coarse frequency offset estimation (if we can estimate the offset frequency, then we can undo it), is to take the square of our signal.  Let's ignore noise for now, to keep the math simpler:
+De eerste truc voor grove instchatting van de frequentieafwijking, is om het kwadraat van ons signaal te nemen. Wanneer we de afwijking weten, dan kunnen we het ongedaan maken. We negeren de ruis voor nu om het simpel te houden:
 
 .. math::
 
  r^2(t) = s^2(t) e^{j4\pi f_o t}
 
-Let's see what happens when we take the square of our signal :math:`s(t)` by considering what QPSK would do.  Squaring complex numbers leads to interesting behavior, especially when we are talking about constellations like BPSK and QPSK.  The following animation shows what happens when you square QPSK, then square it again.  I specifically used QPSK instead of BPSK because you can see that when you square QPSK once, you essentially get BPSK.  And then after one more square it becomes one cluster.  (Thank you to http://ventrella.com/ComplexSquaring/ who created this neat webapp.)
+Wat zou er gebeuren wanneer we het kwadraat nemen van een QPSK signaal? Kwadrateren van complexe getallen geeft een interessant resultaat, met name wanneer we de constellatiediagrammen van BPSK en QPSK bekijken. De volgende animatie laat zien wat er gebeurt wanneer we QPSK twee maal kwadrateren. Er is bewust voor QPSK gekozen zodat je ziet dat eenmaal kwadrateren een BPSK signaal geeft. Als je het nog een keer kwadrateert zie je een cluster. (Dank aan Ventrella voor deze gave app http://ventrella.com/ComplexSquaring/ .)
 
 .. image:: ../_images/squaring-qpsk.gif
    :scale: 80 % 
    :align: center 
- 
-Let's watch what happens when our QPSK signal has a small phase rotation and magnitude scaling applied to it, which is more realistic:
+
+En nog een keer met een kleine fasedraaing en amplitudeverschillen toegepast om het realistischer te maken:
  
 .. image:: ../_images/squaring-qpsk2.gif
    :scale: 80 % 

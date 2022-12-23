@@ -77,7 +77,7 @@ Een lagere code-snelheid betekent meer redundantie maar minder doorvoer.
 Modulatie en codering
 ***************************
 
-In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschemas bekeken. Bij een lage signaalruisverhouding heb je lager orde modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schema als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere code-snelheid bij lage signaal-ruis verhoudingen en bij hoge signaal-ruis verhoudingen wil je een code-snelheid van bijna 1 gebruiken. Moderne communicatiesystemen hebben een combinaties van modulatie- en codeschemas, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
+In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschema’s bekeken. Bij een lage signaalruisverhouding heb je lager orde modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schema als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere code-snelheid bij lage signaal-ruis verhoudingen en bij hoge signaal-ruis verhoudingen wil je een code-snelheid van bijna 1 gebruiken. Moderne communicatiesystemen hebben een combinaties van modulatie- en codeschema’s, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
 
 Moderne systemen passen de MCS real-time aan op basis van de draadloze kanaalcondities. De ontvanger geeft feedback aan de zender over de kanaalkwaliteit.
 Deze feedback moet worden gegeven voordat de kwaliteit van het draadloze kanaal verandert, wat in ms kan gebeuren.
@@ -150,7 +150,7 @@ De 2D matrix is de "generator matrix" dat het codeschema definieert. Het resulta
 ..    :align: center 
 
 De laatste vector is verkregen door modulo-2 uit te voeren.
-De reden waarom we even in Hamming-codes zijn gedoken is om even te proeven hoe foutcodering werkt.
+De reden waarom we even in Hamming-codes zijn gedoken is om te proeven hoe foutcodering werkt.
 De blokcodes volgen ditzelfde concept.
 Convolutionele codes werken anders, maar daar zullen we niet dieper op in gaan; meestal gebruiken ze Trellis-stijl decodering wat kan worden weergeven in zo'n soort diagram:
 
@@ -161,30 +161,30 @@ Convolutionele codes werken anders, maar daar zullen we niet dieper op in gaan; 
 Soft vs Hard Decodering
 ***************************
 
-Demodulatie gebeurt bij de ontvanger voor het decoderen. De demodulator kan zijn beste inschatting over welk symbool was verzonden geven, of het geeft een "zachte" waarde. Voor BPSK, in plaats van 1 of 0, zou het bijvoorbeeld 0.23345 of -1.75634 kunnen geven, of wat de zachte waarde ook was.
+Demodulatie gebeurt bij de ontvanger voor het decoderen. De demodulator kan zijn beste inschatting geven over welk symbool was verzonden, of het geeft een "zachte" waarde. Voor BPSK, in plaats van 1 of 0, zou het bijvoorbeeld 0.23345 of -1.75634 kunnen geven, of wat de zachte waarde ook was.
 Er wordt nu onderscheid gemaakt tussen het hard of zacht decoderen:
 
 - **zachte beslissingsdecodering** – gebruik de zachte waarden
 - **Harde beslissingsdecodering** – gebruikt alleen de 1'en en 0'en
 
-Zachte decodering is robuuster omdat we alle informatie tot onze beschikking hebben, maar tegelijkertijd is het ook complexe om te implementeren.
-De hamming codes van eerder gebruiken harde beslissingen, convolutionele codes gebruiken meesteal zachte beslissingen.
+Zachte decodering is robuuster omdat we meer informatie tot onze beschikking hebben, maar tegelijkertijd is het ook complexer om te implementeren.
+De Hamming-codes van eerder, gebruiken harde beslissingen, convolutionele codes gebruiken meestal zachte beslissingen.
 
 ***************************
 Shannon Limiet
 ***************************
 
-De limiet van Shannon , of de capaciteit van Shannon, is een ongelofelijk stuk theorie dat ons verteld hoeveel bits-per-seconde foutvrij kan worden verzonden:
+De limiet van Shannon, of de capaciteit van Shannon, is een ongelofelijk stuk theorie dat ons verteld hoeveel bits-per-seconde foutvrij kan worden verzonden:
 
 .. math::
  C = B \cdot log_2 \left( 1 + \frac{S}{N}   \right)
 
 - C – Kanaalcapaciteit [bits/sec]
 - B – Bandbreedte kanaal [Hz]
-- S – Gemiddelde signaalvermogen ontvanger [watts]
-- N – Gemiddelde ruisvermogen [watts]
+- S – Gemiddelde signaalvermogen ontvanger [Watt]
+- N – Gemiddelde ruisvermogen [Watt]
 
-Deze vergelijking geeft het beste aan wat een MCS zou kunnen bereiken bij een SNR dat hoog genoeg is om fout-vrij te zenden.
+Deze vergelijking geeft aan welke snelheid een MCS zou kunnen bereiken om zonder fouten data over te sturen bij een gegeven SNR.
 Het zou iets logischer zijn om de limiet in bits/sec/Hz uit te drukken i.p.v. bits/sec per spectrumdeel:
 
 .. math::
@@ -196,12 +196,7 @@ Maar bij het plotten geven we voor het gemakt de SNR meestal wel in dB:
 .. image:: ../_images/shannon_limit.svg
    :align: center 
 
-<<<<<<< HEAD
-
-If you see Shannon limit plots elsewhere that look a little different, they are probably using an x-axis of "energy per bit" or :math:`E_b/N_0`, which is just an alternative to working in SNR.
-=======
 Soms wordt de Shannon-limiet weergeven met een x-as in "signaal/ruisenergie per bit" of :math:`E_n/N_0`; dit is gewoon een alternatief voor SNR.
->>>>>>> 5309d4bfd7958783dc784d4c357007c046236fca
 
 Het kan helpen om te beseffen dat wanneer de SNR vrij hoog is (bijv. boven de 10 dB) de Shannon-limiet benadert kan worden met :math:`log_2 \left( \mathrm{SNR} \right)`, wat ongeveer gelijk is aan :math:`\mathrm{SNR_{dB}}/3` (`(wordt hier uitgelegd) <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem#Bandwidth-limited_case>`_).  
 Als je bijvoorbeeld een SNR hebt van 24 dB, dan komt dat overeen met ongeveer 8 bits/sec/Hz, dus als je 1 MHz moet gebruiken, dan geeft dat 8 Mbps.
@@ -230,14 +225,14 @@ Kijk voor meer informatie `hier <https://en.wikipedia.org/wiki/Shannon%E2%80%93H
 State of the Art Codes
 ***************************
 
-Momenteel zijn de beste kanaalcoderingsschemas:
+Momenteel zijn de beste kanaalcoderingsschema’s:
 
-1. Turbo codes, dit wordt gebruikt in 3G, 4G, NASA’s spacecraft.
+1. Turbo codes, dit wordt gebruikt in 3G, 4G, NASA’s ruimtevaartuigen.
 2. LDPC-codes, gebruikt in DVB-S2, WiMAX, IEEE 802.11n.
 
-Beide codes benaderen de Shannon-limiet (dus raakt het bijna onder bepaalde signaalruisverhoudingen).
+Beide codes benaderen de Shannon-limiet (dus onder bepaalde signaalruisverhoudingen wordt de limiet bijna gehaald).
 Hamming-codes of andere simpele codes komen niet eens in de buurt van de Shannon-limiet.
-Voor wat betreft onderzoek valt er niet veel meer te halen in het verbeteren van de codes. Huidig onderzoek is meer gericht het verbeteren van het decoderen; minder rekenintensief maken en kunnen omgaan met kanaalfeedback.
+Voor wat betreft onderzoek valt er niet veel meer te halen in het verbeteren van de codes voor wat betreft toegevoegde overhead. Huidig onderzoek is meer gericht het verbeteren van het decoderen; minder rekenintensief maken en kunnen omgaan met kanaalfeedback.
 
 Low-density parity-check (LDPC) codes zijn een groep van hele efficiënte lineaire blokcodes. 
 In 1960 werden deze codes geïntroduceerd door Robert G. Gallager in zijn doctoraat aan de MIT-universiteit.
