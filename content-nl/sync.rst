@@ -261,11 +261,11 @@ Ook al stellen we de zender en ontvanger in op dezelfde frequentie, er zal altij
 
 Frequentiesynchronisatie wordt meestal opgedeeld in de grove en fijne sync, waar de grove synchronisatie grote verschillen, van een kHz of meer, kan corrigeren, en de fijne sync corrigeert het overgebleven verschil. Grove correctie gebeurt voor tijdsynchronisatie en fijne correctie erna.
 
-Wiskundig gezien, als een basisband signaal :math:`s(t)` een frequentie(draaggolf)verschuiving ervaar van :math:`f_o` Hz, dan is het ontvangen signaal :math:`r(t)` uit te drukken als:
+Wiskundig gezien, als een basisband signaal :math:`s(t)` een frequentie(draaggolf)verschuiving ervaart van :math:`f_v` Hz, dan is het ontvangen signaal :math:`r(t)` uit te drukken als:
 
 .. math::
 
- r(t) = s(t) e^{j2\pi f_o t} + n(t)
+ r(t) = s(t) e^{j2\pi f_v t} + n(t)
 
 Waar :math:`n(t)` de ruis is.
 
@@ -273,7 +273,7 @@ De eerste truc voor grove instchatting van de frequentieafwijking, is om het kwa
 
 .. math::
 
- r^2(t) = s^2(t) e^{j4\pi f_o t}
+ r^2(t) = s^2(t) e^{j4\pi f_v t}
 
 Wat zou er gebeuren wanneer we het kwadraat nemen van een QPSK signaal? Kwadrateren van complexe getallen geeft een interessant resultaat, met name wanneer we de constellatiediagrammen van BPSK en QPSK bekijken. De volgende animatie laat zien wat er gebeurt wanneer we QPSK twee maal kwadrateren. Er is bewust voor QPSK gekozen zodat je ziet dat eenmaal kwadrateren een BPSK signaal geeft. Als je het nog een keer kwadrateert zie je een cluster. (Dank aan Ventrella voor deze gave app http://ventrella.com/ComplexSquaring/ .)
 
@@ -281,31 +281,32 @@ Wat zou er gebeuren wanneer we het kwadraat nemen van een QPSK signaal? Kwadrate
    :scale: 80 % 
    :align: center 
 
-En nog een keer met een kleine fasedraaing en amplitudeverschillen toegepast om het realistischer te maken:
+En nog een keer met een kleine fasedraaing en amplitudeaanpassing om het realistischer te maken:
  
 .. image:: ../_images/squaring-qpsk2.gif
    :scale: 80 % 
    :align: center 
 
-It still becomes one cluster, just with a phase shift.  The main take-away here is that if you square QPSK twice (and BPSK once), it will merge all four clusters of points into one cluster.  Why is that useful?  Well by merging the clusters we are essentially removing the modulation!  If all points are now in the same cluster, that's like having a bunch of constants in a row.  It's as if there is no modulation anymore, and the only thing left is the sinusoid caused by the frequency offset (we also have noise but let's keep ignoring it for now).  It turns out that you have to square the signal N times, where N is the order of the modulation scheme used, which means that this trick only works if you know the modulation scheme ahead of time.  The equation is really:
+Het resultaat blijft een cluster, maar nu met een fasedraaing. De clue is, dat wanneer je QPSK tweemaal kwadrateert (en BPSK eenmaal), het alle vier de clusters samenvoegt tot een cluster. Waarom is dit handig? Door het samenvoegen verwijderen we de modulatie. Nu alle punten in een cluster vallen houden we effectief een rij van constanten over voor :math:`s(t)`. Het enige wat dan overblijft is de sinusoide die wordt veroorzaakt door het frequentieverschil (en nog ruis maar dat negeren we voor nu). Het blijkt dat je een signaal N maal moet kwadrateren, waarbij N de orde van het modulatieschema is. Deze truc werkt dan alleen wanneer je van ten voren het modulatieschema kent. De algemene vergelijking wordt dan:
 
 .. math::
 
- r^N(t) = s^N(t) e^{j2N\pi f_o t}
+ r^N(t) = s^N(t) e^{j2N\pi f_v t}
 
-For our case of BPSK we have an order 2 modulation scheme, so we will use the following equation for our coarse frequency sync:
+In het geval van BPSK hebben we een 2e orde modulatieschema, dus dan zou de vergelijking dit worden:
 
 .. math::
 
- r^2(t) = s^2(t) e^{j4\pi f_o t}
+ r^2(t) = s^2(t) e^{j4\pi f_v t}
 
-We discovered what happens to the :math:`s(t)` portion of the equation, but what about the sinusoid part (a.k.a. complex exponential)?  As we can see, it is adding the :math:`N` term, which makes it equivalent to a sinusoid at a frequency of :math:`Nf_o` instead of just :math:`f_o`.  A simple method for figuring out :math:`f_o` is to take the FFT of the signal after we square it N times and seeing where the spike occurs.  Let's simulate it in Python.  We will return to generating our BPSK signal, and instead of applying a fractional-delay to it, we will apply a frequency offset by multiplying the signal by :math:`e^{j2\pi f_o t}` just like we did in chapter :ref:`filters-chapter` to convert a low-pass filter to a high-pass filter.
+We weten nu wat er met het :math:`s(t)` deel van de vergelijking, maar hoe zit het met het sinusoide deel (het complexe exponent)?
+Zoals is te zien voegt het :math:`N` toe aan de vergelijking, dus in plaats van de originele frequentieveschuiving :math:`f_v` is het nu N keer zo veel: :math:`N\cdot f_v`. De makkelijkste manier om de waar :math:`N\cdot f_v` te vinden in Python is met behulp van de FFT. Laten we dat doen. We nemen weer ons BPSK signaal, maar in plaats van een fractionele vertraging gaan we nu een frequentieverschuiving toevoegen door het signaal te vermenigvuldigen met :math:`e^{j2\pi f_o t}` zoals we in het :ref:`filters-chapter` hadden gedaan.
 
-Using the code from the beginning of this chapter, apply a +13 kHz frequency offset to your digital signal.  It could happen right before or right after the fractional-delay is added; it doesn't matter which. Regardless, it must happen *after* pulse shaping but before we do any receive-side functions such as time sync.
+Met behulp van de code uit het begin van dit hoofdstuk kun je een afwijking van 13 kHz aan ons signaal toevoegen. De afwijking wordt geintroduceerd door het kanaal. Je kunt het dus tussen de twee RRC filters, of na het enkele RC-filter toevoegen.
 
-Now that we have a signal with a 13 kHz frequency offset, let's plot the FFT before and after doing the squaring, to see what happens.  By now you should know how to do an FFT, including the abs() and fftshift() operation.  For this exercise it doesn't matter whether or not you take the log or whether you square it after taking the abs().
+Laten we de FFT weergeven en kijken wat voor resultaat het kwadrateren geeft in het frequentiedomein. Je zou nu moeten weten hoe je een FFT uitvoert, inclusief de abs() en fftshift() functies. Het maakt in dit geval niet uit of je de log neemt, we zijn alleen geinteresseerd in waar de frequentiepiek zit. Niet hoe hoog het is is.
 
-First look at the signal before squaring (just a normal FFT):
+Eerst bekijken we het signaal zonder te kwadrateren, met een normale FFT:
 
 .. code-block:: python
 
@@ -318,44 +319,45 @@ First look at the signal before squaring (just a normal FFT):
    :align: center
    :target: ../_images/coarse-freq-sync-before.svg
    
-We don't actually see any peak associated with the carrier offset.  It's covered up by our signal.
+Er is helemaal geen draaggolf te herkennen, het wordt verborgen door ons signaal.
 
-Now with the squaring added (just a power of 2 because it's BPSK):
+Nogmaals na het kwadrateren:
 
 .. code-block:: python
 
     # Add this before the FFT line
     samples = samples**2
 
-We have to zoom way in to see which frequency the spike is on:
+Door het figuur te vergroten kunnen we bepalen waar de piek zit:
 
 .. image:: ../_images/coarse-freq-sync.svg
    :align: center
    :target: ../_images/coarse-freq-sync.svg
 
-You can try increasing the number of symbols simulated (e.g., 1000 symbols) so that we have enough samples to work with.  The more samples that go into our FFT, the more accurate our estimation of the frequency offset will be.  Just as a reminder, the code above should come *before* the timing synchronizer.
+Je zou het aantal symbolen kunnen vergroten (bijv. 1000 symbolen) zodat we genoeg samples hebben voor de FFT. Hoe meer samples de FFT gebruikt, hoe nauwkeuriger we de frequentieafwijking kunnen inschatten. Ter herinnering, de bovenstaande code moet *voor* de tijdsynchronisatie plaatsvinden. Deze kan immers niet goed omgaan met een grote frequentieafwijking.
 
-The offset frequency spike shows up at :math:`Nf_o`.  We need to divide this bin (26.6 kHz) by 2 to find our final answer, which is very close to the 13 kHz frequency offset we applied at the beginning of the chapter!  If you had played with that number and it's no longer 13 kHz, that's fine.  Just make sure you are aware of what you set it to.
+De frequentiepiek verschijnt bij :math:`N\cdot f_v`. We moeten de bin (26.6 kHz) dus door 2 delen om :math:`f_v` te vinden. 13.3 kHz is bijzonder dicht bij de frequentieverschuiving die we hebben toegepast aan het begin van dit hoofdstuk. Als je een andere frequentie had gekozen is dat ook geen probleem, zolang je maar bewust bent wat het zou moeten zijn.
 
-Because our sample rate is 1 MHz, the maximum frequencies we can see are -500 kHz to 500 kHz.  If we take our signal to the power of N, that means we can only "see" frequency offsets up to :math:`500e3/N`, or in the case of BPSK +/- 250 kHz.  If we were receiving a QPSK signal then it would only be +/- 125 kHz, and carrier offset higher or lower than that would be out of our range using this technique.  To give you a feel for Doppler shift, if you were transmitting in the 2.4 GHz band and either the transmitter or receiver was traveling at 60 mph (it's the relative speed that matters), it would cause a frequency shift of 214 Hz.  The offset due to a low quality oscillator will probably be the main culprit in this situation.
+De maximale frequenties die we kunnen zien met een samplerate van 1 MHz zijn -500 kHz tot 500 kHz. Wanneer we ons signaal tot de macht N verheffen, dan kunnen we alleen nog de frequentieverschuivingen tot :math:`\frac{500e3}{N}` "zien", dus in het geval van BPSK +- 250 kHz. Voor QPSK slechts 125 kHz; zou de afwijking van de draaggolf groter zijn dan dit, dan kunnen we het niet meer vinden met deze techniek. Om je een gevoel te geven voor het Doppler-effect, als we op 2.4 GHz zouden zenden, en de zender of ontvanger gingen zo'n 100 km/u (het gaat om het relatieve verschil), dan levert dat een verschuiving op van ongeveer 215 Hz. De afwijking dat een goedkope oscillator introduceert is hoogstwaarschijnlijk de grootste bron van afwijking.
 
-Actually correcting this frequency offset is done exactly how we simulated the offset in the first place: multiplying by a complex exponential, except with a negative sign since we want to remove the offset.
+De afwijking ook echt corrigeren gebeurt op dezelfde manier als waarop we het hebben toegevoegd: vermenigvuldigen met een complex (negatieve) exponent.
 
 .. code-block:: python
 
     max_freq = f[np.argmax(psd)]
-    Ts = 1/fs # calc sample period
-    t = np.arange(0, Ts*len(samples), Ts) # create time vector
+    Ts = 1/fs #  sampletijd
+    t = np.arange(0, Ts*len(samples), Ts) # tijdvector
     samples = samples * np.exp(-1j*2*np.pi*max_freq*t/2.0)
 
-It's up to you if you want to correct it or change the initial frequency offset we applied at the start to a smaller number (like 500 Hz) to test out the fine frequency sync we will now learn how to do.
+Het is aan jou of je de afwijking wilt corrigeren, of gewoon verlagen tot zo'n 500 Hz om te kijken hoe fijne synchronisatie daarmee omgaat. Daar gaan we nu naar kijken.
 
 **********************************
 Fine Frequency Synchronization
 **********************************
 
-Next we will switch gears to fine frequency sync.  The previous trick is more for coarse sink, and it's not a closed-loop (feedback type) operation.  But for fine frequency sync we will want a feedback loop that we stream samples through, which once again will be a form of PLL.  Our goal is to get the frequency offset to zero and maintain it there, even if the offset changes over time.  We have to continuously track the offset.  Fine frequency sync techniques work best with a signal that already has been synchronized in time at the symbol level, so the code we discuss in this section will come *after* timing sync.
+We zullen nu overschakelen op fijne frequentiecorrectie. De vorige truc was open-lus en is alleen geschikt om een grove correctie uit te voeren. Voor de fijne correctie willen we terugkoppeling gaan toepassen in de vorm van een PLL. Het doel is om het frequentieverschil tot nul te brengen en te houden, zelfs wanneer het frequentieverschil over de tijd varieert. We zullen continu het verschil moeten bijhouden. Fijne synchronisatietechnieken werken het beste op symboolniveau zonder een tijdafwijking. De code die we hier behandelen komt dus *na* de tijdsynchronisatie.
 
+We zullen de Costas-loop gaan toepassen. Dit is een soort PLL dat speciaal is ontwikkeld om een draaggolfafwijking te corrigeren bij digitale signalen zoals BPSK en QPSK. Het is uitgevonden door John P. Costas bij General Electric in de jaren 50 en heeft een enorme inpact gehad op moderne digitale communicatie. De Costas-loop zal niet alleen de frequentieafwijking corrigeren, maar ook elke faseverschuiving. 
 We will use a technique called a Costas Loop.  It is a form of PLL that is specifically designed for carrier frequency offset correction for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950's, and it had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset while also fixing any phase offset.  The energy is aligned with the I axis.  Frequency is just a change in phase so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2s have been left out of the equations because they don't functionally matter).
 
 .. image:: ../_images/costas-loop.svg
