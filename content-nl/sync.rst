@@ -357,53 +357,60 @@ Fine Frequency Synchronization
 
 We zullen nu overschakelen op fijne frequentiecorrectie. De vorige truc was open-lus en is alleen geschikt om een grove correctie uit te voeren. Voor de fijne correctie willen we terugkoppeling gaan toepassen in de vorm van een PLL. Het doel is om het frequentieverschil tot nul te brengen en te houden, zelfs wanneer het frequentieverschil over de tijd varieert. We zullen continu het verschil moeten bijhouden. Fijne synchronisatietechnieken werken het beste op symboolniveau zonder een tijdafwijking. De code die we hier behandelen komt dus *na* de tijdsynchronisatie.
 
-We zullen de Costas-loop gaan toepassen. Dit is een soort PLL dat speciaal is ontwikkeld om een draaggolfafwijking te corrigeren bij digitale signalen zoals BPSK en QPSK. Het is uitgevonden door John P. Costas bij General Electric in de jaren 50 en heeft een enorme inpact gehad op moderne digitale communicatie. De Costas-loop zal niet alleen de frequentieafwijking corrigeren, maar ook elke faseverschuiving. 
-We will use a technique called a Costas Loop.  It is a form of PLL that is specifically designed for carrier frequency offset correction for digital signals like BPSK and QPSK.  It was invented by John P. Costas at General Electric in the 1950's, and it had a major impact on modern digital communications.  The Costas Loop will remove the frequency offset while also fixing any phase offset.  The energy is aligned with the I axis.  Frequency is just a change in phase so they can be tracked as one.  The Costas Loop is summarized using the following diagram (note that 1/2s have been left out of the equations because they don't functionally matter).
+We zullen de Costas-loop gaan toepassen. Dit is een soort PLL dat speciaal is ontwikkeld om een draaggolfafwijking te corrigeren bij digitale signalen zoals BPSK en QPSK. Het is uitgevonden door John P. Costas bij General Electric in de jaren 50 en heeft een enorme inpact gehad op moderne digitale communicatie. De Costas-loop zal niet alleen de frequentieafwijking corrigeren, maar ook elke faseverschuiving. Frequentie is gewoon een faseverandering dus ze kunnen beiden gevolgd worden. De Costat-loop kan worden samengevat met het volgende figuur (let op dat de halven zijn weggelaten uit de vergelijkingen omdat ze geen invloed hebben). 
 
 .. image:: ../_images/costas-loop.svg
    :align: center 
    :target: ../_images/costas-loop.svg
 
-The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case, since we are simulating a wireless channel, it isn't a voltage, but rather a level represented by a variable.  It determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This behavior is similar to how an SDR downconverts and creates the I and Q branches.
+De spanningsgestuurde oscillator (VCO) is gewoon een sin/cos signaalgenerator dat een frequentie gebruikt op basis van de ingang. In ons geval, omdat we een draadloos kanaal simuleren, is het geen spanning maar een niveau aangegeven door een variabele. Het bepaalt de frequentie en fase van de gegenereerde sinus en cosinus golven. Het vermenigvuldigt het ontvangen signaal met een zelf gegenereerde sinusoide in een poging de frequentie- en faseafwijking ongedaan te maken. Dit gedrag is vergelijkbaar met hoe een SDR een signaal naar de basisband verschuift en de I- en Q-takken maakt.
 
-
-Below is the Python code that is our Costas Loop:
+Hieronder is de code te vinden van de Costas-Loop:
 
 .. code-block:: python
 
     N = len(samples)
-    phase = 0
+    fase = 0
     freq = 0
-    # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
+    # Deze volgende twee parameters bepalen of de feedback loop sneller of langzamer reageert (wat de stabiliteit beinvloed)
     alpha = 0.132
     beta = 0.00932
-    out = np.zeros(N, dtype=np.complex)
+    uit = np.zeros(N, dtype=complex)
     freq_log = []
     for i in range(N):
-        out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
-        error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+        uit[i] = samples[i] * np.exp(-1j*fase) # pas de ingang aan met de inverse van de geschatte faseafwijking
+        fout = np.real(uit[i]) * np.imag(uit[i]) # De is de foutvergelijking voor de 2e orde Costas-loop (dus voor BPSK)
         
-        # Advance the loop (recalc phase and freq offset)
-        freq += (beta * error)
-        freq_log.append(freq * fs / (2*np.pi)) # convert from angular velocity to Hz for logging
-        phase += freq + (alpha * error)
+        # Update de fase en frequentie
+        freq += (beta * fout)
+        freq_log.append(freq * fs / (2*np.pi)) # zet hoekfrfequentie om naar Hz voor het loggen
+        fase += freq + (alpha * fout)
         
-        # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
-        while phase >= 2*np.pi:
-            phase -= 2*np.pi
-        while phase < 0:
-            phase += 2*np.pi
+        # Optioneel: zorg dat de fase tussen 0 en 2pi blijft
+        while fase >= 2*np.pi:
+            fase -= 2*np.pi
+        while fase < 0:
+            fase += 2*np.pi
 
-    # Plot freq over time to see how long it takes to hit the right offset
+    # druk frequentie over de tijd af om de voortgang te kunnen zien
     plt.plot(freq_log,'.-')
     plt.show()
+    #als je verder wilt gaan met samples...
+    #samples=uit
 
-There is a lot here so let's step through it.  Some lines are simple and others are super complicated.  :code:`samples` is our input, and :code:`out` is the output samples.  :code:`phase` and :code:`frequency` are like the :code:`mu` from the time sync code.  They contain the current offset estimates, and each loop iteration we create the output samples by multiplying the input samples by :code:`np.exp(-1j*phase)`.  The :code:`error` variable holds the "error" metric, and for a 2nd order Costas Loop it's a very simple equation.  We multiply the real part of the sample (I) by the imaginary part (Q), and because Q should be equal to zero for BPSK, the error function is minimized when there is no phase or frequency offset that causes energy to shift from I to Q.  For a 4th order Costas Loop, it's still relatively simple but not quite one line, as both I and Q will have energy even when there is no phase or frequency offset, for QPSK.  If you are curious what it looks like click below, but we won't be using it in our code for now.  The reason this works for QPSK is because when you take the absolute value of I and Q, you will get +1+1j, and if there is no phase or frequency offset then the difference between the absolute value of I and Q should be close to zero.
+Er gebeurt een hoop dus laten we erdoorheen lopen. Sommige regels zijn eenvoudig en andere super ingewikkeld.
+:code:`samples` is onze ingang, :code:`uit` onze uitgang.
+:code:`fase` en :code:`freq` werken zoals de :code:`mu` bij het tijdsynchronisatievoorbeeld. 
+Ze bevatten de huidig geschatte afwijking en elke iteratie worden de samples van de ingang vermenigvuldigt met :code:`np.exp(-1j*phase)`.
+De :code:`fout` variabele kwantificeert de fout in de correctie, en voor een 2e orde Costat-loop is dit een simpele vergelijking. 
+We vermenigvuldigen het reele deel van de sample (I) met het imaginaire deel (Q). Omdat het Q-deel 0 zou moeten zijn voor BPSK wordt de foutvergelijking geminimaliseerd wanneer er geen fase- of frequentieafwijking is.
+De 4e orde vergelijking (QPSK) is nog steeds relatief simpel maar niet meer een regel gezien beide I en Q energie zullen bevatten, zelfs wanneer het signaal geen afwijking heeft. 
+We gaan het nu niet toepassen, maar mocht je benieuwd zijn naar hoe de QPSK versie eruit ziet in code dan kun je hieronder klikken.
 
 .. raw:: html
 
    <details>
-   <summary>Order 4 Costas Loop Error Equation (for those curious)</summary>
+   <summary>4e orde Costas-Loop foutvergelijking (voor de geinteresseerden)</summary>
 
 .. code-block:: python
 
@@ -426,50 +433,53 @@ There is a lot here so let's step through it.  Some lines are simple and others 
 
    </details>
 
-The :code:`alpha` and :code:`beta` variables define how fast the phase and frequency update, respectively.  There is some theory behind why I chose those two values; however, we won't address it here.  If you are curious you can try tweaking :code:`alpha` and/or :code:`beta` to see what happens.
+De :code:`alpha` en :code:`beta` variabelen bepalen hoe snel de fase en frequentie worden geupdatet. Er is een reden waarom ik die twee aarden heb gekozen, maar dat gaan we niet behandelen. Als je nieuwsgierig bent kun je alpha en/of beta kunnen varieren om te kijken wat er gebeurt.
 
-We log the value of :code:`freq` each iteration so we can plot it at the end, to see how the Costas Loop converges on the correct frequency offset.  We have to multiply :code:`freq` by the sample rate and convert from angular frequency to Hz, by dividing by :math:`2\pi`.  Note that if you performed time sync prior to the Costas Loop, you will have to also divide by your :code:`sps` (e.g., 8), because the samples coming out of the time sync are at a rate equal to your original sample rate divided by :code:`sps`. 
+Iedere iteratie loggen we :code:`freq` naar het scherm zodat we responsie zien van het regelalgoritme bij het corrigeren van de frequentieafwijking. Om de frequentie in Hz te laten zien moeten we :code:`freq` vermenigvuldigen met de samplerate en door :math:`2\pi` delen. 
+Mocht je eerste de time sync hebben uitgevoerd dan zul je :code:`freq` ook nog door :code:`sps` moeten delen omdat de originele samplerate :code:`sps` keer zo klein is.
 
-Lastly, after recalculating phase, we add or remove enough :math:`2 \pi`'s to keep phase between 0 and :math:`2 \pi`,  which wraps phase around.
+Als laatste moet de berekende fase gecorrigeerd worden om het tussen 0 en :math:`2 \pi` te houden.
 
-Our signal before and after the Costas Loop looks like this:
+Het signaal voor en na onze Costas Loop ziet er dan zo uit:
 
 .. image:: ../_images/costas-loop-output.svg
    :align: center
    :target: ../_images/costas-loop-output.svg
 
-And the frequency offset estimation over time, settling on the correct offset (a -300 Hz offset was used in this example signal):
+De frequentieinschatting uitgezet over de tijd (een -300 Hz offset werdt voor dit voorbeeld gebruikt):
 
 .. image:: ../_images/costas-loop-freq-tracking.svg
    :align: center
    :target: ../_images/costas-loop-freq-tracking.svg
 
-It takes nearly 70 samples for the algorithm to fully lock it on the frequency offset.  You can see that in my simulated example there were about -300 Hz left over after the coarse frequency sync.  Yours may vary.  Like I mentioned before, you can disable the coarse frequency sync and set the initial frequency offset to whatever value you want and see if the Costas Loop figures it out.
+Het duurt bijna 70 samples voordat het algoritme de afwijking heeft gevonden. 
+Je kunt zien dat de grove frequentiesynchronisatie nog steeds 300 Hz ernaast zat. De jouwe kan een andere waarde hebben. Zoals ik al eerder zei, kun je de grove frequentiesynchronisatie uitschakelen en de initiële frequentieafwijking instellen op elke gewenste waarde en kijken of de Costas Loop het kan corrigeren.
 
-The Costas Loop, in addition to removing the frequency offset, aligned our BPSK signal to be on the I portion, making Q zero again.  It is a convenient side-effect from the Costas Loop, and it lets the Costas Loop essentially act as our demodulator.  Now all we have to do is take I and see if it's greater or less than zero.  We won't actually know how to make negative and positive to 0 and 1 because there may or may not be an inversion; there's no way for the Costas Loop (or our time sync) to know.  That is where differential coding comes into play.  It removes the ambiguity because 1's and 0's are based on whether or not the symbol changed, not whether it was +1 or -1.  If we added differential coding, we would still be using BPSK.  We would be adding a differential coding block right before modulation on the tx side and right after demodulation on the rx side.
 
-Below is an animation of the time sync plus frequency sync running, the time sync actually happens almost immediately but the frequency sync takes nearly the entire animation to fully settle, and this was because :code:`alpha` and :code:`beta` were set too low, to 0.005 and 0.001 respectively.  The code used to generate this animation can be found `here <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/costas_loop_animation.py>`_. 
+De Costas-loop heeft niet alleen de frequentieafwijking gecorrigeerd, maar ook ons BPSK signaal uitgelijnd met het I deel waardoor Q weer nul is geworden. Dit is een bijkomend voordeel van de Costas-loop, en maakt het in essentie ook onze demodulator. We hoeven alleen nog maar te kijken of het reele I-deel boven of onder de 0 is. Helaas weten we nog niet of de negatieve of positieve waarde correspondeert met 0 of 1 want er kan een inversie plaats hebben gevonden; de costas-loop kan dat in geen mogelijkheid weten. Hier komt differentiele codering om de hoek kijken. Dit verwijdert de twijfel omdat 1'en en 0'en nu worden gebaseerd op het feit dat er een verandering heeft plaatsgevonden, niet of het een -1 of +1 was. Wanneer de differentiele codering toepassen dan gebruiken we nog steeds BPSK. We zouden dit coderingsblok net voor de modulatie op de tx kant, en net na demodulatie op de rx kant , stoppen.
+
+Hieronder zie je een animatie van de tijdsynchronisatie en frequentiecorrectie algoritmen, de tijdsynchronisatie gebeurd bijna meteen, maar de frequentiecorrectie heeft bijna de hele animatie nodig om de juist instelling te vinden. Dit komt omdat we een te lage waarde hadden gekozen voor :code:`alpha` en :code:`beta` (0.005 en 0.001). De code van deze animatie is hier te `vinden <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/costas_loop_animation.py>`_. 
 
 .. image:: ../_images/costas_animation.gif
    :align: center 
 
 ***************************
-Frame Synchronization
+Frame-synchronisatie
 ***************************
 
-We have discussed how to correct any time, frequency, and phase offsets in our received signal.  But most modern communications protocols are not simply streaming bits at 100% duty cycle.  Instead, they use packets/frames.  At the receiver we need to be able to identify when a new frame begins.  Customarily the frame header (at the MAC layer) contains how many bytes are in the frame.  We can use that information to know how long the frame is, e.g., in units samples or symbols.  Nonetheless, detecting the start of frame is a whole separate task.  Below shows an example WiFi frame structure.  Note how the very first thing transmitted is a PHY-layer header, and the first half of that header is a "preamble".  This preamble contains a synchronization sequence that the receiver uses to detect start of frames, and it is a sequence known by the receiver beforehand.
+We hebben behandeld hoe je een tijd-, frequentie- of faseafwijking in een ontvangen signaal kunt corrigeren. De meeste communicatieprotocollen sturen echter niet alleen data, maar maken gebruik van pakketten/frames. De ontvanger moet namelijk kunnen zien waar een frame start. Gewoonlijk is er een frame header (op de MAC laag) dat verteld hoeveel byts in het frame zitten. We kunnen die infroamtie gebruiken om te weten hoe lang het hele frame is in samples of symbolen. Desalniettemin is het vinden van de start van een frame een hele taak op zich. Hieronder zie je de structuur van een wifi-frame. Het valt op dat het eerste ding wat verstuurt wordt een PHY-laag header is, en de eerste helft van die header is een "preamble" (aankondiging).Deze preamble bevat een rij van bits die de ontvanger kan gebruiken om de start van een frame te herkennen. De preamble is van te voren bekend bij de ontvanger.
 
 .. image:: ../_images/wifi-frame.png
    :scale: 60 % 
    :align: center 
 
-A common and straightforward method of detecting these sequences at the receiver is to cross-correlate the received samples with the known sequence.  When the sequence occurs, this cross-correlation resembles an autocorrelation (with noise added).  Typically the sequences chosen for preambles will have nice autocorrelation properties, such as the autocorrelation of the sequence creates a single strong spike at 0 and no other spikes.  One example is Barker codes, in 802.11/WiFi a length-11 Barker sequence is used for the 1 and 2 Mbit/sec rates:
+Een veel gebruikte en logische methode om deze rij van bits de detecteren is door de ontvangen data te (kruis)corelleren met de bekende preamble. Wanneer de juiste rijs bits binnen komt dan lijkt de correlatie op de eigencorrelatie (maar met ruis). Om deze reden worden de preambles zo gekozen dat de eigencorrelatie mooie eigenschappen heeft. De autocorrelatie moet bijvoorbeeld alleen op plek 0 een piek geven, en niet op andere plekken. Een voorbeeld is een Barker code, i 802.11/wifi wordt een Barker code van lengte 11 toegepast voor de 1 en 2 Mbit.sec snelheden:
 
 .. code-block::
 
     +1 +1 +1 −1 −1 −1 +1 −1 −1 +1 −1
 
-You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of this sequence very easily in Python:
+In feite zouden dit 11 BPSK symbolen kunnen zijn. We kunnen de eigecorrelatie van deze rij gemakkelijk met Python vinden:
 
 .. code-block:: python
 
@@ -484,9 +494,13 @@ You can think of it as 11 BPSK symbols.  We can look at the autocorrelation of t
    :align: center
    :target: ../_images/barker-code.svg
 
-You can see it's 11 (length of the sequence) in the center, and -1 or 0 for all other delays.  It works well for finding the start of a frame because it essentially integrates 11 symbols worth of energy in an attempt to create a 1 bit spike in the output of the cross-correlation.  In fact, the hardest part of performing start-of-frame detection is figuring out a good threshold.  You don't want frames that aren't actually part of your protocol to trigger it.  That means in addition to cross-correlation you also have to do some sort of power normalizing, which we won't consider here.  In deciding a threshold, you have to make a trade-off between probability of detection and probability of false alarms.  Remember that the frame header itself will have information, so some false alarms are OK; you will quickly find it is not actually a frame when you go to decode the header and the CRC inevitably fails (because it wasn't actually a frame).  Yet while some false alarms are OK, missing a frame detection altogether is bad.
+De piek is in het midden en 11 hoog (de lengte van de rij). Op alle andere vertragingen levert het -1 of 0 op. Dit werkt goed om de start van een frame te vinden omdat het in feite de energy van 11 symbolen integreert tot een piek van een enkele bit aan de uitgang van de kruiscorrelatie.
+Het moeilijkste aan het detecteren van de start is om de juiste threshold te kiezen. Je wilt niet dat data dat geen onderdeel van het protocol is, toch een start aangeeft.
+Dus naar de kruiscorrelatie zul je ook vermogen moeten gaan normaliseren, wat buiten de scope valt van dit boek. In het bepalen van de juiste threshold zul je een afweging moeten maken tussen de kans op detectie en de kans op een vals alarm. 
+De frame-header bevat immers zelf ook informatie, dus bepaalde valse alarmen zijn niet erg; zodra je de header decodeert en de CRC faalt, dan weet je dat het geen frame was. 
+Het zou erger zijn als je een frame helemaal mist.
 
-Another sequence with great autocorrelation properties is Zadoff-Chu sequences, which are used in LTE.  They have the benefit of being in sets; you can have multiple different sequences that all have good autocorrelation properties, but they won't trigger each other (i.e., also good cross-correlation properties, when you cross-correlate different sequences in the set).  Thanks to that feature, different cell towers will be assigned different sequences so that a phone can not only find the start of the frame but also know which tower it is receiving from.
+Een andere sequentie van bits met hele goede eigencorrelatie-eigenschappen is de Zadoff-Chu reeks. Dit wordt in LTE toegepast. Zij hebben het voordeel dat ze in sets komen; er zijn meerdere verschillende sequenties die goede eigenschappen hebben, maar elkaar niet zullen triggeren (dus ook goede kruiscorrelatie eigenschappen ten opzicht van elkaar). Dankzij die feature kunnen verschillende telefoonmasten verschillende sequenties gebruiken zodat een telefoon niet alleen de start van een frame van detecteren, maar ook van welke mast het signaal komt.
 
 
 
