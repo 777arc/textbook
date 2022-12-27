@@ -4,10 +4,10 @@
 Synchronisatie
 ################
 
-Dit hoofdstuk gaat over het synchroniseren van draadloze signalen in tijd en frequentie. Hiermee corrigeren we frequentieafwijking en stellen het moment van samplen af op symbool niveau. We zullen de klokhersteltechniek van Mueller en Muller en de Costas Loop gebruiken in Python.
+Dit hoofdstuk gaat over het synchroniseren van draadloze signalen in tijd en frequentie. Hiermee corrigeren we frequentieafwijking en stellen het moment van samplen af op symbool niveau. We zullen de klokhersteltechniek van Mueller en Muller, en de Costas Loop, gebruiken in Python.
 
 ***************************
-Introduction
+Introductie
 ***************************
 
 We hebben besproken hoe je digitale signalen draadloos kunt versturen met een digitaal modulatieschema zoals QPSK en het toepassen van vormgevende filters om de bandbreedte te beperken. We kunnen kanaalcodering toepassen bij slechte signaalruisverhoudingen. 
@@ -16,9 +16,53 @@ In dit hoofdstuk zullen we onderzoeken hoe synchronisatie wordt uitgevoerd aan d
 Synchronisatie is een reeks bewerkingen die plaatsvindt *vóór* demodulatie en kanaaldecodering.
 Hieronder zie je de totale zender-kanaal-ontvanger keten waarbij de blokken die we in dit hoofdstuk zullen behandelen, geel zijn gemaakt. (Dit diagram is niet allesomvattend - de meeste systemen bevatten ook egalisatie en multiplexing).
 
-.. image:: ../_images/sync-diagram.svg
-   :align: center 
-   :target: ../_images/sync-diagram.svg
+.. [font=\sffamily\Large\bfseries]
+.. tikz:: [font=\sffamily\large]
+   \definecolor{yellowish}{HTML}{FFE699}
+   \definecolor{grayish}{HTML}{D9D9D9} 
+   \tikzset{
+      rect/.style={
+         align=center,
+         text=black,		
+         minimum width=2.5cm,
+         minimum height=2cm}
+   }
+   \tikzset{
+      done/.style={rect, fill=grayish }
+   }
+   \tikzset{
+      todo/.style={rect, fill=yellowish}
+   }
+   \tikzset{
+      arrow/.style={line width=1mm}
+   }
+   \node [done]  (codering) {Kanaal\\codering};
+   \node [done, right=1.5cm of codering ]    (modulatie) {Modulatie};
+   \node [done, right=1.5cm of modulatie	]  (pulse) {Pulsvorming};
+   \node [rect, cloud, fill=grayish, right=1.5cm of pulse]  (channel) {Draadloos\\kanaal};
+   \node [done] at (-4,-5)                   (matched) {Matched\\filter};
+   \node [todo, right=0.5cm of matched]      (coarse) {Grove freq.-\\correctie};
+   \node [todo, right=0.5cm of coarse]       (symbol) {Tijdsync};
+   \node [todo, right=0.5cm of symbol]       (fine) {Fijne freq.-\\correctie};
+   \node [done, right=0.5cm of fine]         (demod) {Demodulatie};
+   \node [todo, right=0.5cm of demod]        (frame) {Frame-\\detectie};
+   \node [done, right=0.5cm of frame]        (decodering) {Kanaal\\decodering};
+   \draw [arrow, stealth-](codering.west) -- ++(-2,0) node[left]{\emph{bits}};
+   \draw[arrow, -stealth] (codering.east)--  (modulatie.west);
+   \draw[arrow, -stealth] (modulatie.east)-- (pulse.west);
+   \draw[arrow, -stealth] (pulse.east)--     (channel.west);
+   \draw[arrow, -stealth] (channel.south) -- ++(0,-1) -| (matched.north);
+   \draw[arrow, -stealth] (matched.east) --  (coarse.west);
+   \draw[arrow, -stealth] (coarse.east)--    (symbol.west);
+   \draw[arrow, -stealth] (symbol.east)--    (fine.west);
+   \draw[arrow, -stealth] (fine.east)--      (demod.west);
+   \draw[arrow, -stealth] (demod.east) --    (frame.west);
+   \draw[arrow, -stealth] (frame.east) --    (decodering.west);
+   \draw[arrow, -stealth] (decodering.east) --++(1,0) node[right]{\emph{bits (hopelijk)}};
+
+.. .. image:: ../_images/sync-diagram.svg
+..    :align: center 
+..    :target: ../_images/sync-diagram.svg
 
 ***************************
 Draadloos kanaal simuleren
