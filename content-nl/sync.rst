@@ -39,8 +39,8 @@ Hieronder zie je de totale zender-kanaal-ontvanger keten waarbij de blokken die 
    \node [done]  (codering) {Kanaal\\codering};
    \node [done, right=1.5cm of codering ]    (modulatie) {Modulatie};
    \node [done, right=1.5cm of modulatie	]  (pulse) {Pulsvorming};
-   \node [rect, cloud, fill=grayish, right=1.5cm of pulse]  (channel) {Draadloos\\kanaal};
-   \node [done] at (-4,-5)                   (matched) {Matched\\filter};
+   \node[rect, cloud, cloud puffs=15.7, cloud ignores aspect, minimum width=5cm, minimum height=2cm, align=center, fill=grayish, right=1.5cm of pulse] (channel) {Draadloos\\kanaal};
+   \node [done] at (-4,-4)                   (matched) {Matched\\filter};
    \node [todo, right=0.5cm of matched]      (coarse) {Grove freq.-\\correctie};
    \node [todo, right=0.5cm of coarse]       (symbol) {Tijdsync};
    \node [todo, right=0.5cm of symbol]       (fine) {Fijne freq.-\\correctie};
@@ -51,7 +51,7 @@ Hieronder zie je de totale zender-kanaal-ontvanger keten waarbij de blokken die 
    \draw[arrow, -stealth] (codering.east)--  (modulatie.west);
    \draw[arrow, -stealth] (modulatie.east)-- (pulse.west);
    \draw[arrow, -stealth] (pulse.east)--     (channel.west);
-   \draw[arrow, -stealth] (channel.south) -- ++(0,-1) -| (matched.north);
+   \draw[arrow, -stealth] (channel.south) -- ++(0,-0.5) -| (matched.north);
    \draw[arrow, -stealth] (matched.east) --  (coarse.west);
    \draw[arrow, -stealth] (coarse.east)--    (symbol.west);
    \draw[arrow, -stealth] (symbol.east)--    (fine.west);
