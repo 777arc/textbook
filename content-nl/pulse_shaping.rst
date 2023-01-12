@@ -88,16 +88,16 @@ Raised-Cosine Filter
 
 Het meest populaire pulsvormende filter lijkt het "raised-cosine" filter te zijn. Het is inderdaad een goed laagdoorlaatfilter en tegelijkertijd somt het inderdaad op tot 0 bij elke interval van :math:`T`.
 
-.. image:: ../_images/raised_cosine.svg
+.. image:: images/raised_cosine.svg
    :align: center 
-   :target: ../_images/raised_cosine.svg
+   :target: images/raised_cosine.svg
 
 Het bovenstaande figuur laat de impulsresponsie van het filter zien.
 Met :math:`\beta` kun je de steilheid van het filter instellen in het tijddomein, en dus ook omgekeerd evenredig de steilheid in het frequentiedomein:
 
-.. image:: ../_images/raised_cosine_freq.svg
+.. image:: images/raised_cosine_freq.svg
    :align: center 
-   :target: ../_images/raised_cosine_freq.svg
+   :target: images/raised_cosine_freq.svg
 
 Het wordt een raised-cosine filter genoemd omdat bij een :math:`\beta=1` het frequentiedomein een halve cosinus laat zien, raised (opgeduwd) tot boven de x-as.
 
@@ -135,9 +135,9 @@ Roll-Off Factor
 Laten we :math:`\beta` wat beter gaan bekijken.  
 Het is een getal tussen de 0 en 1 en wordt de "roll-off", of soms "excess bandwith", factor genoemd. Dit bepaalt hoe snel het filter afzakt naar nul in het tijddomein. Om het als een filter te kunnen gebruiken moet de impulsresponsie naar 0 gaan aan beide kanten:
 
-.. image:: ../_images/rrc_rolloff.svg
+.. image:: images/rrc_rolloff.svg
    :align: center 
-   :target: ../_images/rrc_rolloff.svg
+   :target: images/rrc_rolloff.svg
 
 Als resultaat heeft het filter dus meer coëfficiënten nodig naargelang :math:`\beta` lager wordt.
 Wanneer :math:`\beta` nul bereikt zal de impulsresponsie nooit meer afzwakken naar 0, dus in de praktijk proberen we :math:`\beta` zo dicht mogelijk bij de nul te krijgen, zonder andere problemen te veroorzaken.

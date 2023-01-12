@@ -17,12 +17,12 @@ Software/Drivers Installatie
 
 Een VM opzetten
 ###############
-Terwijl de gegeven Python voorbeelden ook onder Windows, Mac en Linux zouden moeten werken, zijn de instructies in het specifiek geschreven voor Ubuntu 22. Als je moeite hebt om de software op jouw OS te installeren met behulp van `de instructies van Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, raad ik aan om een Ubuntu 22 VM te installeren met de instructies hieronder. Onder Windows 11 (en vanaf deze `update https://support.microsoft.com/en-us/topic/november-15-2022-kb5020030-os-builds-19042-2311-19043-2311-19044-2311-and-19045-2311-preview-237a9048-f853-4e29-a3a2-62efdbea95e2>`_ ook onder windows 10) is een alternatieve route, Windows Subsystem for Linux (WSL) met Ubuntu 22. Dit draait vrij goed en ondersteund standaard al grafische linux applicaties. 
+Terwijl de gegeven Python voorbeelden ook onder Windows, Mac en Linux zouden moeten werken, zijn de instructies in het specifiek geschreven voor Ubuntu 22. Als je moeite hebt om de software op jouw OS te installeren met behulp van `de instructies van Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, raad ik aan om een Ubuntu 22 VM te installeren met de instructies hieronder. Onder Windows 11 (en vanaf deze `update <https://support.microsoft.com/en-us/topic/november-15-2022-kb5020030-os-builds-19042-2311-19043-2311-19044-2311-and-19045-2311-preview-237a9048-f853-4e29-a3a2-62efdbea95e2>`_ ook onder windows 10) is een alternatieve route, Windows Subsystem for Linux (WSL) met Ubuntu 22. Dit draait vrij goed en ondersteund standaard al grafische linux applicaties. 
 
 1. Installeer en open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
 2. Maak een nieuwe VM aan. Voor de geheugengrootte raad ik 50% van je RAM aan.
 3. Creëer een dynamisch groeiende virtuele harde schijf, kies hiervoor VDI. 15 GB zou voldoende moeten zijn. Als je zeker wilt zijn kun je nog meer toekennen.
-4. Download de `Ubuntu 22 Desktop .iso https://ubuntu.com/download/desktop`_
+4. Download de `Ubuntu 22 Desktop .iso <https://ubuntu.com/download/desktop>`_
 5. Start de VM. Kies het gedownloade .iso bestand als installatiemedium. Kies “install ubuntu”, met de standaard opties en klik op "continue" bij het venster wat je waarschuwt over de veranderingen. Kies een naam/wachtwoord en wacht op de VM om te installeren. Wanneer de installatie klaar is zal de VM herstarten. Schakel na de herstart de VM uit.
 6. Ga naar de VM instellingen (het tandwieltje).
 7. Onder system > processor > kies tenminste 3 processors. Als je een discrete video kaart hebt dan kun je meer videogeheugen toekennen onder display > video memory.
@@ -120,18 +120,12 @@ Tijd om te hacken! Open een terminal (host of VM):
 Het wachtwoord is analog.
 
 Je zou een welkomst 'scherm' moeten zien. Je hebt nu geSSHd naar de linux-omgeving van de Pluto zelf!
-Als je een Pluto firmwareversie van 0.31 of minder hebt, type dan de volgende commando's in:
+Type de volgende commando's in:
 
 .. code-block:: bash
 
  fw_setenv attr_name compatible
  fw_setenv attr_val ad9364
- reboot
-
-Voor firmware versies van 0.32 en hoger:
-
-.. code-block:: bash
- 
  fw_setenv compatible ad9364
  reboot
 
