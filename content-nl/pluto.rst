@@ -33,9 +33,11 @@ PlutoSDR verbinden
 ###################
 
 1. Drivers installeren
+   
  A. Voor MacOS, onder systeem voorkeuren, zet "kernel extensions" aan. Installeer vervolgens HoRNDIS (Misschien moet je herstarten).
  B. Voor Windows kun je deze driver installeren: https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
  C. Voor Linux zou je niets speciaals hoeven te doen.
+
 2. Plug je Pluto in de host machine via USB. Gebruik de middelste usb poort van de Pluto want de andere is alleen voor voeding. Na het inpluggen van de Pluto wordt er een virtuele netwerkkaart aangemaakt, het verschijnt als een USB ethernet adapter.
 3. Open jouw favoriete tool op de host machine (niet de VM) en ping 192.168.2.1. Zorg er eerst voor dat dit werkt voordat je verder gaat.
 4. Open een nieuwe terminal binnen de VM

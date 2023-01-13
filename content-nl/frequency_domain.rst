@@ -51,9 +51,9 @@ Om te begrijpen hoe een signaal kan worden opgebroken in sinussen, of sinusoïde
 
 **Amplitude** geeft de "kracht" van de golf, terwijl **frequentie** het aantal golven per seconde geeft. **Fase** wordt gebruikt om aan te geven hoever het signaal is verschoven in de tijd, alles tussen 0 en 180 graden (of 0 en :math:`2\pi`). Dit moet wel relatief zijn aan iets anders, zoals twee sinussen met dezelfde frequentie die 30 graden uit fase lopen met elkaar, om wat te kunnen betekenen.
 
-.. image:: ../_images/amplitude_phase_period.svg
+.. image:: images/amplitude_phase_period.svg
    :align: center
-   :target: ../_images/amplitude_phase_period.svg
+   :target: images/amplitude_phase_period.svg
    
 Je hebt nu waarschijnlijk door dat een "signaal" in feite een functie is "van de tijd" (dus, de x-as). Een andere makkelijk onthoudbare eigenschap is **periode**, de inverse van **frequentie**. De **periode** van een sinusoïde is de hoeveelheid tijd, in seconden, dat de golf nodig heeft om 1 ronde af te maken. Dus, de eenheid van frequentie is 1/seconden, of Hz.
 
@@ -257,13 +257,25 @@ Laten we zeggen dat :math:`x(t)` ons ontvangen signaal is.
 Laat :math:`Y(f)` het masker zijn wat we in het frequentiedomein willen toepassen. 
 Dat zou betekenen dat :math:`y(t)` de tijddomein-versie is van ons masker, en wanneer we dit convolueren met :math:`x(t)` het signaal "wegfilteren" dat we niet willen.
 
-.. image:: ../_images/masking-equation.png
-   :scale: 100 % 
-   :align: center 
+.. This shows the carrier wave formula
+.. tikz:: [font=\Large\bfseries\sffamily]
+   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
+   \draw (0,0) node[align=center,babyblueeyes]           {Bijv. ons ontvangen signaal};
+   \draw (0,-4) node[below, align=center,babyblueeyes]   {Bijv. ons masker}; 
+   \draw (0,-2) node[align=center,scale=2]{$\int x(\tau)y(t-\tau)d\tau \leftrightarrow X(f)Y(f)$};   
+   \draw[->,babyblueeyes,thick] (-4,0) -- (-5.5,-1.2);
+   \draw[->,babyblueeyes,thick] (2.5,-0.5) -- (3,-1.3);
+   \draw[->,babyblueeyes,thick] (-2.5,-4) -- (-3.8,-2.8);
+   \draw[->,babyblueeyes,thick] (3,-4) -- (5.2,-2.8);
+     
+
+.. .. image:: ../_images/masking-equation.png
+..    :scale: 100 % 
+..    :align: center 
 
 Wanneer we filters gaan behandelen zal de convolutie eigenschap duidelijker worden.
 
-5. Convolutie in Frequentie:
+1. Convolutie in Frequentie:
 
 Als laatste wil ik opmerken dat de convolutie eigenschap ook omgekeerd werkt, maar dit zullen we niet zoveel gebruiken als convolutie in het tijddomein:
 
@@ -462,9 +474,9 @@ Wanneer we een FFT gebruiken om de frequenties in ons signaal te bepalen, gaat d
 
 We kunnen aan deze cyclische eigenschap voldoen met behulp van een "venster". Net voor de FFT vermenigvuldigen we het signaal met een vensterfunctie. Dit is een functie dat aan beide kanten naar 0 gaat. Dit zal ervoor zorgen dat het deel van het signaal zal beginnen en eindigen bij 0, en dus zal verbinden. Veel voorkomende vensterfuncties zijn Hamming, Hanning, Blackman en Kaiser. Wanneer je geen venster toepast heet het een "rechthoekig" venster want het is alsof je het vermenigvuldigt met een array vol enen. Dit is hoe diverse vensterfuncties eruitzien:
 
-.. image:: ../_images/windows.svg
+.. image:: images/windows.svg
    :align: center
-   :target: ../_images/windows.svg
+   :target: images/windows.svg
 
 Een simpele benadering voor beginners is om gewoon het Hamming venster te gebruiken. Dit kun je in Python maken met :code:`np.hamming(N)` waarbij N het aantal elementen in de array en onze FFT-grootte is. In het bovenstaande voorbeeld zouden we het venster toepassen net voor de FFT. Achter de tweede lijn code voegen we toe:
 

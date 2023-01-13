@@ -1,15 +1,19 @@
 .. _rds-chapter:
 
 ##################
-End-to-End Example
+Compleet voorbeeld
 ##################
 
-In this chapter we bring together many of the concepts we previously learned about, and walk through a full example of receiving and decoding a real digital signal.  We will be looking at Radio Data System (RDS), which is a communications protocol for embedding small amounts of information in FM radio broadcasts, such as station and song name.  We will have to demodulate FM, frequency shift, filter, decimate, resample, synchronize, decode, and parse the bytes.  An example IQ file is provided for testing purposes or if you don't have an SDR handy.
+We zullen in dit hoofdstuk vele geleerde concepten samenbrengen en door een compleet voorbeeld heenlopen waarin we een echt digitaal signaal ontvangen en decoderen. We zullen kijken naar het Radio Data Systeem (RDS) wat een protocol is om kleine hoeveelheden informatie in een FM signaal te stoppen, zoals de naam van het nummer. We zullen FM moeten demoduleren, verschuiven, filteren, decimeren, hersamplen, synchroniseren, decoderen en de bytes interpreteren. Er is sowieso een IQ-bestand beschikbaar waarmee je kunt testen wanneer je geen SDR klaar hebt liggen.
 
 ********************************
-Introduction to FM Radio and RDS
+Introductie FM Radio en RDS
 ********************************
 
+Om RDS te kunnen begrijpen zullen we eerst kijken een een FM-signaal is opgebouwd.
+Je bent waarschijnlijk al bekend met het audio gedeelte van een FM-signaal: een FM-gemoduleerd audiosignaal verstuurt op de frequentie van het station.
+Naast de audio worden in een FM-signaal nog meer informatiecomponenten FM-gemoduleerd.
+In plaats van 
 To understand RDS we must first review FM radio broadcasts and how their signals are structured.  You are probably familiar with the audio portion of FM signals, which are simply audio signals frequency modulated and transmitted at center frequencies corresponding to the station's name, e.g., "WPGC 95.5 FM" is centered at exactly 95.5 MHz.  In addition to the audio portion, each FM broadcast contains some other components that are frequency modulated along with the audio.  Instead of just Googling the signal structure, let's take a look at the power spectral density (PSD) of an example FM signal, *after* the FM demodulation. We only view the positive portion because the output of FM demodulation is a real signal, even though the input was complex (we will view the code to perform this demodulation shortly). 
 
 .. image:: ../_images/fm_psd.svg
