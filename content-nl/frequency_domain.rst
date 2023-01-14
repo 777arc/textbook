@@ -11,7 +11,9 @@ Een van de coolste gevolgen van het leren over DSP en draadloze communicatie is 
 .. image:: ../_images/audio_equalizer.webp
    :align: center
 
-Wanneer je dit hoofdstuk hebt afgerond zul je begrijpen wat het frequentiedomein echt betekent, hoe je kunt schakelen tussen tijd en frequentie (en wat er gebeurt als we dit doen) en wat interessante principes die we zullen gebruiken door ons onderzoek naar DSP en SDR. Wanneer je dit boek hebt afgerond zul je een master zijn in het werken in het frequentiedomein. Gegarandeerd!
+Wanneer je dit hoofdstuk hebt afgerond zul je begrijpen wat het frequentiedomein echt betekent. 
+Je leert hoe je kunt schakelen tussen tijd en frequentie (en wat er gebeurt als we dit doen) en wat andere interessante principes die we zullen gebruiken door ons onderzoek naar DSP en SDR. 
+Wanneer je dit boek hebt afgerond zul je een master zijn in het werken in het frequentiedomein. Gegarandeerd!
 
 Als eerste, waarom willen we naar signalen kijken in het frequentiedomein? Nou, hieronder staan twee voorbeelden, weergeven in beide het tijd- en frequentiedomein.
 
@@ -79,9 +81,9 @@ Dit is hoe een sinus met frequentie f eruitziet in het tijd- en frequentiedomein
 
 Het tijddomein moet er bekend uitzien. 
 Het is een oscillerende golf. 
-Maak je geen zorgen over wanneer de golf start of hoe lang een periode is, wat je moet onthouden is dat het een *enkele frequentie* heeft waardoor we slechts een enkele piek in het frequentiedomein zien. 
+Maak je geen zorgen over wanneer de golf start of hoe lang een periode is, wat je moet onthouden is dat het een *enkele frequentie* heeft, waardoor we slechts een enkele piek in het frequentiedomein zien. 
 Op welke frequentie de sinus ook oscilleert, dat is de frequentie waar die piek zich zal bevinden in het frequentiedomein. 
-De wiskundig naam voor zo'n piek is een "impuls".
+De wiskundige naam voor zo'n piek is een "impuls".
 
 En wat als we een impuls in het tijddomein hadden? 
 Stel je een opname voor van iemand die in zijn handen klapt of met een hamer slaat. 
@@ -211,7 +213,7 @@ Hier is nog een manier om deze eigenschap te laten zien:
 .. math::
    x(at) \leftrightarrow X\left(\frac{f}{a}\right)
 
-Aan de linker kant van de vergelijking zien we dat we ons signaal :math:`x(t)` vermenigvuldigen in de tijd. 
+Aan de linkerkant van de vergelijking zien we dat we ons signaal :math:`x(t)` vermenigvuldigen in de tijd. 
 Hieronder een voorbeeld van een signaal wat in de tijd wordt vermenigvuldigd, en wat er gebeurt in de frequentieversie van het signaal.
 
 .. image:: ../_images/time-scaling.svg
@@ -239,7 +241,7 @@ Wanneer je twee signalen bij elkaar optelt, gebeurt er bijna niets, zoals je heb
 Maar wanneer je twee signalen convolueert is het alsof je een derde signaal creëert. 
 Convolutie is de belangrijkste techniek in DSP, maar we moeten eerst begrijpen hoe filters werken om dit te laten bezinken.
 
-Om uit te leggen hoe belangrijk deze eigenschap is kijken we eerst naar deze situatie voor we verder gaan: Je hebt een signaal dat je wilt ontvangen en er staat een interfererend signaal naast. 
+Om uit te leggen hoe belangrijk deze eigenschap is, kijken we eerst naar deze situatie voor we verder gaan: Je hebt een signaal dat je wilt ontvangen en er staat een interfererend signaal naast. 
 
 .. image:: ../_images/two-signals.svg
    :align: center
@@ -284,7 +286,7 @@ Als laatste wil ik opmerken dat de convolutie eigenschap ook omgekeerd werkt, ma
 
 Er zijn nog meer eigenschappen, maar de bovenstaande vijf zijn naar mijn mening de meest cruciale om te begrijpen. 
 Ook al zijn we niet door alle bewijzen heengelopen, de crux is dat we wiskundige eigenschappen gebruiken om inzicht te verschaffen in wat er gebeurt met echte signalen wanneer we deze analyseren en bewerken. 
-Blijf niet hangen op de vergelijken, zorg ervoor dat je de beschrijving van elke eigenschap begrijpt.
+Blijf niet hangen op de vergelijkingen, zorg ervoor dat je de beschrijving van elke eigenschap begrijpt.
 
 ****************************
 Fast Fourier Transform (FFT)
@@ -362,7 +364,7 @@ De FFT "mixt" soort van het ingangssignaal naar de uitgang, wat een andere schaa
 We zitten namelijk niet langer in het tijddomein. 
 Een goede manier om dit te onthouden is om te beseffen dat de volgorde waarin dingen gebeuren in het tijddomein geen invloed heeft op hoe het frequentiedomein er uit ziet. 
 D.w.z., de FFT van het volgende signaal zal dezelfde twee pieken laten zien, want het signaal bestaat gewoon uit twee sinussen met verschillende frequenties. 
-Het feit dat er twee frequenties zijn zal niet veranderen als we de volgorde van de sinussen omdraaien.
+Het feit dat er twee frequenties zijn, verandert niet wanneer we de volgorde van de sinussen omdraaien.
 
 .. image:: ../_images/fft_signal_order.png
    :scale: 50 % 
@@ -502,7 +504,7 @@ Een spectrogram is een plot dat de frequentieverandering over de tijd laat zien.
    :scale: 120 % 
    :align: center 
 
-Probeer als oefening de Python code te schrijven waarmee we zo'n spectrogram kunnen maken. Bedenk dat het slechts rijen van FFT’s zijn die op elkaar zijn gestapeld. Elke rij is 1 FFT. Zorg ervoor dat je het tijdsignaal opbreekt in delen van jouw FFT-grootte (bijv. 1024 samples per deel). Om dingen simpel te houden kun je een reëel signaal invoeren en simpelweg het negatieve deel van de frequenties weggooien voordat je het spectrogram plot. Je kunt het volgende signaal als voorbeeld gebruiken, een enkele toon met witte ruis:
+Probeer als oefening de Python code te schrijven waarmee we zo'n spectrogram kunnen maken. Bedenk dat het slechts op elkaar gestapelde rijen van FFT’s zijn. Elke rij is 1 FFT. Zorg ervoor dat je het tijdsignaal opbreekt in delen van jouw FFT-grootte (bijv. 1024 samples per deel). Om dingen simpel te houden kun je een reëel signaal invoeren en simpelweg het negatieve deel van de frequenties weggooien voordat je het spectrogram plot. Je kunt het volgende signaal als voorbeeld gebruiken, een enkele toon met witte ruis:
 
 .. code-block:: python
 

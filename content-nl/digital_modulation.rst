@@ -147,7 +147,7 @@ In de praktijk maakt het niet echt uit welke modulus je gebruikt; een hogere waa
    :align: center 
 
 Het bovenstaande IQ-diagram laat zien wat, of eigenlijk de set van symbolen waaruit, we versturen.
-Het laat de draaggolf niet zien, dus je kunt dit zien als een basisband-symbolen.
+Het laat de draaggolf niet zien, dus je kunt dit zien als basisband-symbolen.
 Wanneer we voor een modulatieschema de mogelijke set van symbolen laten zien, noemen we dat de "constellatie". 
 Vele modulatieschema’s kunnen door hun constellaties worden gedefinieerd.
 
@@ -242,7 +242,7 @@ Frequency Shift Keying (FSK)
 ****************************
 
 De laatste op ons lijstje is Frequency Shift Keying (FSK) (Nederlands: Frequentieverschuivingsmodulatie).
-FSK is niet moeilijk te vatten -- we schuiven tussen N frequenties waarbij elke frequentie een symbool voor stelt. Omdat we een draaggolf moduleren, is het eigenlijk de draaggolffrequentie +/- deze N frequenties. Als we bijv. een draaggolf hebben van 1.2 GHz, dan zouden we kunnen schuiven tussen deze vier frequenties:
+FSK is niet moeilijk te vatten -- we schuiven tussen N frequenties waarbij elke frequentie een symbool voorstelt. Omdat we een draaggolf moduleren, is het eigenlijk de draaggolffrequentie +/- deze N frequenties. Als we bijv. een draaggolf hebben van 1.2 GHz, dan zouden we kunnen schuiven tussen deze vier frequenties:
 
 1. 1.2005 GHz
 2. 1.2010 GHz
@@ -284,13 +284,13 @@ Differentiële Codering
 .. 
    todo - This chapter  has a bunch of terms that haven't come up yet in the book, this doesn't help readers understand the material. Also the bitsequence in the text didn't correspond with the image, another possible source of confusion.
 Je zult waarschijnlijk in de meeste draadloze (en bedraade) communicatieprotocollen tegen iets aanlopen wat differentiële codering wordt genoemd.
-Om het nut hiervan aan te tonen gaan we kijken naar de ontvangst van een BPSK-signaal.
+Om het nut hiervan aan te tonen, gaan we kijken naar de ontvangst van een BPSK-signaal.
 Zoals eerder verteld, wanneer dit signaal door de lucht vliegt ervaart het een willekeurige vertraging tussen zender en ontvanger, dit veroorzaakt een willekeurige draaiing/rotatie in de constellatie.
 De ontvanger zal nu proberen te synchroniseren en de BPSK uit te lijnen met de I-as, maar het heeft geen idee of het 180 graden uit fase loopt of niet, de constellaties zien er exact hetzelfde uit.
 
 .. 
    todo - this is confusing, talking about clusters the reader hasn't even encountered yet. Same with coherent receivers, this hasn't been mentioned yet before
-In plaats van absolute symbolen te versturen om absolute aan te geven wat een 1 of 0 voorstelt, kan het kiezen om differentiële codering toe te passen en zich hier niet eens zorgen om te maken.
+In plaats van absolute symbolen te versturen om absoluut aan te geven wat een 1 of 0 voorstelt, kan het kiezen om differentiële codering toe te passen en zich hier niet eens zorgen om te maken.
 
 ..
    De differentiële codering stelt ons ook in staat om niet-coherente ontvangers te gebruiken, welke simpeler zijn dan coherente ontvangers.
@@ -302,8 +302,8 @@ Laten we naar een voorbeeld kijken om aan te geven hoe dit werkt.
 Stel we versturen [1, 1, 0, 0, 1, 1, 1] met BPSK.
 We beginnen de uitgangsreeks met een 1; dit maakt niets uit, 1 of 0.
 Na het toepassen van de differentiële codering versturen we uiteindelijk [1, 0, 1, 1, 1, 0, 1, 0].
-De 1'en en 0'en worden nog steeds aan de positieve (1+0j) en negatieve (-1+0j) symbolen gekoppeld zoals eerder.
-Dit is makkelijker voor te stellen wanner we de in- en uitgangsreeksen op elkaar stapelen:
+De 1'en en 0'en worden nog steeds aan de positieve (1+0j) en negatieve (-1+0j) symbolen gekoppeld.
+Dit is makkelijker voor te stellen wanneer we de in- en uitgangsreeksen op elkaar stapelen:
 
 .. image:: ../_images/differential_coding.svg
    :align: center
@@ -313,7 +313,7 @@ Het grote nadeel van differentiële codering is dat een verkeerde bit tot twee b
 Een alternatief voor differentiële codering is om periodiek piloot-symbolen te sturen, dit zijn symbolen die de ontvanger al kent, hiermee zou de ontvanger kunnen herkennen of er een faseverschuiving van 180 graden heeft plaatsgevonden. 
 Het probleem met deze oplossing is dat een draadloos kanaal snel kan veranderen, helemaal als de zender/ontvanger in beweging zijn, dus dan moet je die piloot-symbolen vaak genoeg versturen om dit te kunnen verhelpen.
 Differentiële codering is veel eenvoudiger om te implementeren, dus als eenvoud belangrijker is dan hier en daar een verloren bit, dan zal dit de voorkeur hebben. 
-In het :ref:`rds-chapter` behandelen we RDS, dit gebruikt dus de (minder complexe) differentiële codering.
+In het :ref:`rds-chapter`hoofdstuk, behandelen we RDS, dit gebruikt dus de (minder complexe) differentiële codering.
 
 *******************
 Python Voorbeeld
@@ -361,8 +361,8 @@ We gaan wat ruis toevoegen:
    :align: center
    :target: ../_images/qpsk_python2.svg
 
-De additieve witte Guassian ruis (AWGN) veroorzaakt een spreiding rondom elk constellatiepunt.
-Ruis wordt behandeld in het :ref:`gaussian noise` hoofdstuk.
+De additieve witte Gaussische ruis (AWGN) veroorzaakt een spreiding rondom elk constellatiepunt.
+Ruis wordt behandeld in het :ref:`Gaussische ruis` hoofdstuk.
 Het punt is, als er te veel ruis wordt toegevoegd dan zullen sommige symbolen/samples over de grens (de vier kwadranten) gaan en incorrect geïnterpreteerd worden.
 Probeer dit zelf uit door het ruisvermogen toe te laten nemen.
 

@@ -10,7 +10,7 @@ We introduceren in dit hoofdstuk een concept genaamd IQ-sampling, of complex sam
 Basis van samplen
 *************************
 
-Voordat we naar IQ-sampling springen gaan we eerst discussiëren wat samplen eigenlijk inhoudt. Je bent waarschijnlijk al tegen samplen aangelopen zonder dat je het door had door audio op te nemen met een microfoon. De microfoon is de omvormer dat geluidsgolven omzet naar een elektrisch signaal (een spanningsniveau). Het elektrische signaal wordt omgezet door een Analoog-naar-Digitaal omzetter (ADC) en produceert een digitale versie van de geluidsgolf. Om het nog simpeler te maken, de microfoon vangt de geluidsgolven op en zet deze om naar elektriciteit, de elektriciteit wordt vervolgens omgezet in getallen. De ADC gedraagt zich als een brug tussen de analoge en digitale domeinen. SDR's werken bijna hetzelfde. In plaats van een microfoon gebruiken ze een antenne, maar ze gebruiken ook ADC's. In beide gevallen wordt het spanningsniveau gesampled door een ADC. In het geval van een SDR is het radiogolven erin, getallen eruit.
+Voordat we naar IQ-sampling springen, gaan we eerst discussiëren wat samplen eigenlijk inhoudt. Je bent waarschijnlijk al tegen samplen aangelopen zonder dat je het door had, door audio op te nemen met een microfoon. De microfoon is de omvormer dat geluidsgolven omzet naar een elektrisch signaal (een spanningsniveau). Het elektrische signaal wordt omgezet door een Analoog-naar-Digitaal omzetter (ADC) en produceert een digitale versie van de geluidsgolf. Om het nog simpeler te maken, de microfoon vangt de geluidsgolven op en zet deze om naar elektriciteit, de elektriciteit wordt vervolgens omgezet in getallen. De ADC gedraagt zich als een brug tussen de analoge en digitale domeinen. SDR's werken bijna hetzelfde. In plaats van een microfoon gebruiken ze een antenne, maar ze gebruiken ook ADC's. In beide gevallen wordt het spanningsniveau gesampled door een ADC. In het geval van een SDR is het radiogolven erin, getallen eruit.
 
 Of we het hebben over geluids- of radiogolven, we moeten samplen als we een signaal digitaal willen opvangen, bewerken of opslaan. Dit samplen lijkt recht-door-zee maar er zit veel achter. Een meer technische manier om hierover na te denken is het pakken van waarden op vaste momenten in de tijd en die digitaal opslaan. Stel we hebben een willekeurige functie, :math:`S(t)`, kan alles voorstellen, en het is een continue functie dat we willen samplen:
 
@@ -25,12 +25,12 @@ Voor diegene die liever de wiskunde zien; Laat :math:`S_n` het sample :math:`n` 
 Nyquist samplen
 *************************
 
-De grote vraag is altijd hoe snel we een gegeven signaal moeten samplen? Laten we eens kijken naar een signaal wat slechts een sinus is van frequentie f. Deze is in het groen hieronder te zien. Stel we samplen dit met een snelheid van Fs (samples zijn blauw). Wanneer we dat signaal samplen op een snelheid van f (dus Fs=f) dan krijgen we iets als dit:
+De grote vraag is altijd hoe snel we een gegeven signaal moeten samplen? Laten we eens kijken naar een signaal wat bestaat uit een sinus met frequentie f. Deze is in het groen hieronder te zien. Stel we samplen dit met een snelheid van Fs (samples zijn blauw). Wanneer we dat signaal samplen op een snelheid van f (dus Fs=f) dan krijgen we iets als dit:
 
 .. image:: ../_images/sampling_Fs_0.3.svg
    :align: center 
 
-De rode lijn in het bovenstaande figuur reconstrueert een andere (verkeerde) functie dat mogelijk is met de opgeslagen samples. Dit geeft aan dat onze sample-nelheid te langzaam is, want de samples zouden kunnen toebehoren aan twee verschillende functies. Als we het originele signaal accuraat willen reconstrueren kunnen we deze ambiguïteit niet gebruiken. 
+De rode lijn in het bovenstaande figuur reconstrueert een andere (verkeerde) functie, wat mogelijk is met de opgeslagen samples. Dit geeft aan dat onze sample-snelheid te langzaam is, want de samples zouden kunnen toebehoren aan twee verschillende functies. Als we het originele signaal accuraat willen reconstrueren kunnen we deze ambiguïteit niet gebruiken. 
 
 We gaan iets sneller samplen op Fs = 1.2f:
 
@@ -38,14 +38,14 @@ We gaan iets sneller samplen op Fs = 1.2f:
 .. image:: ../_images/sampling_Fs_0.36.svg
    :align: center 
 
-Nog steeds zou een ander signaal passen op deze samples. Deze ambiguïteit houdt in dat als iemand ons deze lijst van samples zou geven we geen onderscheid zouden kunnen maken welke het originele signaal was.
+Nog steeds zou een ander signaal passen op deze samples. Deze ambiguïteit houdt in dat als iemand ons deze lijst van samples zou geven, we geen onderscheid zouden kunnen maken welke het originele signaal was.
 
 Wat als we samplen op Fs = 1.5f:
 
 .. image:: ../_images/sampling_Fs_0.45.svg
    :align: center 
 
-Nog steeds niet genoeg! Volgens een stuk DSP-theorie waar we niet dieper op in gaan, moet je samplen met tenminste **twee** keer de frequentie van het signaal om deze ambiguïteit te kunnen voorkomen:
+Nog steeds niet genoeg! Volgens een stuk DSP-theorie, waar we niet dieper op in gaan, moet je samplen met tenminste **twee** keer de frequentie van het signaal om deze ambiguïteit te kunnen voorkomen:
 
 .. image:: ../_images/sampling_Fs_0.6.svg
    :align: center 
@@ -57,7 +57,7 @@ Het bovenstaande signaal bestond slechts uit een sinus, meeste signalen bestaan 
 .. image:: ../_images/max_freq.svg
    :align: center 
    
-We moeten het hoogste frequentiecomponent vinden, verdubbelen, en op die snelheid of sneller samples nemen. De minimale snelheid waarmee we kunnen samplen wordt de Nyquist snelheid genoemd. In andere woorden, de Nyquist snelheid is de minimale snelheid waarop een signaal gesampled moet worden om alle informatie te behouden. Deze eigenschap is een extreem belangrijk stuk theorie binnen de DSP en SDR en dient als een brug tussen continue en discrete signalen.
+We moeten de hoogste frequentiecomponent vinden, verdubbelen, en op die snelheid of sneller samples nemen. De minimale snelheid waarmee we kunnen samplen wordt de Nyquist snelheid genoemd. In andere woorden, de Nyquist snelheid is de minimale snelheid waarop een signaal gesampled moet worden om alle informatie te behouden. Deze eigenschap is een extreem belangrijk stuk theorie binnen de DSP en SDR en dient als een brug tussen continue en discrete signalen.
 
 .. image:: ../_images/nyquist_rate.png
    :scale: 70% 
@@ -69,7 +69,10 @@ Wanneer we te langzaam samplen krijgen we een effect genaamd aliasing (Nederland
 Kwadratuursamplen
 *************************
 
-De term "kwadratuur" betekent veel, maar in de context van DSP en SDR verwijst het naar twee golven die 90 graden uit fase lopen. Waarom 90 graden uit fase? Denk eraan dat wanneer twee golven 180 graden uit fase lopen ze in feite dezelfde golf zijn maar vermenigvuldigt met -1. Door 90 graden uit fase te lopen worden de signalen orthogonaal, en er zijn een hoop coole dingen die je kunt doen met orthogonale functies. Voor het gemak gebruiken we een sinus en cosinus voor onze golven die 90 graden uit fase lopen.
+De term "kwadratuur" betekent veel, maar in de context van DSP en SDR verwijst het naar twee golven die 90 graden uit fase lopen. 
+Waarom 90 graden uit fase? 
+Denk eraan dat wanneer twee golven 180 graden uit fase lopen, ze in feite dezelfde golf zijn, maar vermenigvuldigt met -1. 
+Door 90 graden uit fase te lopen worden de signalen orthogonaal, en er zijn een hoop coole dingen die je kunt doen met orthogonale functies. Voor het gemak gebruiken we een sinus en cosinus voor onze golven die 90 graden uit fase lopen.
 
 Laten we nu variabelen gebruiken om de **amplitude** van de sinus en cosinus aan te geven. We zullen :math:`I` voor de cos() en :math:`Q` voor sin() gebruiken:
 
@@ -99,7 +102,7 @@ Wat zou er gebeuren wanneer we een sinus en cosinus optellen? Of eigenlijk, wat 
 
 (De code voor deze Python app kun je hier vinden: `link <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
 
-Wat je hier uit moet onthouden is dat wanneer de cos() en sin() worden opgeteld, we een andere zuivere sinusoïde krijgen met een andere fase en amplitude. Daarnaast verschuift de fase wanneer we langzaam een van de twee delen groter of kleiner maken. De amplitude verandert ook mee. Dit is allemaal het gevolg van de goniometrische identiteit: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, waar we dadelijk op terug komen.  Het "nut" van dit gedrag is dat we de fase en amplitude van de resulterende sinusoïde kunnen controleren door I en Q aan te passen (we hoeven niets de doen met de fase van cosinus of sinus). We kunnen bijvoorbeeld I en Q aanpassen op zo'n manier dat de amplitude constant blijft en de fase wordt wat we ook zouden willen. Omdat we weten dat we een sinusoïde signaal moeten versturen om het door de lucht te laten vliegen als een elektromagnetische golf, is deze mogelijkheid voor een zender extreem handig. Het is daarnaast veel makkelijker om twee amplitudes aan te passen en een optelling uit te voeren dan amplitude en fase moeten aanpassen. Het resultaat is de onze zender er ongeveer zo uit zal zien:
+Wat je hier uit moet onthouden is dat wanneer de cos() en sin() worden opgeteld, we een andere zuivere sinusoïde krijgen met een andere fase en amplitude. Daarnaast verschuift de fase wanneer we langzaam een van de twee delen groter of kleiner maken. De amplitude verandert ook mee. Dit is allemaal het gevolg van de goniometrische identiteit: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, waar we dadelijk op terug komen.  Het "nut" van dit gedrag is dat we de fase en amplitude van de resulterende sinusoïde kunnen controleren door I en Q aan te passen (we hoeven niets de doen met de fase van cosinus of sinus). We kunnen bijvoorbeeld I en Q aanpassen op zo'n manier dat de amplitude constant blijft en de fase wordt wat we ook zouden willen. Omdat we weten dat we een sinusoïde signaal moeten versturen om het door de lucht te laten vliegen als een elektromagnetische golf, is deze mogelijkheid voor een zender extreem handig. Het is daarnaast veel makkelijker om twee amplitudes aan te passen en een optelling uit te voeren, dan amplitude en fase moeten aanpassen. Het resultaat is de onze zender er ongeveer zo uit zal zien:
 
 .. image:: ../_images/IQ_diagram.png
    :scale: 80% 
@@ -123,7 +126,7 @@ Een complex getal is niets meer dan twee getallen die samen zijn gevoegd, een re
    :scale: 70% 
    :align: center
 
-Een sinusoïde op deze manier weergeven heet een "fasor diagram". We plotten simpelweg de complexe getallen en behandelen ze als vectoren. Maar was is nu de modulus en fase van ons complexe getal 0.7-0.4j? Voor een gegeven complex getal waar :math:`a` het reële deel is en :math:`b` het imaginaire:
+Een sinusoïde op deze manier weergeven heet een "fasor diagram". We plotten simpelweg de complexe getallen en behandelen ze als vectoren. Maar wat is nu de modulus en fase van ons complexe getal 0.7-0.4j? Voor een gegeven complex getal waar :math:`a` het reële deel is en :math:`b` het imaginaire:
 
 .. math::
   \mathrm{modulus} = \sqrt{a^2 + b^2} = 0.806
@@ -156,7 +159,7 @@ Zelfs al zijn met een complex getal gestart, we versturen iets reëels, wat goed
 **************************
 Complexe getallen bij FFTs
 **************************
-We gingen bij de bovenstaande complexe getallen ervan uit dat het samples waren uit het tijddomein, maar je komt ook complexe getallen tegen bij het gebruik van een FFT. Toen we de Fourierreeks en FFT vorig hoofdstuk behandelden hebben we nog niet naar complexe getallen gekeken. Wanneer je de FFT neemt van een serie samples dan geeft dat de frequentiedomein-representatie. We hebben het erover gehad hoe de FFT uitvindt welke frequenties in een serie samples zitten (de modulus van de FFT gaf de kracht van elke frequentie aan). Maar wat de FFT daarnaast doet, is de vertraging (in de tijd) uitvogelen die op elk van deze frequenties toegepast moet worden, zodanig dat de set van sinusoïden opgeteld kunnen worden om het tijddomein-signaal weer te reconstrueren. Die vertraging is simpelweg de fase van de FFT. De uitgang van de FFT is een array van complexe getallen waarbij elk complex getal een modulus en fase geeft en de index van dat getal de frequentie. Als je dus sinusoïden genereert met die frequenties/fases/amplitudes en bij elkaar optelt, dan krijg je het originele tijddomein-signaal weer (of iets wat er erg op lijkt, en dat is waar Nyquist om de hoek komt).
+We gingen bij de bovenstaande complexe getallen ervan uit dat het samples waren uit het tijddomein, maar je komt ook complexe getallen tegen bij het gebruik van een FFT. Toen we de Fourierreeks en FFT vorig hoofdstuk behandelden hebben we nog niet naar complexe getallen gekeken. Wanneer je de FFT neemt van een serie samples dan geeft dat de frequentiedomein-representatie. We hebben het erover gehad hoe de FFT uitvindt welke frequenties in een serie samples zitten (de modulus van de FFT gaf de kracht van elke frequentie aan). Maar wat de FFT daarnaast doet, is de vertraging (in de tijd) uitvogelen die op elk van deze frequenties toegepast moet worden, zodanig dat de set van sinusoïden opgeteld kunnen worden om het tijddomein-signaal weer te reconstrueren. Die vertraging is simpelweg de fase van de FFT. De uitgang van de FFT is een array van complexe getallen waarbij elk complex getal een modulus en fase geeft en de index van dat getal de frequentie. Als je dus sinusoïden genereert met die frequenties/fases/amplitudes en bij elkaar optelt, dan krijg je het originele tijddomein-signaal weer terug (of iets wat er erg op lijkt, en dat is waar Nyquist bij komt kijken).
 
 *************************
 Ontvangende kant
@@ -171,9 +174,9 @@ Er komt een reëel signaal onze antenne binnen, deze wordt omgezet in IQ waarden
 
 Als iemand jou een stapel IQ-samples geeft, zal dat op een 1D array/vector lijken van complexe getallen. Dit punt, complex of niet, is waar dit hele hoofdstuk naar toe heeft gebouwd, en we zijn er eindelijk.
 
-Door dit hele boek door zul je **super** bekend raken met hoe IQ-samples werken, hoe je die ontvangt en verstuurt met een SDR, hoe je ze verwerkt in Python en hoe je ze kunt opslaan in een bestand voor later.
+Door dit hele boek door, zul je **super** bekend raken met hoe IQ-samples werken, hoe je die ontvangt en verstuurt met een SDR, hoe je ze verwerkt in Python en hoe je ze kunt opslaan in een bestand voor later.
 
-Nog een laatste belangrijke opmerking: Het figuur hierboven laat zien wat er **binnen** de SDR gebeurt. We hoeven niet zelf een sinus te generen, op te schuiven met 90 graden, vermenigvuldigen of toevoegen -- de SDR doet dat voor ons. We vertellen de SDR op welke frequentie we willen samplen, of op welke frequentie we willen versturen. Aan de ontvangende kant zal de SDR ons voorzien van IQ-samples. Aan de kant van de zender moeten we de IQ-samples aanbieden. Dit zal van het datatype complexe ints of floats zijn.   
+Nog een laatste belangrijke opmerking: Het figuur hierboven laat zien wat er **binnen** de SDR gebeurt. We hoeven niet zelf een sinus te genereren, op te schuiven met 90 graden, vermenigvuldigen of toevoegen -- de SDR doet dat voor ons. We vertellen de SDR op welke frequentie we willen samplen, of op welke frequentie we willen versturen. Aan de ontvangende kant zal de SDR ons voorzien van IQ-samples. Aan de kant van de zender moeten we de IQ-samples aanbieden. Dit zal van het datatype complexe ints of floats zijn.   
    
 *************************************
 Draaggolven en frequentieverschuiving
@@ -194,13 +197,13 @@ Tot nu toe hebben we de frequentie nog niet behandelt, maar er was wel een :math
 ..    :align: center
    
 Ter referentie, radiosignalen zoals FM-radio, WiFi, Bluetooth, LTE, GPS, etc., gebruiken meestal een frequentie (dus een draaggolf) tussen de 100 MHz en 6 GHz.  
-Deze frequenties vliegen erg goed door de lucht, maar hebben niet een superlange antenne nodig of een hoop vermogen om te versturen of te ontvangen. Jouw magnetron maakt het eten warm met elektromagnetische golven op 2.5 GHz. Als de deur signalen zou lekken dan zou de magnetron jouw WiFi verstoren en misschien je huid verbranden. Een ander vorm van elektromagnetische golven is licht. Zichtbaar licht heeft een frequentie rond de 500 THz. Dit is zo hoog dat we geen antennes nodig hebben om licht te versturen. We gebruiken methoden zoals halfgeleider leds. Ze creëren licht wanneer een elektron tussen de atomaire banen van het halfgeleider materiaal springt, en de afstand die wordt gesprongen bepaalt de kleur. Technisch gezien worden frequenties tussen de 20 kHz en 300 GHz beschouwt als radiofrequenties (RF). Dit zijn de frequenties waarbij de energie van een oscillerende stroom door een geleider (antenne) uit kan stralen en door de ruimte bewegen. De meest nuttige frequenties voor moderne toepassingen liggen tussen de 100 MHz en 6 GHz. De frequenties daarboven wordt al decennia gebruikt door radar en satellietcommunicatie en worden nu ook toegepast in 5G "mmWave" (24 - 29 GHz) om de lagere frequenties een helpende hand te bieden en de snelheid te verhogen.
+Deze frequenties vliegen erg goed door de lucht, maar hebben niet een superlange antenne nodig of een hoop vermogen om te versturen of te ontvangen. Jouw magnetron maakt het eten warm met elektromagnetische golven op 2.5 GHz. Als de deur signalen zou lekken dan zou de magnetron jouw WiFi verstoren en misschien je huid verbranden. Een andere vorm van elektromagnetische golven is licht. Zichtbaar licht heeft een frequentie rond de 500 THz. Dit is zo hoog dat we geen antennes nodig hebben om licht te versturen. We gebruiken methoden zoals halfgeleider leds. Ze creëren licht wanneer een elektron tussen de atomaire banen van het halfgeleider materiaal springt, en de afstand die wordt gesprongen bepaalt de kleur. Technisch gezien worden frequenties tussen de 20 kHz en 300 GHz beschouwt als radiofrequenties (RF). Dit zijn de frequenties waarbij de energie van een oscillerende stroom door een geleider (antenne) uit kan stralen en door de ruimte bewegen. De meest nuttige frequenties voor moderne toepassingen liggen tussen de 100 MHz en 6 GHz. De frequenties daarboven wordt al decennia gebruikt door radar en satellietcommunicatie en worden nu ook toegepast in 5G "mmWave" (24 - 29 GHz) om de lagere frequenties een helpende hand te bieden en de snelheid te verhogen.
 
 Wanneer we onze IQ-waarden snel veranderen en via onze draaggolf versturen wordt dit het "moduleren" van de draaggolf genoemd (met data of wat we ook willen). Wanneer we de I en Q aanpassen veranderen we dus de fase en amplitude van de draaggolf. Een andere optie is om de frequentie van de draaggolf aan te passen, dus een beetje hoger of lager, dat is wat een FM-zender doet.
 
 Stel, als een simpel voorbeeld, we versturen het IQ sample 1+0j en vervolgens 0+1j. Dan gaan we van :math:`\cos(2\pi ft)` versturen naar :math:`\sin(2\pi ft)`, wat betekent dat onze draaggolf 90 graden van fase verandert wanneer we schakelen van het ene naar het andere sample.
 
-Nu even terug naar samplen. Wat als we in plaats van samples ontvangen door het antennesignaal te vermenigvuldigen met een cos() en sin() en I en Q op te nemen, we het antennesignaal direct in een ADC zouden stoppen zoals we het hoofdstuk zijn begonnen. Stel de draaggolf is 2.4 GHz, zoals van WiFi of Bluetooth. Zoals we geleerd hebben zou dat betekenen dat we op 4.8 GHz moeten samplen. Dat is extreem snel! En een ADC die zo snel kan samplen kost duizenden euro's. In plaats hiervan verschuiven we het signaal eerst naar "beneden" zodat het signaal dat we willen samplen gecentreerd is rond DC of 0 Hz. Deze verschuiving vindt plaats voor het samplen. We gaan van:
+Nu even terug naar samplen. Wat als we in plaats van samples ontvangen door het antennesignaal te vermenigvuldigen met een cos() en sin() en I en Q op te nemen, we het antennesignaal direct in een ADC zouden stoppen zoals we het hoofdstuk zijn begonnen. Stel de draaggolf is 2.4 GHz, zoals van WiFi of Bluetooth. Zoals we geleerd hebben zou dat betekenen dat we op 4.8 GHz moeten samplen. Dat is extreem snel! En een ADC die zo snel kan samplen kost duizenden euro's. In plaats hiervan verschuiven we het signaal eerst naar "beneden" zodat het signaal dat we willen samplen, gecentreerd is rond DC of 0 Hz. Deze verschuiving vindt plaats voor het samplen. We gaan van:
 
 .. math::
   I \cos(2\pi ft)
@@ -220,22 +223,22 @@ Laten we kijken hoe dit in het frequentiedomein eruitziet:
 
 Wanneer we gecentreerd zouden zijn rond 0 Hz dan is de maximale frequentie niet langer 2.4 GHz maar afhankelijk van het signaal zelf, gezien we de draaggolf hebben verwijderd. De meeste signalen hebben tussen de 100 kHz en 40 MHz bandbreedte, dus door de verschuiving kunnen we samplen op een *veel* lagere snelheid. Zowel de B2X0 USRP's en PlutoSDR bevatten een RF IC die kan samplen op een frequentie tot 56 MHz, wat hoog genoeg is voor de meeste signalen die we tegen zullen komen.
 
-Om te herhalen, dit proces van verschuiven doet onze SDR; als gebruiker van de SDR hoeven we niets anders te doen dan af te stemmen op de juiste frequentie. Het verschuiven naar benden (en boven) wordt gedaan door een component genaamd mixer, meestal weergeven in diagrammen met een vermenigvuldigingssymbool in een cirkel. De mixer neemt een signaal aan de ingang en geeft een verschoven signaal aan de uitgang, en een derde signaal waar een oscillator op aan wordt gesloten. De frequentie van de oscillator bepaalt de frequentieverschuiving dat op het signaal wordt toegepast. De mixer is in essentie een vermenigvuldiging (herinner dat vermenigvuldigen met een sinusoïde een frequentieverschuiving veroorzaakt).
+Om te herhalen, dit proces van verschuiven doet onze SDR; als gebruiker van de SDR hoeven we niets anders te doen dan af te stemmen op de juiste frequentie. Het verschuiven naar beneden (en boven) wordt gedaan door een component genaamd mixer, meestal weergeven in diagrammen met een vermenigvuldigingssymbool in een cirkel. De mixer neemt een signaal aan de ingang en geeft een verschoven signaal aan de uitgang, en een derde signaal waar een oscillator op aan wordt gesloten. De frequentie van de oscillator bepaalt de frequentieverschuiving dat op het signaal wordt toegepast. De mixer is in essentie een vermenigvuldiging (herinner dat vermenigvuldigen met een sinusoïde een frequentieverschuiving veroorzaakt).
 
-Als laatste vraag je misschien af hoe snel signalen door de lucht bewegen. Herinner van de middelbare school natuurkundelessen dat radiogolven gewoon elektromagnetische golven zijn op lage frequenties (ergens tussen de 3 kHz en 80 GHz). Zichtbaar licht is een vorm van elektromagnetische golven, maar op veel hogere frequenties (400 THz tot 700 THz). Alle elektromagnetische golven bewegen zich met de lichtsnelheid, ongeveer 3e8m/s in de lucht of vacuüm. Omdat de snelheid altijd gelijk is, is de afstand die een enkele periode van de golf aflegt, afhankelijk van zijn frequentie. Dit noemen we de golflengte, aangegeven als :math:`\lambda`. Deze relatie heb je vast eerder gezien:
+Als laatste vraag je je misschien af hoe snel signalen door de lucht bewegen. Herinner van de middelbare school natuurkundelessen dat radiogolven gewoon elektromagnetische golven zijn op lage frequenties (ergens tussen de 3 kHz en 80 GHz). Zichtbaar licht is een vorm van elektromagnetische golven, maar op veel hogere frequenties (400 THz tot 700 THz). Alle elektromagnetische golven bewegen zich met de lichtsnelheid, ongeveer 3e8m/s in de lucht of vacuüm. Omdat de snelheid altijd gelijk is, is de afstand die een enkele periode van de golf aflegt, afhankelijk van zijn frequentie. Dit noemen we de golflengte, aangegeven als :math:`\lambda`. Deze relatie heb je vast eerder gezien:
 
 .. math::
  f = \frac{c}{\lambda}
 
 Hier is :math:`c` de lichtsnelheid, meestal 3e8 wanneer :math:`f` in Hz wordt uitgedrukt en :math:`\lambda` in meters.  
 In de draadloze communicatie is deze relatie belangrijk omdat wanneer we naar antennes kijken, om een bepaalde draaggolf te kunnen ontvangen, je een antenne nodig hebt die overeenkomt met de golflengte, :math:`\lambda`. Meestal is de antenne :math:`\lambda/2` of :math:`\lambda/4` in lengte.  Maar, onafhankelijk van de frequentie/golflengte, de informatie gedragen door dat signaal zal zich tussen zender en ontvanger altijd voortplanten met de snelheid van het licht. 
-Om deze vertraging door de lucht te berekenen kun je een vuistregel gebruiken; licht legt ongeveer :math:`\frac{1}{3}m` per nanoseconde af. Een ander vuistregel is dat het signaal van een satelliet in geostationaire baan er ongeveer 0.25 seconden erover doet om de aarde te bereiken.
+Om deze vertraging door de lucht te berekenen kun je een vuistregel gebruiken; licht legt ongeveer :math:`\frac{1}{3}m` per nanoseconde af. Een andere vuistregel is dat het signaal van een satelliet in geostationaire baan er ongeveer 0.25 seconden erover doet om de aarde te bereiken.
 
 ***************************
 Architectuur van ontvangers
 ***************************
 
-Het figuur uit de "ontvangende kant" sectie, laat zien hoe het signaal wordt verschoven en opgesplitst in I en Q. Deze opstelling wordt een "directe omzetting" genoemd, of "nul IF", want de RF-frequenties worden direct neerwaarts omgezet naar de laagfrequente "basisband" (Engels: baseband). Nog een optie is om de frequentieverschuiving niet te doen en zo snel te samplen dat het alles opvangt tussen 0 Hz en 1/2 de sample-frequentie. Dit heet "direct samplen" of "directe RF" en heeft een extreem dure ADC-chip nodig. Een derde architectuur waar veel oude radio's op werken heet "superheterodyne". Deze voert ook frequentieverschuiving uit maar niet naar 0 Hz. Het schuift het signaal naar een middenfrequentie of "intermediate frequency" (IF). Een low-noise amplifier (LNA) (Nederlands: lage ruis versterker) is simpelweg een versterker die is ontworpen om met hele lage ingangsvermogens te werken. Hier zijn de blokdiagrammen van de drie architectuuropstellingen (er bestaan hier ook variaties op):
+Het figuur uit de "ontvangende kant" sectie, laat zien hoe het signaal wordt verschoven en opgesplitst in I en Q. Deze opstelling wordt een "directe omzetting" genoemd, of "nul IF", want de RF-frequenties worden direct neerwaarts omgezet naar de laagfrequente "basisband" (Engels: baseband). Nog een optie is om de frequentieverschuiving niet te doen en zo snel te samplen, dat het alles opvangt tussen 0 Hz en 1/2 de sample-frequentie. Dit heet "direct samplen" of "directe RF" en heeft een extreem dure ADC-chip nodig. Een derde architectuur waar veel oude radio's op werken, heet "superheterodyne". Deze voert ook frequentieverschuiving uit maar niet naar 0 Hz. Het schuift het signaal naar een middenfrequentie of "intermediate frequency" (IF). Een low-noise amplifier (LNA) (Nederlands: lage ruis versterker) is simpelweg een versterker die is ontworpen om met hele lage ingangsvermogens te werken. Hier zijn de blokdiagrammen van de drie architectuuropstellingen (er bestaan hier ook variaties op):
 
 .. image:: ../_images/receiver_arch_diagram.svg
    :align: center
@@ -243,7 +246,7 @@ Het figuur uit de "ontvangende kant" sectie, laat zien hoe het signaal wordt ver
 ***********************************
 Basisband- en Banddoorlaatsignalen
 ***********************************
-We noemen de band waar het signaal rond de 0 Hz zit de "basisband". Andersom, "bandoorlaat" refereert naar wanneer een signaal nergens in de buurt van de 0 Hz zit, maar omhoog is geschoven met draadloze transmissie als doel. Iets als een *basisbandtransmissie* bestaat niet, want je kunt niet iets imaginairs versturen. Een signaal in de basisband kan perfect gecentreerd zijn rond 0 Hz net als de rechterkant van figuur :numref:`verschuiving`. Het signaal kan ook *in de buurt* van 0 Hz zitten, zoals de twee signalen hieronder. Die signalen worden nog steeds opgevat als basisband. Er is ook een banddoorlaatsignaal weergeven, gecentreerd op een erg hoge frequentie :math:`f_c`.
+We noemen de band waar het signaal rond de 0 Hz zit de "basisband". Andersom, "bandoorlaat" refereert naar wanneer een signaal nergens in de buurt van de 0 Hz zit, maar omhoog is geschoven met draadloze transmissie als doel. Iets als een *basisbandtransmissie* bestaat niet, want je kunt niet iets imaginairs versturen. Een signaal in de basisband kan perfect gecentreerd zijn rond 0 Hz net als de rechterkant van figuur :numref:`verschuiving`. Het signaal kan ook *in de buurt* van 0 Hz zitten, zoals de twee signalen hieronder. Die signalen worden nog steeds opgevat als basisband. Er is ook een banddoorlaatsignaal weergegeven, gecentreerd op een erg hoge frequentie :math:`f_c`.
 
 .. image:: ../_images/baseband_bandpass.png
    :scale: 50% 
@@ -251,7 +254,7 @@ We noemen de band waar het signaal rond de 0 Hz zit de "basisband". Andersom, "b
 
 Misschien ben je ook de term "intermediate frequency" (IF) of tussenfrequentie tegengekomen; zie IF voor nu als een tussenstap tussen de basisband en RF/bandoorlaatband.
 
-We maken, analyseren of slaan signalen op vanuit de basisband zodat we op een lagere sample-frequentie kunnen werken (zoals eerder uitgelegd). Hierbij is het belangrijk op te merken dat basisbandsignalen meestal complex zijn, terwijl bandoorlaatsignalen (dus te versturen RF signalen) reëel zijn. Als je erover nadenkt: signalen die door een antenne gaan moeten reëel zijn, je kunt geen complex/imaginair signaal uitzenden. Wanneer het negatieve en positieve deel van het frequentiespectrum niet precies hetzelfde zijn, dan weet je zeker dat het signaal complex is. Negatieve frequenties worden immers weergeven met complexe getallen. In de werkelijkheid bestaan negatieve frequenties niet, alleen frequenties onder de draaggolf. 
+We maken, analyseren of slaan signalen op vanuit de basisband zodat we op een lagere sample-frequentie kunnen werken (zoals eerder uitgelegd). Hierbij is het belangrijk op te merken dat basisbandsignalen meestal complex zijn, terwijl bandoorlaatsignalen (dus te versturen RF signalen) reëel zijn. Als je erover nadenkt: signalen die door een antenne gaan moeten reëel zijn, je kunt geen complex/imaginair signaal uitzenden. Wanneer het negatieve en positieve deel van het frequentiespectrum niet precies hetzelfde zijn, dan weet je zeker dat het signaal complex is. Negatieve frequenties worden immers met complexe getallen weergegeven. In de werkelijkheid bestaan negatieve frequenties niet, alleen frequenties onder de draaggolf. 
 
 Eerder speelden we met het complexe punt 0.7 - 0.4j, dat was in feite een sample van een basisbandsignaal. In de meeste gevallen, als je complexe samples (IQ-samples) ziet, ben je in de basisband bezig. Vanwege de hoeveelheid data dat het in beslag zou nemen, worden signalen zelden opgeslagen op RF-frequenties, en om het feit dat we meestal alleen geïnteresseerd zijn in een smal deel van het RF spectrum.
 
@@ -268,11 +271,11 @@ Hier is een voorbeeld van zo’n DC-piek:
    :scale: 50% 
    :align: center
    
-Omdat SDR's afstellen op een middenfrequentie komt het 0 Hz gedeelte van de FFT overeen met die middenfrequentie.
+Omdat we SDR's afstellen op een middenfrequentie, komt het 0 Hz gedeelte van de FFT overeen met die middenfrequentie.
 Maar die DC-piek betekent niet per se dat er energie op de middenfrequentie zit.
-Wanneer alleen een DC-piek te zien, en de rest van de FFT lijkt op ruis, dan is er hoogstwaarschijnlijk niet een eens signaal aanwezig op 0 Hz.
+Wanneer alleen een DC-piek te zien is, en de rest van de FFT lijkt op ruis, dan is er hoogstwaarschijnlijk niet eens een signaal aanwezig op 0 Hz.
 
-De DC-offset is een gevolg van directe conversie ontvangers, de architectuur die gebruikt wordt door SDR's zoals de PlutoSDR, RTL-SDR, LimeSDR, en veel Ettus USRP's. In directe conversie ontvangers verschuift een oscillator, de LO, het signaal van zijn frequentie naar de basisband. Met als resultaat dat lekkage van de LO verschijnt in het midden van de waargenomen band. LO-lekkage is de extra energie die ontstaat bij het combineren van frequenties. Het is moeilijk deze extra ruis te verwijderen omdat het dicht bij het gewenste uitgangssignaal zit. Veel RF ic's hebben DC offset filters ingebouwd, maar meestal moet er een signaal aanwezig zijn om te kunnen werken. Om deze reden is de DC-piek sterk aanwezig op het moment dat er geen signalen zijn.
+De DC-offset is een gevolg van directe conversie ontvangers, de architectuur die gebruikt wordt door SDR's zoals de PlutoSDR, RTL-SDR, LimeSDR, en veel Ettus USRP's. In directe conversie ontvangers verschuift een oscillator, de LO, het signaal van zijn frequentie naar de basisband. Met als resultaat dat lekkage van de LO in het midden van de waargenomen band verschijnt. LO-lekkage is de extra energie die ontstaat bij het combineren van frequenties. Het is moeilijk deze extra ruis te verwijderen omdat het dicht bij het gewenste uitgangssignaal zit. Veel RF ic's hebben DC offset filters ingebouwd, maar meestal moet er een signaal aanwezig zijn om te kunnen werken. Om deze reden is de DC-piek sterk aanwezig op het moment dat er geen signalen zijn.
 
 Een snelle manier om met DC-offset om te gaan is om het signaal te oversamplen en de LO af te stellen naast de signaalfrequentie. Stel we willen 5 MHz van het spectrum rond 100 MHz bekijken. Wat we dan doen is samplen met bijvoorbeeld 20 MHz en afstellen op 95 MHz.
 
@@ -283,7 +286,7 @@ Een snelle manier om met DC-offset om te gaan is om het signaal te oversamplen e
 
    Afstellen naast de signaalfrequentie
 
-Het blauwe vlak in figuur :numref:`afstellen` laat zien wat gesampled is door onze SDR, het groene vlak laat zien in welk deel van het spectrum we geïnteresseerd zijn. Onze LO is afgesteld op 95 MHz omdat we dat hebben aangegeven aan de SDR. Gezien 95 MHz buiten het groene vlak valt hebben we geen last van de DC-piek.
+Het blauwe vlak in figuur :numref:`afstellen` laat zien wat gesampled is door onze SDR, het groene vlak laat zien in welk deel van het spectrum we geïnteresseerd zijn. Onze LO is afgesteld op 95 MHz, omdat we de SDR zo hebben ingesteld. Gezien 95 MHz buiten het groene vlak valt, hebben we geen last van de DC-piek.
 
 Nu is er een probleem: Als we inderdaad die 5 MHz band rond de 100 MHz willen hebben, moeten zelf een frequentieverschuiving, filter, en hersamplen uitvoeren (iets wat we later leren).
 Gelukkig wordt dit proces van scheef afstellen, dus een LO-offset toepassen, gedaan binnen de SDR, zodat het automatisch de verschuiving naar/van de gewenste middenfrequentie voor je doet. Dit is een voordeel want dan hoeven we niet een hogere frequentie over onze USB of ethernetverbinding heen te sturen, want dit vormt vaak het knelpunt.
@@ -296,8 +299,8 @@ samplen met onze SDR
 
 SDR-specifieke informatie over samplen vind je in de volgende hoofdstukken:
 
-* :ref:`pluto-chapter` Chapter
-* :ref:`usrp-chapter` Chapter
+* :ref:`pluto-chapter`
+* :ref:`usrp-chapter`
 
 *****************************
 Gemiddelde Vermogen Berekenen
@@ -307,7 +310,7 @@ We kunnen het gemiddelde vermogen van een discreet complex signaal, dus wat we z
 .. math::
    P = \frac{1}{N} \sum_{n=1}^{N} |x[n]|^2
 
-De absolute waarde van een complex getal en gewoon de modulus, dus :math:`\sqrt{I^2+Q^2}`
+De absolute waarde van een complex getal is gewoon de modulus: :math:`\sqrt{I^2+Q^2}`
 
 In Python zou je het gemiddelde vermogen als volgt bepalen:
 
@@ -320,7 +323,7 @@ Als je signaal een gemiddelde heeft van nul -- wat bij SDR's het geval is (later
 
 .. code-block:: python
 
- avg_pwr = np.var(x) # (signal should have roughly zero mean)
+ avg_pwr = np.var(x) # (signaal zou grofweg een gemiddelde van 0 moeten hebben)
 
 De reden waarom de variantie van de samples het gemiddelde vermogen berekent is vrij simpel: de vergelijking voor de variantie is :math:`\frac{1}{N}\sum^N_{n=1} |x[n]-\mu|^2` waar :math:`\mu` voor de gemiddelde waarde van het signaal staat. Die vergelijking ziet er bekend uit! Als :math:`\mu`  nul is, dan wordt de vergelijking voor de variantie gelijk aan de vergelijking waarmee het gemiddelde vermogen wordt gevonden. Je zou ook eerst het gemiddelde van de samples kunnen aftrekken en daarna de variantie uitrekenen.  Besef dan wel dat als het gemiddelde niet nul is, de variantie en vermogen niet overeenkomen.
  
@@ -328,7 +331,7 @@ De reden waarom de variantie van de samples het gemiddelde vermogen berekent is 
 Power Spectral Density berekenen
 **************************************
 
-In het vorige hoofdstuk hebben we geleerd dat je een signaal komt omzetten naar het frequentiedomein met een FFT, en dat het resultaat de Power Spectral Density (PSD) (Nederlands: densiteit van het vermogensspectrum) wordt genoemd.
+In het vorige hoofdstuk hebben we geleerd dat je een signaal met een FFT kunt omzetten naar het frequentiedomein, en dat het resultaat de Power Spectral Density (PSD) (Nederlands: densiteit van het vermogensspectrum) wordt genoemd.
 Maar om de PSD van een stapel samples echt te vinden en te plotten, moeten we meer doen dan alleen een FFT nemen.
 De volgende zes operaties zijn nodig om de PSD te bepalen:
 
@@ -336,8 +339,8 @@ De volgende zes operaties zijn nodig om de PSD te bepalen:
 2. Neem de modulus van de FFT uitgang, dit geeft ons 1024 reële floats.
 3. Kwadrateer de modulus vervolgens om vermogen te krijgen.
 4. Normaliseren: Deel door de FFT lengte (:math:`N`) en sample-frequentie (:math:`Fs`).
-5. Ze naar dB om met behulp van :math:`10 \log_{10}()`; we bekijken PSD's altijd in de log-schaal.
-6. Voer een FFT-shift uit, zoals is behandeld in het vorige hoofdstuk, om "0 Hz" in het midden te plaatsen en de negatieve frequenties links van het midden.
+5. Zet het om naar dB met behulp van :math:`10 \log_{10}()`; we bekijken PSD's altijd in de log-schaal.
+6. Voer een FFT-shift uit, zoals is behandeld in het vorige hoofdstuk, om "0 Hz" in het midden, en de negatieve frequenties links van het midden, te plaatsen.
 
 Die zes stappen in Python zien er zo uit:
 
@@ -351,7 +354,7 @@ Die zes stappen in Python zien er zo uit:
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
-We kunnen optioneel ook een venster toepassen, zoals we hebben geleerd in het :ref:`freq-domain-chapter` hoofdstuk. Het toepassen van dit venster zou net voor de regel met fft() moeten gebeuren.
+We kunnen optioneel ook een venster toepassen, zoals we hebben geleerd in :ref:`freq-domain-chapter` hoofdstuk. Het toepassen van dit venster zou net voor de regel met fft() moeten gebeuren.
 
 .. code-block:: python
 
@@ -362,8 +365,8 @@ Om nu deze PSD te plotten hebben we wel informatie nodig over de x-as.
 Afgelopen hoofdstuk hebben we geleerd dat bij het samplen we enkel het spectrum tussen -Fs/2 en Fs/2 zien, waarbij Fs onze sample-frequentie is.
 De resolutie die we halen in het frequentiedomein hangt af van de lengte van onze FFT, wat normaal gelijk is aan het aantal samples waarop we de FFT uitvoeren.
 In dit geval komt dat neer op 1024 equidistante punten tussen -0.5 MHz en 0.5 MHz.
-Als onze SDR afgesteld was op 2.4 GHz, zouden we de frequenties waarnemen tussen 2.3995 GHz en 2.4005 GHz.
-Om in python de x-as te verschuiven naar de echt waargenomen frequenties:
+Als onze SDR was afgesteld op 2.4 GHz, zouden we de frequenties tussen 2.3995 GHz en 2.4005 GHz kunnen waarnemen.
+Je kunt in python de x-as naar de echt waargenomen frequenties verschuiven:
 
 .. code-block:: python
  
@@ -376,10 +379,10 @@ Om in python de x-as te verschuiven naar de echt waargenomen frequenties:
 Het resultaat is een prachtige PSD!
 
 Mocht je de PSD willen vinden van miljoenen samples, neem dan niet een FFT van een miljoen punten, wat dat duurt voor eeuwig. Je zou dan een uitgang krijgen met een miljoen "frequentiepunten" (bins), dat is meer dan je op een plot kunt tonen.
-In plaats daarvan kun je betere meerdere smalle PSD's uitvoeren en het gemiddelde nemen, of weergeven in een spectrogramplot.
-Anderzijds, als je weet dat het signaal niet snel verandert, dan is het genoeg om een paar duizend samples te nemen en daar de PSD van te vinden; binnen het tijDSPestek van een paar duizend samples ontvang je waarschijnlijk genoeg van het signaal om een mooie representatie te krijgen.
+In plaats daarvan kun je beter meerdere smalle PSD's uitvoeren en het gemiddelde nemen, of weergeven in een spectrogramplot.
+Anderzijds, als je weet dat het signaal niet snel verandert, dan is het genoeg om een paar duizend samples te nemen en daar de PSD van te vinden; binnen het tijdbestek van een paar duizend samples ontvang je waarschijnlijk genoeg van het signaal om een mooie representatie te krijgen.
 
-Hieronder staat de volledige broncode inclusief het genereren van een signaal (complex exponent op 50 Hz) en ruis. Let op dat N, het aantal samples van het signaal, ook de lengte is van de FFT. We nemen de FFT over het hele gesimuleerde signaal.
+Hieronder staat de volledige broncode, inclusief het genereren van een signaal (complex exponent op 50 Hz) met ruis. Let op dat N, het aantal samples van het signaal, ook de lengte is van de FFT. We nemen de FFT over het hele gesimuleerde signaal.
 
 .. code-block:: python
 
