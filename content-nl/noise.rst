@@ -5,7 +5,7 @@ Ruis en dB
 #############
 
 In dit hoofdstuk behandelen we ruis, hoe het wordt gemodelleerd en hoe ermee wordt omgegaan in draadloze systemen.
-Concepten als AWGN, complexe ruis en SNR/SINR komt langs.
+Concepten als AWGN, complexe ruis en SNR/SINR komen langs.
 Onderweg introduceren we ook decibellen (dB) omdat dit veel gebruikt wordt binnen draadloze communicatiesystemen en SDR.
 
 ************************
@@ -18,8 +18,8 @@ De meeste mensen zijn bekend met het concept van ruis: ongewilde fluctuaties dat
    :scale: 70 % 
    :align: center 
 
-We merken op dat het gemiddelde ruisniveau nul is in het tijddomein-figuur. 
-Als de gemiddelde waarde niet nul zou zijn, dan hadden we de gemiddelde waarde ervan af kunnen halen, de offset, en dan zouden we over zijn gebleven met een gemiddelde van nul. Ook merken we op dat de individuele punten in het figuur *niet* "uniform" verdeeld zijn, hogere waarden zijn minder aanwezig dan punten die dichter bij nul zitten.
+We merken op dat het gemiddelde ruisniveau in het tijddomein-figuur nul is. 
+Als de gemiddelde waarde niet nul zou zijn, dan hadden we de gemiddelde waarde, de offset, ervan af kunnen halen, en dan zouden we over zijn gebleven met een gemiddelde van nul. Ook merken we op dat de individuele punten in het figuur *niet* "uniform" verdeeld zijn, hogere waarden zijn minder aanwezig dan punten die dichter bij nul zitten.
 
 We noemen dit "gaussische ruis".
 Dat is een goed model voor het type ruis wat ontstaat door vele natuurlijke bronnen, zoals de thermische trilling van atomen binnen het silicium van de RF-componenten in onze ontvanger.
@@ -139,7 +139,7 @@ Lineair   dB
 En om afsluitend deze nummers een context te geven staan hieronder wat voorbeeld vermogens in dBm:
 
 =========== ===
-80 dBm      Zendvermogen van een afgelogen FM-radio station
+80 dBm      Zendvermogen van een afgelegen FM-radio station
 62 dBm      Max vermogen van een ham radiozender
 60 dBm      Vermogen van een typische magnetron
 37 dBm      Vermogen van een typische draagbare radiozender
@@ -202,7 +202,7 @@ Complexe Ruis
 *************************
 
 "Complexe Gaussische" ruis zullen we ervaren met signalen in de basisband; het ruisvermogen wordt evenredig verdeelt over de reële en imaginaire delen. 
-No belangrijker is te beseffen dat de reële en imaginaire delen onafhankelijk van elkaar zijn; de waarde van het reële deel zegt niets over de waarde van het imaginaire deel.
+Nog belangrijker is te beseffen dat de reële en imaginaire delen onafhankelijk van elkaar zijn; de waarde van het reële deel zegt niets over de waarde van het imaginaire deel.
 
 In Python kunnen we complexe gaussische ruis genereren met:
 

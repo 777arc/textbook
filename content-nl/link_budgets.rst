@@ -236,12 +236,12 @@ Meestal laten we de winsten en verliezen in een tabel zien, zoals we dat met fin
 Ruisvermogen
 *************************
 
-Nu we het signaalvermogen hebben gaan we overschakelen naar het ruisvermogen, we moeten immers de signaal-ruisverhouding bepalen.
+Nu we het signaalvermogen hebben, gaan we overschakelen naar het ruisvermogen, we moeten immers de signaal-ruisverhouding bepalen.
 Het bepalen van het ruisvermogen gaan we op een vergelijkbare manier doen als het signaalvermogen.
 
 Het is nu een goed moment om te bespreken waar ruis ons kanaal binnenkomt. Antwoord: **Bij de ontvanger**!
 Het signaal wordt niet verpest door de ruis totdat we het gaan ontvangen. Het is *extreem* belangrijk om dit te begrijpen.
-Veel student maken dit zich niet eigen en maken daardoor domme fouten.
+Veel studenten maken dit zich niet eigen en maken daardoor domme fouten.
 Er zweeft geen ruis door de lucht. 
 De ruis ontstaat doordat onze ontvanger een versterker en andere elektronica heeft die niet perfect zijn en ook niet op 0 Kelvin werken.
 
@@ -250,9 +250,9 @@ Een populaire vergelijking voor het ruisbudget maakt gebruik van de "kTB" aanpak
 .. math::
  P_{noise} = kTB
 
-- :math:`k` – Boltzmann’s constante = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**. De Bolzmann constante, voor de nieuwsgieren onder ons, is een fysische constante wat de gemiddelde energie van deeltjes in een gas relateert aan de temperatuur van het gas.
+- :math:`k` – Boltzmann’s constante = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**. De Bolzmann constante, voor de nieuwsgierigen onder ons, is een fysische constante wat de gemiddelde energie van deeltjes in een gas relateert aan de temperatuur van het gas.
 
-- :math:`T` – Is de temperatuur van het systeem in Kelvin (cryocoolers anyone?), voornamelijk veroorzaakt door de versterker. Deze term is moeilijk te vinden en wordt meestal alleen benadert. Je betaald meer voor een versterker die een lage temperatuur kan behouden voor hetzelfde vermogen.
+- :math:`T` – Is de temperatuur van het systeem in Kelvin (cryocoolers anyone?), voornamelijk veroorzaakt door de versterker. Deze term is moeilijk te vinden en wordt meestal alleen benadert. Je betaalt meer voor een versterker die een lage temperatuur kan behouden voor hetzelfde vermogen.
 
 - :math:`B` – Bandbreedte waarover we de ruis berekenen. Voor een LTE signaal van 10 MHz breed gebruiken we dus 10MHz voor :math:`B`, of 70 dbHz.
 
@@ -262,7 +262,7 @@ Het vermenigvuldigen (of optellen in dB) van kTB geeft het ruisvermogen, de noem
 SNR
 *************************
 
-Nu we beide nummers hebben kunnen we de signaal-ruisverhouding berekenen (Zie het :ref:`noise-chapter` hoofdstuk voor extra informatie over ruis):
+Nu we beide nummers hebben, kunnen we de signaal-ruisverhouding berekenen (Zie het :ref:`noise-chapter` hoofdstuk voor extra informatie over ruis):
 
 .. math::
    \mathrm{SNR} = \frac{P_{signaal}}{P_{ruis}}

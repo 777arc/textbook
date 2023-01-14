@@ -58,7 +58,7 @@ Op dezelfde manier zal de uitgang altijd een signaal betreffen, bijv. een 1D arr
 
 Er zijn vier basistypen filters: laagdoorlaat, hoogdoorlaat, banddoorlaat en bandstop (of sper).
 Elke type bewerkt signalen zodanig dat de focus op verschillende gebieden aan frequenties ligt.
-De onderstaande grafieken laten voor elke van de typen zien hoe de frequenties worden gefilterd.
+De onderstaande grafieken laten voor elk van de typen zien hoe de frequenties worden gefilterd.
 We merken op dat onderstaande figuren ook de negatieve frequenties tonen. Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
 
 .. the only way i could manage to get the tikz drawings next each other
@@ -128,7 +128,7 @@ Filter opbouw
 *************************
 
 De meeste digitale filters die we tegen zullen komen (zoals FIR) kunnen we beschrijven met een array van floating point getallen.
-Filters die in het frequentiedomein symmetrisch zijn hebben reële getallen (i.p.v. complex), en meestal zijn het een oneven aantal.
+Filters die in het frequentiedomein symmetrisch zijn, bestaan uit (meestal een oneven aantal) reële getallen (i.p.v. complex).
 We noemen deze array van getallen "coëfficiënten" of in het Engels "taps".
 Meestal gebruiken we :math:`h` als symbool voor deze filter coëfficiënten/taps. 
 Hier zijn een aantal voorbeeld coëfficiënten van een enkel filter:
@@ -243,7 +243,7 @@ Hier is de frequentieresponsie van het filter dat we zojuist gebruikten:
 Let op dat wat hier getoond wordt *niet* een signaal is, het is de frequentieresponsie van het filter.
 Misschien is het moeilijk om je vinger hierop te leggen, terwijl we voorbeelden en programma's bekijken zal het duidelijker worden.
 
-Een filter heeft ook een tijddomein-versie; dit heet de "impulsrespons" van het filter. Dit heet zo omdat een impuls aan de ingang deze responsie aan de uitgang geeft. (Google de "dirac delta functie" voor meer informatie over zo'n impuls)
+Een filter heeft ook een tijddomein-versie; dit heet de "impulsrespons" van het filter. Dit heet zo omdat een impuls aan de ingang deze responsie aan de uitgang geeft. Google de "dirac delta functie" voor meer informatie over zo'n impuls.
 Voor een geven FIR-filter is de impulsresponsie gelijk aan de coëfficiënten zelf.
 Voor dat filter met 77 coëfficiënten van eerder is dat:
 
@@ -394,7 +394,7 @@ De impuls- en frequentieresponsie worden hieronder weergeven:
 ..    :scale: 60 % 
 ..    :align: center 
 
-Omdat ons filter niet symmetrisch is rond 0 Hz moeten we complexe coëfficiënten gebruiken en hebben we twee lijnen nodig om het te weergeven.
+Omdat ons filter niet rond 0 Hz symmetrisch is, moeten we complexe coëfficiënten gebruiken en hebben we twee lijnen nodig om het te weergeven.
 Wat aan de linkerkant van het bovenstaande figuur te zien is, is deze complexe impulsresponsie.
 De rechterkant valideert dat we inderdaad het gewenste filter hebben verkregen; het filtert alles weg, behalve de frequenties rondom 10 kHz.
 Let nogmaals op dat het bovenstaande figuur *geen* signaal is, maar de responsie van het filter.
@@ -431,7 +431,7 @@ We zullen niet te diep op theorie ingaan maar onthoud voor nu dat FIR filters ge
 IIR-filters zijn efficiënter en zouden hetzelfde kunnen bereiken met minder coëfficiënten maar met het risico dat het filter instabiel wordt en niet goed werkt.
 Als een lijst coëfficiënten wordt gegeven, dan is dit over het algemeen voor een FIR-filter.
 Als er wordt gesproken over "polen" dan betreft het een IIR-filter.
-In dit boek zullen we et bij FIR-filters houden.
+In dit boek zullen we het bij FIR-filters houden.
 
 Het onderstaande figuur laat het verschil zien tussen een FIR en IIR-filter. Ze hebben hetzelfde gedrag maar het FIR-filter gebruikt 50 coëfficiënten en het IIR filter maar 12. Toch hebben ze beiden ongeveer dezelfde transitiebreedte.
 
@@ -650,7 +650,7 @@ De frequentieresponsie is niet zo recht.... het komt niet echt overeen met het o
 Een belangrijke reden hiervoor is omdat onze impulsresponsie nog niet was uitgedoofd, dus de linker- en rechterkant gaan niet naar nul.
 Er zijn twee opties om dit wel voor elkaar te krijgen:
 
-**Optie 1:** We passen een "venster" toe op de impulsresponsie zodanig dat beide kant aflopen naar 0. Dit komt neer op een "vensterfunctie", dat begint en eindigt bij 0, te vermenigvuldigen met onze impulsresponsie.
+**Optie 1:** We passen een "venster" op de impulsresponsie toe, zodanig dat beide kanten naar 0 aflopen. Dit komt neer op een "vensterfunctie", dat begint en eindigt bij 0, vermenigvuldigen met onze impulsresponsie.
 
 .. code-block:: python
 
