@@ -19,6 +19,7 @@ On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) i
 ```bash
 sphinx-build -b html . _build
 sphinx-build -b html -D exclude_patterns=_build,index.rst,content/* -D master_doc=index-fr . _build/fr/
+make html-nl
 ```
 
 ## Getting pdf created (not working yet due to gifs)
