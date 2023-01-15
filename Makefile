@@ -53,7 +53,7 @@ clean:
 
 .PHONY: html
 html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel,sphinxcontrib.tikz -D imgmath_latex=latex -D tikz_includegraphics_path=_images -D tikz_tikzlibraries=positioning,shapes,arrows,snakes $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 

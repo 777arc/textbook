@@ -17,7 +17,7 @@ sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x6
 On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) installed with pip, I had to add ~/.local/bin to PATH, and apt-get install texlive-latex-extra.  Also after dutch version was added I needed `apt-get install -y pdf2svg` and `pip install sphinxcontrib-tikz`.
 
 ```bash
-sphinx-build -b html . _build
+make html
 sphinx-build -b html -D exclude_patterns=_build,index.rst,content/* -D master_doc=index-fr . _build/fr/
 make html-nl
 cp -R _build/* ../777arc.github.io/

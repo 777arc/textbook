@@ -26,19 +26,79 @@ You may think we only care about digital filters; this textbook explores DSP, af
    
 In DSP, where the input and output are signals, a filter has one input signal and one output signal:
 
-.. image:: ../_images/filter.png
-   :scale: 70 % 
-   :align: center 
+.. tikz:: [font=\sffamily\Large\bfseries, scale=2]
+   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
+   \node [draw,
+    color=white,
+    fill=babyblueeyes,
+    minimum width=4cm,
+    minimum height=2.4cm
+   ]  (filter) {Filter};
+   \draw[<-, very thick] (filter.west) -- ++(-2,0) node[left,align=center]{Input\\(time domain)} ;
+   \draw[->, very thick] (filter.east) -- ++(2,0) node[right,align=center]{Output\\(time domain)};   
+   :libs: positioning
+   :xscale: 80
 
 You cannot feed two different signals into a single filter without adding them together first or doing some other operation.  Likewise, the output will always be one signal, i.e., a 1D array of numbers.
 
-There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The graphs below demonstrate how frequencies in signals are filtered for each type.
+There are four basic types of filters: low-pass, high-pass, band-pass, and band-stop. Each type modifies signals to focus on different ranges of frequencies within them. The plots below demonstrate how frequencies in signals are filtered for each type, presented first with just positive frequencies (easier to understand), then also including negative.
 
 .. image:: ../_images/filter_types.png
    :scale: 70 % 
    :align: center 
 
-(ADD DIAGRAM SHOWING NEGATIVE FREQS TOO)
+
+.. START OF FILTER TYPES TIKZ
+.. raw:: html
+
+   <table><tbody><tr><td>
+
+.. This draw the lowpass filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Low-Pass}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-2.5,0.5) (-1.5,3) (1.5,3) (2.5,0.5) (5,0)};
+   :xscale: 70
+
+.. raw:: html
+
+   </td><td  style="padding: 0px">
+
+.. this draws the highpass filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{High-Pass}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-2.5,2.5) (-1.5,0.3) (1.5,0.3) (2.5,2.5) (5,3)};
+   :xscale: 70
+
+.. raw:: html
+
+   </td></tr><tr><td>
+
+.. this draws the bandpass filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Pass}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-4.5,0.3) (-3.5,3) (-2.5,3) (-1.5,0.3) (1.5, 0.3) (2.5,3) (3.5, 3) (4.5,0.3) (5,0)};
+   :xscale: 70
+
+.. raw:: html
+
+   </td><td>
+
+.. and finally the bandstop filter
+.. tikz:: [font=\sffamily\Large]    
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Stop}};
+   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-4.5,2.7) (-3.5,0.3) (-2.5,0.3) (-1.5,2.7) (1.5, 2.7) (2.5,0.3) (3.5, 0.3) (4.5,2.7) (5,3)};   
+   :xscale: 70
+
+.. raw:: html
+
+   </td></tr></tbody></table>
+
+.. .......................... end of filter plots in tikz
+
 
 Each filter permits certain frequencies to remain from a signal while blocking other frequencies.  The range of frequencies a filter lets through is known as the "passband", and "stopband" refers to what is blocked.  In the case of the low-pass filter, it passes low frequencies and stops high frequencies, so 0 Hz will always be in the passband.  For a high-pass and band-pass filter, 0 Hz will always be in the stopband.
 
@@ -188,9 +248,17 @@ Real vs. Complex Filters
 
 The filter I showed you had real taps, but taps can also be complex.  Whether the taps are real or complex doesn't have to match the signal you put through it, i.e., you can put a complex signal through a filter with real taps and vice versa.  When the taps are real, the filter's frequency response will be symmetrical around DC (0 Hz).  Typically we use complex taps when we need asymmetry, which does not happen too often.
 
-.. image:: ../_images/complex_taps.png
-   :scale: 80 % 
-   :align: center 
+.. draw real vs complex filter
+.. tikz:: [font=\sffamily\Large,scale=2] 
+   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}   
+   \draw[->, thick] (-5,0) node[below]{$-\frac{f_s}{2}$} -- (5,0) node[below]{$\frac{f_s}{2}$};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,1);
+   \draw[babyblueeyes, smooth, line width=3pt] plot[tension=0.1] coordinates{(-5,0) (-1,0) (-0.5,2) (0.5,2) (1,0) (5,0)};
+   \draw[->,thick] (6,0) node[below]{$-\frac{f_s}{2}$} -- (16,0) node[below]{$\frac{f_s}{2}$};
+   \draw[->,thick] (11,-0.5) node[below]{0 Hz} -- (11,1);
+   \draw[babyblueeyes, smooth, line width=3pt] plot[tension=0] coordinates{(6,0) (11,0) (11,2) (11.5,2) (12,0) (16,0)};
+   \draw[font=\huge\bfseries] (0,2.5) node[above,align=center]{Example Low-Pass Filter\\with Real Taps};
+   \draw[font=\huge\bfseries] (11,2.5) node[above,align=center]{Example Low-Pass Filter\\with Complex Taps};
 
 As an example of complex taps, let's go back to the filtering use-case, except this time we want to receive the other interfering signal (without having to re-tune the radio).  That means we want a band-pass filter, but not a symmetrical one. We only want to keep (a.k.a "pass") frequencies between around 7 kHz to 13 kHz (we don't want to also pass -13 kHz to -7 kHz):
 

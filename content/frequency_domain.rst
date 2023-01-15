@@ -199,9 +199,18 @@ The concept of masking is heavily used in programming, so let's use it here.  Wh
 
 We usually perform DSP operations in the time domain, so let's utilize the convolution property to see how we can do this masking in the time domain.  Let's say that x(t) is our received signal.  Let Y(f) be the mask we want to apply in the frequency domain.  Well that means y(t) is the time domain representation of our mask, and if we convolve it with x(t), we can "filter out" the signal we don't want.
 
-.. image:: ../_images/masking-equation.png
-   :scale: 100 % 
-   :align: center 
+.. This shows the carrier wave formula
+.. tikz:: [font=\Large\bfseries\sffamily]
+   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
+   \draw (0,0) node[align=center,babyblueeyes]           {E.g., our received signal};
+   \draw (0,-4) node[below, align=center,babyblueeyes]   {E.g., the mask}; 
+   \draw (0,-2) node[align=center,scale=2]{$\int x(\tau)y(t-\tau)d\tau \leftrightarrow X(f)Y(f)$};   
+   \draw[->,babyblueeyes,thick] (-4,0) -- (-5.5,-1.2);
+   \draw[->,babyblueeyes,thick] (2.5,-0.5) -- (3,-1.3);
+   \draw[->,babyblueeyes,thick] (-2.5,-4) -- (-3.8,-2.8);
+   \draw[->,babyblueeyes,thick] (3,-4) -- (5.2,-2.8);
+   :xscale: 70
+   
    
 When we discuss filtering, the convolution property will make more sense.
 

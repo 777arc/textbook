@@ -183,9 +183,13 @@ Carrier and Downconversion
 
 Until this point we have not discussed frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air (the electromagnetic wave's frequency).  We refer to it as the "carrier" because it carries our information on a certain frequency.  When we tune to a frequency with our SDR and receive samples, our information is stored in I and Q; this carrier does not show up in I and Q, assuming we tuned to the carrier.
 
-.. image:: ../_images/carrier.png
-   :scale: 70% 
-   :align: center
+.. This shows the carrier wave formula
+.. tikz:: [font=\Large\bfseries\sffamily]
+   \draw (0,0) node[align=center]{$A\cdot cos(2\pi ft+ \phi)$}
+   (0,-2) node[align=center]{$\left(\sqrt{I^2+Q^2}\right)cos\left(2\pi ft + tan^{-1}(\frac{Q}{I})\right)$};
+   \draw[->,red,thick] (-2,-0.5) -- (-2.5,-1.2);
+   \draw[->,red,thick] (1.9,-0.5) -- (2.4,-1.5);
+   \draw[->,red,thick] (0,-4) node[red, below, align=center]{This is what we call the carrier} -- (-0.6,-2.7);
    
 For reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc., usually use a frequency (i.e., a carrier) between 100 MHz and 6 GHz.  These frequencies travel really well through the air, but they don't require super long antennas or a ton of power to transmit or receive.  Your microwave cooks food with electromagnetic waves at 2.4 GHz. If there is a leak in the door then your microwave will jam WiFi signals and possibly also burn your skin.  Another form of electromagnetic waves is light. Visible light has a frequency of around 500 THz.  It's so high that we don't use traditional antennas to transmit light. We use  methods like LEDs that are semiconductor devices. They create light when electrons jump in between the atomic orbits of the semiconductor material, and the color depends on how far they jump.  Technically, radio frequency (RF) is defined as the range from roughly 20 kHz to 300 GHz. These are the frequencies at which energy from an oscillating electric current can radiate off a conductor (an antenna) and travel through space.  The 100 MHz to 6 GHz range are the more useful frequencies, at least for most modern applications.  Frequencies above 6 GHz have been used for radar and satellite communications for decades, and are now being used in 5G "mmWave" (24 - 29 GHz) to supplement the lower bands and increase speeds. 
 
