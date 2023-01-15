@@ -59,40 +59,50 @@ Op dezelfde manier zal de uitgang altijd een signaal betreffen, bijv. een 1D arr
 Er zijn vier basistypen filters: laagdoorlaat, hoogdoorlaat, banddoorlaat en bandstop (of sper).
 Elke type bewerkt signalen zodanig dat de focus op verschillende gebieden aan frequenties ligt.
 De onderstaande grafieken laten voor elk van de typen zien hoe de frequenties worden gefilterd.
-We merken op dat onderstaande figuren ook de negatieve frequenties tonen. Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
+Eerst worden, voor de duidelijkheid, alleen de positieve frequenties getoond, daarna ook figuren met negatieve frequenties.
+Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
 
 .. the only way i could manage to get the tikz drawings next each other
 .. was to use a html table... In a pdf the pictures would be beneath each
 .. other
+.. image:: ../_images/filter_types.png
+   :scale: 70 % 
+   :align: center 
+
+
+.. START OF FILTER TYPES TIKZ
 .. raw:: html
 
    <table><tbody><tr><td>
 
 .. This draw the lowpass filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Laag-doorlaat}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-2.5,0.5) (-1.5,3) (1.5,3) (2.5,0.5) (5,0)};
+   :xscale: 70
 
 .. raw:: html
 
-   </td><td>
+   </td><td  style="padding: 0px">
 
 .. this draws the highpass filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Hoog-doorlaat}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-2.5,2.5) (-1.5,0.3) (1.5,0.3) (2.5,2.5) (5,3)};
+   :xscale: 70
 
 .. raw:: html
 
-   </td><td>
+   </td></tr><tr><td>
 
 .. this draws the bandpass filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-doorlaat}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-4.5,0.3) (-3.5,3) (-2.5,3) (-1.5,0.3) (1.5, 0.3) (2.5,3) (3.5, 3) (4.5,0.3) (5,0)};
+   :xscale: 70
 
 .. raw:: html
 
@@ -100,10 +110,11 @@ We merken op dat onderstaande figuren ook de negatieve frequenties tonen. Zolang
 
 .. and finally the bandstop filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
-   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-stop}};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Stop}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-4.5,2.7) (-3.5,0.3) (-2.5,0.3) (-1.5,2.7) (1.5, 2.7) (2.5,0.3) (3.5, 0.3) (4.5,2.7) (5,3)};   
-   
+   :xscale: 70
+
 .. raw:: html
 
    </td></tr></tbody></table>

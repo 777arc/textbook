@@ -76,7 +76,7 @@ Nu we weten waarom het nodig is kunnen we zien waar het wordt toegepast in de co
 ..    :align: center 
 ..    :target: ../_images/tx_rx_chain.svg
 
-Er vinden meerdere stappen van codering plaats in de keten. Broncodering, de eerste stap, is lijkt op kanaalcodering; broncodering heeft als doel de data zoveel mogelijk te comprimeren voordat het verzonden wordt, net als een bestandje zippen voordat je het e-mailt.
+Er vinden meerdere stappen van codering plaats in de keten. Broncodering, de eerste stap, lijkt op kanaalcodering; broncodering heeft als doel de data zoveel mogelijk te comprimeren voordat het verzonden wordt, net als een bestandje zippen voordat je het e-mailt.
 In andere woorden, de uitgang van de broncodering zal **kleiner** zijn dan de data ingang, maar de uitgang van kanaalcodering zal langer zijn dan de ingang want er is redundante informatie toegevoegd.
 
 ***************************
@@ -120,7 +120,7 @@ Een lagere code-snelheid betekent meer redundantie maar minder doorvoer.
 Modulatie en codering
 ***************************
 
-In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschema’s bekeken. Bij een lage signaalruisverhouding heb je lager orde modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schema als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere code-snelheid bij lage signaal-ruis verhoudingen en bij hoge signaal-ruis verhoudingen wil je een code-snelheid van bijna 1 gebruiken. Moderne communicatiesystemen hebben een combinaties van modulatie- en codeschema’s, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
+In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschema’s bekeken. Bij een lage signaalruisverhouding heb je lager orde modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schema als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere code-snelheid bij lage signaal-ruis verhoudingen en bij hoge signaal-ruis verhoudingen wil je een code-snelheid van bijna 1 gebruiken. Moderne communicatiesystemen gebruiken combinaties van modulatie- en codeschema’s, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
 
 Moderne systemen passen de MCS real-time aan op basis van de draadloze kanaalcondities. De ontvanger geeft feedback aan de zender over de kanaalkwaliteit.
 Deze feedback moet worden gegeven voordat de kwaliteit van het draadloze kanaal verandert, wat in ms kan gebeuren.
@@ -175,7 +175,7 @@ Hier volgen belangrijke eigenschappen van de Hamming-code:
 - Het kan een bitfout repareren
 - Het kan twee fouten detecteren maar niet repareren
 
-Het proces van databits coderen met de Hamming-code kan worden gaan door een matrixvermenigvuldiging uit te voeren met de "generator matrix".
+Het proces van databits coderen met de Hamming-code kan gedaan worden door een matrixvermenigvuldiging uit te voeren met de "generator matrix".
 In het onderstaande voorbeeld is 1011 de databit-vector dat we willen coderen en naar de ontvanger sturen.
 De 2D matrix is de "generator matrix" dat het codeschema definieert. Het resultaat van de vermenigvuldiging is een *code-woord* dat we willen versturen.
 
@@ -251,7 +251,7 @@ Een optie om die snelheid te halen is om pal naast de router te gaan zitten.
 In dit geval krijg je misschien een SNR van 60 dB, maar om praktische redenen heeft de snelste MCS waarschijnlijk niet zo'n hoge SNR nodig.
 Je zou zelfs naar de `MCS lijst voor 802.11n <https://en.wikipedia.org/wiki/IEEE_802.11n-2009#Data_rates>`_ kunnen kijken.  
 802.11n gaat tot 64-QAM, gecombineerd met kanaalcodering heeft het een SNR van ongeveer 25 dB nodig volgens `deze tabel <https://d2cpnw0u24fjm4.cloudfront.net/wp-content/uploads/802.11n-and-802.11ac-MCS-SNR-and-RSSI.pdf>`_.  
-Dat bekent dus dat zelfs bij 60 dB het wifi signaal nog steeds 64-QAM zal gebruiken.
+Dat betekent dus dat zelfs bij 60 dB het wifi signaal nog steeds 64-QAM zal gebruiken.
 Bij 25 dB is de Shannon-limiet ongeveer 8.3 bits/sec/Hz, dus 166 Mbps bij een bandbreedte van 20 MHz.
 Als we ook rekening houden met MIMO, dit wordt later behandeld, dan krijgen we 4 64-QAM signalen tegelijkertijd met een totale snelheid van 664 Mbps.
 Als we dat getal halveren dan komen we behoorlijk in de buurt van de 300 Mbps dat 802.11n wifi beloofd op de 2.4 GHz band.
@@ -275,7 +275,7 @@ Momenteel zijn de beste kanaalcoderingsschema’s:
 
 Beide codes benaderen de Shannon-limiet (dus onder bepaalde signaalruisverhoudingen wordt de limiet bijna gehaald).
 Hamming-codes of andere simpele codes komen niet eens in de buurt van de Shannon-limiet.
-Voor wat betreft onderzoek valt er niet veel meer te halen in het verbeteren van de codes voor wat betreft toegevoegde overhead. Huidig onderzoek is meer gericht het verbeteren van het decoderen; minder rekenintensief maken en kunnen omgaan met kanaalfeedback.
+Voor wat betreft onderzoek valt er niet veel meer te halen in het verbeteren van de codes voor wat betreft toegevoegde overhead. Huidig onderzoek is meer gericht op het verbeteren van het decoderen; minder rekenintensief maken en kunnen omgaan met kanaalfeedback.
 
 Low-density parity-check (LDPC) codes zijn een groep van hele efficiënte lineaire blokcodes. 
 In 1960 werden deze codes geïntroduceerd door Robert G. Gallager in zijn doctoraat aan de MIT-universiteit.

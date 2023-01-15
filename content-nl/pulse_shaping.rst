@@ -28,7 +28,7 @@ Matched Filter
 **********************************
 
 Een truc dat in draadloze communicatie wordt toegepast heet matched filters (op elkaar afgestemde filters).
-Om deze afstemming van filters te begrijpen zul je eerste deze twee punten moeten snappen:
+Om deze afstemming van filters te begrijpen zul je eerst deze twee punten moeten snappen:
 
 1. De besproken pulsen hoeven *alleen bij de ontvanger* voor het samplen perfect te zijn uitgelijnd. Tot dat punt maakt het niet uit of er ISI plaatsvindt, de signalen kunnen met ISI zonder problemen door het luchtruim vliegen.
 
@@ -81,7 +81,7 @@ We weten nu dat we:
 
 2. het filter willen opsplitsen en een helft bij de zender en de andere helft bij de ontvanger willen plaatsen.
 
-Laten we eens kijken naar wat specifieke filters die aan deze eisen voldoen:
+Laten we eens naar wat specifieke filters kijken die aan deze eisen voldoen:
 
 Raised-Cosine Filter
 #########################
@@ -106,7 +106,7 @@ De impulsresponsie van het filter kun je beschrijven met:
 .. math::
  h(t) = \frac{1}{T} \mathrm{sinc}\left( \frac{t}{T} \right) \frac{\cos\left(\frac{\pi\beta t}{T}\right)}{1 - \left( \frac{2 \beta t}{T}   \right)^2}
 
-Je kunt `hier <https://en.wikipedia.org/wiki/Sinc_function>`_meer lezen over de :math:`\mathrm{sinc}()` functie.
+Je kunt `hier <https://en.wikipedia.org/wiki/Sinc_function>`_ meer lezen over de :math:`\mathrm{sinc}()` functie.
 
 Dit is het raised-cosine filter. Die gaan we echter in tweeën splitsen en dan krijgen we het Root Raised Cosine (RRC) filter!
 
@@ -199,7 +199,7 @@ Raak niet verstrikt in het feit dat we impulsen gebruiken, het is waarschijnlijk
 We zullen een RC-filter bouwen met een :math:`\beta` van 0.35 en 101 coëfficiënten zodat het signaal genoeg tijd heeft om naar 0 te gaan.
 De RC vergelijking vraagt om een periodetijd met een tijdvector, maar voor het gemak zullen we uitgaan van een periodetijd van 1 seconde.
 Dit betekent dat onze symboolperiode :math:`T_s` dan 8 is omdat we 8 samples per symbool hebben gebruikt.
-Onze tijdvector zal dan gewoon een oplopende lijst van gehele getalen zijn.
+Onze tijdvector zal dan gewoon een oplopende lijst van gehele getallen zijn.
 Met de manier waarop de filtervergelijking werkt willen we het tijdstip 0 in het midden hebben. De 101 coëfficiënten zullen dan starten bij -51 en eindigen bij +52.
 
 .. code-block:: python
