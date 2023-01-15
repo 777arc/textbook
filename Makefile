@@ -57,6 +57,13 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+#make sure you install sphinxcontrib-tikz python module and pdf2svg application
+.PHONY: html-nl
+html-nl:
+	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/* -D master_doc=index-nl -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel,sphinxcontrib.tikz -D imgmath_latex=latex -D tikz_includegraphics_path=_images -D tikz_tikzlibraries=positioning,shapes,arrows,snakes . $(BUILDDIR)/nl/
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/nl/html."
+
 .PHONY: dirhtml
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
