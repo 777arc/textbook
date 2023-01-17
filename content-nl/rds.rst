@@ -4,106 +4,125 @@
 Compleet voorbeeld
 ##################
 
-We zullen in dit hoofdstuk vele geleerde concepten samenbrengen en door een compleet voorbeeld heenlopen waarin we een echt digitaal signaal ontvangen en decoderen. We zullen kijken naar het Radio Data Systeem (RDS) wat een protocol is om kleine hoeveelheden informatie in een FM signaal te stoppen, zoals de naam van het nummer. We zullen FM moeten demoduleren, verschuiven, filteren, decimeren, hersamplen, synchroniseren, decoderen en de bytes interpreteren. Er is sowieso een IQ-bestand beschikbaar waarmee je kunt testen wanneer je geen SDR klaar hebt liggen.
+We zullen in dit hoofdstuk vele geleerde concepten samenbrengen en door een compleet voorbeeld heenlopen waarin we een echt digitaal signaal ontvangen en decoderen. We zullen kijken naar het Radio Data Systeem (RDS) wat een protocol is om kleine hoeveelheden informatie in een FM-signaal te stoppen, zoals de naam van het nummer. We zullen FM moeten demoduleren, verschuiven, filteren, decimeren, hersamplen, synchroniseren, decoderen en de bytes interpreteren. Er is sowieso een IQ-bestand beschikbaar waarmee je kunt testen wanneer je geen SDR klaar hebt liggen.
 
 ********************************
-Introductie FM Radio en RDS
+Introductie FM-Radio en RDS
 ********************************
 
-Om RDS te kunnen begrijpen zullen we eerst kijken een een FM-signaal is opgebouwd.
-Je bent waarschijnlijk al bekend met het audio gedeelte van een FM-signaal: een FM-gemoduleerd audiosignaal verstuurt op de frequentie van het station.
-Naast de audio worden in een FM-signaal nog meer informatiecomponenten FM-gemoduleerd.
-In plaats van 
-To understand RDS we must first review FM radio broadcasts and how their signals are structured.  You are probably familiar with the audio portion of FM signals, which are simply audio signals frequency modulated and transmitted at center frequencies corresponding to the station's name, e.g., "WPGC 95.5 FM" is centered at exactly 95.5 MHz.  In addition to the audio portion, each FM broadcast contains some other components that are frequency modulated along with the audio.  Instead of just Googling the signal structure, let's take a look at the power spectral density (PSD) of an example FM signal, *after* the FM demodulation. We only view the positive portion because the output of FM demodulation is a real signal, even though the input was complex (we will view the code to perform this demodulation shortly). 
+Om RDS te kunnen begrijpen zullen we eerst kijken naar hoe een FM-signaal is opgebouwd.
+Je bent waarschijnlijk al bekend met het audio gedeelte van een FM-signaal.
+Naast de audio worden, in een FM-signaal, nog meer informatiecomponenten frequentie gemoduleerd.
+In plaats van de signaalstructuur te Googelen kunnen we ook naar de PSD (spectrale vermogensdichtheid) kijken van een FM-signaal *na* demodulatie.
+We bekijken enkel het positieve deel omdat een gedemoduleerd FM-signaal reëel is, zelfs als de ingang complex was.
 
-.. image:: ../_images/fm_psd.svg
+.. _PSD:
+.. figure:: ../_images/fm_psd.svg
    :align: center 
    :target: ../_images/fm_psd.svg
 
-By looking at the signal in the frequency domain, we notice the following individual signals:
+   PSD van gedemoduleerd FM-signaal
 
-#. A high power signal between 0 - 17 kHz
-#. A tone at 19 kHz
-#. Centered at 38 kHz and roughly 30 kHz wide we see an interesting looking symmetric signal
-#. Double-lobe shaped signal centered at 57 kHz
-#. Single-lobe shaped signal centered at 67 kHz
+Door het signaal in het frequentiedomein te bekijken zien we de volgende signalen:
 
-This is essentially all we are able to determine by just looking at the PSD, and remember that this is *after* the FM demodulation.  The PSD before the FM demodulation looks like the following, which doesn't really tell us much.
+#. Een signaal met een hoog vermogen tussen 0 - 17 kHz
+#. Een toon op 19 kHz
+#. Gecentreerd op 38 kHz en ongeveer 30 kHz breed zien we een interessant symmetrisch signaal.
+#. Een dubbel signaal gecentreerd op 57 kHz
+#. Een enkel signaal gecentreerd op 67 kHz
+
+Dit is alles wat we uit de PSD kunnen halen, en let op dat dit *na* de FM demodulatie is. De PSD voordat we het demoduleren ziet er als volgt uit, en dit verteld ons vrijwel niets.
 
 .. image:: ../_images/fm_before_demod.svg
    :align: center 
    :target: ../_images/fm_before_demod.svg
    
-That being said, it's important to understand that when you FM modulate a signal, a higher frequency in the data signal will lead to a higher frequency in the resulting FM signal.  So that signal centered at 67 kHz being present is increasing the total bandwidth occupied by the transmitted FM signal, as the maximum frequency component is now around 75 kHz as shown in the first PSD above.  `Carson's bandwidth rule <https://en.wikipedia.org/wiki/Carson_bandwidth_rule>`_ applied to FM tells us that FM stations occupy roughly 250 kHz of spectrum, which is why we usually sample at 250 kHz (recall that when using quadrature/IQ sampling, your received bandwidth equals your sampling rate).
+Toch is het belangrijk te beseffen dat wanneer je een signaal frequentiemoduleert, een hogere frequentie in de data ook een hogere frequentie in het FM-signaal zal opleveren.
+Dus het signaal op 67 kHz zorgt ervoor dat de totale bandbreedte van het signaal toeneemt, de hoogste frequentiecomponent is ongeveer 75 kHz volgens figuur :numref:`PSD`.
+Wanneer we `de bandbreedte-regel van Carson <https://en.wikipedia.org/wiki/Carson_bandwidth_rule>`_ op FM toepassen, zegt dit dat een FM-zender ongeveer 250 kHz aan spectrum inneemt. Om deze reden samplen we meestal op 250 kHz (vergeet niet dat bij kwadratuur/IQ-sampling de ontvangen bandbreedte gelijk is aan de samplerate).
 
-As a quick aside, some readers may be familiar with looking at the FM band using an SDR or spectrum analyzer and seeing the following spectrogram, and thinking that the block-y signals adjacent to some of the FM stations are RDS.  
+Sommige lezers die gewent zijn om de FM-band met een SDR of spectrumanalyzer te bekijken herkennen het volgende diagram. Misschien denk je dat de blokkige signalen naast de FM-zenders RDS zijn.
 
 .. image:: ../_images/fm_band_psd.png
    :scale: 80 % 
    :align: center 
 
-It turns out that those block-y signals are actually HD Radio, a digital version of the same FM radio signal (same audio content).  This digital version leads to a higher quality audio signal at the receiver because analog FM will always include some noise after demodulation, since it's an analog scheme, but the digital signal can be demodulated/decoded with zero noise, assuming there are zero bit errors.  
+Het blijkt dat deze blokkige signalen eigenlijk HD Radio zijn, een digitale versie van hetzelfde FM-radiosignaal (zelfde audio).
+Deze digitale versie geeft de ontvanger een hogere kwaliteit audio, omdat digitale signalen geen analoge ruis bevatten zoals het analoge signaal.
 
-Back to the five signals we discovered in our PSD; the following diagram labels what each signal is used for.  
+Weer terug naar de 5 signalen die we in onze PSD herkenden; Het volgende diagram laat zien waar elk signaal voor wordt gebruikt:
 
 .. image:: ../_images/fm_components.png
    :scale: 80 % 
    :align: center 
 
-Going through each of these signals in no particular order:
+We doorlopen deze signalen in willekeurige volgorde:
 
-The mono and stereo audio signals simply carry the audio signal, in a pattern where adding and subtracting them gives you the left and right channels.
+De mono en stereo audiosignalen bevatten gewoon de audio. Je kunt doormiddel van optellen of aftrekken de linker en rechter kanalen onderscheiden.
 
-The 19 kHz pilot tone is used to demodulate the stereo audio.  If you double the tone it acts as a frequency and phase reference, since the stereo audio signal is centered at 38 kHz.  Doubling the tone can be done by simply squaring the samples, recall the frequency shift Fourier property we learned about in the :ref:`freq-domain-chapter` chapter.
+De toon op 19 kHz wordt gebruikt om het stereo signaal te kunnen demoduleren. Door het verdubbelen van de toon kun je het gebruiken als frequentie- en fasereferentie, het audiosignaal is immers gecentreerd op 38 kHz. Dit verdubbelen kun je doen door de samples te kwadrateren.
 
-DirectBand was a North America wireless datacast network owned and operated by Microsoft, also called "MSN Direct" within consumer markets. DirectBand transmitted information to devices like portable GPS receivers, wristwatches, and home weather stations.  It even allowed users to receive short messages from Windows Live Messenger.  One of the most successful applications of DirectBand was realtime local traffic data displayed on Garmin GPS receivers, which were used by millions of people before smartphones became ubiquitous.  The DirectBand service was shut down on January 2012, which raises the question, why do we see it in our FM signal that was recorded after 2012?  My only guess is that most FM transmitters were designed and built way before 2012, and even without any DirectBand "feed" active, it still transmits something, perhaps pilot symbols.
+DirectBand werd in Noord-Amerika gebruikt als een datanetwerk van Microsoft. Ook bekend als "MSN direct" onder de consumenten.
+Het verstuurde informatie naar apparaten zoals GPS ontvangers, horloges en weerstations. Je kon zelfs berichtjes ontvangen van Windows Live Messenger. De meest succesvolle toepassing was real-time verkeersinformatie voor Garmin GPS-ontvangers. Dit werd door miljoenen mensen gebruikt voordat smartphones breed beschikbaar waren. De service is in januari 2012 uitgeschakeld. Naar mijn weten is dit nooit in Nederland toegepast.
 
-Lastly, we come to RDS, which is the focus of the rest of this chapter.  As we can see in our first PSD, RDS is roughly 4 kHz in bandwidth (before it gets FM modulated), and sits in between the stereo audio and DirectBand signal.  It is a low data rate digital communications protocol that allows FM stations to include station identification, program information, time, and other miscellaneous information alongside the audio.  The RDS standard is published as IEC standard 62106 and can be `found here <http://www.interactive-radio-system.com/docs/EN50067_RDS_Standard.pdf>`_.
+Als laatste komen we bij RDS waar de rest van het hoofdstuk om draait. Zoals in de PSD is te zien, is het ongeveer 4 kHz breed en is het rechts van het stereosignaal te vinden. Het is een digitaal communicatieprotocol waarmee FM-stations op lage snelheid informatie kunnen oversturen zoals de naam van het station, programma informatie, tijd en overige dingen. De standaard is gepubliceerd als IEC 62106 en kun je `hier terugvinden <http://www.interactive-radio-system.com/docs/EN50067_RDS_Standard.pdf>`_.
 
 ********************************
-The RDS Signal
+Het RDS-Signaal
 ********************************
 
-In this chapter we will use Python to receive RDS, but in order to best understand how to receive it, we must first learn about how the signal is formed and transmitted.  
+We zullen in dit hoofdstuk Python toepassen om RDS te ontvangen. Om goed te begrijpen hoe je het ontvangt is het verstandig om eerst uit te zoeken hoe het signaal wordt gevormd en uitgezonden.
 
-Transmit Side
+Zender
 #############
 
-The RDS information to be transmitted by the FM station (e.g., track name, etc.) is encoded into sets of 8 bytes.  Each set of 8 bytes, which corresponds to 64 bits, is combined with 40 "check bits" to make a single "group".  These 104 bits are transmitted together, although there is no gap of time between groups, so from the receiver's perspective it receives these bits nonstop and must determine the boundary between the groups of 104 bits.   We will see more details on the encoding and message structure once we dive into the receive side.
+De RDS-informatie dat door een FM-station wordt verzonden (bijv. naam nummer) is gecodeerd in groepen van 8 bytes.
+Elke set van 8 bytes, wat overeenkomt met 64 bits, wordt met 40 "controllebits" gegroepeerd. Deze 104 bits worden samen verzonden zonder enige vertraging tussen de groepen. De ontvanger moet dus de grens tussen de groepen zien te vinden. We gaan de details hierover bekijken wanneer we naar de ontvanger gaan.
 
-To transmit these bits wirelessly, RDS uses BPSK, which as we learned in the :ref:`modulation-chapter` chapter is a simple digital modulation scheme used to map 1's and 0's to the phase of a carrier.  Like many BPSK-based protocols, RDS uses differential coding, which simply means the 1's and 0's of data are encoded in changes of 1's and 0's instead, which lets you no longer care whether you are 180 degrees out of phase (more on this later).  The BPSK symbols are transmitted at 1187.5 symbols per second, and because BPSK carries one bit per symbol, that means RDS has a raw data rate of roughly 1.2 kbps (including overhead).  RDS does not contain any channel coding (a.k.a. forward error correction), although the data packets do contain a cyclic redundancy check (CRC) to know when an error occurred.   The experienced BPSK-er may be wondering why we saw a double-lobe shaped signal in the first PSD; BPSK usually has one main lobe.  It turns out RDS takes the BPSK signal and duplicates/mirrors it across the 57 kHz center frequency, for robustness through redundancy.  When we dive into the Python code used to receive RDS, one of our steps will involve filtering to isolate just one of these BPSK signals.
+Om deze bits draadloos te versturen gebruikt RDS BPSK. We hebben in het :ref:`modulation-chapter` hoofdstuk gezien dat dit een simpel modulatieschema is waarmee de fase van de draaggolf is gekoppeld aan de enen en nullen.
+RDS maakt gebruik van differentiële codering zodat we niet langer zorgen hoeven te maken over een 180 graden fasedraaiing.
+De BPSK-symbolen worden verstuurd op een snelheid van 1187.5 symbolen per seconde.
+Omdat BPSK slechts 1 bit per symbool gebruikt komt dit neer op een transmissiesnelheid van ongeveer 1.2 kbps.
+RDS gebruikt geen kanaalcodering (foutcorrectie) maar bevat wel een CRC-som om fouten te kunnen detecteren.
+De ervaren BPSK-er vraagt zich misschien af waarom het signaal twee zijbanden heeft in figuur :numref:`PSD`; meestal heeft BPSK maar 1 zijband.
+RDS blijkt het BPSK-signaal te dupliceren/spiegelen rondom 57 kHz voor extra redundantie. 
+Wanneer we de Python code gaan bekijken gebruiken we een filter om slechts een van deze BPSK-signalen te demoduleren.
 
-The final "double BPSK" signal is then frequency shifted up to 57 kHz and added to all the other components of the FM signal, before being FM modulated and transmitted over the air at the station's frequency.  FM radio signals are transmitted at an extremely high power compared to most other wireless communications, up to 80 kW!  This is why many SDR users have an FM-reject filter (i.e., a band-stop filter) in-line with their antenna; so FM does not add interference to what they are trying to receive.
+Het dubbele BPSK-signaal wordt uiteindelijk verschoven in frequentie naar 57 kHz en aan alle andere componenten van het FM-signaal toegevoegd, voordat de frequentiemodulatie zelf plaatsvindt. 
+FM-signalen worden, vergeleken met andere draadloze communicatie, uitgezonden op extreem hoge vermogens, tot 80 kW!
+Om deze reden hebben veel SDR-gebruikers een band-stop-filter met de antenne in serie gezet om te voorkomen dat het FM-signaal andere signalen overstemt.
 
-While this was only a brief overview of the transmit side, we will be diving into more details when we discuss receiving RDS.
-
-Receive Side
+Ontvanger
 ############
 
-In order to demodulate and decode RDS, we will perform the following steps, many of which are transmit-side steps in reverse (no need to memorize this list, we will walk through each step individually below):
+De volgende stappen zijn nodig om RDS te demoduleren en decoderen. Je hoeft deze lijst niet te onthouden, we zullen elke stap gaan behandelen:
 
-#. Receive an FM radio signal centered at the station's frequency (or read in an IQ recording), usually at a sample rate of 250 kHz
-#. Demodulate the FM using what is called "quadrature demodulation"
-#. Frequency shift by 57 kHz so the RDS signal is centered at 0 Hz
-#. Low-pass filter, to filter out everything besides RDS
-#. Decimate by 10 so that we can work at a lower sample rate, since we filtered out the higher frequencies anyway
-#. Resample to 19 kHz which will give us an integer number of samples per symbol
-#. Isolate one of the two RDS BPSK signals with a band-pass filter
-#. Symbol-level time synchronization, using Mueller and Muller in this example
-#. Fine frequency synchronization using a Costas loop
-#. Demodulate the BPSK to 1's and 0's
-#. Differential decoding, to undo the differential encoding that was applied
-#. Decoding of the 1's and 0's into groups of bytes
-#. Parsing of the groups of bytes into our final output
+#. FM-signaal ontvangen (of lees een IQ-opname), meestal met een samplerate van 250 kHz
+#. "kwadratuur demodulatie" toepassen om het FM-signaal te demoduleren
+#. Frequentieverschuiving van 57 kHz toepassen zodat het RDS-signaal zich rond de 0 Hz bevindt.
+#. Laagdoorlaatfilter toepassen om alleen RDS over te houden
+#. Decimeren met 10, na het filteren werken we toch met lagere frequenties
+#. Hersamplen naar 19 kHz zodat we een geheel getal aan samples per symbool hebben
+#. Een van de RDS-signalen wegfilteren met een banddoorlaatfilter
+#. Tijdsynchronisatie, met behulp van Mueller en Muller in dit voorbeeld
+#. Fijne frequentiesynchronisatie m.b.v. een Costas-loop
+#. BPSK demoduleren naar 1'en en 0'en.
+#. Differentieel decoderen
+#. De 1'en en 0'en groeperen in bytes
+#. De bytes ontleden tot de uiteindelijke data
 
-While this may seem like a lot of steps, RDS is actually one of the simplest wireless digital communications protocols out there.  A modern wireless protocol like WiFi or 5G requires a whole textbook to cover just the high-level PHY/MAC layer information.
+Het lijkt op een hoop stappen, maar RDS is een van de makkelijkste protocollen om te decoderen. Een modern protocol zoals wifi of 5G heeft een boek nodig om de PHY/MAC lagen uit te leggen.
 
-We will now dive into the Python code used to receive RDS.  This code has been tested to work using an `FM radio recording you can find here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, although you should be able to feed in your own signal as long as its received at a high enough SNR, simply tune to the station's center frequency and sample at a rate of 250 kHz.  To maximize the received signal power (e.g., if you are indoors), it helps to use a half-wave dipole antenna of the correct length (~1.5 meters), not the 2.4 GHz antennas that come with the Pluto.  That being said, FM is a very loud signal, and if you are near a window or outside, the 2.4 GHz antennas will likely be enough to pick up the stronger radio stations.  
+We zullen nu gaan kijken naar de Python code waarmee we RDS kunnen ontvangen.
+Deze code werkt met een `FM opname die je hier kunt vinden <https://github.com/versd/pysdr/blob/dutch/fm_1027mhz_250ksps?raw=true>`_, of met een eigen ontvangen signaal zolang de SNR maar hoog genoeg is. Je hoeft alleen af te stemmen op de middenfrequentie van het FM-station en te samplen op 250 kHz.
+Om het signaalvermogen te maximaliseren helpt het om een dipoolantenne toe te passen met de juiste lengte (~1.5 meter), niet de 2.4 GHz antennes van de Pluto.
+Daarentegen is FM wel een heel luid signaal, als je dicht bij een raam staat, of buiten, is de 2.4 GHz antenne waarschijnlijk genoeg om sterke FM stations te ontvangen.
 
-In this section we will present small portions of the code individually, with discussion, but the same code is provided at the end of this chapter in one large block.  Each section will present a block of code, and then explain what it is doing.
+In de volgende delen behandelen we telkens een klein stukje code, maar de totale code is ook aan het einde van dit hoofdstuk te vinden.
+Elk deel zal een stuk code geven en uitleggen wat het doet.
 
 ********************************
-Acquiring a Signal
+Signaal ontvangen
 ********************************
 
 .. code-block:: python
@@ -113,98 +132,119 @@ Acquiring a Signal
  import matplotlib.pyplot as plt
  
  # Read in signal
- x = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64)
+ x = np.fromfile('/home/versd/Downloads/fm_1027mhz_250ksps', dtype=complex64)
  sample_rate = 250e3
- center_freq = 99.5e6
+ center_freq = 102.7e6
 
-We read in our test recording, which was sampled at 250 kHz and centered on an FM station received at a high SNR.  Make sure to update the file path to reflect your system and where you saved the recording.  If you have an SDR already set up and working from within Python, feel free to receive a live signal, although it helps to have first tested the entire code with a `known-to-work IQ recording <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.  Throughout this code we will use :code:`x` to store the current signal being manipulated. 
-
-********************************
-FM Demodulation
-********************************
-
-.. code-block:: python
-
- # Quadrature Demod
- x = 0.5 * np.angle(x[0:-1] * np.conj(x[1:])) # see https://wiki.gnuradio.org/index.php/Quadrature_Demod
-
-As discussed at the beginning of this chapter, several individual signals are combined in frequency and FM modulated to create what is actually transmitted through the air.  So the first step is to undo that FM modulation.  Another way to think about it is the information is stored in the frequency variation of the signal we receive, and we want to demodulate it so the information is now in the amplitude not frequency.  Note that the output of this demodulation is a real signal, even though we fed in a complex signal.
-
-What this single line of Python is doing, is first calculating the product of our signal with a delayed and conjugated version of our signal.  Next, it finds the phase of each sample in that result, which is the moment at which it goes from complex to real.  To prove to ourselves that this gives us the information contained in the frequency variations, consider a tone at frequency :math:`f` with some arbitrary phase :math:`\phi`, which we can represent as :math:`e^{j2 \pi (f t + \phi)}`.  When dealing in discrete time, which uses an integer :math:`n` instead of :math:`t`, this becomes :math:`e^{j2 \pi (f n + \phi)}`.  The conjugated and delayed version is :math:`e^{-j2 \pi (f (n-1) + \phi)}`.  Multiplying these two together leads to :math:`e^{j2 \pi f}`, which is great because :math:`\phi` is gone, and when we calculate the phase of that expression we are left with just :math:`f`.
-
-One convenient side effect of FM modulation is that amplitude variations of the received signal does not actually change the volume of the audio, unlike AM radio.  
+Hiermee lezen we de testopname in. De opname was gesampled op 250 kHz met een hoge SNR om RDS te kunnen decoderen. Je zult het pad naar het bestand moeten aanpassen voor jouw systeem. Je kunt natuurlijk ook een SDR gebruiken, alhoewel het zal helpen de code eerst te testen met de `FM opname die je hier kunt vinden <https://github.com/versd/pysdr/blob/dutch/fm_1027mhz_250ksps?raw=true>`_.
+Door alle code heen zullen we :code:`x` gebruiken als het signaal. 
 
 ********************************
-Frequency Shift
+FM Demodulatie
 ********************************
 
 .. code-block:: python
 
- # Freq shift
+ # Kwadratuur Demod
+ x = 0.5 * np.angle(x[0:-1] * np.conj(x[1:])) # zie https://wiki.gnuradio.org/index.php/Quadrature_Demod
+
+Zoals aan het begin van het hoofdstuk is behandeld, wordt een FM-signaal gevormd door meerdere componenten te combineren en vervolgens te frequentiemoduleren om het door de lucht te zenden. De eerste stap is dus om die frequentiemodulatie ongedaan te maken.
+Een andere manier om erover na te denken is dat de informatie in de frequentievariatie van het ontvangen signaal is gestopt, en we de informatie willen demoduleren zodat het in de amplitudeverschillen gaat zitten, en niet langer frequentie.
+Let op dat de uitgang een reëel signaal is, terwijl de ingang complex was.
+
+Wat deze enkele regel Python-code doet is de vermenigvuldiging uitrekenen tussen ons signaal en een vertraagde en geconjugeerde versie van ons signaal. Hierna berekent het de fase van elke sample van het resultaat, dit is het moment waar het signaal reëel wordt.
+We kunnen als volgt bewijzen dat deze regel inderdaad de informatie uit de frequentievariatie onttrekt.
+Neem een toon met frequentie :math:`f` en fase :math:`\phi` dat we kunnen uitdrukken als :math:`e^{j2 \pi (f t + \phi)}`.
+Als we nu in de discrete tijd gaan denken, gebruiken we niet langer de continue t maar maken we stappen van nT met T de duur van de stap.
+Voor het gemak maken we T gelijk aan 1 en kunnen dan de vergelijking schrijven als :math:`e^{j2 \pi (f n + \phi)}`.
+Het geconjugeerde en vertraagde signaal is dan :math:`e^{-j2 \pi (f (n-1) + \phi)}`.
+De regel wordt:
+
+.. math:: 
+    e^{j2 \pi (fn + \phi)}*e^{-j2 \pi (f(n-1) + \phi)}=e^{j2 \pi (fn-f(n-1) +\phi -\phi)} = e^{j2 \pi f}
+
+Dit is mooi, want nu is :math:`\phi` verdwenen en de hoek van het complexe getal is gelijk aan de huidige frequentie :math:`f`.
+
+Een bijkomend voordeel van frequentiemodulatie is dat variaties in de amplitude van het ontvangen signaal geen impact heeft op het volume van de audio, zoals bij AM radio wel het geval is. 
+
+********************************
+Frequentieverschuiving
+********************************
+
+.. code-block:: python
+
+ # Freq verschuiven
  N = len(x)
- f_o = -57e3 # amount we need to shift by
- t = np.arange(N)/sample_rate # time vector
- x = x * np.exp(2j*np.pi*f_o*t) # down shift
+ f_o = -57e3 # hoeveelheid in Hz
+ t = np.arange(N)/sample_rate # tijdvector
+ x = x * np.exp(2j*np.pi*f_o*t) # verschuiving
 
-Next we frequency shift down by 57 kHz, using the :math:`e^{j2 \pi f_ot}` trick we learned in the :ref:`sync-chapter` chapter where :code:`f_o` is the frequency shift in Hz and :code:`t` is just a time vector, the fact it starts at 0 isn't important, what matters is that it uses the right sample period (which is inverse of sample rate).  As an aside, because it's a real signal being fed in, it doesn't actually matter if you use a -57 or +57 kHz because the negative frequencies match the positive, so either way we are going to get our RDS shifted to 0 Hz.
+We gaan nu het signaal in frequentie naar beneden schuiven met 57 kHz. We kunnen hiervoor de :math:`e^{j2 \pi f_ot}` *truc* gebruiken uit het :ref:`sync-chapter` hoofdstuk waarbij :code:`f_o` de verschuiving is in Hz en :code:`t` de tijdvector. Dat de tijdvector bij 0 begint is niet belangrijk, wat wel belangrijk is, is dat de juiste periodetijd wordt gebruikt, de inverse van de samplefrequentie. 
+Trouwens, omdat een reëel signaal gespiegeld is rond 0 Hz maakt het niet uit of we -57 of + 57 kHz verschuiven. Aan beide kanten van 0 Hz is het RDS-signaal te vinden.
 
 ********************************
-Filter to Isolate RDS
+RDS eruit filteren
 ********************************
 
 .. code-block:: python
 
- # Low-Pass Filter
+ # laagdoorlaatfilter
  taps = firwin(numtaps=101, cutoff=7.5e3, fs=sample_rate)
  x = np.convolve(x, taps, 'valid')
 
-Now we must filter out everything besides RDS. Since we have RDS centered at 0 Hz, that means a low-pass filter is the one we want.  We use :code:`firwin()` to design an FIR filter (i.e., find the taps), which just needs to know how many taps we want the filter to be, and the cutoff frequency.  The sample rate must also be provided or else the cutoff frequency doesn't make sense to firwin.  The result is a symmetric low-pass filter, so we know the taps are going to be real numbers, and we can apply the filter to our signal using a convolution.  We choose :code:`'valid'` to get rid of the edge effects of doing convolution, although in this case it doesn't really matter because we are feeding in such a long signal that a few weird samples on either edge isn't going to throw anything off.
+Nu zullen we alle signalen behalve RDS moeten wegfilteren. Omdat het RDS-signaal nu gecentreerd is rond 0 Hz willen we een laagdoorlaatfilter toepassen. We kunnen :code:`firwin()` gebruiken om de coëfficiënten van een FIR filter te berekenen. Het heeft alleen het aantal coëfficiënten en de kantelfrequentie nodig. De samplerate moet ook worden gegeven omdat de kantelfrequentie anders geen betekenis heeft voor firwin. Het resultaat is een symmetrisch laagdoorlaatfilter met reële coëfficiënten waarmee we het signaal kunnen convolueren. 
+We kiezen :code:`'valid'` om randeffecten te voorkomen bij de convolutie, alhoewel het in dit geval niet echt uitmaakt omdat we toch een enorm lang signaal geven waardoor een paar gekke samples aan de randen weinig invloed heeft.
 
 ********************************
-Decimate by 10
+Met 10 decimeren
 ********************************
 
 .. code-block:: python
 
- # Decimate by 10, now that we filtered and there wont be aliasing
+ # Geen vouwvervorming meer dankzij het filter, nu decimeren met 10
  x = x[::10]
  sample_rate = 25e3
 
-Any time you filter down to a small fraction of your bandwidth (e.g., we started with 125 kHz of *real* bandwidth and saved only 7.5 kHz of that), it makes sense to decimate.  Recall the beginning of the :ref:`sampling-chapter` chapter where we learned about the Nyquist Rate and being able to fully store band-limited information as long as we sampled at twice the highest frequency. Well now that we used our low-pass filter, our highest frequency is about 7.5 kHz, so we only need a sample rate of 15 kHz.  Just to be safe we'll add some margin and use a new sample rate of 25 kHz (this ends up working well mathematically later on).  
+Telkens wanneer je een klein stuk van de originele bandbreedte overhoudt dankzij een filter (bijv. van 125 kHz *reële* bandbreedte naar 7.5 kHz), heeft het nut te decimeren. In het begin van het :ref:`sampling-chapter` hoofdstuk hebben we geleerd over de Nyquistfrequentie, en dat we een signaal met beperkte bandbreedte volledig kunnen opslaan, zolang we twee keer zo snel samplen als de hoogste frequentie in het signaal.
+Dus, nu we ons laagdoorlaatfilter hebben toegepast is de hoogste frequentie ongeveer 7.5 kHz, en een samplerate van 15 kHz zou voldoende moeten zijn. Voor de zekerheid voegen we er nog een marge aan toe en gaan we een samplerate van 25 kHz gebruiken. Deze frequentie helpt later ook nog eens.
 
-We perform the decimation by simply throwing out 9 out of every 10 samples, since we previously were at a sample rate of 250 kHz and we want it to now be at 25 kHz.  This might seem confusing at first, because throwing out 90% of the samples feels like you are throwing out information, but if you review the :ref:`sampling-chapter` chapter you will see why we are not actually losing anything, because we filtered properly (which acted as our anti-aliasing filter) and reduced our maximum frequency and thus signal bandwidth.
+Om te decimeren kunnen we simpelweg 9 van de 10 samples weggooien. We hadden immers een frequentie van 250 kHz en we willen naar 25 kHz.
+Dit lijkt in eerste instantie verwarrend, want 90% van de samples weggooien voelt alsof we informatie verliezen, maar als je het :ref:`sampling-chapter` hoofdstuk doorleest zie dat we echt niets verliezen vanwege het filter. Het laagdoorlaatfilter werkt als een anti-aliasing filter en vermindert de maximale frequentie en dus bandbreedte van het signaal.
 
-From a code perspective this is probably the simplest step out of them all, but make sure to update your :code:`sample_rate` variable to reflect the new sample rate.
+Vanuit de code bekeken is dit de makkelijkste stap, maar vergeet niet de :code:`sample_rate` variabele nu ook aan te passen!
 
 ********************************
-Resample to 19 kHz
+Hersamplen naar 19 kHz
 ********************************
 
 .. code-block:: python
 
- # Resample to 19kHz
- x = resample_poly(x, 19, 25) # up, down
+ # Hersamplen naar 19kHz
+ x = resample_poly(x, 19, 25) # omhoog, beneden
  sample_rate = 19e3
 
-In the :ref:`pulse-shaping-chapter` chapter we solidified the concept of "samples per symbol", and learned the convenience of having an integer number of samples per symbol (a fractional value is valid, just not convenient).  As mentioned earlier, RDS uses BPSK transmitting 1187.5 symbols per second.  If we continue to use our signal as-is, sampled at 25 kHz, we'll have 21.052631579 samples per symbol (pause and think about the math if that doesn't make sense).  So what we really want is a sample rate that is an integer multiple of 1187.5 Hz, but we can't go too low or we won't be able to "store" our full signal's bandwidth.  In the previous subsection we talked about how we need a sample rate of 15 kHz or higher, and we chose 25 kHz just to give us some margin.
+In het :ref:`pulse-shaping-chapter` hoofdstuk is het concept van "samples per symbool" duidelijk gemaakt en hebben we gezien dat een volledig aantal samples per symbool handiger is dan een fractioneel aantal. 
+Eerder is opgemerkt dat RDS met BPSK 1187.5 symbolen per seconde verstuurt.
+Met een samplefrequentie van 25 kHz komt dit neer op 21.052631579 samples per symbool (denk hier even over na als je deze uitkomst niet volgt).
+Wat we dus echt willen is een samplefrequentie dat een veelvoud is van 1187.5 Hz, maar wel voldoet aan Nyquist. In de vorige sectie hadden we besloten dat de samplefrequentie tenminste 15 kHz moest zijn en met een marge 25 kHz.
 
-Finding the best sample rate to resample to comes down to how many samples per symbol we want, and we can work backwards.  Hypothetically, let us consider targeting 10 samples per symbol.  The RDS symbol rate of 1187.5 multiplied by 10 would give us a sample rate of 11.875 kHz, which unfortunately is not high enough for Nyquist.  How about 13 samples per symbol?  1187.5 multiplied by 13 gives us 15437.5 Hz, which is above 15 kHz, but quite the uneven number.  How about the next power of 2, so 16 samples per symbol?  1187.5 multiplied by 16 is exactly 19 kHz!  The even number is less of a coincidence and more of a protocol design choice.  
+De gewenste samplefrequentie is nu afhankelijk van hoeveel samples per symbool we willen overhouden. Stel we willen 10 samples per symbool. De RDS-symboolfrequentie van 1187.5 maal 10 geeft ons een samplefrequentie van 11.875 kHz. Dit voldoet helaas niet aan Nyquist. Wat als we 13 samples per symbool proberen? Dan komen we uit op 15437.5 Hz. dit is wel boven de 15 kHz maar niet zo'n mooie frequentie. En wat als we de volgende macht van 2 proberen, dus 16 samples per symbool? 1187.5 maal 16 levert exact 19 kHz op! Dit nummer is geen toeval maar een protocol ontwerpkeuze.
 
-To resample from 25 kHz to 19 kHz, we use :code:`resample_poly()` which upsamples by an integer value, filters, then downsamples by an integer value.  This is convenient because instead of entering in 25000 and 19000 we can use 25 and 19.  If we had used 13 samples per symbol by using a sample rate of 15437.5 Hz, we wouldn't be able to use :code:`resample_poly()` and the resampling process would be much more complicated.
+Om de samplefrequentie nu van 25 kHz naar 19 kHz te brengen kunnen we :code:`resample_poly()` toepassen. Deze functie interpoleert met een gehele waarde, filtert, en decimeert met een gehele waarde. Dit is handig want nu kunnen we 25 en 19 gebruiken i.p.v. 25000 en 19000. Hadden we toch voor 13 samples per symbool gekozen, dan hadden we :code:`resample_poly()` niet kunnen gebruiken en zou alles veel lastiger worden.
 
-Once again, always remember to update your :code:`sample_rate` variable when performing an operation that changes it.
+Nogmaals, vergeet niet om de :code:`sample_rate` variabele aan te passen wanneer het is verandert.
 
 ********************************
-Band-Pass Filter
+Banddoorlaatfilter
 ********************************
 
 .. code-block:: python
 
- # Bandpass filter to isolate one RDS BPSK signal
+ # Banddoorlaatfilter om 1 RDS BPSK signaal te isoleren
  taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
  x = np.convolve(x, taps, 'valid')
 
-Recall that RDS contains two identical BPSK signals, hence the shape we saw in the PSD at the beginning.  We have to choose one, so we will arbitrarily decide to keep the positive one with a band-pass filter.  We use :code:`firwin()` again, but note the :code:`pass_zero=False` which is how you indicate you want it to be a band-pass filter instead of low-pass, and there are two cutoff frequencies to define the band.  The signal is from roughly 0 Hz to 2 kHz but you can't specify a 0 Hz starting frequency so we use 0.05 kHz.  Lastly, we need to increase our number of taps, to get a steeper frequency response.  We can verify that these numbers worked by looking at our filter in the time domain (by plotting taps) and frequency domain (by taking FFT of taps).  Note how in the frequency domain, we reach near-zero response at about 0 Hz.
+We weten dat RDS twee identieke BPSK signalen bevat gezien de vorm van de PSD (figuur :numref:`PSD`).  We moeten er een kiezen, dus we kiezen willekeurig ervoor om het positieve deel te behouden door middel van een banddoorlaatfilter. Weer gebruiken we :code:`firwin()`, maar nu met  :code:`pass_zero=False` waarmee we aangeven dat het om een banddoorlaatfilter gaat. Er zijn dus twee kantelfrequenties nodig. Omdat we 0 Hz niet als kantelfrequentie kunnen opgeven, kiezen we voor 50 Hz. Als laatste verhogen we ook het aantal coëfficiënten zodat we een scherp filter krijgen. We kunnen deze instelling verifiëren door het filter in het tijd- en frequentiedomein te bekijken, d.m.v. de coëfficiënten en de FFT ervan. Zie dat de doorlaatband in het frequentiedomein tot bijna 0 Hz gaat.
 
 .. image:: ../_images/bandpass_filter_taps.svg
    :align: center 
@@ -214,124 +254,137 @@ Recall that RDS contains two identical BPSK signals, hence the shape we saw in t
    :align: center 
    :target: ../_images/bandpass_filter_freq.svg
 
-Side note: At some point I will update the filter above to use a proper matched filter (root-raised cosine I believe is what RDS uses), for conceptual sake, but I got the same error rates using the firwin() approach as GNU Radio's proper matched filter, so it's clearly not a strict requirement.
+Kanttekening: Op een gegeven moment zal ik dit filter vervangen met een echt matched filter (volgens mij gebruikt RDS een RRC filter). Met de firwin() aanpak kreeg ik dezelfde bitfout-frequentie als met GNU Radio's gematchte filter, dus het is duidelijk geen harde eis.
 
 ***********************************
-Time Synchronization (Symbol-Level)
+Tijdsynchronisatie (Symbool-niveau)
 ***********************************
 
 .. code-block:: python
 
- # Symbol sync, using what we did in sync chapter
- samples = x # for the sake of matching the sync chapter
- samples_interpolated = resample_poly(samples, 32, 1) # we'll use 32 as the interpolation factor, arbitrarily chosen, seems to work better than 16
+ # Symbol sync, zoals uit het synchronisatie hoofdstuk sync chapter
+ samples = x # zodat we met het synchronisatie hoofdstuk overeenkomen
+ samples_interpolated = resample_poly(samples, 32, 1) # we interpoleren met 32, dit lijkt beter te werken dan 16
  sps = 16
- mu = 0.01 # initial estimate of phase of sample
+ mu = 3 # eerste inschatting van faseafwijking
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
- out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stores values, each iteration we need the previous 2 values plus current value
+ out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # oude waardes opslaan
  i_in = 0 # input samples index
- i_out = 2 # output index (let first two outputs be 0)
+ i_out = 2 # output index (eerste twee zijn 0)
  while i_out < len(samples) and i_in+32 < len(samples):
-     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] # grab what we think is the "best" sample
+     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] #neem het `beste` sample
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
      mm_val = np.real(y - x)
-     mu += sps + 0.01*mm_val
-     i_in += int(np.floor(mu)) # round down to nearest int since we are using it as an index
-     mu = mu - np.floor(mu) # remove the integer part of mu
-     i_out += 1 # increment output index
- x = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
+     mu += sps + 0.8*mm_val
+     i_in += int(np.floor(mu)) # afronden naar geheel getal
+     mu = mu - np.floor(mu) # fractie berekenen
+     i_out += 1 # output index verhogen
+ x = out[2:i_out] # pak alleen de nuttige data
 
-We are finally ready for our symbol/time synchronization, here we will use the exact same Mueller and Muller clock synchronization code from the :ref:`sync-chapter` chapter, reference it if you want to learn more about how it works.  We set the sample per symbol (:code:`sps`) to 16 as discussed earlier.  A mu gain value of 0.01 was found via experimentation to work well.  The output should now be one sample per symbol, i.e., our output is our "soft symbols", with possible frequency offset included.  The following constellation plot animation is used to verify we are getting BPSK symbols (with a frequency offset causing rotation):
+Eindelijk kunnen we de symbool/tijdsynchronisatie gaan toepassen. We gebruiken exact dezelfde Mueller en Muller kloksynchronisatie code als uit het :ref:`sync-chapter` hoofdstuk. Je kunt dat lezen mocht je meer willen weten over deze code. We stellen het aantal samples per symbool (:code:`sps`) in op 16, zoals eerder besloten. Een mu versterking van 0.8 is met trial-en-error gevonden als een waarde die goed werkt met ons signaal. De uitgang krijgt 1 sample per symbool met "zachte" samples en een mogelijke frequentieafwijking. De volgende animatie kunnen we gebruiken om te verifiëren dat we BPSK-symbolen krijgen (met een frequentieverschuiving wat rotatie veroorzaakt):
 
 .. image:: ../_images/constellation-animated.gif
    :scale: 80 % 
    :align: center 
 
-If you are using your own FM signal and are not getting two distinct clusters of complex samples at this point, it means either the symbol sync above failed to achieve sync, or there is something wrong with one of the previous steps.  You don't need to animate the constellation, but if you plot it, make sure to avoid plotting all the samples, because it will just look like a circle.  If you plot only 100 or 200 samples at a time, you will get a better feel for whether they are in two clusters or not, even if they are spinning.
+Mocht je een eigen FM-signaal gebruiken, en je krijgt nu niet twee aparte clusters van complexe samples, dan kan het synchronisatiealgoritme van hierboven niet synchroniseren of je hebt in de eerdere stappen een fout gemaakt. Je hoeft de constellatie niet te animeren, maar probeer niet alle samples te weergeven want dan zie je alleen een cirkel. Als je 100 of 200 samples per keer laat zien dan heb je een beter gevoel of dat er twee clusters zijn of niet, zelfs als ze ronddraaien.
 
 ********************************
-Fine Frequency Synchronization
+Fijne Frequentiesynchronisatie
 ********************************
 
 .. code-block:: python
 
- # Fine freq sync
- samples = x # for the sake of matching the sync chapter
+ # Fijne freq sync
+ samples = x # om met het sync hoofdstuk overeen te komen
  N = len(samples)
  phase = 0
  freq = 0
- # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
- alpha = 8.0 
- beta = 0.002
+ # deze parameters maken de regelaar sneller of langzamer (of instabiel)
+ alpha = 100
+ beta = 0.23
  out = np.zeros(N, dtype=np.complex64)
  freq_log = []
  for i in range(N):
-     out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
-     error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+     out[i] = samples[i] * np.exp(-1j*phase) # intgang corrigeren met geschatte afwijking
+     error = np.real(out[i]) * np.imag(out[i]) # foutvergelijking voor BPSK
  
-     # Advance the loop (recalc phase and freq offset)
+     # fase- en frequentieafwijking opnieuw bepalen
      freq += (beta * error)
-     freq_log.append(freq * sample_rate / (2*np.pi)) # convert from angular velocity to Hz for logging
+     freq_log.append(freq * sample_rate / (2*np.pi)) # van rad/s naar Hz voor loggen
      phase += freq + (alpha * error)
  
-     # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
+     # Fase tussen 0 and 2pi forceren
      while phase >= 2*np.pi:
          phase -= 2*np.pi
      while phase < 0:
          phase += 2*np.pi
  x = out
 
-We will also copy the fine frequency synchronization Python code from the :ref:`sync-chapter` chapter, which uses a Costas loop to remove any residual frequency offset, as well as align our BPSK to the real (I) axis, by forcing Q to be as close to zero as possible.  Anything left in Q is likely due to the noise in the signal, assuming the Costas loop was tuned properly.  Just for fun let's view the same animation as above except after the frequency synchronization has been performed (no more spinning!):
+We kopiëren ook de fijne frequentiesynchronisatie-code van het :ref:`sync-chapter` hoofdstuk.
+We gebruiken dus een Costas-loop om enig overgebleven frequentieafwijking te corrigeren, alsmede het BPSK uitlijnen met de reële (I) as.
+Alles wat overblijft op de Q as komt waarschijnlijk door ruis, als de loop goed is afgesteld.
+Laten we dezelfde animatie als eerder bekijken maar met de frequentiesynchronisatie toegepast (het is gestopt met draaien!):
 
 .. image:: ../_images/constellation-animated-postcostas.gif
    :scale: 80 % 
    :align: center 
 
-Additionally, we can look at the estimated frequency error over time to see the Costas loop working, note how we logged it in the code above.  It appears that there was about 13 Hz of frequency offset, either due to the transmitter's oscillator/LO being off or the receiver's LO (most likely the receiver).  If you are using your own FM signal, you may need to tweak :code:`alpha` and :code:`beta` until the curve looks similar, it should achieve synchronization fairly quickly (e.g., a few hundred symbols) and maintain it with minimal oscillation.  The pattern you see below after it finds its steady state is frequency jitter, not oscillation.
+We kunnen ook nog de geschatte frequentieafwijking over de tijd weergeven om te zien hoe de Costas-loop werkt. We hadden dit immers opgeslagen in de code. Het lijkt op een afwijking van ongeveer 0.8 Hz, mogelijk veroorzaakt door een oscillatorafwijking bij de zender, maar waarschijnlijk bij de ontvanger. Wanneer je een eigen signaal gebruikt zul je :code:`alpha` en :code:`beta` moeten aanpassen totdat je een vergelijkbaar figuur krijgt. Het zou redelijk snel moeten afregelen met minimale oscillaties. Wat na steady-state overblijft is jitter, niet oscillaties.
 
-.. image:: ../_images/freq_error.png
-   :scale: 40 % 
+.. image:: images/freq_error.svg
+   :scale: 10 % 
    :align: center 
 
 ********************************
-Demodulate the BPSK
+BPSK demoduleren
 ********************************
 
 .. code-block:: python
 
  # Demod BPSK
- bits = (np.real(x) > 0).astype(int) # 1's and 0's
+ bits = (np.real(x) > 0).astype(int) # enen en nullen
 
-Demodulating the BPSK at this point is very easy, recall that each sample represents one soft symbol, so all we have to do is check whether each sample is above or below 0.  The :code:`.astype(int)` is just so we can work with an array of ints instead of an array of bools.  You may wonder whether above/below zero represents a 1 or 0.  As you will see in the next step, it doesn't matter!
+BPSK demoduleren is op dit punt erg simpel geworden. Omdat elk sample een *zacht* symbool voorstelt hoeven we alleen nog maar te kijken of de sample boven of onder de 0 is. Het stukje :code:`.astype(int)` is zodat we een array van getallen krijgen, in plaats van booleaanse variabelen. Als je je afvraagt of onder/boven de nul een 1 of een 0 voorstelt, dan zul je in de volgende sectie zien dat dit niet uitmaakt!
 
 ********************************
-Differential Decoding
+Differentieel decoderen
 ********************************
 
 .. code-block:: python
 
- # Differential decoding, so that it doesn't matter whether our BPSK was 180 degrees rotated without us realizing it
+ # Differentieel decoderen, het maakt dan niet uit of alles 180 graden gedraaid is.
  bits = (bits[1:] - bits[0:-1]) % 2
- bits = bits.astype(np.uint8) # for decoder
+ bits = bits.astype(np.uint8) # voor decoderen
 
-The BPSK signal used differential coding when it was created, which means that each 1 and 0 of the original data was transformed such that a change from 1 to 0 or 0 to 1 got mapped to a 1, and no change got mapped to a 0.  The nice benefit of using differential coding is so you don't have to worry about 180 degree rotations in receiving the BPSK, because whether we consider a 1 to be greater than zero or less than zero is no longer an impact, what matters is changing between 1 and 0.  This concept might be easier to understand by looking at example data, below shows the first 10 symbols before and after the differential decoding:
+Toen het BPSK-signaal werd opgezet, is differentiële codering gebruikt. Dit betekent dat elke 1 en 0 van de originele data op zo'n manier is opgezet dat een bit verandering een 1 oplevert, en geen verandering een 0. Het grote voordeel van differentiële codering is dat je geen zorgen meer hebt over een mogelijke 180 graden fasedraaiing. Je kijkt dus niet meer of een 1 groter dan nul of minder dan nul moet zijn, je kijkt nu alleen of er een verschil is geweest tussen 1 en 0. Dit concept is misschien makkelijker te begrijpen door naar voorbeelddata te kijken. Hieronder zie je 10 symbolen voor en na differentiële decodering:
 
 .. code-block:: python
 
- [1 1 1 1 0 1 0 0 1 1] # before differential decoding
- [- 0 0 0 1 1 1 0 1 0] # after differential decoding
+ [1 1 1 1 0 1 0 0 1 1] # voor differentiele decodering
+ [- 0 0 0 1 1 1 0 1 0] # na differentiele decodering
 
 ********************************
-RDS Decoding
+RDS Decoderen
 ********************************
 
-We finally have our bits of information, and we are ready to decode what they mean!  The massive block of code provided below is what we will use to decode the 1's and 0's into groups of bytes.  This part would make a lot more sense if we first created the transmitter portion of RDS, but for now just know that in RDS, bytes are grouped into groups of 12 bytes, where the first 8 represent the data and the last 4 act as a sync word (called "offset words").  The last 4 bytes are not needed by the next step (the parser) so we don't include them in the output.  This block of code takes in the 1's and 0's created above (in the form of a 1D array of uint8's) and outputs a list of lists of bytes (a list of 8 bytes where those 8 bytes are in a list).  This makes it convenient for the next step, which will iterate through the list of 8 bytes, one group of 8 at a time.
+Nu we eindelijk onze bits aan informatie hebben kunnen we het gaan decoderen en zien wat het betekent.
+Het enorme blok code wat hieronder is gegeven zullen we gebruiken om de 1'en en 0'en te decoderen naar groepen bytes.
+Dit deel zou een stuk logischer worden al we eerst het zendende deel van RDS hadden gemaakt, maar accepteer voor nu dat RDS, groepen van 12 bytes gebruikt. De eerste 8 bytes geven de data aan, de laatste 4 bytes dienen voor synchronisatie. De laatste 4 bytes zijn niet noodzakelijk voor de volgende stap (het interpreteren van de data) dus dit wordt niet meegenomen in de uitgang. 
+Dit blok code neemt de 1'en en 0'en van hierboven en geeft aan de uitgang een lijst van bytes (in groepen van 8). Dit is handig voor de volgende stap waarbij we door de lijst gaan, per groep van 8 bytes.
 
-Most of the actual decoding code below revolves around syncing (at the byte level, not symbol) and error checking.  It works in blocks of 104 bits, each block is either received correctly or in error (using CRC to check), and every 50 blocks it checks whether more than 35 of them were received with error, in which case it resets everything and attempts to sync again.  The CRC is performed using a 10-bit check, with polynomial :math:`x^{10}+x^8+x^7+x^5+x^4+x^3+1`; this occurs when :code:`reg` is xor'ed with 0x5B9 which is the binary equivalent of that polynomial.  In Python, the bitwise operators for [and, or, not, xor] are :code:`& | ~ ^` respectively, exactly the same as C++. A left bit shift is :code:`x << y` (same as multiplying x by 2**y), and a right bit shift is :code:`x >> y` (same as dividing x by 2**y), also like in C++.  
+Het grootste gedeelte van de onderstaande code draait om het synchroniseren en de foutcontrole.
+Het werkt in blokken van 104 bits waarbij elk blok succesvol is ontvangen of fouten bevat (CRC controle). Elke 50 blokken controleert het of er meer dan 35 blokken een fout hadden, waarna het de synchronisatie probeert te herstarten.
+De CRC wordt uitgevoerd met een 10-bits controle, met de polynoom :math:`x^{10}+x^8+x^7+x^5+x^4+x^3+1`; dit vind plaats wanneer :code:`reg` met 0x5B9 wordt geXORt, het binaire equivalent van de polynoom.
+In Python kun je bitoperaties uitvoeren met :code:`& | ~ ^` voor de functies [and, or, not, xor], net als in C/C++.
+Een bitverschuiving naar links is :code:`x << y` (het zelfde als x vermenigvuldigen met 2**y), en een bitverschuiving naar rechts is :code:`x >> y` (net als x delen door 2**y), net als in C/C++.  
 
-Note, you **do not** need to go through all of this code, or any of it, especially if you are focusing on learning the physical (PHY) layer side of DSP and SDR, as this does *not* represent signal processing.  This code is simply an implementation of a RDS decoder, and essentially none of it can be reused for other protocols, because it's so specific to the way RDS works.  If you are already somewhat exhausted by this chapter, feel free to just skip this enormous block of code that has one fairly simple job but does it in a complex manner.
+Je **hoeft niet** door alle code heen te lopen, of iets ervan, zeker als je focust op het leren van de fysieke (PHY) laag i.r.t. DSP en SDR, dit betreft *geen* signaalbewerking.
+De code is simpelweg een implementatie van een RDS-decodering en alleen toepasbaar op het RDS protocol. 
+Als je al bent uitgeput door dit hoofdstuk, voel je dan vrij om dit enorme stuk code gewoon over te slaan.
+Het heeft een vrij makkelijke functie maar lost het complex op.
 
 .. code-block:: python
 
@@ -458,7 +511,7 @@ Note, you **do not** need to go through all of this code, or any of it, especial
                  blocks_counter = 0
                  wrong_blocks_counter = 0
 
-Below shows an example output from this decoding step, note how in this example it synced fairly quickly but then loses sync a couple times for some reason, although it's still able to parse all of the data as we'll see.  If you are using the downloadable 1M samples file, you will only see the first few lines below.  The actual contents of these bytes just look like random numbers/characters depending on how you display them, but in the next step we will parse them into human readable information!
+Hieronder zie je een voorbeelduitgang van deze stap. Het voorbeeld synchroniseert snel maar verliest de synchronisatie een paar keer om een of andere reden. Het kan nog steeds de data goed interpreteren zoals we later zien. Als je het downloadbare FM-signaal gebruikt zul je slechts de eerste paar regels van hieronder zien. De echte inhoud van de bytes lijkt gewoon op willekeurige nummers/karakters afhankelijk van hoe je ze weergeeft. In de volgende stap zetten we het om naar leesbare informatie!
 
 .. code-block:: console
 
@@ -502,12 +555,16 @@ Below shows an example output from this decoding step, note how in this example 
  Still Sync-ed (Got  32  bad blocks on  50  total)
  
 ********************************
-RDS Parsing
+RDS Interpreteren
 ********************************
 
-Now that we have bytes, in groups of 8, we can extract the final data, i.e., the final output that is human understandable.  This is known as parsing the bytes, and just like the decoder in the previous section, it is simply an implementation of the RDS protocol, and is really not that important to understand.  Luckily it's not a ton of code, if you don't include the two tables defined at the start, which are simply the lookup tables for the type of FM channel and the coverage area.
+Nu we de bytes in groepen van 8 hebben verkregen, kunnen we de uiteindelijke data extraheren.
+Dit wordt ook wel "parsen" genoemd en net als het vorige blok code is dit simpelweg een implementatie van het RDS-protocol, en niet belangrijk om te begrijpen. Gelukkig is het niet een groot stuk code als je de eerste twee tabellen weglaat. Dit zijn alleen look-up tabellen voor het type FM-kanaal en het dekkingsgebied.
 
-For those who want to learn how this code works, I'll provide some added information.  The protocol uses this concept of an A/B flag, which means some messages are marked A and others B, and the parsing changes based on which one (whether it's A or B is stored in the third bit of the second byte).  It also uses different "group" types which are analogous to message type, and in this code we are only parsing message type 2, which is the message type that has the radio text in it, which is the interesting part, it's the text that scrolls across the screen in your car.  We will still be able to parse the channel type and region, as they are stored in every message.  Lastly, note that :code:`radiotext` is a string that gets initialized to all spaces, gets filled out slowly as bytes are parsed, and then resets to all spaces if a specific set of bytes is received.  If you are curious what other message types exist, the list is: ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "EON"]. The message "RT" is radiotext which is the only one we decode.  The RDS GNU Radio block decodes "BASIC" as well, but for the stations I used for testing it didn't contain much interesting information, and would have added a lot of lines to the code below.
+Als je toch geïnteresseerd bent in hoe deze code werkt, geef ik hier wat extra informatie. Het protocol gebruikt het A/B vlaggetjes concept. Dit betekent dat sommige berichten gemarkeerd worden met een A en anderen met een B. Het interpreteren van de data hangt dan af van de vlag, deze is te vinden in de derde bit van de tweede byte. Het gebruikt ook verschillende type groepen wat gelijk is aan een berichttype. Hieronder bekijken we alleen berichten van type 2 wat de tekst bevat die het radiostation doorstuurt en wat je voorbij ziet komen op de autoradio.
+Het kanaaltype en de regio kunnen we nog steeds vinden omdat dit in elk bericht zit.
+Als laatste is het goed om te weten dat de string :code:`radiotext` wordt geinitialiseerd met alleen maar spaties. Het wordt langzaam opgevuld terwijl de data wordt geïnterpreteerd en wordt weer nul bij het ontvangen van een speciale reeks bytes. 
+Andere mogelijke berichttypes zijn ["BASIC", "PIN/SL", "RT", "AID", "CT", "TDC", "IH", "RP", "TMC", "EWS", "EON"]. Het type "RT" is radiotext wat wij hieronder decoderen. Het RDS GNU Radio block geeft "BASIC" ook terug, maar met de stations die ik heb getest zat daar geen interessante informatie in, terwijl het onderstaande code wel een stuk groter zou maken.
 
 .. code-block:: python
 
@@ -545,7 +602,7 @@ For those who want to learn how this code works, I'll provide some added informa
               ["Documentary",           "Weather"],
               ["Alarm Test",            "Emergency Test"],
               ["Alarm",                 "Emergency"]]
- pty_locale = 1 # set to 0 for Europe which will use first column instead
+ pty_locale = 0 # set to 0 for Europe which will use first column instead
  
  # page 72, Annex D, table D.2 in the standard
  coverage_area_codes = ["Local",
@@ -615,124 +672,138 @@ For those who want to learn how this code works, I'll provide some added informa
          pass
          #print("unsupported group_type:", group_type)
 
-Below shows the output of the parsing step for an example FM station.  Note how it has to build the radiotext string over multiple messages, and then it periodically clears out the string and starts again.  If you are using the 1M sample downloaded file, you will only see the first few lines below.
+Hieronder zie je het resultaat met het downloadbare FM-signaal. Je ziet hoe het de radiostring opbouwt over meerdere berichten.
 
 .. code-block:: console
 
- PTY: Top 40
- program: 29
- coverage_area: Regional 4
-             ing.                                                 
-             ing. Upb                                             
-             ing. Upbeat.                                         
-             ing. Upbeat. Rea                                     
-                         
- WAY-                                                             
- WAY-FM U                                                         
- WAY-FM Uplif                                                     
- WAY-FM Uplifting                                                 
- WAY-FM Uplifting. Up                                             
- WAY-FM Uplifting. Upbeat                                         
- WAY-FM Uplifting. Upbeat. Re                                     
-                                                                                      
- WayF                                                             
- WayFM Up                                                         
- WayFM Uplift                                                     
- WayFM Uplifting.                                                 
- WayFM Uplifting. Upb                                             
- WayFM Uplifting. Upbeat.                                         
- WayFM Uplifting. Upbeat. Rea                                     
-
+    PTY: Pop Music
+    program: 199
+    coverage_area: Supra-regional
+                                                                    
+    OnAi                                                             
+    OnAir: L                                                         
+    OnAir: Lionh                                                     
+    OnAir: Lionheart                                                 
+    OnAir: Lionheart (fe                                             
+    OnAir: Lionheart (fearle                                         
+    OnAir: Lionheart (fearless)                                      
+    OnAir: Lionheart (fearless) - Jo                                 
+    OnAir: Lionheart (fearless) - Joel C                             
+    OnAir: Lionheart (fearless) - Joel Corry                         
+    OnAir: Lionheart (fearless) - Joel Corry & T                     
+    OnAir: Lionheart (fearless) - Joel Corry & Tom G                 
+    OnAir: Lionheart (fearless) - Joel Corry & Tom Grenn             
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan
+            nheart (fearless) - Joel Corry & Tom Grennan                                    
 
 
 ********************************
-Wrap-Up and Final Code
+Laatste code
 ********************************
 
-You did it!  Below is all of the code above, concatenated, it should work with the `test FM radio recording you can find here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_, although you should be able to feed in your own signal as long as its received at a high enough SNR, simply tune to the station's center frequency and sample at a rate of 250 kHz.  If you find you had to make tweaks to get it to work with your own recording or live SDR, let me know what you had to do, you can submit it as a GitHub PR at `the textbook's GitHub page <https://github.com/777arc/textbook>`_.  You can also find a version of this code with dozens of debug plotting/printing included, that I originally used to make this chapter, `here <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/rds_demo.py>`_.  
+Het is af! Alle bovenstaande code is samengevoegd tot de code hieronder. Het zou moeten werken met de `FM opname die je hier kunt vinden <https://github.com/versd/pysdr/blob/dutch/fm_1027mhz_250ksps?raw=true>`_ . Je zou ook je eigen signaal moeten kunnen gebruiken zolang de SNR hoog genoeg is, de middenfrequentie goed is afgesteld en je een samplefrequentie van 250 kHz hebt gebruikt.
+Mocht je de code moeten tweaken om het werkend te krijgen met jouw opname of SDR, laat me dan weten wat je moest doen en je kunt het insturen als een pull-request op de `GitHub pagina <https://github.com/777arc/textbook>`_. Ook is `hier <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/rds_demo.py>`_ een versie te vinden met een hoop code om de figuren uit dit hoofdstuk te genereren.
 
 .. raw:: html
 
    <details>
-   <summary>Final Code</summary>
+   <summary>Uiteindelijke Code</summary>
    
 .. code-block:: python
 
  import numpy as np
  from scipy.signal import resample_poly, firwin, bilinear, lfilter
  import matplotlib.pyplot as plt
-
+ 
  # Read in signal
- x = np.fromfile('/home/marc/Downloads/fm_rds_250k_from_sdrplay.iq', dtype=np.complex64)
+ x = np.fromfile('/home/versd/Downloads/fm_1027mhz_250ksps', dtype=complex64)
  sample_rate = 250e3
- center_freq = 99.5e6
+ center_freq = 102.7e6
 
- # Quadrature Demod
- x = 0.5 * np.angle(x[0:-1] * np.conj(x[1:])) # see https://wiki.gnuradio.org/index.php/Quadrature_Demod
+ # Kwadratuur Demod
+ x = 0.5 * np.angle(x[0:-1] * np.conj(x[1:])) # zie https://wiki.gnuradio.org/index.php/Quadrature_Demod
 
- # Freq shift
+ # Freq verschuiven
  N = len(x)
- f_o = -57e3 # amount we need to shift by
- t = np.arange(N)/sample_rate # time vector
- x = x * np.exp(2j*np.pi*f_o*t) # down shift
+ f_o = -57e3 # hoeveelheid in Hz
+ t = np.arange(N)/sample_rate # tijdvector
+ x = x * np.exp(2j*np.pi*f_o*t) # verschuiving
 
- # Low-Pass Filter
+ # laagdoorlaatfilter
  taps = firwin(numtaps=101, cutoff=7.5e3, fs=sample_rate)
  x = np.convolve(x, taps, 'valid')
 
- # Decimate by 10, now that we filtered and there wont be aliasing
+ # Geen vouwvervorming meer dankzij het filter, nu decimeren met 10
  x = x[::10]
  sample_rate = 25e3
 
- # Resample to 19kHz
- x = resample_poly(x, 19, 25) # up, down
+ # Hersamplen naar 19kHz
+ x = resample_poly(x, 19, 25) # omhoog, beneden
  sample_rate = 19e3
 
- # Bandpass filter (TODO: make it a proper matched filter with RRC, even though it's not required to function)
+ # Banddoorlaatfilter om 1 RDS BPSK signaal te isoleren
  taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
  x = np.convolve(x, taps, 'valid')
 
- # Symbol sync, using what we did in sync chapter
- samples = x # for the sake of matching the sync chapter
- samples_interpolated = resample_poly(samples, 32, 1) # we'll use 32 as the interpolation factor, arbitrarily chosen
+ # Symbol sync, zoals uit het synchronisatie hoofdstuk sync chapter
+ samples = x # zodat we met het synchronisatie hoofdstuk overeenkomen
+ samples_interpolated = resample_poly(samples, 32, 1) # we interpoleren met 32, dit lijkt beter te werken dan 16
  sps = 16
- mu = 0.01 # initial estimate of phase of sample
+ mu = 3 # eerste inschatting van faseafwijking
  out = np.zeros(len(samples) + 10, dtype=np.complex64)
- out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # stores values, each iteration we need the previous 2 values plus current value
+ out_rail = np.zeros(len(samples) + 10, dtype=np.complex64) # oude waardes opslaan
  i_in = 0 # input samples index
- i_out = 2 # output index (let first two outputs be 0)
+ i_out = 2 # output index (eerste twee zijn 0)
  while i_out < len(samples) and i_in+32 < len(samples):
-     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] # grab what we think is the "best" sample
+     out[i_out] = samples_interpolated[i_in*32 + int(mu*32)] #neem het `beste` sample
      out_rail[i_out] = int(np.real(out[i_out]) > 0) + 1j*int(np.imag(out[i_out]) > 0)
      x = (out_rail[i_out] - out_rail[i_out-2]) * np.conj(out[i_out-1])
      y = (out[i_out] - out[i_out-2]) * np.conj(out_rail[i_out-1])
      mm_val = np.real(y - x)
-     mu += sps + 0.01*mm_val
-     i_in += int(np.floor(mu)) # round down to nearest int since we are using it as an index
-     mu = mu - np.floor(mu) # remove the integer part of mu
-     i_out += 1 # increment output index
- x = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
+     mu += sps + 0.8*mm_val
+     i_in += int(np.floor(mu)) # afronden naar geheel getal
+     mu = mu - np.floor(mu) # fractie berekenen
+     i_out += 1 # output index verhogen
+ x = out[2:i_out] # pak alleen de nuttige data
 
- # Fine freq sync
- samples = x # for the sake of matching the sync chapter
+ sample_rate /= 16 # nu krijgen we 1187.5 kHz
+ 
+ #Fijne freq sync
+ samples = x # om met het sync hoofdstuk overeen te komen
  N = len(samples)
  phase = 0
  freq = 0
- # These next two params is what to adjust, to make the feedback loop faster or slower (which impacts stability)
- alpha = 8.0 
- beta = 0.002
+ # deze parameters maken de regelaar sneller of langzamer (of instabiel)
+ alpha = 100
+ beta = 0.23
  out = np.zeros(N, dtype=np.complex64)
  freq_log = []
  for i in range(N):
-     out[i] = samples[i] * np.exp(-1j*phase) # adjust the input sample by the inverse of the estimated phase offset
-     error = np.real(out[i]) * np.imag(out[i]) # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+     out[i] = samples[i] * np.exp(-1j*phase) # intgang corrigeren met geschatte afwijking
+     error = np.real(out[i]) * np.imag(out[i]) # foutvergelijking voor BPSK
  
-     # Advance the loop (recalc phase and freq offset)
+     # fase- en frequentieafwijking opnieuw bepalen
      freq += (beta * error)
-     freq_log.append(freq * sample_rate / (2*np.pi)) # convert from angular velocity to Hz for logging
+     freq_log.append(freq * sample_rate / (2*np.pi)) # van rad/s naar Hz voor loggen
      phase += freq + (alpha * error)
  
-     # Optional: Adjust phase so its always between 0 and 2pi, recall that phase wraps around every 2pi
+     # Fase tussen 0 and 2pi forceren
      while phase >= 2*np.pi:
          phase -= 2*np.pi
      while phase < 0:
@@ -740,11 +811,11 @@ You did it!  Below is all of the code above, concatenated, it should work with t
  x = out
 
  # Demod BPSK
- bits = (np.real(x) > 0).astype(int) # 1's and 0's
+ bits = (np.real(x) > 0).astype(int) # enen en nullen
 
- # Differential decoding, so that it doesn't matter whether our BPSK was 180 degrees rotated without us realizing it
+ # Differentieel decoderen, het maakt dan niet uit of alles 180 graden gedraaid is.
  bits = (bits[1:] - bits[0:-1]) % 2
- bits = bits.astype(np.uint8) # for decoder
+ bits = bits.astype(np.uint8) # voor decoderen
 
  ###########
  # DECODER #
@@ -911,7 +982,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
               ["Documentary",           "Weather"],
               ["Alarm Test",            "Emergency Test"],
               ["Alarm",                 "Emergency"]]
- pty_locale = 1 # set to 0 for Europe which will use first column instead
+ pty_locale = 0 # set to 0 for Europe which will use first column instead
  
  # page 72, Annex D, table D.2 in the standard
  coverage_area_codes = ["Local",
@@ -985,9 +1056,7 @@ You did it!  Below is all of the code above, concatenated, it should work with t
 
    </details>
 
-Once again, the example FM recording known to work with this code `can be found here <https://github.com/777arc/498x/blob/master/fm_rds_250k_1Msamples.iq?raw=true>`_.
-
-For those interested in demodulating the actual audio signal, just add the following lines right after the "Acquiring a Signal" section (special thanks to `Joel Cordeiro <http://github.com/joeugenio>`_ for the code):
+Als je het audiosignaal ook wilt demoduleren kun je dit toevoegen nadat je het signaal hebt ontvangen, met dank aan `Joel Cordeiro <http://github.com/joeugenio>`_ voor de code:
 
 .. code-block:: python
 
@@ -1012,20 +1081,21 @@ For those interested in demodulating the actual audio signal, just add the follo
  # Save to wav file, you can open this in Audacity for example
  wavfile.write('fm.wav', int(sample_rate), x)
 
-The most complicated part is the de-emphasis filter, `which you can learn about here <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, although it's actually an optional step if you are OK with audio that has a poor bass/treble balance.  For those curious, here is what the frequency response of the `IIR <https://en.wikipedia.org/wiki/Infinite_impulse_response>`_ de-emphasis filter looks like, it doesn't fully filter out any frequencies, it's more of a "shaping" filter.
+Het meest ingewikkelde deel is het de-emphasis filter, `waar je hier meer over kunt lezen <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, maar die stap is optioneel als je het niet erg vind dat de audio een slechte bas/treble balans heeft. Hieronder zie je de filterresponsie van het IIR filter. Het is meer een vormgevend filter dan een scherp filter.
 
 .. image:: ../_images/fm_demph_filter_freq_response.svg
    :align: center 
    :target: ../_images/fm_demph_filter_freq_response.svg
    
 ********************************
-Acknowledgments
+Erkenningen
 ********************************
 
-Most of the steps above used to receive RDS were adapted from the GNU Radio implementation of RDS, which lives in the GNU Radio Out-of-Tree Module called `gr-rds <https://github.com/bastibl/gr-rds>`_, originally created by Dimitrios Symeonidis and maintained by Bastian Bloessl, and I would like to acknowledge the work of these authors.  In order to create this chapter, I started with using gr-rds in GNU Radio, with a working FM recording, and slowly converted each of the blocks (including many built-in blocks) to Python.  It took quite a bit of time, there are some nuances to the built-in blocks that are easy to miss, and going from stream-style signal processing (i.e., using a work function that processes a few thousand samples at a time in a stateful manner) to a block of Python is not always straightforward.  GNU Radio is an amazing tool for this kind of prototyping and I would never have been able to create all of this working Python code without it.
+De meeste RDS-code is overgenomen van het RDS Out-Of-Tree blok voor GNU Radio. Dit heet `gr-rds <https://github.com/bastibl/gr-rds>`_, en is origineel gemaakt door Dimitrios Symeonidis en wordt onderhouden door Bastian Bloessl, dus ik wil deze auteurs de erkenning geven.
+Om dit hoofdstuk op te zetten ben ik begonnen met gr-rds in GNU Radio. Met behulp van een werkende FM-opname ben ik langzaam elk blok gaan omzetten naar Python. Dit koste best veel tijd omdat er nuances bij de ingebouwde blokken zitten die makkelijk te missen zijn, en het omzetten van stream-achtige signaalbewerking naar een blok code in Python is zo simpel nog niet. GNU Radio is een geweldige tool voor dit soort prototyping en ik had dit nooit kunnen maken zonder GNU Radio.
 
 ********************************
-Further Reading
+Extra leesmateriaal
 ********************************
 
 #. https://en.wikipedia.org/wiki/Radio_Data_System

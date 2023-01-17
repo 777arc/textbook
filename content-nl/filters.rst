@@ -77,7 +77,7 @@ Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
 
 .. This draw the lowpass filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Laag-doorlaat}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-2.5,0.5) (-1.5,3) (1.5,3) (2.5,0.5) (5,0)};
    :xscale: 70
@@ -88,7 +88,7 @@ Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
 
 .. this draws the highpass filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Hoog-doorlaat}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-2.5,2.5) (-1.5,0.3) (1.5,0.3) (2.5,2.5) (5,3)};
    :xscale: 70
@@ -99,7 +99,7 @@ Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
 
 .. this draws the bandpass filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-doorlaat}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-4.5,0.3) (-3.5,3) (-2.5,3) (-1.5,0.3) (1.5, 0.3) (2.5,3) (3.5, 3) (4.5,0.3) (5,0)};
    :xscale: 70
@@ -110,7 +110,7 @@ Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
 
 .. and finally the bandstop filter
 .. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
+   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Stop}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-4.5,2.7) (-3.5,0.3) (-2.5,0.3) (-1.5,2.7) (1.5, 2.7) (2.5,0.3) (3.5, 0.3) (4.5,2.7) (5,3)};   
    :xscale: 70
