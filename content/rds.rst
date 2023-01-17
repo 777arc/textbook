@@ -684,6 +684,9 @@ You did it!  Below is all of the code above, concatenated, it should work with t
      i_out += 1 # increment output index
  x = out[2:i_out] # remove the first two, and anything after i_out (that was never filled out)
 
+ #new sample_rate should be 1187.5
+ sample_rate /= 16
+
  # Fine freq sync
  samples = x # for the sake of matching the sync chapter
  N = len(samples)
