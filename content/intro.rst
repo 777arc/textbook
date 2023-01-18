@@ -60,4 +60,4 @@ Thank you to anyone who has read any portion of this textbook and provided feedb
 - James Hayek
 - Deidre Stuffer
 - Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_
-
+- `Daniel Versluis <https://versd.bitbucket.io/content/about.html>`_ for `translating PySDR to Dutch <https://pysdr.org/nl/index-nl.html>`_
