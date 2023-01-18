@@ -4,82 +4,84 @@
 Multipath Fading
 #######################
 
-In this chapter we introduce multipath, a propagation phenomenon that results in signals reaching the receiver by two or more paths, which we experience in real-world wireless systems.  So far we have only discussed the "AWGN Channel", i.e., a model for a wireless channel where the signal is simply added to noise, which really only applies to signals over a cable and some satellite communications systems. 
+In dit hoofdstuk gaan we multipath behandelen, dit is een fenomeen bij draadloze systemen waar signalen de ontvanger via meerdere wegen bereiken.
+Voor zover hebben we alleen "AWGN" kanalen behandeld; een kanaalmodel waaraan ruis wordt toegevoegd. Dat model is alleen goed voor signalen die over kabels lopen of via sommige satellieten.
 
 *************************
 Multipath
 *************************
 
-All realistic wireless channels include many "reflectors", given that RF signals bounce.  Any object between or near the transmitter (Tx) or receiver (Rx) can cause additional paths the signal travels along.  Each path experiences a different phase shift (delay) and attenuation (amplitude scaling).  At the receiver, all of the paths add up.  They can add up constructively, destructively, or a mix of both.  We call this concept of multiple signal paths "multipath".  There is the Line-of-Sight (LOS) path, and then all other paths.  In the example below, we show the LOS path and a single non-LOS path:
+Elk realistisch draadloos-kanaal bevat meerdere "reflectors" waardoor RF-signalen gereflecteerd kunnen worden. Elke object dat tussen de zender (Tx) en ontvanger (Rx) staat kan voor extra wegen zorgen waarover het signaal reist. Het signaal ervaart via elke weg een andere faseverschuiving (vertraging) en demping (vermindering van amplitude). Al deze extra signalen worden bij de ontvanger samengevoegd. Ze kunnen constructief, destructief of beide worden samengevoegd. Dit concept waarin signalen meerdere wegen vinden wordt "multipath" genoemd. Er is een directe weg via de zichtlijn (line-of-sight: LOS) en dan zijn er alle andere signalen. In het voorbeeld wat hieronder staat laten we de zichtlijn zien en een enkele andere weg:
 
-.. image:: ../_images/multipath.svg
+.. image:: images/multipath.svg
    :align: center 
-   :target: ../_images/multipath.svg
+   :target: images/multipath.svg
 
-Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in physics class.  In wireless systems when the paths destructively combine, we call this interference "deep fade" because our signal briefly disappears.
+Destructieve interferentie vindt plaats wanneer de signalen ongelukkig samenkomen. Neem het voorbeeld van hierboven met slechts twee wegen. Afhankelijk van de frequentie en afstand is het mogelijk dat de twee signalen 180 graden uit fase lopen en bijna dezelfde amplitude hebben. Dit zou erin resulteren dat de twee signalen elkaar tenietdoen (zoals hieronder weergegeven). Misschien ben je deze constructieve en destructieve interferentie in de natuurkundelessen tegengekomen. Wanneer signalen destructief samenkomen noemen we dit in draadloze systemen "deep fade", omdat het signaal eventjes verdwijnt.
 
 .. image:: ../_images/destructive_interference.svg
    :align: center 
    :target: ../_images/destructive_interference.svg
 
-Paths can also add up constructively, causing a strong signal to be received.  Each path has a different phase shift and amplitude, which we can visualize on a plot in the time domain called a "power delay profile":
+Signalen kunnen ook constructief optellen waardoor een extra sterk signaal wordt ontvangen. Elke weg leidt tot een andere fasedraaiing en demping wat we in het tijddomein kunnen weergeven als een "vermogensvertraging profiel" (Engels: power delay profile):
 
-.. image:: ../_images/multipath2.svg
+.. image:: images/multipath2.svg
    :align: center 
-   :target: ../_images/multipath2.svg
+   :target: images/multipath2.svg
 
-The first path, the one closest to the y-axis, will always be the LOS path (assuming there is one) because there's no way for any other path to reach the receiver faster than the LOS path.  Typically the magnitude will decrease as the delay increases, since a path that took longer to show up at the receiver will have traveled further.
+De snelste weg, dicht bij de y-as, zal altijd via de zichtlijn lopen (als er een is), want op geen manier kan een signaal via een andere weg sneller aankomen. Over het algemeen zal een later aangekomen signaal een kleinere amplitude hebben omdat dat signaal een langere weg heeft afgelegd.
 
 *************************
 Fading
 *************************
 
-What tends to happen is we get a mix of constructive and destructive interference, and it changes over time as the Rx, Tx, or environment is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel **changing** over time.  That's why we often refer to it as "multipath fading"; it's really the combination of constructive/destructive interference and a changing environment.  What we end up with is a SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the Tx/Rx is moving.  Beneath is a plot of SNR over time in milliseconds that demonstrates multipath fading.
+Waar het op neer komt is dat we meestal een mix van constructieve en destructieve interferentie ondervinden, dat over de tijd varieert omdat Rx, Tx of de omgeving verplaatst/verandert. We gebruiken de term "fading" of vervaging om te wijzen naar een multipath kanaal dat over de tijd **verandert**. Daarom noemen we het vaak "multipath fading" (letterlijk vervaging via meerdere wegen) omdat dit over beide effecten gaat, de constructieve/destructieve interferentie en de veranderende omgeving. Dit zal leiden tot een signaalruisverhouding dat over de tijd varieert; meestal in de micro- tot milliseconden, afhankelijk van hoe snel de Tx/Rx bewegen. Hieronder zie je de SNR uitgezet in de tijd onder het effect van multipath fading.
 
 .. image:: ../_images/multipath_fading.png
    :scale: 100 % 
    :align: center 
 
-There are two types of fading from a **time** domain perspective:
+Vanuit het tijddomein bekeken zijn er twee typen fading/vervaging:
 
-- **Slow Fading:** The channel doesn't change within one packet's worth of data.  That is, a deep null during slow fading will wipe out the whole packet.
-- **Fast Fading:** The channel changes very quickly compared to the length of one packet.  Forward error correction, combined with interleaving, can combat fast fading.
+- **Langzame vervaging:** Het kanaal verandert niet binnen de duur van een datapakket. D.w.z., een diepe langzame vervaging zal een compleet pakket doen missen.
+- **Snelle vervaging:** Het kanaal verandert sneller dan de duur van een pakket. Voorwaartse foutcorrectie, samen met het mixen van de data (interleaving), kan snelle vervaging overkomen.
 
-There are also two types of fading from a **frequency** domain perspective:
+Vanuit het frequentiedomein bekeken bestaan er ook twee typen fading/vervaging:
 
-**Frequency Selective Fading**: The constructive/destructive interference changes within the frequency range of the signal.  When we have a wideband signal, we span a large range of frequencies.  Recall that wavelength determines whether it's constructive or destructive.  Well if our signal spans a wide frequency range, it also spans a wide wavelength range (since wavelength is the inverse of frequency).  Consequently we can get different channel qualities in different portions of our signal (in the frequency domain).  Hence the name frequency selective fading.
+**Frequentieafhankelijke vervaging**: De constructieve/destructieve interferentie verandert ook binnen het frequentiebereik van het signaal. Een breedbandig signaal heeft een groot bereik aan frequenties. De golflengte beïnvloedt het type interferentie. Dus wanneer ons signaal een breed bereik aan frequenties heeft, heeft het ook een breed bereik aan golflengtes, de inverse van frequentie. Met als gevolg dat het kanaal andere eigenschappen heeft voor andere delen van ons signaal (in het frequentiedomein). Vandaar de naam frequentieafhankelijke vervaging.
 
-**Flat Fading**: Occurs when the signal's bandwidth is narrow enough that all frequencies experience roughly the same channel.  If there is a deep fade then the whole signal will disappear (for the duration of the deep fade).  
+**Vlakke vervaging**: Dit vindt plaats wanneer de bandbreedte van het signaal zo smal is, dat alle frequenties hetzelfde kanaal ervaren. Mocht er een "deep fade" plaatsvinden, dan kan dus heel het signaal vervagen voor de duur van de "deep fade".
 
-In the figure below, the :red:`red` shape shows our signal in the frequency domain, and the black curvy line shows the current channel condition over frequency.  Because the narrower signal is experiencing the same channel conditions throughout the whole signal, it's experiencing flat fading.  The wider signal is very much experiencing frequency selective fading.
+De :red:`rode` vorm in het onderstaande figuur stelt ons signaal voor, de zwarte curve laat de huidige signaalcondities zien in het frequentiedomein. Omdat het smallere signaal dezelfde kanaalcondities ervaart over het hele bereik ervaart het "vlakke vervaging" of "flat fading" in het Engels. Het bredere signaal ervaart de frequentieafhankelijke vervaging een stuk sterker.
 
 .. image:: ../_images/flat_vs_freq_selective.png
    :scale: 70 % 
    :align: center 
 
-Here is an example of a 16 MHz wide signal that is continuously transmitting.  There are several moments in the middle where there's a period of time a piece of signal is missing.  This example depicts frequency selective fading, which causes holes in the signal that wipe out some frequencies but not others.
+Hieronder wordt een 16 MHz breed signaal getoond dat continu wordt uitgezonden. Er zijn verschillende momenten waarin een deel van het signaal is verdwenen. Dit voorbeeld laat frequentieafhankelijke vervaging zien, het zorgt voor gaten in het signaal dat sommige frequenties laat verdwijnen en andere niet. 
 
 .. image:: ../_images/fading_example.jpg
    :scale: 60 % 
    :align: center 
    
-**************************
-Simulating Rayleigh Fading
-**************************
+****************************
+Rayleigh Vervaging Simuleren
+****************************
 
-Rayleigh fading is used to model fading over time, when there is no significant LOS path.  When there is a dominant LOS path, the Rician fading model becomes more suitable, but we will be focusing on Rayleigh.  Note that Rayleigh and Rician models do not include the primarily path loss between the transmitter and receiver (such as the path loss calculated as part of a link budget), or any shadowing caused by large objects.  Their role is to model the multipath fading that occurs over time, as a result of movement and scatterers in the environment. 
+Rayleigh vervaging wordt gebruikt om de vervaging over de tijd te modelleren in de situatie dat er geen duidelijke zichtlijn is. Wanneer er wel een duidelijke zichtlijn is, is Rican een geschikter model, maar wij focussen op Rayleigh.
+We merken wel op dat Rayleigh en Rican geen andere verliezen meenemen, zoals de verliezen uit ons link budget of verliezen door hele grote obstakels tussen zender en ontvanger. Hun rol is alleen om de multipath fading te modelleren over de tijd, ontstaan door beweging en weerkaatsingen in de omgeving.
 
-There is a lot of theory that comes out of the Rayleigh fading model, such as expressions for level crossing rate and average fade duration.  But the Rayleigh fading model doesn't directly tell us how to actually simulate a channel using the model.  To generate Rayleigh fading in simulation we have to use one of many published methods, and in the following Python example we will be using Clarke's "sum-of-sinusoids" method.
+Het Rayleigh model levert veel theorieën, maar verteld ons helaas niets over hoe we een kanaal moeten simuleren. Om Rayleigh vervaging toe te passen in een simulatie zullen we een van de vele gepubliceerde methoden moeten gebruiken. In de onderstaande Python-code gebruiken we de "som-van-sinusoïden" methode van Clarke.
 
-To generate a Rayleigh fading channel in Python we need to first specify the max Doppler shift, in Hz, which is based on how fast the transmitter and/or receiver is moving, denoted :math:`\Delta v`.  When the velocity is small compared to the speed of light, which will always be the case in wireless communications, the Doppler shift can be calculated as:
+Om een Rayleigh gemodelleerd kanaal op te kunnen zetten in Python, zullen we eerst moeten aangeven wat de maximale Dopplerverschuiving is in Hz. Dit hangt af van hoe snel de zender en/of ontvanger zich verplaatsen, aangegeven met :math:`\Delta v`. Wanneer de snelheid vergeleken met de lichtsnelheid klein is, wat altijd het geval zal zijn in draadloze communicatie, kan de Dopplerverschuiving als volgt worden berekend:
 
 .. math::
 
   f_D = \frac{\Delta v f_c}{c} 
   
-where :math:`c` is the speed of light, roughly 3e8 m/s, and :math:`f_c` is the carrier frequency being transmitted on.  
+Hierbij is :math:`c` de lichtsnelheid, ongeveer 3e8 m/s, en :math:`f_c` de draaggolf-frequentie waarop wordt gezonden.
 
-We also choose how many sinusoids to simulate, and there's no right answer because it's based on the number of scatterers in the environment, which we never actually know.  As part of the calculations we assume the phase of the received signal from each path is uniformly random between 0 and :math:`2\pi`.  The following code simulates a Rayleigh fading channel using Clarke's method:
+We moeten ook het aantal sinusoïden kiezen voor de simulatie, er is geen "correct" aantal omdat dit van de hoeveelheid reflecties in de omgeving afhangt, wat we nooit echt zullen weten. Als onderdeel van de berekening gaan we ervan uit dat de fase van elke reflectie uniform verdeelt is tussen 0 en :math:`2\pi`. De volgende code simuleert een Rayleigh kanaal volgens de methode van Clarke:
 
 .. code-block:: python
 
@@ -116,25 +118,24 @@ We also choose how many sinusoids to simulate, and there's no right answer becau
     plt.axis([0, 1, -15, 5])
     plt.show()
 
-If you are intending to use this channel model as part of a larger simulation, you would simply multiply the received signal by the complex number :code:`z`, representing flat fading.   The value :code:`z` would then update every time step.  This means all frequency components of the signal experience the same channel at any given moment in time, so you would **not** be simulating frequency selective fading, that requires a multi-tap channel impulse response which we will not get into in this chapter.  If we look at the magnitude of :code:`z`, we can see the Rayleigh fading over time:
+Mocht je dit (vlakke vervagings)model willen gebruiken als onderdeel van een grotere simulatie, dan kun je simpelweg het ontvangen signaal vermenigvuldigen met het complexe getal :code:`z`. De waarde :code:`z` zou dan elke tijdstap geüpdatet worden. Op deze manier ervaren alle frequentiecomponenten van het signaal dus hetzelfde kanaal op elk moment in de tijd. Je simuleert dus **niet** frequentieafhankelijke vervaging omdat het een kanaal impulsresponsie nodig heeft met meerdere coëfficiënten waar we nu niet op in gaan. Wanneer we de modulus van :code:`z` bekijken kunnen we de Rayleigh-vervaging over de tijd zien:
 
-.. image:: ../_images/rayleigh.svg
+.. image:: images/rayleigh.svg
    :align: center 
-   :target: ../_images/rayleigh.svg
+   :target: images/rayleigh.svg
 
-Note the deep fades that occur briefly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
-
+We zien een korte diepe vervaging en ook een deel waar het kanaal beter is dan als er geen vervaging was opgetreden.
 
 ****************************
-Mitigating Multipath Fading
+Multipath Fading Overkomen
 ****************************
 
-In modern communications, we have developed ways to combat multipath fading.  
+In de moderne communicatie zijn er manieren ontwikkeld om multipath fading aan te vechten.
 
 CDMA
 #####
 
-3G cellular uses a technology called code division multiple access (CDMA).  With CDMA you take a narrowband signal and spread it over a wide bandwidth before transmitting it (using a spread spectrum technique called DSSS).  Under frequency selective fading, it's unlikely that all frequencies will be in a deep null at the same time.  At the receiver the spreading is reversed, and this de-spreading process greatly mitigates a deep null.
+3G gebruikt een code division multiple access (CDMA) techniek. Met CDMA neem je een signaal met kleine bandbreedte en je smeert het uit over een veel bredere bandbreedte voordat je het overstuurt (doormiddel van DSSS). Mocht er frequentieafhankelijke vervaging plaatsvinden dan is er een kleine kans dat alle frequenties zullen verdwijnen. Wanneer de ontvanger het uitsmeren van frequenties ongedaan maakt, wordt een diepe vervaging bijna tenietgedaan.
 
 .. image:: ../_images/cdma.png
    :scale: 100 % 
@@ -143,10 +144,4 @@ CDMA
 OFDM 
 #####
 
-4G cellular, WiFi, and many other technologies use a scheme called orthogonal frequency-division multiplexing (OFDM).  OFDM uses something called subcarriers, where we split up the signal in the frequency domain into a bunch of narrow signals squashed together.  To combat multipath fading we can avoid assigning data to subcarriers that are in a deep fade, although it requires the receiving end to send channel information back to the transmitter quick enough.  We can also assign high order modulation schemes to subcarriers with great channel quality to maximize our data rate.
-
-
-
-
-
-
+4G, WiFi, en veel andere technieken maken gebruik van orthogonal frequency-division multiplexing (OFDM). OFDM maakt gebruik van sub-draaggolven waarmee we het signaal in het frequentiedomein opsplitsen in een hoop signalen met kleine bandbreedte die we samenproppen. Om nu multipath fading tegen te gaan kunnen we selectief data op een sub-draaggolf sturen, op zo'n manier dat frequenties die slechte condities ervaren geen data oversturen, en frequenties die uitstekende condities ervaren een hogere orde modulatieschema gaan gebruiken. Natuurlijk moet de ontvanger dan snel genoeg informatie over het kanaal kunnen terugsturen.
