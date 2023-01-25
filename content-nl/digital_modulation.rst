@@ -19,7 +19,7 @@ Als een versimpeld voorbeeld, laten we zeggen dat we 1'en en 0'en sturen met hog
    :scale: 60 % 
    :align: center 
 
-In het bovenstaande voorbeeld stelt een symbool slechts een bit voor. Hoe kunnen we meerdere bits per symbool overbrengen? Laten we gaan kijken hoe signalen over ethernetkabels worden gestuurd, dit is vastgelegd in een IEEE standaard genaamd IEEE 802.3 1000BASE-T. In normale situaties gebruikt ethernet amplitude modulatie met 4 niveaus (2 bits per symbool) en 8 ns symbolen.
+In het bovenstaande voorbeeld stelt een symbool slechts een bit voor. Hoe kunnen we meerdere bits per symbool overbrengen? Laten we gaan kijken hoe signalen over ethernetkabels worden gestuurd, dit is vastgelegd in een IEEE standaard genaamd IEEE 802.3 1000BASE-T. In normale situaties gebruikt ethernet amplitudemodulatie met 4 niveaus (2 bits per symbool) en 8 ns symbolen.
 
 .. image:: ../_images/ethernet.svg
    :align: center 
@@ -49,7 +49,7 @@ Neem een moment om deze vragen te beantwoorden:
 *******************
 Draadloze Symbolen
 *******************
-Vraag: Waarom kunnen we niet het ethernet signaal van hierboven direct versturen? Er zijn vele redenen, maar de belangrijkste zijn:
+Vraag: Waarom kunnen we het ethernet signaal van hierboven niet direct versturen? Er zijn vele redenen, maar de belangrijkste zijn:
 
 1. Lage frequenties hebben *enorme* antennes nodig
 2. Blokgolven nemen voor het aantal bits-per-seconde een *overbodige* hoeveelheid ruimte van het spectrum in -- herinner van het  :ref:`freq-domain-chapter` hoofdstuk dat scherpe veranderingen in het tijddomein een grote hoeveelheid bandbreedte/spectrum gebruiken:
@@ -66,7 +66,7 @@ Op wat voor manier kunnen we de draaggolf moduleren? Een andere manier om dit te
 2. Fase
 3. Frequentie
 
-We kunnen onze data op een draaggolf moduleren door een of meerdere van deze drie aan te passen.
+Door een of meerdere van deze drie aan te passen kunnen we data op een draaggolf moduleren.
 
 ****************************
 Amplitude Shift Keying (ASK)
@@ -107,13 +107,14 @@ Dit moduleert ons signaal op de draaggolf (de sinusoïde is die draaggolf). Het 
    :align: center
    :target: ../_images/ask3.svg
 
-Het bovenste figuur laat de discrete samples zien als rode punten, dus ons digitale signaal. Het onderste figuur laat zien hoe het resulterende gemoduleerde signaal eruitziet, dit zou verzonden kunnen worden door de lucht. In echte systemen is de frequentie van de draaggolf veel hoger dan de snelheid waarmee de symbolen afwisselen. In ons voorbeeld zijn er maar 3 perioden van de draaggolf per symbool, maar in de praktijk zouden er duizenden kunnen zijn, afhankelijk van hoe hoog in het spectrum het verzonden wordt.
+Het bovenste figuur laat de discrete samples zien als rode punten, dus ons digitale signaal. Het onderste figuur laat zien hoe het resulterende gemoduleerde signaal eruitziet, dit zou door de lucht verzonden kunnen worden. 
+In echte systemen is de frequentie van de draaggolf veel hoger dan de snelheid waarmee de symbolen afwisselen. In ons voorbeeld zijn er maar 3 perioden van de draaggolf per symbool, maar in de praktijk zouden er duizenden kunnen zijn, afhankelijk van hoe hoog in het spectrum het verzonden wordt.
 
 ************************
 Phase Shift Keying (PSK)
 ************************
 
-Laten we overwegen om de fase te moduleren op dezelfde manier als we met de amplitude hebben gedaan. De simpelste vorm is Binaire PSK (BPSK) waar er twee faseniveaus zijn:
+Laten we overwegen om de fase op dezelfde manier te moduleren als we met de amplitude hebben gedaan. De simpelste vorm is Binaire PSK (BPSK) waar er twee faseniveaus zijn:
 
 1. Geen faseverandering
 2. 180 graden faseverandering
@@ -152,7 +153,7 @@ Wanneer we voor een modulatieschema de mogelijke set van symbolen laten zien, no
 Vele modulatieschema’s kunnen door hun constellaties worden gedefinieerd.
 
 Om BPSK te ontvangen en decoderen kunnen we IQ-sampling toepassen, zoals we hebben geleerd in het vorige hoofdstuk, en bekijken waar de punten terechtkomen in het IQ-diagram.
-Door het draadloze kanaal zal er echter wel een willekeurige faserotatie plaatsvinden, want het signaal loopt een willekeurige vertraging op wanneer het door de lucht voortplant tussen de antennes.
+Door het draadloze kanaal zal er echter wel een willekeurige faserotatie plaatsvinden, want het signaal loopt een willekeurige vertraging op wanneer het zich door de lucht en tussen de antennes voortplant.
 Verschillende methodes waar we later over leren kunnen deze willekeurige faserotatie tenietdoen. 
 Hier zijn een paar voorbeelden van hoe het BPSK-signaal eruit zou kunnen zien bij de ontvanger (zonder ruis).
 
@@ -161,13 +162,13 @@ Hier zijn een paar voorbeelden van hoe het BPSK-signaal eruit zou kunnen zien bi
    :align: center 
 
 Terug naar PSK. Wat als we vier verschillende fasen zouden willen? Bijv., 0, 90, 180 en 270 graden. 
-Dat zou op deze manier getoond kunnen worden in het IQ-diagram, dit vormt het Quadrature Phase Shift Keying (QPSK) schema:
+Dat zou als volgt getoond kunnen worden in het IQ-diagram, dit vormt het Quadrature Phase Shift Keying (QPSK) schema:
 
 .. image:: ../_images/qpsk.png
    :scale: 60 % 
    :align: center 
 
-We hebben voor PSK altijd N verschillende hoeken/fasen, voor het beste resultaat evenredig verdeeld over de 360 graden.
+We hebben voor PSK altijd N verschillende hoeken/fasen, voor het beste resultaat evenredig over de 360 graden verdeeld.
 Meestal laten we ook de eenheidscirkel zien om aan te geven dat alle punten dezelfde modulus hebben:
 
 .. image:: ../_images/psk_set.png
@@ -187,7 +188,7 @@ Vraag: Is er wat mis met het gebruik van het onderstaande PSK-schema? Is dit een
 
 Er is niets onmogelijks aan dit PSK-schema. Je kunt het zeker gebruiken, maar, het schema is niet zo effectief als mogelijk omdat de symbolen niet uniform verdeeld zijn.
 Wanneer we ruis op onze symbolen gaan behandelen wordt schema-efficiëntie duidelijk.
-Het korte antwoord is dat we zoveel mogelijk 'ruimte' tussen de symbolen willen houden voor het geval er ruis is, zodanig dat bij de ontvanger een symbool niet wordt opgevat als een van de andere (incorrecte) symbolen. 
+Het korte antwoord is dat we zoveel mogelijk 'ruimte' tussen de symbolen willen houden voor het geval er ruis is, zodanig dat bij de ontvanger een symbool niet als een van de andere (incorrecte) symbolen wordt opgevat. 
 We willen niet een 0 ontvangen als een 1.
 
 .. raw:: html
@@ -200,7 +201,7 @@ Even terug naar ASK. Net als PSK kun je ASK ook laten zien in het IQ-diagram. Hi
    :scale: 50 % 
    :align: center 
 
-Misschien is het je al opgevallen, de bipolaire 2-ASK en BPSK zijn hetzelfde. Een fasedraaiing van 180 graden is hetzelfde als een sinusoïde vermenigvuldigen met -1. We noemen het waarschijnlijk BPSK omdat dit veel meer gebruikt wordt dan ASK.
+Misschien is het je al opgevallen, de bipolaire 2-ASK en BPSK zijn hetzelfde. Een fasedraaiing van 180 graden is hetzelfde als een sinusoïde vermenigvuldigen met -1. We noemen het waarschijnlijk BPSK omdat dit veel meer wordt gebruikt dan ASK.
 
 **************************************
 Quadrature Amplitude Modulation (QAM)
@@ -225,9 +226,9 @@ Aan de andere kant zou je de I en Q waarden voor elk punt kunnen beschrijven, zo
    :scale: 80 % 
    :align: center 
 
-Hierbij de opmerking dat de meeste modulatieschema's, behalve sommige ASK's en BPSK, vrij moeilijk te herkennen zijn in het tijddomein. 
+Hierbij de opmerking dat de meeste modulatieschema's, behalve sommige ASK's en BPSK, vrij moeilijk in het tijddomein zijn te herkennen. 
 Om dit punt thuis te brengen is hier een voorbeeld van hoe QAM in het tijddomein eruitziet. 
-Kun jij van elk symbool de fase onderscheiden in het onderstaande figuur? 
+Kun jij in het onderstaande figuur van elk symbool de fase onderscheiden? 
 Dat is lastig.
 
 .. image:: ../_images/qam_time_domain.png
@@ -249,14 +250,14 @@ FSK is niet moeilijk te vatten -- we schuiven tussen N frequenties waarbij elke 
 3. 1.1995 GHz
 4. 1.1990 GHz
 
-Dit zou dan om 4-FSK gaan met twee bits per symbool.
+Dit zou dan om 4-FSK met twee bits per symbool gaan.
 In het frequentiedomein zou 4-FSK er zo uit kunnen zien:
 
 .. image:: ../_images/fsk.svg
    :align: center 
    :target: ../_images/fsk.svg
 
-Een belangrijke vraag die je jezelf moet stellen is: Welke afstand moet ik aanhouden tussen de frequenties? 
+Een belangrijke vraag die je jezelf moet stellen is: Welke afstand moet ik tussen de frequenties aanhouden? 
 Deze afstand wordt vaak aangegeven als :math:`\Delta f` in Hz. 
 We willen vermijden dat signalen in het frequentiedomein overlappen, dus :math:`\Delta f` moet groot genoeg zijn.  
 De bandbreedte van elke draaggolf is een functie van de symboolsnelheid.
@@ -284,7 +285,7 @@ Differentiële Codering
 .. 
    todo - This chapter  has a bunch of terms that haven't come up yet in the book, this doesn't help readers understand the material. Also the bitsequence in the text didn't correspond with the image, another possible source of confusion.
 Je zult waarschijnlijk in de meeste draadloze (en bedraade) communicatieprotocollen tegen iets aanlopen wat differentiële codering wordt genoemd.
-Om het nut hiervan aan te tonen, gaan we kijken naar de ontvangst van een BPSK-signaal.
+Om het nut hiervan aan te tonen, gaan we naar de ontvangst van een BPSK-signaal kijken.
 Zoals eerder verteld, wanneer dit signaal door de lucht vliegt ervaart het een willekeurige vertraging tussen zender en ontvanger, dit veroorzaakt een willekeurige draaiing/rotatie in de constellatie.
 De ontvanger zal nu proberen te synchroniseren en de BPSK uit te lijnen met de I-as, maar het heeft geen idee of het 180 graden uit fase loopt of niet, de constellaties zien er exact hetzelfde uit.
 
@@ -316,10 +317,10 @@ Differentiële codering is veel eenvoudiger om te implementeren, dus als eenvoud
 In het :ref:`rds-chapter`hoofdstuk, behandelen we RDS, dit gebruikt dus de (minder complexe) differentiële codering.
 
 *******************
-Python Voorbeeld
+Voorbeeld in Python
 *******************
 
-Laten we als een voorbeeld QPSK in de basisband genereren en tonen in een constellatiediagram met Python.
+Laten we als voorbeeld QPSK in de basisband genereren en in een constellatiediagram tonen met Python.
 
 We zouden een lijstje van complexe symbolen kunnen intypen, maar laten we beginnen met het feit dat QPSK vier symbolen heeft met afstanden van 90-graden op de eenheidscirkel.
 We gaan 45, 135, 225 en 315 graden gebruiken voor onze punten/symbolen.  
@@ -366,7 +367,7 @@ Ruis wordt behandeld in het :ref:`Gaussische ruis` hoofdstuk.
 Het punt is, als er te veel ruis wordt toegevoegd dan zullen sommige symbolen/samples over de grens (de vier kwadranten) gaan en incorrect geïnterpreteerd worden.
 Probeer dit zelf uit door het ruisvermogen toe te laten nemen.
 
-Je zou ook de faseruis kunnen simuleren, wat zou kunnen ontstaan door variaties in de lokale oscillator (LO), door :code:`r` te vervangen met:
+Je zou ook de faseruis kunnen simuleren, wat door variaties in de lokale oscillator (LO) zou kunnen ontstaan, door :code:`r` te vervangen met:
 
 .. code-block:: python
 
