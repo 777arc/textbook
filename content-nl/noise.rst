@@ -34,7 +34,7 @@ De gaussische verdeling wordt de "normale" verdeling genoemd.
 De normale verdeling heeft twee parameters: gemiddelde/verwachtingswaarde en variantie.
 We hebben al behandeld waarom het gemiddelde als nul kan worden gezien, omdat een statische afwijking altijd eraf kan worden gehaald.
 De variantie verteld ons hoe "sterk" de ruis is.
-Een hogere variantie zal lijden tot hogere nummers.
+Een hogere variantie zal leiden tot hogere nummers.
 Om deze reden wordt het vermogen ook gedefinieerd door de variantie.
 
 De variantie staat gelijk aan de standaard deviatie in het kwadraat (:math:`\sigma^2`).
@@ -52,7 +52,7 @@ Voorbeeld 1: Signaal 1 heeft een vermogen van 2 Watt en de ruisvloer is 0.000000
 
 Voorbeeld 2: Een vuilnisbelt is 100000 keer luider dan een stille omgeving, terwijl een kettingzaag 10000 keer luider is dan een vuilnisbelt (geluidsgolven).
 
-Zonder dB, dus in normale "lineaire" termen, hebben we een hoop nullen nodig om de waarden te weergeven in voorbeelden 1 en 2.
+Zonder dB, dus in normale "lineaire" termen, hebben we een hoop nullen nodig om de waarden in voorbeelden 1 en 2 te kunnen weergeven.
 Als we de waarden van signaal 1 zouden willen tonen in de tijd, dan zouden we de ruisvloer niet eens zien!
 Als bijvoorbeeld de y-as van 0 tot 3 Watt loopt, dan zou de ruis te klein zijn om zichtbaar te worden in de grafiek.
 Om beide waarden in dezelfde schaal te kunnen gebruiken, moeten we overgaan naar de logaritmische schaal.
@@ -201,7 +201,7 @@ Maar waarom hadden we alleen "reële" ruis gegenereerd, en hoe werkt dat met com
 Complexe Ruis
 *************************
 
-"Complexe Gaussische" ruis zullen we ervaren met signalen in de basisband; het ruisvermogen wordt evenredig verdeelt over de reële en imaginaire delen. 
+"Complexe Gaussische" ruis zullen we ervaren met signalen in de basisband; het ruisvermogen wordt evenredig over de reële en imaginaire delen verdeeld. 
 Nog belangrijker is te beseffen dat de reële en imaginaire delen onafhankelijk van elkaar zijn; de waarde van het reële deel zegt niets over de waarde van het imaginaire deel.
 
 In Python kunnen we complexe gaussische ruis genereren met:
@@ -225,7 +225,7 @@ Om complexe ruis te generen meet een vermogen van 1 (wat dingen eenvoudiger maak
 
  n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # AWGN with unity power
 
-Om de complexe ruis te tonen in het tijddomein hebben we, zoals bij elk complex signaal, twee regels nodig:
+Om de complexe ruis in het tijddomein te weergeven hebben we, zoals bij elk complex signaal, twee regels nodig:
 
 .. code-block:: python
 
@@ -257,7 +257,7 @@ In dit geval hebben beide assen een onafhankelijke gaussische verdeling.
    :align: center 
 
 Dit ziet eruit zoals we het zouden verwachten; een willekeurige klodder met het midden rond 0+0j, de oorsprong.
-Laten we voor de lol, om te kijken hoe het eruit ziet, wat ruis proberen toe te voegen aan een QPSK signaal:
+Laten we voor de lol, om te kijken hoe het eruit ziet, wat ruis proberen toe te voegen aan een QPSK-signaal:
 
 .. image:: ../_images/noisey_qpsk.png
    :scale: 60 % 
@@ -276,7 +276,7 @@ We willen zoveel mogelijk bits per symbool versturen, maar als de ruis te groot 
 AWGN
 *************************
 
-Additive White Gaussian Noise (AWGN) is een afkorting die je vaak in de DSP en SDR wereld zult tegenkomen.
+Additive White Gaussian Noise (AWGN) is een afkorting die je vaak in de DSP en SDR-wereld zult tegenkomen.
 GN, gaussische ruis, hebben we al behandeld.
 'Additive' of toevoegend, betekent gewoon dat de ruis wordt toegevoegd aan ons ontvangen signaal.
 'White' of wit, betekent dat het frequentiespectrum over het volledig geobserveerde bereik vlak is.
@@ -292,7 +292,7 @@ Signal-to-Noise Ratio (SNR) of de signaalruisverhouding is hoe we het krachtvers
 Het is een verhouding dus het heeft geen eenheid.
 In de praktijk is SNR bijna altijd in dB.
 Voor simulaties programmeren we onze signalen altijd op zo'n manier dat het een vermogen heeft van 1, of eenheidsvermogen.
-Als we nu een SNR willen creëren van 10 dB in de simulatie, kunnen we simpelweg ruis genereren van -10 dB vermogen door bij het aanmaken van de ruis de variantie aan te passen.
+Als we nu een SNR van 10 dB in de simulatie willen creëren, kunnen we simpelweg ruis genereren van -10 dB vermogen door bij het aanmaken van de ruis de variantie aan te passen.
 
 .. math::
    \mathrm{SNR} = \frac{P_{signaal}}{P_{ruis}}
