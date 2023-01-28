@@ -23,9 +23,9 @@ QPSK geeft 2 bits per symbool, terwijl 16QAM een dubbele datasnelheid heeft van 
    :align: center 
 
 Een CRC-fout resulteert bij een protocol als TCP meestal in het opnieuw verzenden van een pakket.
-Als Alice een bericht stuurt naar Bob we zouden we liever niet Bob nog een bericht naar Alice laten sturen om de informatie opnieuw aan te vragen.   
+Als Alice een bericht naar Bob stuurt zouden we liever niet Bob nog een bericht naar Alice laten sturen om de informatie opnieuw aan te vragen.   
 Het doel van kanaalcodering is om overtollige of **redundante** informatie te sturen.
-Door redundante data mee te sturen bouwen we een failsafe in om foute pakketten, her transmissies en verloren data te kunnen voorkomen. 
+Door redundante data mee te sturen bouwen we een failsafe in om foute pakketten, hertransmissies en verloren data te kunnen voorkomen. 
 
 Nu we weten waarom het nodig is kunnen we zien waar het wordt toegepast in de communicatieketen:
 
@@ -94,7 +94,7 @@ Voor een herhalings-3 code zouden we elk bit driemaal versturen:
 - 0 :raw-html:`&rarr;` 000
 - 1 :raw-html:`&rarr;` 111
 
-Het bericht 10010110 wordt na de kanaalcodering dan verstuurt als 111000000111000111111000.
+Het bericht 10010110 wordt na de kanaalcodering dan verstuurd als 111000000111000111111000.
 
 Sommige van de codes werken op blokken van bits terwijl anderen op een stroom van bits werken.
 De codes die op blokken werken worden "blokcodes" genoemd, de codes die op stromen werken heten "convolutionele codes". Dit zijn de twee primaire codes. Onze herhalings-3 code is een blokcode dat werkt op blokken van drie bits.
@@ -120,11 +120,11 @@ Een lagere code-snelheid betekent meer redundantie maar minder doorvoer.
 Modulatie en codering
 ***************************
 
-In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschema’s bekeken. Bij een lage signaalruisverhouding heb je lager orde modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schema als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere code-snelheid bij lage signaal-ruis verhoudingen en bij hoge signaal-ruis verhoudingen wil je een code-snelheid van bijna 1 gebruiken. Moderne communicatiesystemen gebruiken combinaties van modulatie- en codeschema’s, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
+In het :ref:`modulation-chapter` hoofdstuk hebben we de invloed van ruis op modulatieschema’s bekeken. Bij een lage signaal-ruisverhouding heb je een lager orde van modulatieschema nodig (bijv. QPSK) om met de ruis om te kunnen gaan. Bij een hoge SNR kun je een schema als 256QAM toepassen om meer bits per seconden over te kunnen sturen. Kanaalcodering werkt hetzelfde; je wilt een lagere codesnelheid bij lage signaal-ruisverhoudingen en bij hoge signaal-ruisverhoudingen wil je een codesnelheid van bijna 1 gebruiken. Moderne communicatiesystemen gebruiken combinaties van modulatie- en codeschema’s, MCS. Elke MCS specificeert een modulatie- plus codeschema wat bij een specifieke SNR gebruikt moet worden.
 
 Moderne systemen passen de MCS real-time aan op basis van de draadloze kanaalcondities. De ontvanger geeft feedback aan de zender over de kanaalkwaliteit.
 Deze feedback moet worden gegeven voordat de kwaliteit van het draadloze kanaal verandert, wat in ms kan gebeuren.
-Deze adaptieve aanpak leidt tot de hoogste doorvoersnelheid mogelijk, en wordt gebruikt door moderne technologieën zoals LTE, 5G en wifi.
+Deze adaptieve aanpak leidt tot de hoogst mogelijke doorvoersnelheid, en wordt door moderne technologieën gebruikt zoals LTE, 5G en wifi.
 Hieronder zie je hoe een telefoontoren de MCS aanpast op basis van de afstand tot de gebruiker.
 
 .. image:: ../_images/adaptive_mcs.svg
@@ -141,7 +141,7 @@ Wanneer de MCS wordt aangepast, als je dit uitzet tegenover de SNR, dan krijg je
 Hamming Code
 ***************************
 
-Laten we eens kijken naar simpele foutcorrectiecodes. De Hamming-code was de eerste niet-triviale code dat werkt ontwikkeld.
+Laten we eens kijken naar simpele foutcorrectiecodes. De Hamming-code was de eerste niet-triviale code dat werd ontwikkeld.
 Aan het einde van 1940, bij Bell Laboratories, werkte Richard Hamming met een elektromechanische computer die ponskaarten gebruikte.
 Wanneer er fouten werden gevonden moest de computer stoppen en de bedienden moesten de kaarten repareren.
 Hamming raakte gefrustreerd dat zijn programma telkens bij een fout opnieuw opgestart moest worden.
@@ -156,7 +156,7 @@ Elke pariteitsbit :math:`p_x` is *verantwoordelijk* voor alle databits :math:`d_
 Dit is met een rode X hieronder aangegeven.
 Wanneer we dan een databit willen gebruiken, dan hebben we de pariteitsbits nodig die hier verantwoordelijk voor zijn. 
 Om databit :math:`d_{11}` te gebruiken zouden we pariteitsbit :math:`p_8` ,en alle pariteitsbits die daarvoor kwamen, nodig hebben. 
-De tabel verteld ons dan hoeveel pariteitsbits we nodig hebben voor elke databit. Dit patroon gaat oneindig door.
+De tabel vertelt ons dan hoeveel pariteitsbits we nodig hebben voor elke databit. Dit patroon gaat oneindig door.
 
 .. image:: ../_images/hamming.svg
    :align: center 
@@ -175,7 +175,7 @@ Hier volgen belangrijke eigenschappen van de Hamming-code:
 - Het kan een bitfout repareren
 - Het kan twee fouten detecteren maar niet repareren
 
-Het proces van databits coderen met de Hamming-code kan gedaan worden door een matrixvermenigvuldiging uit te voeren met de "generator matrix".
+Het proces van databits met de Hamming-code coderen kan worden gedaan door een matrixvermenigvuldiging uit te voeren met de "generator matrix".
 In het onderstaande voorbeeld is 1011 de databit-vector dat we willen coderen en naar de ontvanger sturen.
 De 2D matrix is de "generator matrix" dat het codeschema definieert. Het resultaat van de vermenigvuldiging is een *code-woord* dat we willen versturen.
 
@@ -217,7 +217,7 @@ De Hamming-codes van eerder, gebruiken harde beslissingen, convolutionele codes 
 Shannon Limiet
 ***************************
 
-De limiet van Shannon, of de capaciteit van Shannon, is een ongelofelijk stuk theorie dat ons verteld hoeveel bits-per-seconde foutvrij kan worden verzonden:
+De limiet van Shannon, of de capaciteit van Shannon, is een ongelofelijk stuk theorie dat ons vertelt hoeveel bits-per-seconde foutvrij kan worden verzonden:
 
 .. math::
  C = B \cdot log_2 \left( 1 + \frac{S}{N}   \right)
@@ -227,26 +227,26 @@ De limiet van Shannon, of de capaciteit van Shannon, is een ongelofelijk stuk th
 - S – Gemiddelde signaalvermogen ontvanger [Watt]
 - N – Gemiddelde ruisvermogen [Watt]
 
-Deze vergelijking geeft aan welke snelheid een MCS zou kunnen bereiken om zonder fouten data over te sturen bij een gegeven SNR.
+Deze vergelijking laat zien welke snelheid een MCS zou kunnen bereiken om zonder fouten data over te sturen bij een gegeven SNR.
 Het zou iets logischer zijn om de limiet in bits/sec/Hz uit te drukken i.p.v. bits/sec per spectrumdeel:
 
 .. math::
  \frac{C}{B} = log_2 \left( 1 + \mathrm{SNR}   \right)
 
 Hierbij is de SNR lineair gegeven (niet dB). 
-Maar bij het plotten geven we voor het gemakt de SNR meestal wel in dB:
+Maar bij het plotten geven we voor het gemak de SNR meestal wel in dB:
 
 .. image:: ../_images/shannon_limit.svg
    :align: center 
 
-Soms wordt de Shannon-limiet weergeven met een x-as in "signaal/ruisenergie per bit" of :math:`E_n/N_0`; dit is gewoon een alternatief voor SNR.
+Soms wordt de Shannon-limiet in "signaal/ruisenergie per bit" weergeven of :math:`E_n/N_0`; dit is gewoon een alternatief voor SNR.
 
-Het kan helpen om te beseffen dat wanneer de SNR vrij hoog is (bijv. boven de 10 dB) de Shannon-limiet benadert kan worden met :math:`log_2 \left( \mathrm{SNR} \right)`, wat ongeveer gelijk is aan :math:`\mathrm{SNR_{dB}}/3` (`(wordt hier uitgelegd) <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem#Bandwidth-limited_case>`_).  
+Het kan helpen om te beseffen dat wanneer de SNR vrij hoog is (bijv. boven de 10 dB) de Shannon-limiet benaderd kan worden met :math:`log_2 \left( \mathrm{SNR} \right)`, wat ongeveer gelijk is aan :math:`\mathrm{SNR_{dB}}/3` (`(wordt hier uitgelegd) <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem#Bandwidth-limited_case>`_).  
 Als je bijvoorbeeld een SNR hebt van 24 dB, dan komt dat overeen met ongeveer 8 bits/sec/Hz, dus als je 1 MHz moet gebruiken, dan geeft dat 8 Mbps.
 Nu denk je misschien "Dat is alleen theoretisch", maar moderne communicatiesystemen komen erg dicht bij die limiet, dus het geeft je tenminste een grove inschatting om naartoe te werken.
-Je zou dat getal altijd kunnen halveren om rekening te houden met de overhead die pakketjes of frames introduceren en niet-ideale MCS.
+Je zou dat getal altijd kunnen halveren om rekening te houden met de overhead die pakketjes of frames introduceren en een niet-ideale MCS.
 
-De maximale snelheid dat 802.11n wifi kan halen in de 2.4 GHz band, met een kanaalbreedte van 20 MHz, is 300 Mbps volgens de specificaties.
+De maximale snelheid dat 802.11n wifi in de 2.4 GHz band kan halen, met een kanaalbreedte van 20 MHz, is 300 Mbps volgens de specificaties.
 Een optie om die snelheid te halen is om pal naast de router te gaan zitten.
 In dit geval krijg je misschien een SNR van 60 dB, maar om praktische redenen heeft de snelste MCS waarschijnlijk niet zo'n hoge SNR nodig.
 Je zou zelfs naar de `MCS lijst voor 802.11n <https://en.wikipedia.org/wiki/IEEE_802.11n-2009#Data_rates>`_ kunnen kijken.  
@@ -254,7 +254,7 @@ Je zou zelfs naar de `MCS lijst voor 802.11n <https://en.wikipedia.org/wiki/IEEE
 Dat betekent dus dat zelfs bij 60 dB het wifi signaal nog steeds 64-QAM zal gebruiken.
 Bij 25 dB is de Shannon-limiet ongeveer 8.3 bits/sec/Hz, dus 166 Mbps bij een bandbreedte van 20 MHz.
 Als we ook rekening houden met MIMO, dit wordt later behandeld, dan krijgen we 4 64-QAM signalen tegelijkertijd met een totale snelheid van 664 Mbps.
-Als we dat getal halveren dan komen we behoorlijk in de buurt van de 300 Mbps dat 802.11n wifi beloofd op de 2.4 GHz band.
+Als we dat getal halveren dan komen we behoorlijk in de buurt van de 300 Mbps dat 802.11n wifi belooft op de 2.4 GHz band.
 
 Het bewijs achter de Shannon-limiet is best gestoord; dit heeft wiskunde wat hierop lijkt:
 
@@ -273,7 +273,7 @@ Momenteel zijn de beste kanaalcoderingsschema’s:
 1. Turbo codes, dit wordt gebruikt in 3G, 4G, NASA’s ruimtevaartuigen.
 2. LDPC-codes, gebruikt in DVB-S2, WiMAX, IEEE 802.11n.
 
-Beide codes benaderen de Shannon-limiet (dus onder bepaalde signaalruisverhoudingen wordt de limiet bijna gehaald).
+Beide codes benaderen de Shannon-limiet (dus onder bepaalde signaal-ruisverhoudingen wordt de limiet bijna gehaald).
 Hamming-codes of andere simpele codes komen niet eens in de buurt van de Shannon-limiet.
 Voor wat betreft onderzoek valt er niet veel meer te halen in het verbeteren van de codes voor wat betreft toegevoegde overhead. Huidig onderzoek is meer gericht op het verbeteren van het decoderen; minder rekenintensief maken en kunnen omgaan met kanaalfeedback.
 

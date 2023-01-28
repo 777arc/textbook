@@ -11,8 +11,8 @@ Introductie
 *************************
 
 Een "link" budget is een opsomming van alle winsten en verliezen tussen de zender en ontvanger van een communicatiesysteem.
-Het beschrijft een richting van een draadloos kanaal.
-De meeste communicatiesystemen zijn echter bi directioneel en hebben dus aparte up- en downlink budgetten.
+Het beschrijft één richting van een draadloos kanaal.
+De meeste communicatiesystemen zijn echter bidirectioneel en hebben dus aparte up- en downlink budgetten.
 Het resultaat van zo'n budget geeft je een grove inschatting van de signaal-ruisverhouding (SNR) die je kunt verwachten bij de ontvanger.
 Na verdere analyse kun je dan besluiten of de SNR hoog genoeg is voor jouw doel.
 
@@ -165,7 +165,7 @@ Een veelgebruikt model voor steden en bewoonde gebieden is het Okumura–Hata mo
 .. math::
  L_{path} = 69.55 + 26.16 \log_{10} f - 13.82 \log_{10} h_B - C_H + \left[ 44.9 - 6.55 \log_{10} h_B \right] \log_{10} d
 
-Hierbij is :math:`L_{path}` het transmissieverlies in dB, :math:`h_B` is de hoogte van de antenne boven de grond in meters, :math:`f` is de draaggolffrequentie in MHz, :math:`d` is de afstand tussen zender en ontvanger in km en :math:`C_H` wordt de "antenne correctiefactor" genoemd en wordt gedefinieerd aan de hand van het frequentiebereik en de grootte van de stad:
+Hierbij is :math:`L_{path}` het transmissieverlies in dB, :math:`h_B` is de hoogte van de antenne boven de grond in meters, :math:`f` is de draaggolffrequentie in MHz, :math:`d` is de afstand tussen zender en ontvanger in km en :math:`C_H` wordt de "antennecorrectiefactor" genoemd en wordt gedefinieerd aan de hand van het frequentiebereik en de grootte van de stad:
 
 :math:`C_H` voor dorpen:
 
@@ -252,7 +252,7 @@ Een populaire vergelijking voor het ruisbudget maakt gebruik van de "kTB" aanpak
 
 - :math:`k` – Boltzmann’s constante = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**. De Bolzmann constante, voor de nieuwsgierigen onder ons, is een fysische constante wat de gemiddelde energie van deeltjes in een gas relateert aan de temperatuur van het gas.
 
-- :math:`T` – Is de temperatuur van het systeem in Kelvin (cryocoolers anyone?), voornamelijk veroorzaakt door de versterker. Deze term is moeilijk te vinden en wordt meestal alleen benadert. Je betaalt meer voor een versterker die een lage temperatuur kan behouden voor hetzelfde vermogen.
+- :math:`T` – Is de temperatuur van het systeem in Kelvin (cryocoolers anyone?), voornamelijk veroorzaakt door de versterker. Deze term is moeilijk te vinden en wordt meestal alleen benaderd. Je betaalt meer voor een versterker die een lage temperatuur kan behouden voor hetzelfde vermogen.
 
 - :math:`B` – Bandbreedte waarover we de ruis berekenen. Voor een LTE signaal van 10 MHz breed gebruiken we dus 10MHz voor :math:`B`, of 70 dbHz.
 
@@ -277,7 +277,7 @@ Hoe hoger de SNR, hoe meer bits je in een symbool kan stoppen zonder teveel bitf
 ***************************
 Voorbeeld budget: ADS-B
 ***************************
-Het Automatic Dependent Surveillance-Broadcast (ADS-B) protocool wordt gebruikt door vliegtuigen om hun positie en overige informatie over het vliegtuig door te sturen naar de luchtverkeersleiding en andere vliegtuigen. ADS-B werkt autonoom en gebruikt het navigatiesysteem en andere computers van het vliegtuig om de informatie te genereren. De berichten gebruiken geen encryptie (yay!). 
+Het Automatic Dependent Surveillance-Broadcast (ADS-B) protocool wordt door vliegtuigen gebruikt om de positie en overige informatie over het vliegtuig door te sturen naar de luchtverkeersleiding en andere vliegtuigen. ADS-B werkt autonoom en gebruikt het navigatiesysteem en andere computers van het vliegtuig om de informatie te genereren. De berichten gebruiken geen encryptie (yay!). 
 De ADS-B apparatuur is momenteel in het luchtruim van Australië verplicht terwijl de VS het slechts voor bepaalde vliegtuigen verplicht stelt, afhankelijk van de grootte.
 
 .. image:: ../_images/adsb.jpg
@@ -309,7 +309,7 @@ We kunnen dan de FSPL voor die afstand en een frequentie van 1090 MHz berekenen:
 
 We zouden ook de FSPL als functie van de afstand :math:`d` kunnen beschrijven. Dan zouden we de maximale afstand kunnen berekenen voor een gegeven signaal-ruisverhouding.
 
-Omdat we zeker geen open ruimte hebben kunnen we 3 dB toevoegen aan de verliezen.
+Omdat we zeker geen open ruimte hebben kunnen we 3 dB aan de verliezen toevoegen.
 We voegen nog een extra 3 dB aan de verliezen toe vanwege een imperfecte antenne, kabels en connectoren. 
 Uiteindelijk ziet ons budget er zo uit:
 
