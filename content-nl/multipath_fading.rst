@@ -11,7 +11,7 @@ Voor zover hebben we alleen "AWGN" kanalen behandeld; een kanaalmodel waaraan ru
 Multipath
 *************************
 
-Elk realistisch draadloos-kanaal bevat meerdere "reflectors" waardoor RF-signalen gereflecteerd kunnen worden. Elke object dat tussen de zender (Tx) en ontvanger (Rx) staat kan voor extra wegen zorgen waarover het signaal reist. Het signaal ervaart via elke weg een andere faseverschuiving (vertraging) en demping (vermindering van amplitude). Al deze extra signalen worden bij de ontvanger samengevoegd. Ze kunnen constructief, destructief of beide worden samengevoegd. Dit concept waarin signalen meerdere wegen vinden wordt "multipath" genoemd. Er is een directe weg via de zichtlijn (line-of-sight: LOS) en dan zijn er alle andere signalen. In het voorbeeld wat hieronder staat laten we de zichtlijn zien en een enkele andere weg:
+Elk realistisch draadloos-kanaal bevat meerdere "reflectors" waardoor RF-signalen gereflecteerd kunnen worden. Elk object dat tussen de zender (Tx) en ontvanger (Rx) staat kan voor extra wegen zorgen waarover het signaal reist. Het signaal ervaart via elke weg een andere faseverschuiving (vertraging) en demping (vermindering van amplitude). Al deze extra signalen worden bij de ontvanger samengevoegd. Ze kunnen constructief, destructief of beide worden samengevoegd. Dit concept waarin signalen meerdere wegen vinden wordt "multipath" genoemd. Er is een directe weg via de zichtlijn (line-of-sight: LOS) en dan zijn er alle andere signalen. In het voorbeeld wat hieronder staat laten we de zichtlijn zien en een enkele andere weg:
 
 .. image:: images/multipath.svg
    :align: center 
@@ -35,7 +35,7 @@ De snelste weg, dicht bij de y-as, zal altijd via de zichtlijn lopen (als er een
 Fading
 *************************
 
-Waar het op neer komt is dat we meestal een mix van constructieve en destructieve interferentie ondervinden, dat over de tijd varieert omdat Rx, Tx of de omgeving verplaatst/verandert. We gebruiken de term "fading" of vervaging om te wijzen naar een multipath kanaal dat over de tijd **verandert**. Daarom noemen we het vaak "multipath fading" (letterlijk vervaging via meerdere wegen) omdat dit over beide effecten gaat, de constructieve/destructieve interferentie en de veranderende omgeving. Dit zal leiden tot een signaalruisverhouding dat over de tijd varieert; meestal in de micro- tot milliseconden, afhankelijk van hoe snel de Tx/Rx bewegen. Hieronder zie je de SNR uitgezet in de tijd onder het effect van multipath fading.
+Waar het op neer komt is dat we meestal een mix van constructieve en destructieve interferentie ondervinden, dat over de tijd varieert omdat Rx, Tx of de omgeving verplaatst/verandert. We gebruiken de term "fading" of vervaging om naar een multipath kanaal te wijzen dat over de tijd **verandert**. Daarom noemen we het vaak "multipath fading" (letterlijk vervaging via meerdere wegen) omdat dit over beide effecten gaat, de constructieve/destructieve interferentie en de veranderende omgeving. Dit zal leiden tot een signaal-ruisverhouding dat over de tijd varieert; meestal in de micro- tot milliseconden, afhankelijk van hoe snel de Tx/Rx bewegen. Hieronder zie je de SNR uitgezet in de tijd onder het effect van multipath fading.
 
 .. image:: ../_images/multipath_fading.png
    :scale: 100 % 
@@ -71,7 +71,7 @@ Rayleigh Vervaging Simuleren
 Rayleigh vervaging wordt gebruikt om de vervaging over de tijd te modelleren in de situatie dat er geen duidelijke zichtlijn is. Wanneer er wel een duidelijke zichtlijn is, is Rican een geschikter model, maar wij focussen op Rayleigh.
 We merken wel op dat Rayleigh en Rican geen andere verliezen meenemen, zoals de verliezen uit ons link budget of verliezen door hele grote obstakels tussen zender en ontvanger. Hun rol is alleen om de multipath fading te modelleren over de tijd, ontstaan door beweging en weerkaatsingen in de omgeving.
 
-Het Rayleigh model levert veel theorieën, maar verteld ons helaas niets over hoe we een kanaal moeten simuleren. Om Rayleigh vervaging toe te passen in een simulatie zullen we een van de vele gepubliceerde methoden moeten gebruiken. In de onderstaande Python-code gebruiken we de "som-van-sinusoïden" methode van Clarke.
+Het Rayleigh model levert veel theorieën, maar vertelt ons helaas niets over hoe we een kanaal moeten simuleren. Om Rayleigh vervaging in een simulatie toe te passen zullen we een van de vele gepubliceerde methoden moeten gebruiken. In de onderstaande Python-code gebruiken we de "som-van-sinusoïden" methode van Clarke.
 
 Om een Rayleigh gemodelleerd kanaal op te kunnen zetten in Python, zullen we eerst moeten aangeven wat de maximale Dopplerverschuiving is in Hz. Dit hangt af van hoe snel de zender en/of ontvanger zich verplaatsen, aangegeven met :math:`\Delta v`. Wanneer de snelheid vergeleken met de lichtsnelheid klein is, wat altijd het geval zal zijn in draadloze communicatie, kan de Dopplerverschuiving als volgt worden berekend:
 
@@ -81,7 +81,7 @@ Om een Rayleigh gemodelleerd kanaal op te kunnen zetten in Python, zullen we eer
   
 Hierbij is :math:`c` de lichtsnelheid, ongeveer 3e8 m/s, en :math:`f_c` de draaggolf-frequentie waarop wordt gezonden.
 
-We moeten ook het aantal sinusoïden kiezen voor de simulatie, er is geen "correct" aantal omdat dit van de hoeveelheid reflecties in de omgeving afhangt, wat we nooit echt zullen weten. Als onderdeel van de berekening gaan we ervan uit dat de fase van elke reflectie uniform verdeelt is tussen 0 en :math:`2\pi`. De volgende code simuleert een Rayleigh kanaal volgens de methode van Clarke:
+We moeten ook het aantal sinusoïden kiezen voor de simulatie, er is geen "correct" aantal omdat dit van de hoeveelheid reflecties in de omgeving afhangt, wat we nooit echt zullen weten. Als onderdeel van de berekening gaan we ervan uit dat de fase van elke reflectie uniform verdeeld is tussen 0 en :math:`2\pi`. De volgende code simuleert een Rayleigh kanaal volgens de methode van Clarke:
 
 .. code-block:: python
 
@@ -118,7 +118,7 @@ We moeten ook het aantal sinusoïden kiezen voor de simulatie, er is geen "corre
     plt.axis([0, 1, -15, 5])
     plt.show()
 
-Mocht je dit (vlakke vervagings)model willen gebruiken als onderdeel van een grotere simulatie, dan kun je simpelweg het ontvangen signaal vermenigvuldigen met het complexe getal :code:`z`. De waarde :code:`z` zou dan elke tijdstap geüpdatet worden. Op deze manier ervaren alle frequentiecomponenten van het signaal dus hetzelfde kanaal op elk moment in de tijd. Je simuleert dus **niet** frequentieafhankelijke vervaging omdat het een kanaal impulsresponsie nodig heeft met meerdere coëfficiënten waar we nu niet op in gaan. Wanneer we de modulus van :code:`z` bekijken kunnen we de Rayleigh-vervaging over de tijd zien:
+Mocht je dit (vlakke vervagings)model willen gebruiken als onderdeel van een grotere simulatie, dan kun je simpelweg het ontvangen signaal vermenigvuldigen met het complexe getal :code:`z`. De waarde :code:`z` zou dan elke tijdstap geüpdatet worden. Op deze manier ervaren alle frequentiecomponenten van het signaal dus hetzelfde kanaal op elk moment in de tijd. Je simuleert dus **niet** frequentieafhankelijke vervaging omdat het een kanaal impulsrespons nodig heeft met meerdere coëfficiënten waar we nu niet op in gaan. Wanneer we de modulus van :code:`z` bekijken kunnen we de Rayleigh-vervaging over de tijd zien:
 
 .. image:: images/rayleigh.svg
    :align: center 

@@ -21,7 +21,7 @@ Wanneer we digitale symbolen versturen, dan versturen we ze zij-aan-zij (i.t.t. 
    :align: center 
    :target: ../_images/pulse_train.svg
 
-Zoals je ziet is op elke interval van :math:`T` er maar een puls hoog, terwijl alle andere pulsen 0 zijn en de x-as kruisen. Wanneer de ontvanger het signaal sampled doet het dit op het perfecte moment (wanner de puls het hoogst is), dus alleen dat moment in tijd is belangrijk. Meestal vindt er nog een vorm van symboolsynchronisatie plaats bij de ontvanger om ervoor te zorgen dat de symbolen inderdaad bij de toppen wordt gesampled.
+Zoals je ziet is op elke interval van :math:`T` er maar een puls hoog, terwijl alle andere pulsen 0 zijn en de x-as kruisen. Wanneer de ontvanger het signaal samplet doet het dit op het perfecte moment (wanneer de puls het hoogst is), dus alleen dat moment in tijd is belangrijk. Meestal vindt er nog een vorm van symboolsynchronisatie plaats bij de ontvanger om ervoor te zorgen dat de symbolen inderdaad bij de toppen worden gesampled.
 
 **********************************
 Matched Filter
@@ -32,7 +32,7 @@ Om deze afstemming van filters te begrijpen zul je eerst deze twee punten moeten
 
 1. De besproken pulsen hoeven *alleen bij de ontvanger* voor het samplen perfect te zijn uitgelijnd. Tot dat punt maakt het niet uit of er ISI plaatsvindt, de signalen kunnen met ISI zonder problemen door het luchtruim vliegen.
 
-2. We willen een laagdoorlaatfilter bij de zender om te voorkomen dat ons signaal te veel van het spectrum gebruikt. De ontvanger heeft echter ook een laagdoorlaatfilter nodig om zoveel mogelijk ruis/interferentie op on signaal weg te filteren. Dit resulteert in een laagdoorlaatfilter bij de zender (Tx) alsmede de ontvanger (Rx). De ontvanger sampled het signaal dan na beide filters (en natuurlijk de effecten van het draadloze kanaal).
+2. We willen een laagdoorlaatfilter bij de zender om te voorkomen dat ons signaal te veel van het spectrum gebruikt. De ontvanger heeft echter ook een laagdoorlaatfilter nodig om zoveel mogelijk ruis/interferentie op on signaal weg te filteren. Dit resulteert in een laagdoorlaatfilter bij de zender (Tx) alsmede de ontvanger (Rx). De ontvanger samplet het signaal dan na beide filters (en natuurlijk de effecten van het draadloze kanaal).
 
 Wat we in moderne communicatie doen, is het opsplitsen van het vormgevende filter tussen Tx en Rx. Ze *moeten* niet identiek zijn, maar, theoretisch gezien, is het *optimaal* om identieke filters te gebruiken bij de aanwezigheid van AWGN, om de SNR te maximaliseren. Deze vorm van filteren heet het "matched filter" concept.
 
@@ -48,7 +48,7 @@ Als analogie kun je denken aan een beeldherkenningssysteem dat gezichten zoekt a
 Een filter opsplitsen
 **********************************
 
-Hoe splitsen we eigenlijk een filter in tweeën? Convolutie is associatief, dit betekend:
+Hoe splitsen we eigenlijk een filter in tweeën? Convolutie is associatief, dit betekent:
 
 .. math::
  (f * g) * h = f * (g * h)
@@ -222,7 +222,7 @@ Met de manier waarop de filtervergelijking werkt willen we het tijdstip 0 in het
 De uitgang zakt zeker naar 0 aan beide kanten. De hoeveelheid samples per symbool bepaalt hoe smal dit filter lijkt en hoe snel het naar 0 afzwakt.
 De bovenstaande impulsresponsie lijkt op een typisch laagdoorlaatfilter. Er is vrijwel geen onderscheid te maken tussen een vormgevend filter en een algemeen laagdoorlaatfilter.
 
-Nu zullen we het filter toepassen op ons signaal :math:`x` en het resultaat bestuderen.
+Nu zullen we het filter op ons signaal :math:`x` toepassen en het resultaat bestuderen.
 De for-loop tekent alleen wat extra lijntjes in het figuur, maak je hier niet druk om.
 
 .. code-block:: python 
@@ -241,7 +241,7 @@ De for-loop tekent alleen wat extra lijntjes in het figuur, maak je hier niet dr
    :align: center 
    :target: ../_images/pulse_shaping_python3.svg
 
-Het resultaat is een opsomming van alle impulsresponsies waarbij ongeveer de helft met -1 is vermenigvuldigd. Het ziet er ingewikkeld uit dus we zullen er samen doorheen lopen.
+Het resultaat is een opsomming van alle impulsresponsen waarbij ongeveer de helft met -1 is vermenigvuldigd. Het ziet er ingewikkeld uit dus we zullen er samen doorheen lopen.
 
 Als eerste zie je samples voor en achter de data vanwege hoe convolutie werkt. De extra samples worden wel meegestuurd, maar bevatten geen 'pieken' van de impulsen.
 
@@ -249,7 +249,7 @@ Als tweede zijn de verticale lijnen aangebracht voor de uitleg. Ze laten zien wa
 Het zijn de momenten waarop de ontvanger het signaal moet samplen. 
 Op elk samplemoment is het signaal precies 1.0 of -1.0: het ideale tijdstip om te samplen.
 
-Zouden we dit signaal moduleren op een draaggolf en verzenden, dan moet de ontvanger zelf bepalen waar de samplemomenten vallen met bijvoorbeeld een symboolsynchronisatie-algoritme. Mocht de ontvanger net te vroeg of te laat samples nemen dan krijgen we waarden die door ISI een beetje afwijken, mochten we veel te vroeg of laat samplen dan krijgen we alleen een boel rare getallen.
+Zouden we dit signaal op een draaggolf moduleren en verzenden, dan moet de ontvanger zelf bepalen waar de samplemomenten vallen met bijvoorbeeld een symboolsynchronisatie-algoritme. Mocht de ontvanger net te vroeg of te laat samples nemen dan krijgen we waarden die door ISI een beetje afwijken, mochten we veel te vroeg of laat samplen dan krijgen we alleen een boel rare getallen.
 
 Hieronder laten we in een IQ-diagram zien hoe het op tijd (of niet) samplen eruitziet. 
 
