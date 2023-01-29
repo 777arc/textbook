@@ -2,7 +2,7 @@
 
 ################
 Synchronisatie
-################
+################beperken
 
 Dit hoofdstuk gaat over het synchroniseren van draadloze signalen in tijd en frequentie. Hiermee corrigeren we frequentieafwijkingen en stellen het moment van samplen af op symbool niveau. We zullen de klokhersteltechniek van Mueller en Muller, en de Costas Loop, gebruiken in Python.
 
@@ -10,7 +10,7 @@ Dit hoofdstuk gaat over het synchroniseren van draadloze signalen in tijd en fre
 Introductie
 ***************************
 
-We hebben besproken hoe je digitale signalen draadloos kunt versturen met een digitaal modulatieschema zoals QPSK en het toepassen van vormgevende filters om de bandbreedte te beperken. We kunnen kanaalcodering toepassen bij slechte signaalruisverhoudingen. 
+We hebben besproken hoe je digitale signalen draadloos kunt versturen met een digitaal modulatieschema zoals QPSK en de bandbreedte kunt beperken door het toepassen van vormgevende filters. We kunnen kanaalcodering toepassen bij slechte signaal-ruisverhoudingen. 
 Het zal sowieso helpen om zoveel mogelijk te filteren voordat we het signaal verwerken.
 In dit hoofdstuk zullen we onderzoeken hoe synchronisatie wordt uitgevoerd aan de ontvangende kant. 
 Synchronisatie is een reeks bewerkingen die plaatsvindt *vóór* demodulatie en kanaaldecodering.
@@ -70,12 +70,12 @@ Draadloos kanaal simuleren
 
 We zullen een realistischer kanaalmodel moeten gaan gebruiken voordat we het over synchronisatie gaan hebben. Zolang er geen willekeurige vertraging plaatsvindt is er namelijk geen synchronisatie nodig, of tenminste is het erg simpel om te synchroniseren (met de sampleklok). Je zou in dat geval alleen maar rekening hoeven houden met de vertraging die jouw filters introduceren. Naast een tijdsvertraging zullen we ook een frequentieafwijking simuleren; oscillators zijn immers niet perfect, er zal altijd een verschil zijn tussen de middenfrequentie van de zender en ontvanger.
 
-We zullen eerst wat Python code gaan bekijken waarmee we een vertraging en frequentieafwijking kunnen simuleren. De code zal verder gaan waar het :ref:`pulse-shaping-chapter` is geëindigd; alle code uit dit hoofdstuk kun je erachter toevoegen. Voor het gemak is de code hier ook te vinden:
+We zullen eerst wat pythoncode gaan bekijken waarmee we een vertraging en frequentieafwijking kunnen simuleren. De code zal verder gaan waar het :ref:`pulse-shaping-chapter` is geëindigd; alle code uit dit hoofdstuk kun je erachter toevoegen. Voor het gemak is de code hier ook te vinden:
 
 .. raw:: html
 
    <details>
-   <summary>Python Code van het vorige hoofdstuk</summary>
+   <summary>pythoncode van het vorige hoofdstuk</summary>
 
 .. code-block:: python
 
@@ -108,13 +108,13 @@ We zullen eerst wat Python code gaan bekijken waarmee we een vertraging en frequ
 
    </details>
 
-De code die te maken heeft met het weergeven van de figuren hebben we weggelaten, we gaan ervan uit dat je nu hebt geleerd hoe je dat moet doen.
-Om de figuren extra mooi te maken zoals in dit boek heb je veel extra code nodig, wat niet het leerdoel is.
+De code voor het weergeven van de figuren hebben we weggelaten, we gaan ervan uit dat je nu hebt geleerd hoe je dat moet doen.
+Om de figuren zoals in dit boek extra mooi te maken heb je veel extra code nodig, wat niet het leerdoel is.
 
 Vertraging toevoegen
 ####################
 
-We zouden makkelijk het signaal kunnen vertragen door de samples te verschuiven, maar dit simuleert alleen een vertraging dat een veelvoud is van onze sampletijd. Realistisch gezien zal de vertraging nooit exact gelijk zijn aan de sampletijd. We kunnen een willekeurige vertraging geven met een speciaal filter dat alle frequenties doorlaat maar de samples wel vertraagt met een fractie van de sampletijd. Je kunt het zien als een alles-doorlaatfilter dat een faseverschuiving introduceert op alle frequenties. (Een tijdsvertraging en faseverschuiving zijn immers hetzelfde!) De Python code van dit filter staat hieronder:
+We zouden het signaal makkelijk kunnen vertragen door de samples te verschuiven, maar dit simuleert alleen een vertraging dat een veelvoud is van onze sampletijd. Realistisch gezien zal de vertraging nooit exact gelijk zijn aan de sampletijd. We kunnen een willekeurige vertraging geven met een speciaal filter dat alle frequenties doorlaat maar de samples wel vertraagt met een fractie van de sampletijd. Je kunt het zien als een alles-doorlaatfilter dat een faseverschuiving introduceert op alle frequenties. (Een tijdsvertraging en faseverschuiving zijn immers hetzelfde!) De pythoncode van dit filter staat hieronder:
 
 .. code-block:: python
 
@@ -166,7 +166,7 @@ Voor nu kun je de code beschouwen als de simulatie van een draadloos kanaal. De 
 Tijdsynchronisatie
 ***************************
 
-Wanneer een signaal draadloos wordt verzonden ervaart het een willekeurige faseverschuiving vanwege de reistijd. We kunnen niet zomaar beginnen te samplen op onze samplefrequentie want dan zitten we hoogstwaarschijnlijk naast het juiste samplemoment zoals aan het eind van :ref:`pulse-shaping-chapter` is besproken. Bekijk de laatste drie figuren van dat hoofdstuk eens als je dit niet kunt volgen. Het doel is dus om de originele samplefrequentie en fase terug te vinden. Het wordt ook "clock-recovery" (herstellen van de klok) genoemd.
+Wanneer een signaal draadloos wordt verzonden ervaart het een willekeurige faseverschuiving vanwege de reistijd. We kunnen niet zomaar op onze samplefrequentie beginnen te samplen want dan zitten we hoogstwaarschijnlijk naast het juiste samplemoment zoals aan het eind van :ref:`pulse-shaping-chapter` is besproken. Bekijk eens de laatste drie figuren van dat hoofdstuk als je dit niet kunt volgen. Het doel is dus om de originele samplefrequentie en fase terug te vinden. Het wordt ook "clock-recovery" (herstellen van de klok) genoemd.
 
 De meeste synchronisatietechnieken zijn gebaseerd op de phase locked loop (PLL); we zullen PLL’s hier niet bespreken maar het is goed om te weten en je kunt er zelf informatie over opzoeken als je geïnteresseerd bent. PLL's zijn closed-loop systemen die feedback gebruiken om voortdurend wat bij te stellen; in dit geval een tijdsvertraging om op de pieken te kunnen samplen.
 
@@ -180,7 +180,7 @@ De meeste algoritmes leunen op het feit dat digitale symbolen stijgen en dalen e
    :scale: 40 % 
    :align: center 
 
-De meeste algoritmen zijn op een PLL gebaseerd en ze verschillen in de vergelijking die de afwijking in de tijd (:math:`\mu`) probeert te corrigeren. De waarde van :code:`mu` wordt in elke iteratie van de loop geüpdatet. Je kunt het bekijken als de waarde die verteld hoeveel samples we het signaal moeten verschuiven om het "perfecte" samplemoment te vinden. Dus met een waarde van :code:`mu = 3.61` zouden we de ingang 3.61 samples moeten verschuiven om correct te kunnen samplen. Omdat we 8 samples per symbool hebben zou een :code:`mu>8` gewoon weer terugvouwen naar 0.
+De meeste algoritmen zijn op een PLL gebaseerd en ze verschillen in de vergelijking die de afwijking in de tijd (:math:`\mu`) probeert te corrigeren. De waarde van :code:`mu` wordt in elke iteratie van de loop geüpdatet. Je kunt het bekijken als de waarde die vertelt hoeveel samples we het signaal moeten verschuiven om het "perfecte" samplemoment te vinden. Dus met een waarde van :code:`mu = 3.61` zouden we de ingang 3.61 samples moeten verschuiven om correct te kunnen samplen. Omdat we 8 samples per symbool hebben zou een :code:`mu>8` gewoon weer terugvouwen naar 0.
 
 Het volgende stuk code implementeert het Mueller en Muller klokherstelalgoritme. Je kunt het testen zolang je de frequentieverschuiving 0 laat; dit corrigeert alleen een faseverschuiving:
 
@@ -213,7 +213,7 @@ De snelheid waarmee de lus reageert wordt bepaald door de 0.3 constante; een hog
 De volgende grafiek toont een voorbeelduitvoer waarbij we zowel de fractionele tijdvertraging als de frequentieverschuiving *uitgeschakeld* hebben. We tonen alleen I omdat Q nu uit nullen bestaat vanwege het gebrek aan frequentieverschuiving. De drie figuren zijn boven elkaar gezet om te laten zien hoe de bits verticaal zijn uitgelijnd.
 
 **Bovenste figuur**
-    De originele BPSK symbolen, i.e., 1'en end -1'en.  Er zitten nullen tussen vanwege de 8 samples per symbool.
+    De originele BPSK symbolen, dus 1'en en -1'en.  Er zitten nullen tussen vanwege de 8 samples per symbool.
 **Middelste figuur**
     Na het vormgeven van de pulsen.
 **Onderste figuur**
@@ -223,7 +223,7 @@ De volgende grafiek toont een voorbeelduitvoer waarbij we zowel de fractionele t
    :align: center
    :target: ../_images/time-sync-output.svg
 
-Als we kijken naar de uitgang van het synchronisatieblok in het onderste figuur, dan zien we dat het bijna 30 symbolen duurde voordat de juiste tijdvertraging was gevonden. Omdat een feedback-systeem altijd tijd nodig heeft om te reageren maken vele communicatieprotocolen gebruik van een "preamble" (Nederlands: reeks aan bits die het signaal voorgaan). Deze preamble bevat een synchronisatiesequentie: het verkondigt dat een nieuw pakketje is aangekomen, en geeft de ontvanger de tijd om te synchroniseren. Maar na ~30 symbolen werkt het perfect (in het figuur). Wat we overhouden zijn perfecte 1'en en -1'en die overeenkomen met de verzonden data. Natuurlijk helpt het dat dit voorbeeld geen ruis had. Voel je vrij het ruisniveau en de tijdsvertraging aan te passen om te kijken hoe de synchronisatie werkt. In geval van QPSK zouden we met complexe getallen werken, maar de aanpak blijft hetzelfde.
+Als we naar de uitgang van het synchronisatieblok in het onderste figuur kijken, dan zien we dat het bijna 30 symbolen duurde voordat de juiste tijdvertraging was gevonden. Omdat een feedback-systeem altijd tijd nodig heeft om te reageren maken vele communicatieprotocolen gebruik van een "preamble" (Nederlands: reeks aan bits die het signaal voorgaan). Deze preamble bevat een synchronisatiesequentie: het verkondigt dat een nieuw pakketje is aangekomen, en geeft de ontvanger de tijd om te synchroniseren. Maar na ~30 symbolen werkt het perfect (in het figuur). Wat we overhouden zijn perfecte 1'en en -1'en die overeenkomen met de verzonden data. Natuurlijk helpt het dat dit voorbeeld geen ruis had. Voel je vrij het ruisniveau en de tijdsvertraging aan te passen om te kijken hoe de synchronisatie werkt. In geval van QPSK zouden we met complexe getallen werken, maar de aanpak blijft hetzelfde.
 
 ****************************************
 Tijdsynchronisatie met interpolatie
@@ -231,9 +231,9 @@ Tijdsynchronisatie met interpolatie
 
 Meestal interpoleren synchronisatieblokken de ingangssamples door een bepaald nummer, bijv. 16, zodanig dat het signaal ook een fractie van de sampletijd verschoven kan worden. De willekeurige vertraging dat een draadloos kanaal introduceert, is hoogstwaarschijnlijk niet perfect gelijk aan een veelvoud van de sampletijd. Dit zal helemaal niet het geval zijn wanneer we 2 of 4 samples per symbool ontvangen. Door de samples te interpoleren geeft het ons de mogelijkheid om "tussen" de samples te samplen om de uiterste piek van het symbool te vinden. De uitgang zal nog steeds 1 sample per symbool bevatten, het is de ingang dat geïnterpoleerd wordt.
 
-De Python code voor tijdsynchronisatie dat we hierboven gebruikten bevat geen interpolatie. Om de code uit te breiden kun je de fractionele tijdvertraging aanzetten dat we aan het begin van dit hoofdstuk hebben geïmplementeerd, dit geeft een realistischer beeld. Laat de frequentieverschuiving uit staan. Wanneer je de simulatie opnieuw uitvoert zul je zien dat er nooit volledig gesynchroniseerd wordt met het signaal. Dit komt omdat we niet interpoleren en het dus niet mogelijk is om tussen de samples in te samplen. Laten we interpolatie toevoegen.
+De pythoncode die we hierboven gebruikten voor de tijdsynchronisatie bevat geen interpolatie. Om de code uit te breiden kun je de fractionele tijdvertraging aanzetten dat we aan het begin van dit hoofdstuk hebben geïmplementeerd, dit geeft een realistischer beeld. Laat de frequentieverschuiving uit staan. Wanneer je de simulatie opnieuw uitvoert zul je zien dat er nooit volledig gesynchroniseerd wordt met het signaal. Dit komt omdat we niet interpoleren en het dus niet mogelijk is om tussen de samples in te samplen. Laten we interpolatie toevoegen.
 
-De snelste en makkelijkste manier om met Python een signaal te interpoleren is door gebruik te maken van scipy's :code:`signal.resample` of :code:`signal.resample_poly`. Beide functies bereiken hetzelfde, maar werken iets anders. We zullen de tweede functie toepassen omdat deze wat sneller is. We gaan een interpolatiefactor van 16 gebruiken, dus we voegen 15 extra samples tussen elke sample toe. Dit kan worden toegepast in 1 regel code en moet *voor* de tijdsynchronisatie worden toegevoegd. Het synchronisatie-algoritme moet ook iets aangepast worden. We kunnen het verschil bekijken:
+De snelste en makkelijkste manier om met Python een signaal te interpoleren is door gebruik te maken van scipy's :code:`signal.resample` of :code:`signal.resample_poly`. Beide functies bereiken hetzelfde, maar werken iets anders. We zullen de tweede functie toepassen omdat deze wat sneller is. We gaan een interpolatiefactor van 16 gebruiken, dus we voegen 15 extra samples tussen elke sample toe. Dit kunnen we in 1 regel code doen en moet *voor* de tijdsynchronisatie worden toegevoegd. Het synchronisatie-algoritme moet ook iets aangepast worden. We kunnen het verschil bekijken:
 
 .. code-block:: python
 
@@ -267,7 +267,8 @@ Het is niet heel belangrijk dat je het algoritme snapt, maar wel de limitatie er
 
 Voel je vrij om met eigen interpolatiefactoren te spelen. Je kunt ook proberen om de frequentieverschuiving nu toe te passen, of ruis toe te voegen, om te zien hoe het synchronisatiealgoritme dit aanpakt (hint: misschien moet je die 0.3 factor ook aanpassen).
 
-Als we een frequentieverschuiving toepassen van 1 kHz dan zie je de volgende situatie. We zullen beide I en Q moeten weergeven omdat een frequentieverschuiving toe hebben gevoegd (door een complex exponent):
+Als we een frequentieverschuiving toepassen van 1 kHz dan zie je de volgende situatie. 
+Omdat we een frequentieverschuiving hebben toegevoegd, door het vermenigvuldigen met een complex exponent, zullen we beide I en Q moeten weergeven:
 
 .. image:: images/time-sync-output2.svg
    :align: center
@@ -275,7 +276,7 @@ Als we een frequentieverschuiving toepassen van 1 kHz dan zie je de volgende sit
 
 Het is nu iets lastiger te zien maar de tijdsynchronisatie werkt nog steeds prima. Er is nu een sinusoïde zichtbaar omdat we een frequentieverschuiving hebben geïntroduceerd. In het volgende deel leren we hier mee om te gaan.
 
-Het IQ-diagram (constellatie-diagram) is hieronder te zien van voor en na synchronisatie. Mocht je het zijn vergeten; je kunt een IQ-diagram maken d.m.v. een "scatter plot": :code:`plt.plot(np.real(samples), np.imag(samples), '.')`. In de animatie hebben we bewust de eerste en laatste 30 symbolen niet meegenomen omdat het algoritme toen nog niet klaar was met synchroniseren. De symbolen die overblijven zijn allemaal rond de eenheidscirkel verdeelt vanwege de frequentieverschuiving.
+Het IQ-diagram (constellatie-diagram) van voor en na de synchronisatie is hieronder te zien. Mocht je het zijn vergeten; je kunt een IQ-diagram maken d.m.v. een "scatter plot": :code:`plt.plot(np.real(samples), np.imag(samples), '.')`. In de animatie hebben we bewust de eerste en laatste 30 symbolen niet meegenomen omdat het algoritme toen nog niet klaar was met synchroniseren. De symbolen die overblijven zijn allemaal rond de eenheidscirkel verdeeld vanwege de frequentieverschuiving.
 
 .. image:: images/time-sync-constellation.svg
    :align: center
@@ -287,7 +288,7 @@ We kunnen nog meer leren wanneer we de constellatie over de tijd uitzetten. Aan 
 .. image:: ../_images/time-sync-constellation-animated.gif
    :align: center 
 
-Hopelijk heb je dankzij de animatie een beter beeld van wat er echt gebeurt, en een gevoel voor hoe het werkt. In de praktijk werkt de while loop alleen op een beperkt aantal samples (bijv. 1000) en zul je het herhaaldelijk moeten aanroepen. Tussen de aanroepen in moet je de waarde van :code:`mu` , en de laatste paar waarden van :code:`out` en :code:`out_rail` , moeten onthouden.
+Hopelijk heb je dankzij de animatie een beter beeld van wat er echt gebeurt, en een gevoel voor hoe het werkt. In de praktijk werkt de while loop alleen op een beperkt aantal samples (bijv. 1000) en zul je het herhaaldelijk moeten aanroepen. Tussen de aanroepen in moet je de waarde van :code:`mu` en de laatste paar waarden van :code:`out` en :code:`out_rail` onthouden.
 
 Nu gaan we ons druk maken over frequentiesynchronisatie, opgedeeld in grove en fijne synchronisatie. Meestal doen we eerst de grove en daarna de fijne.
 
@@ -311,7 +312,7 @@ Wiskundig gezien, als een basisband signaal :math:`s(t)` een frequentie(draaggol
 
 Waar :math:`n(t)` de ruis is.
 
-De eerste truc voor grove inschatting van de frequentieafwijking, is om het kwadraat van ons signaal te nemen. Wanneer we de afwijking weten, dan kunnen we het ongedaan maken. We negeren de ruis voor nu om het simpel te houden:
+De eerste truc voor grove inschatting van de frequentieafwijking, is om het kwadraat van ons signaal te nemen. Wanneer we de afwijking weten, dan kunnen we het ongedaan maken. Om het simpel te houden negeren voorlopig de ruis:
 
 .. math::
 
@@ -341,7 +342,7 @@ In het geval van BPSK hebben we een 2e orde modulatieschema, dus dan zou de verg
 
  r^2(t) = s^2(t) e^{j4\pi f_v t}
 
-We weten nu wat er met het :math:`s(t)` deel van de vergelijking, maar hoe zit het met het sinusoïde deel (het complexe exponent)?
+We weten nu wat er met het :math:`s(t)` deel van de vergelijking gebeurt, maar hoe zit het met het sinusoïde deel (het complexe exponent)?
 Zoals is te zien voegt het :math:`N` toe aan de vergelijking, dus in plaats van de originele frequentieverschuiving :math:`f_v` is het nu N keer zo veel: :math:`N\cdot f_v`. De makkelijkste manier om met Python de waarde van :math:`N\cdot f_v` te vinden is door middel van een FFT. Laten we dat doen. We nemen weer ons BPSK signaal, maar in plaats van een fractionele vertraging gaan we nu een frequentieverschuiving toevoegen door het signaal te vermenigvuldigen met :math:`e^{j2\pi f_o t}` zoals we in het :ref:`filters-chapter` hoofdstuk hadden gedaan.
 
 Met behulp van de code uit het begin van dit hoofdstuk kun je een afwijking van 13 kHz aan ons signaal toevoegen. De afwijking wordt geïntroduceerd door het kanaal. Je kunt het dus tussen de twee RRC-filters, of na het enkele RC-filter toevoegen.
@@ -397,7 +398,7 @@ Het is aan jou of je de afwijking wilt corrigeren, of gewoon verlagen tot zo'n 5
 Fijne Frequentiesynchronisatie
 **********************************
 
-We zullen nu overschakelen op fijne frequentiecorrectie. De vorige truc was open-lus en is alleen geschikt om een grove correctie uit te voeren. Voor de fijne correctie willen we terugkoppeling gaan toepassen in de vorm van een PLL. Het doel is om het frequentieverschil tot nul te brengen en te houden, zelfs wanneer het frequentieverschil over de tijd varieert. We zullen continu het verschil moeten bijhouden. Fijne synchronisatietechnieken werken het beste op symboolniveau zonder een tijdafwijking. De code die we hier behandelen komt dus *na* de tijdsynchronisatie.
+We zullen nu naar fijne frequentiecorrectie overschakelen. De vorige truc was open-lus en is alleen geschikt om een grove correctie uit te voeren. Voor de fijne correctie willen we terugkoppeling gaan toepassen in de vorm van een PLL. Het doel is om het frequentieverschil tot nul te brengen en te houden, zelfs wanneer het frequentieverschil over de tijd varieert. We zullen continu het verschil moeten bijhouden. Fijne synchronisatietechnieken werken het beste op symboolniveau zonder een tijdafwijking. De code die we hier behandelen komt dus *na* de tijdsynchronisatie.
 
 We zullen de Costas-loop gaan toepassen. Dit is een soort PLL dat speciaal is ontwikkeld om een draaggolfafwijking te corrigeren bij digitale signalen zoals BPSK en QPSK. Het is uitgevonden door John P. Costas bij General Electric in de jaren 50 en heeft een enorme impact gehad op moderne digitale communicatie. De Costas-loop zal niet alleen de frequentieafwijking corrigeren, maar ook elke faseverschuiving. Frequentie is gewoon een faseverandering dus ze kunnen beiden gevolgd worden. De Costas-loop kan worden samengevat met het volgende figuur (let op dat de halveringsfactor is weggelaten uit de vergelijkingen omdat dit geen invloed heeft). 
 
@@ -443,11 +444,11 @@ Hieronder is de code te vinden van de Costas-Loop:
 Er gebeurt een hoop dus laten we erdoorheen lopen. Sommige regels zijn eenvoudig en andere super ingewikkeld.
 :code:`samples` is onze ingang, :code:`uit` onze uitgang.
 :code:`fase` en :code:`freq` werken zoals de :code:`mu` bij het tijdsynchronisatievoorbeeld. 
-Ze bevatten de huidig geschatte afwijking en elke iteratie worden de samples van de ingang vermenigvuldigt met :code:`np.exp(-1j*phase)`.
+Ze bevatten de huidig geschatte afwijking en elke iteratie worden de samples van de ingang vermenigvuldigd met :code:`np.exp(-1j*phase)`.
 De :code:`fout` variabele kwantificeert de fout in de correctie, en voor een 2e orde Costas-loop is dit een simpele vergelijking. 
 We vermenigvuldigen het reële deel van de sample (I) met het imaginaire deel (Q). Omdat het Q-deel 0 zou moeten zijn voor BPSK wordt de foutvergelijking geminimaliseerd wanneer er geen fase- of frequentieafwijking is.
 De 4e orde vergelijking (QPSK) is nog steeds relatief simpel, maar niet meer een enkele regel, gezien beide I en Q energie zullen bevatten, zelfs wanneer het signaal geen afwijking heeft. 
-We gaan het nu niet toepassen, maar mocht je benieuwd zijn naar hoe de QPSK-versie eruitziet in code dan kun je hieronder klikken.
+We gaan het nu niet toepassen, maar mocht je benieuwd zijn naar hoe de QPSK-versie in code eruitziet dan kun je hieronder klikken.
 
 .. raw:: html
 
@@ -507,7 +508,7 @@ Hieronder zie je een animatie van de tijdsynchronisatie en frequentiecorrectie a
 Frame-synchronisatie
 ***************************
 
-We hebben behandeld hoe je een tijd-, frequentie- of faseafwijking in een ontvangen signaal kunt corrigeren. De meeste communicatieprotocollen sturen echter niet alleen data, maar maken gebruik van pakketten/frames. De ontvanger moet namelijk kunnen zien waar een frame start. Gewoonlijk is er een frame header (op de MAC laag) dat verteld hoeveel bits in het frame zitten. We kunnen die informatie gebruiken om te weten hoe lang het hele frame is in samples of symbolen. Desalniettemin is het vinden van de start van een frame een hele taak op zich. Hieronder zie je de structuur van een wifi-frame. Het valt op dat het eerste ding wat verstuurt wordt een PHY-laag header is, en de eerste helft van die header is een "preamble" (aankondiging).Deze preamble bevat een rij van bits die de ontvanger kan gebruiken om de start van een frame te herkennen. De preamble is van tevoren bekend bij de ontvanger.
+We hebben behandeld hoe je een tijd-, frequentie- of faseafwijking in een ontvangen signaal kunt corrigeren. De meeste communicatieprotocollen sturen echter niet alleen data, maar maken gebruik van pakketten/frames. De ontvanger moet namelijk kunnen zien waar een frame start. Gewoonlijk is er een frame header (op de MAC laag) dat vertelt hoeveel bits in het frame zitten. We kunnen die informatie gebruiken om te weten hoe lang het hele frame is in samples of symbolen. Toch is de start van een frame vind een hele taak op zich. Hieronder zie je de structuur van een wifi-frame. Het valt op dat het eerste ding wat verstuurd wordt een PHY-laag header is, en de eerste helft van die header is een "preamble" (aankondiging).Deze preamble bevat een rij van bits die de ontvanger kan gebruiken om de start van een frame te herkennen. De preamble is van tevoren bekend bij de ontvanger.
 
 .. image:: ../_images/wifi-frame.png
    :scale: 60 % 
