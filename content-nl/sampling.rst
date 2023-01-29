@@ -4,7 +4,7 @@
 IQ-sampling
 ##################
 
-We introduceren in dit hoofdstuk een concept genaamd IQ-sampling, of complex samplen of kwadratuur samplen. We zullen ook Nyquist, complexe nummers, RF-draaggolven, frequentieverschuiving en power spectral density behandelen. IQ-sampling is een vorm van samplen dat wordt uitgevoerd door een SDR en vele andere digitale ontvangers (en zenders). Het is een iets complexere versie van gewoon samplen (pun intended) dus we zullen er langzaam doorheen lopen, en met wat oefening zal het concept vast duidelijk worden.
+In dit hoofdstuk introduceren we een concept genaamd IQ-sampling, of complex samplen of kwadratuur samplen. We zullen ook Nyquist, complexe nummers, RF-draaggolven, frequentieverschuiving en power spectral density behandelen. IQ-sampling is een vorm van samplen dat wordt uitgevoerd door een SDR en vele andere digitale ontvangers (en zenders). Het is een iets complexere versie van gewoon samplen (pun intended) dus we zullen er langzaam doorheen lopen, en met wat oefening zal het concept vast duidelijk worden.
 
 *************************
 Basis van samplen
@@ -17,9 +17,9 @@ Of we het hebben over geluids- of radiogolven, we moeten samplen als we een sign
 .. image:: ../_images/sampling.svg
    :align: center 
 
-We slaan op vaste tijden van :math:`T` seconden, de **sample-periode**, de waarde op van :math:`S(T)`. De frequentie waarop we samplen, het aantal samples per seconde, is simpelweg :math:`\frac{1}{T}`. We noemen dit de **sample-frequentie**, de inverse van de sample-periode. Stel we hebben een sample-frequentie van 10 Hz, dan is de sample-periode 0.1 seconden; er zit 0.1 seconde tussen elk sample. In de praktijk zullen onze sample-frequenties lopen van de honderden kHz tot tientallen MHz of zelfs hoger. Wanneer we signalen samplen moeten we altijd op de sample-frequentie letten, dit is een erg belangrijke instelling.
+We slaan op vaste tijden van :math:`T` seconden, de **sample-periode**, de waarde op van :math:`S(T)`. De frequentie waarop we samplen, het aantal samples per seconde, is simpelweg :math:`\frac{1}{T}`. We noemen dit de **sample-frequentie**, de inverse van de sample-periode. Stel we hebben een sample-frequentie van 10 Hz, dan is de sample-periode 0.1 seconden; er zit 0.1 seconde tussen elk sample. In de praktijk zullen onze sample-frequenties van de honderden kHz tot tientallen MHz lopen, of zelfs hoger. Wanneer we signalen samplen moeten we altijd op de sample-frequentie letten, dit is een erg belangrijke instelling.
 
-Voor diegene die liever de wiskunde zien; Laat :math:`S_n` het sample :math:`n` voorstellen, meestal een geheel getal wat bij 0 start. Als we deze afspraak aanhouden dan kunnen we het samplen wiskundig beschrijven als :math:`S_n=S(nT)` voor integer waarden van :math:`n`. Dus we bekijken het analoge signaal :math:`S(t)` op intervallen van :math:`nT`.
+Voor diegenen die liever de wiskunde zien; Laat :math:`S_n` het sample :math:`n` voorstellen, meestal een geheel getal wat bij 0 start. Als we deze afspraak aanhouden dan kunnen we het samplen wiskundig beschrijven als :math:`S_n=S(nT)` voor integer waarden van :math:`n`. Dus we bekijken het analoge signaal :math:`S(t)` op intervallen van :math:`nT`.
 
 *************************
 Nyquist samplen
@@ -38,7 +38,7 @@ We gaan iets sneller samplen op Fs = 1.2f:
 .. image:: ../_images/sampling_Fs_0.36.svg
    :align: center 
 
-Nog steeds zou een ander signaal passen op deze samples. Deze ambiguïteit houdt in dat als iemand ons deze lijst van samples zou geven, we geen onderscheid zouden kunnen maken welke het originele signaal was.
+Nog steeds zou een ander signaal op deze samples passen. Deze ambiguïteit houdt in dat als iemand ons deze lijst van samples zou geven, we geen onderscheid zouden kunnen maken welke het originele signaal was.
 
 Wat als we samplen op Fs = 1.5f:
 
@@ -71,8 +71,8 @@ Kwadratuursamplen
 
 De term "kwadratuur" betekent veel, maar in de context van DSP en SDR verwijst het naar twee golven die 90 graden uit fase lopen. 
 Waarom 90 graden uit fase? 
-Denk eraan dat wanneer twee golven 180 graden uit fase lopen, ze in feite dezelfde golf zijn, maar vermenigvuldigt met -1. 
-Door 90 graden uit fase te lopen worden de signalen orthogonaal, en er zijn een hoop coole dingen die je kunt doen met orthogonale functies. Voor het gemak gebruiken we een sinus en cosinus voor onze golven die 90 graden uit fase lopen.
+Denk eraan dat wanneer twee golven 180 graden uit fase lopen, ze in feite dezelfde golf zijn, maar vermenigvuldigd met -1. 
+Door 90 graden uit fase te lopen worden de signalen orthogonaal, en er zijn een hoop coole dingen die je met orthogonale functies kunt doen. Voor het gemak gebruiken we een sinus en cosinus voor onze golven die 90 graden uit fase lopen.
 
 Laten we nu variabelen gebruiken om de **amplitude** van de sinus en cosinus aan te geven. We zullen :math:`I` voor de cos() en :math:`Q` voor sin() gebruiken:
 
@@ -94,15 +94,15 @@ IQ-sampling is gemakkelijker te begrijpen bekeken vanuit de zender, dus vanuit h
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
 
-Wat zou er gebeuren wanneer we een sinus en cosinus optellen? Of eigenlijk, wat zou we gebeuren wanneer we twee sinusoïden optellen die 90 graden uit fase lopen. In de onderstaande video zijn er sliders om I en Q mee aan te passen. Wat geplot wordt zijn de cosinus, sinus en de som van beide.
+Wat zou er gebeuren wanneer we een sinus en cosinus optellen? Of eigenlijk, wat zou er gebeuren wanneer we twee sinusoïden optellen die 90 graden uit fase lopen. In de onderstaande video zijn er sliders om I en Q mee aan te passen. Wat geplot wordt zijn de cosinus, sinus en de som van beide.
 
 .. image:: ../_images/IQ3.gif
    :scale: 100% 
    :align: center 
 
-(De code voor deze Python app kun je hier vinden: `link <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
+(De code voor deze Python-app kun je hier vinden: `link <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
 
-Wat je hier uit moet onthouden is dat wanneer de cos() en sin() worden opgeteld, we een andere zuivere sinusoïde krijgen met een andere fase en amplitude. Daarnaast verschuift de fase wanneer we langzaam een van de twee delen groter of kleiner maken. De amplitude verandert ook mee. Dit is allemaal het gevolg van de goniometrische identiteit: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, waar we dadelijk op terug komen.  Het "nut" van dit gedrag is dat we de fase en amplitude van de resulterende sinusoïde kunnen controleren door I en Q aan te passen (we hoeven niets de doen met de fase van cosinus of sinus). We kunnen bijvoorbeeld I en Q aanpassen op zo'n manier dat de amplitude constant blijft en de fase wordt wat we ook zouden willen. Omdat we weten dat we een sinusoïde signaal moeten versturen om het door de lucht te laten vliegen als een elektromagnetische golf, is deze mogelijkheid voor een zender extreem handig. Het is daarnaast veel makkelijker om twee amplitudes aan te passen en een optelling uit te voeren, dan amplitude en fase moeten aanpassen. Het resultaat is de onze zender er ongeveer zo uit zal zien:
+Wat je hier uit moet onthouden is dat wanneer de cos() en sin() worden opgeteld, we een andere zuivere sinusoïde krijgen met een andere fase en amplitude. Daarnaast verschuift de fase wanneer we langzaam een van de twee delen groter of kleiner maken. De amplitude verandert ook mee. Dit is allemaal het gevolg van de goniometrische identiteit: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`, waar we dadelijk op terug komen.  Het "nut" van dit gedrag is dat we de fase en amplitude van de resulterende sinusoïde kunnen controleren door I en Q aan te passen (we hoeven niets de doen met de fase van cosinus of sinus). We kunnen bijvoorbeeld I en Q op zo'n manier aanpassen dat de amplitude constant blijft en de fase naar wens wordt ingesteld. Omdat we weten dat we een sinusoïde signaal moeten versturen om het door de lucht te laten vliegen als een elektromagnetische golf, is deze mogelijkheid voor een zender extreem handig. Het is daarnaast veel makkelijker om twee amplitudes aan te passen en een optelling uit te voeren, dan amplitude en fase moeten aanpassen. Het resultaat is dat onze zender er ongeveer zo uit zal zien:
 
 .. image:: ../_images/IQ_diagram.png
    :scale: 80% 
@@ -114,19 +114,19 @@ We hoeven alleen een cosinus te genereren en deze 90 graden op te schuiven om he
 Complexe Getallen
 *************************
 
-Uiteindelijk is de IQ-afspraak alleen een alternatieve manier om naar de modulus en fase te kijken, wat ons nu bij complexe getallen brengt en de manier waarop we die weergeven in het complexe vlak. Je hebt complexe getallen misschien al eerder gezien in andere vakken. Neem het complexe getal 0.7-0.4j als voorbeeld:
+Uiteindelijk is de IQ-afspraak alleen een alternatieve manier om naar de modulus en fase te kijken, wat ons nu bij complexe getallen brengt en de manier waarop we die in het complexe vlak weergeven. Je hebt complexe getallen misschien al eerder gezien in andere vakken. Neem het complexe getal 0.7-0.4j als voorbeeld:
 
 .. image:: ../_images/complex_plane_1.png
    :scale: 70% 
    :align: center
 
-Een complex getal is niets meer dan twee getallen die samen zijn gevoegd, een reëel en een imaginair deel. Een complex getal heeft ook een modulus en fase, wat iets logischer is wanneer je het behandelt als een vector in plaats van een punt. De modulus is de lengte van de oorsprong tot het punt (dus de lengte van de vector), terwijl de fase de hoek is tussen de vector en 0 graden, de x-as:
+Een complex getal is niets meer dan twee getallen die samen zijn gevoegd, een reëel en een imaginair deel. Een complex getal heeft ook een modulus en fase, wat iets logischer is wanneer je het behandelt als een vector in plaats van een punt. De modulus is de lengte van de oorsprong tot het punt (dus de lengte van de vector), terwijl de fase de hoek is tussen de vector en 0 graden:
 
 .. image:: ../_images/complex_plane_2.png
    :scale: 70% 
    :align: center
 
-Een sinusoïde op deze manier weergeven heet een "fasor diagram". We plotten simpelweg de complexe getallen en behandelen ze als vectoren. Maar wat is nu de modulus en fase van ons complexe getal 0.7-0.4j? Voor een gegeven complex getal waar :math:`a` het reële deel is en :math:`b` het imaginaire:
+Een sinusoïde op deze manier weergeven heet een "fasordiagram". We plotten simpelweg de complexe getallen en behandelen ze als vectoren. Maar wat is nu de modulus en fase van ons complexe getal 0.7-0.4j? Voor een gegeven complex getal waar :math:`a` het reële deel is en :math:`b` het imaginaire:
 
 .. math::
   \mathrm{modulus} = \sqrt{a^2 + b^2} = 0.806
@@ -135,7 +135,7 @@ Een sinusoïde op deze manier weergeven heet een "fasor diagram". We plotten sim
   
 In Python kun je np.abs(x) en np.angle(x) gebruiken voor de modulus en fase. De ingang kan een complex getal zijn of een array van complexe getallen, de uitgang zal een of meerdere **reële** (floating point) getallen bevatten. 
 
-Ondertussen heb je misschien uitgevogeld hoe het fasor diagram relateert aan de IQ-afspraak: I is reëel en Q is imaginair. Wanneer we vanaf nu een complex vak tekenen zullen we I en Q gebruiken in plaat van reëel en imaginair. Maar het blijven complexe getallen!
+Ondertussen heb je misschien uitgevogeld hoe het fasordiagram relateert aan de IQ-afspraak: I is reëel en Q is imaginair. Wanneer we vanaf nu een complex vak tekenen zullen we I en Q gebruiken in plaat van reëel en imaginair. Maar het blijven complexe getallen!
 
 .. image:: ../_images/complex_plane_3.png
    :scale: 70% 
@@ -154,29 +154,31 @@ We kunnen de goniometrische identiteit :math:`a \cos(x) + b \sin(x) = A \cos(x-\
 .. math::
   x(t) = 0.806 \cos(2\pi ft + 0.519)
 
-Zelfs al zijn met een complex getal gestart, we versturen iets reëels, wat goed is want we kunnen eigenlijk niet iets imaginairs uitzenden met een elektromagnetische golf. We gebruiken de imaginaire/complexe getallen alleen om aan te geven *wat* we versturen. We gaan het zo over de :math:`f` hebben.
+Zelfs al zijn we met een complex getal gestart, we versturen iets reëels, wat goed is want we kunnen eigenlijk niet iets imaginairs met een elektromagnetische golf uitzenden. We gebruiken de imaginaire/complexe getallen alleen om aan te geven *wat* we versturen. We gaan het zo over de :math:`f` hebben.
 
 **************************
 Complexe getallen bij FFTs
 **************************
-We gingen bij de bovenstaande complexe getallen ervan uit dat het samples waren uit het tijddomein, maar je komt ook complexe getallen tegen bij het gebruik van een FFT. Toen we de Fourierreeks en FFT vorig hoofdstuk behandelden hebben we nog niet naar complexe getallen gekeken. Wanneer je de FFT neemt van een serie samples dan geeft dat de frequentiedomein-representatie. We hebben het erover gehad hoe de FFT uitvindt welke frequenties in een serie samples zitten (de modulus van de FFT gaf de kracht van elke frequentie aan). Maar wat de FFT daarnaast doet, is de vertraging (in de tijd) uitvogelen die op elk van deze frequenties toegepast moet worden, zodanig dat de set van sinusoïden opgeteld kunnen worden om het tijddomein-signaal weer te reconstrueren. Die vertraging is simpelweg de fase van de FFT. De uitgang van de FFT is een array van complexe getallen waarbij elk complex getal een modulus en fase geeft en de index van dat getal de frequentie. Als je dus sinusoïden genereert met die frequenties/fases/amplitudes en bij elkaar optelt, dan krijg je het originele tijddomein-signaal weer terug (of iets wat er erg op lijkt, en dat is waar Nyquist bij komt kijken).
+
+We gingen bij de bovenstaande complexe getallen ervan uit dat het samples waren uit het tijddomein, maar je komt complexe getallen bij het gebruik van een FFT ook tegen. Toen we de Fourierreeks en FFT vorig hoofdstuk behandelden hebben we nog niet naar complexe getallen gekeken. Wanneer je de FFT neemt van een serie samples dan geeft dat de frequentiedomein-representatie. We hebben het erover gehad hoe de FFT uitvindt welke frequenties in een serie samples zitten (de modulus van de FFT gaf de kracht van elke frequentie aan). Maar wat de FFT daarnaast doet, is de vertraging (in de tijd) uitvogelen die op elk van deze frequenties toegepast moet worden, zodanig dat de set van sinusoïden opgeteld kunnen worden om het tijddomein-signaal weer te reconstrueren. Die vertraging is simpelweg de fase van de FFT. De uitgang van de FFT is een array van complexe getallen waarbij elk complex getal een modulus en fase geeft en de index van dat getal de frequentie. Als je dus sinusoïden genereert met die frequenties/fases/amplitudes en bij elkaar optelt, dan krijg je het originele tijddomein-signaal weer terug (of iets wat er erg op lijkt, en dat is waar Nyquist bij komt kijken).
 
 *************************
 Ontvangende kant
 *************************
-Laten we nu gaan kijken vanuit het perspectief van een radio-ontvanger die een signaal probeert te ontvangen (bijv. een FM radio signaal). Met IQ-sampling lijkt het diagram hierop:
+
+Laten we nu vanuit het perspectief van een radio-ontvanger gaan kijken die een signaal probeert te ontvangen (bijv. een FM radio signaal). Met IQ-sampling lijkt het diagram hierop:
 
 .. image:: ../_images/IQ_diagram_rx.png
    :scale: 70% 
    :align: center
 
-Er komt een reëel signaal onze antenne binnen, deze wordt omgezet in IQ waarden. We kunnen de I en Q takken apart samplen met twee ADC's en daarna dit combineren en opslaan als complexe getallen. In andere woorden, op elke tijdstap samplen we de I en de Q waarde en combineren ze in de vorm :math:`I + jQ` (dus een complex getal per IQ sample). Er zal altijd een "sample rate" of sample-snelheid zijn, de snelheid waarmee gesampled wordt. Sommige zouden zeggen "Ik heb mijn SDR op een sample-frequentie van 2 MHz lopen”. Dit betekent dat de SDR twee miljoen samples per seconde ontvangt.
+Er komt een reëel signaal onze antenne binnen, deze wordt omgezet in IQ-waarden. We kunnen de I en Q takken apart samplen met twee ADC's en daarna dit combineren en opslaan als complexe getallen. In andere woorden, op elke tijdstap samplen we de I en de Q waarde en combineren ze in de vorm :math:`I + jQ` (dus een complex getal per IQ-sample). Er zal altijd een samplefrequentie of samplesnelheid zijn, de snelheid waarmee gesampled wordt. Sommige zouden zeggen "Ik heb mijn SDR op een samplefrequentie van 2 MHz lopen”. Dit betekent dat de SDR twee miljoen samples per seconde ontvangt.
 
 Als iemand jou een stapel IQ-samples geeft, zal dat op een 1D array/vector lijken van complexe getallen. Dit punt, complex of niet, is waar dit hele hoofdstuk naar toe heeft gebouwd, en we zijn er eindelijk.
 
-Door dit hele boek door, zul je **super** bekend raken met hoe IQ-samples werken, hoe je die ontvangt en verstuurt met een SDR, hoe je ze verwerkt in Python en hoe je ze kunt opslaan in een bestand voor later.
+Door dit hele boek door, zul je **super** bekend raken met hoe IQ-samples werken, hoe je die ontvangt en verstuurt met een SDR, hoe je ze verwerkt in Python en hoe je ze in een bestand voor later kunt opslaan.
 
-Nog een laatste belangrijke opmerking: Het figuur hierboven laat zien wat er **binnen** de SDR gebeurt. We hoeven niet zelf een sinus te genereren, op te schuiven met 90 graden, vermenigvuldigen of toevoegen -- de SDR doet dat voor ons. We vertellen de SDR op welke frequentie we willen samplen, of op welke frequentie we willen versturen. Aan de ontvangende kant zal de SDR ons voorzien van IQ-samples. Aan de kant van de zender moeten we de IQ-samples aanbieden. Dit zal van het datatype complexe ints of floats zijn.   
+Nog een laatste belangrijke opmerking: Het figuur hierboven laat zien wat er **binnen** de SDR gebeurt. We hoeven niet zelf een sinus te genereren, op te schuiven met 90 graden, vermenigvuldigen of toevoegen -- de SDR doet dat voor ons. We vertellen de SDR op welke frequentie we willen samplen, of op welke frequentie we willen versturen. Aan de ontvangende kant zal de SDR ons voorzien van IQ-samples. Aan de kant van de zender moeten we de IQ-samples aanbieden. Dit zal van het datatype complexe ints of floats zijn.
    
 *************************************
 Draaggolven en frequentieverschuiving
