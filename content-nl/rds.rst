@@ -31,7 +31,7 @@ Door het signaal in het frequentiedomein te bekijken zien we de volgende signale
 #. Een dubbel signaal gecentreerd op 57 kHz
 #. Een enkel signaal gecentreerd op 67 kHz
 
-Dit is alles wat we uit de PSD kunnen halen, en let op dat dit *na* de FM demodulatie is. De PSD voordat we het demoduleren ziet er als volgt uit, en dit verteld ons vrijwel niets.
+Dit is alles wat we uit de PSD kunnen halen, en let op dat dit *na* de FM demodulatie is. De PSD voordat we het demoduleren ziet er als volgt uit, en dit vertelt ons vrijwel niets.
 
 .. image:: ../_images/fm_before_demod.svg
    :align: center 
@@ -41,7 +41,7 @@ Toch is het belangrijk te beseffen dat wanneer je een signaal frequentiemoduleer
 Dus het signaal op 67 kHz zorgt ervoor dat de totale bandbreedte van het signaal toeneemt, de hoogste frequentiecomponent is ongeveer 75 kHz volgens figuur :numref:`PSD`.
 Wanneer we `de bandbreedte-regel van Carson <https://en.wikipedia.org/wiki/Carson_bandwidth_rule>`_ op FM toepassen, zegt dit dat een FM-zender ongeveer 250 kHz aan spectrum inneemt. Om deze reden samplen we meestal op 250 kHz (vergeet niet dat bij kwadratuur/IQ-sampling de ontvangen bandbreedte gelijk is aan de samplerate).
 
-Sommige lezers die gewent zijn om de FM-band met een SDR of spectrumanalyzer te bekijken herkennen het volgende diagram. Misschien denk je dat de blokkige signalen naast de FM-zenders RDS zijn.
+Sommige lezers die gewend zijn om de FM-band met een SDR of spectrumanalyzer te bekijken herkennen het volgende diagram. Misschien denk je dat de blokkige signalen naast de FM-zenders RDS zijn.
 
 .. image:: ../_images/fm_band_psd.png
    :scale: 80 % 
@@ -58,9 +58,9 @@ Weer terug naar de 5 signalen die we in onze PSD herkenden; Het volgende diagram
 
 We doorlopen deze signalen in willekeurige volgorde:
 
-De mono en stereo audiosignalen bevatten gewoon de audio. Je kunt doormiddel van optellen of aftrekken de linker en rechter kanalen onderscheiden.
+De mono en stereo audiosignalen bevatten gewoon de audio. Je kunt door middel van optellen of aftrekken de linker en rechter kanalen onderscheiden.
 
-De toon op 19 kHz wordt gebruikt om het stereo signaal te kunnen demoduleren. Door het verdubbelen van de toon kun je het gebruiken als frequentie- en fasereferentie, het audiosignaal is immers gecentreerd op 38 kHz. Dit verdubbelen kun je doen door de samples te kwadrateren.
+De toon op 19 kHz wordt gebruikt om het stereo signaal te kunnen demoduleren. Door het verdubbelen van de toon kun je het gebruiken als frequentie- en fasereferentie, het audiosignaal is namelijk gecentreerd op 38 kHz. Dit verdubbelen kun je doen door de samples te kwadrateren.
 
 DirectBand werd in Noord-Amerika gebruikt als een datanetwerk van Microsoft. Ook bekend als "MSN direct" onder de consumenten.
 Het verstuurde informatie naar apparaten zoals GPS ontvangers, horloges en weerstations. Je kon zelfs berichtjes ontvangen van Windows Live Messenger. De meest succesvolle toepassing was real-time verkeersinformatie voor Garmin GPS-ontvangers. Dit werd door miljoenen mensen gebruikt voordat smartphones breed beschikbaar waren. De service is in januari 2012 uitgeschakeld. Naar mijn weten is dit nooit in Nederland toegepast.
@@ -71,7 +71,7 @@ Als laatste komen we bij RDS waar de rest van het hoofdstuk om draait. Zoals in 
 Het RDS-Signaal
 ********************************
 
-We zullen in dit hoofdstuk Python toepassen om RDS te ontvangen. Om goed te begrijpen hoe je het ontvangt is het verstandig om eerst uit te zoeken hoe het signaal wordt gevormd en uitgezonden.
+We zullen in dit hoofdstuk Python toepassen om RDS te ontvangen. Om goed te begrijpen hoe je het ontvangt, is het verstandig om eerst uit te zoeken hoe het signaal wordt gevormd en uitgezonden.
 
 Zender
 #############
@@ -79,18 +79,18 @@ Zender
 De RDS-informatie dat door een FM-station wordt verzonden (bijv. naam nummer) is gecodeerd in groepen van 8 bytes.
 Elke set van 8 bytes, wat overeenkomt met 64 bits, wordt met 40 "controllebits" gegroepeerd. Deze 104 bits worden samen verzonden zonder enige vertraging tussen de groepen. De ontvanger moet dus de grens tussen de groepen zien te vinden. We gaan de details hierover bekijken wanneer we naar de ontvanger gaan.
 
-Om deze bits draadloos te versturen gebruikt RDS BPSK. We hebben in het :ref:`modulation-chapter` hoofdstuk gezien dat dit een simpel modulatieschema is waarmee de fase van de draaggolf is gekoppeld aan de enen en nullen.
+Om deze bits draadloos te versturen gebruikt RDS BPSK. We hebben in het :ref:`modulation-chapter` hoofdstuk gezien dat dit een simpel modulatieschema is waarmee de fase van de draaggolf aan de enen en nullen wordt gekoppeld.
 RDS maakt gebruik van differentiële codering zodat we niet langer zorgen hoeven te maken over een 180 graden fasedraaiing.
 De BPSK-symbolen worden verstuurd op een snelheid van 1187.5 symbolen per seconde.
 Omdat BPSK slechts 1 bit per symbool gebruikt komt dit neer op een transmissiesnelheid van ongeveer 1.2 kbps.
 RDS gebruikt geen kanaalcodering (foutcorrectie) maar bevat wel een CRC-som om fouten te kunnen detecteren.
 De ervaren BPSK-er vraagt zich misschien af waarom het signaal twee zijbanden heeft in figuur :numref:`PSD`; meestal heeft BPSK maar 1 zijband.
 RDS blijkt het BPSK-signaal te dupliceren/spiegelen rondom 57 kHz voor extra redundantie. 
-Wanneer we de Python code gaan bekijken gebruiken we een filter om slechts een van deze BPSK-signalen te demoduleren.
+Wanneer we de Pythoncode gaan bekijken gebruiken we een filter om slechts een van deze BPSK-signalen te demoduleren.
 
-Het dubbele BPSK-signaal wordt uiteindelijk verschoven in frequentie naar 57 kHz en aan alle andere componenten van het FM-signaal toegevoegd, voordat de frequentiemodulatie zelf plaatsvindt. 
+Het dubbele BPSK-signaal wordt uiteindelijk in frequentie verschoven naar 57 kHz en aan alle andere componenten van het FM-signaal toegevoegd, voordat de frequentiemodulatie zelf plaatsvindt. 
 FM-signalen worden, vergeleken met andere draadloze communicatie, uitgezonden op extreem hoge vermogens, tot 80 kW!
-Om deze reden hebben veel SDR-gebruikers een band-stop-filter met de antenne in serie gezet om te voorkomen dat het FM-signaal andere signalen overstemt.
+Om deze reden hebben veel SDR-gebruikers een band-stop-filter in serie met de antenne gezet om te voorkomen dat het FM-signaal andere signalen overstemt.
 
 Ontvanger
 ############
@@ -105,7 +105,7 @@ De volgende stappen zijn nodig om RDS te demoduleren en decoderen. Je hoeft deze
 #. Hersamplen naar 19 kHz zodat we een geheel getal aan samples per symbool hebben
 #. Een van de RDS-signalen wegfilteren met een banddoorlaatfilter
 #. Tijdsynchronisatie, met behulp van Mueller en Muller in dit voorbeeld
-#. Fijne frequentiesynchronisatie m.b.v. een Costas-loop
+#. Fijne frequentiesynchronisatie m.b.v. een Costas-loopcomponent
 #. BPSK demoduleren naar 1'en en 0'en.
 #. Differentieel decoderen
 #. De 1'en en 0'en groeperen in bytes
@@ -113,7 +113,7 @@ De volgende stappen zijn nodig om RDS te demoduleren en decoderen. Je hoeft deze
 
 Het lijkt op een hoop stappen, maar RDS is een van de makkelijkste protocollen om te decoderen. Een modern protocol zoals wifi of 5G heeft een boek nodig om de PHY/MAC lagen uit te leggen.
 
-We zullen nu gaan kijken naar de Python code waarmee we RDS kunnen ontvangen.
+We zullen nu gaan kijken naar de pythoncode waarmee we RDS kunnen ontvangen.
 Deze code werkt met een `FM opname die je hier kunt vinden <https://github.com/versd/pysdr/blob/dutch/fm_1027mhz_250ksps?raw=true>`_, of met een eigen ontvangen signaal zolang de SNR maar hoog genoeg is. Je hoeft alleen af te stemmen op de middenfrequentie van het FM-station en te samplen op 250 kHz.
 Om het signaalvermogen te maximaliseren helpt het om een dipoolantenne toe te passen met de juiste lengte (~1.5 meter), niet de 2.4 GHz antennes van de Pluto.
 Daarentegen is FM wel een heel luid signaal, als je dicht bij een raam staat, of buiten, is de 2.4 GHz antenne waarschijnlijk genoeg om sterke FM stations te ontvangen.
@@ -155,8 +155,8 @@ Let op dat de uitgang een reëel signaal is, terwijl de ingang complex was.
 Wat deze enkele regel Python-code doet is de vermenigvuldiging uitrekenen tussen ons signaal en een vertraagde en geconjugeerde versie van ons signaal. Hierna berekent het de fase van elke sample van het resultaat, dit is het moment waar het signaal reëel wordt.
 We kunnen als volgt bewijzen dat deze regel inderdaad de informatie uit de frequentievariatie onttrekt.
 Neem een toon met frequentie :math:`f` en fase :math:`\phi` dat we kunnen uitdrukken als :math:`e^{j2 \pi (f t + \phi)}`.
-Als we nu in de discrete tijd gaan denken, gebruiken we niet langer de continue t maar maken we stappen van nT met T de duur van de stap.
-Voor het gemak maken we T gelijk aan 1 en kunnen dan de vergelijking schrijven als :math:`e^{j2 \pi (f n + \phi)}`.
+Als we nu in de discrete tijd gaan denken, gebruiken we niet langer de continue :math:`t` maar maken we stappen van :math:`nT` met :math:`T` de duur van de stap.
+Voor het gemak maken we :math:`T` gelijk aan 1 en kunnen dan de vergelijking schrijven als :math:`e^{j2 \pi (f n + \phi)}`.
 Het geconjugeerde en vertraagde signaal is dan :math:`e^{-j2 \pi (f (n-1) + \phi)}`.
 De regel wordt:
 
@@ -193,7 +193,7 @@ RDS eruit filteren
  x = np.convolve(x, taps, 'valid')
 
 Nu zullen we alle signalen behalve RDS moeten wegfilteren. Omdat het RDS-signaal nu gecentreerd is rond 0 Hz willen we een laagdoorlaatfilter toepassen. We kunnen :code:`firwin()` gebruiken om de coëfficiënten van een FIR filter te berekenen. Het heeft alleen het aantal coëfficiënten en de kantelfrequentie nodig. De samplerate moet ook worden gegeven omdat de kantelfrequentie anders geen betekenis heeft voor firwin. Het resultaat is een symmetrisch laagdoorlaatfilter met reële coëfficiënten waarmee we het signaal kunnen convolueren. 
-We kiezen :code:`'valid'` om randeffecten te voorkomen bij de convolutie, alhoewel het in dit geval niet echt uitmaakt omdat we toch een enorm lang signaal geven waardoor een paar gekke samples aan de randen weinig invloed heeft.
+We kiezen :code:`'valid'` om randeffecten bij de convolutie te voorkomen, alhoewel het in dit geval niet echt uitmaakt omdat we toch een enorm lang signaal geven waardoor een paar gekke samples aan de randen weinig invloed heeft.
 
 ********************************
 Met 10 decimeren
@@ -209,7 +209,7 @@ Telkens wanneer je een klein stuk van de originele bandbreedte overhoudt dankzij
 Dus, nu we ons laagdoorlaatfilter hebben toegepast is de hoogste frequentie ongeveer 7.5 kHz, en een samplerate van 15 kHz zou voldoende moeten zijn. Voor de zekerheid voegen we er nog een marge aan toe en gaan we een samplerate van 25 kHz gebruiken. Deze frequentie helpt later ook nog eens.
 
 Om te decimeren kunnen we simpelweg 9 van de 10 samples weggooien. We hadden immers een frequentie van 250 kHz en we willen naar 25 kHz.
-Dit lijkt in eerste instantie verwarrend, want 90% van de samples weggooien voelt alsof we informatie verliezen, maar als je het :ref:`sampling-chapter` hoofdstuk doorleest zie dat we echt niets verliezen vanwege het filter. Het laagdoorlaatfilter werkt als een anti-aliasing filter en vermindert de maximale frequentie en dus bandbreedte van het signaal.
+Dit lijkt in eerste instantie verwarrend, want 90% van de samples weggooien voelt alsof we informatie verliezen, maar als je het :ref:`sampling-chapter` hoofdstuk doorleest, zie je dat we echt niets verliezen vanwege het filter. Het laagdoorlaatfilter werkt als een anti-aliasing filter en vermindert de maximale frequentie en dus bandbreedte van het signaal.
 
 Vanuit de code bekeken is dit de makkelijkste stap, maar vergeet niet de :code:`sample_rate` variabele nu ook aan te passen!
 
@@ -232,7 +232,7 @@ De gewenste samplefrequentie is nu afhankelijk van hoeveel samples per symbool w
 
 Om de samplefrequentie nu van 25 kHz naar 19 kHz te brengen kunnen we :code:`resample_poly()` toepassen. Deze functie interpoleert met een gehele waarde, filtert, en decimeert met een gehele waarde. Dit is handig want nu kunnen we 25 en 19 gebruiken i.p.v. 25000 en 19000. Hadden we toch voor 13 samples per symbool gekozen, dan hadden we :code:`resample_poly()` niet kunnen gebruiken en zou alles veel lastiger worden.
 
-Nogmaals, vergeet niet om de :code:`sample_rate` variabele aan te passen wanneer het is verandert.
+Nogmaals, vergeet niet om de :code:`sample_rate` variabele aan te passen wanneer het is veranderd.
 
 ********************************
 Banddoorlaatfilter
@@ -244,7 +244,7 @@ Banddoorlaatfilter
  taps = firwin(numtaps=501, cutoff=[0.05e3, 2e3], fs=sample_rate, pass_zero=False)
  x = np.convolve(x, taps, 'valid')
 
-We weten dat RDS twee identieke BPSK signalen bevat gezien de vorm van de PSD (figuur :numref:`PSD`).  We moeten er een kiezen, dus we kiezen willekeurig ervoor om het positieve deel te behouden door middel van een banddoorlaatfilter. Weer gebruiken we :code:`firwin()`, maar nu met  :code:`pass_zero=False` waarmee we aangeven dat het om een banddoorlaatfilter gaat. Er zijn dus twee kantelfrequenties nodig. Omdat we 0 Hz niet als kantelfrequentie kunnen opgeven, kiezen we voor 50 Hz. Als laatste verhogen we ook het aantal coëfficiënten zodat we een scherp filter krijgen. We kunnen deze instelling verifiëren door het filter in het tijd- en frequentiedomein te bekijken, d.m.v. de coëfficiënten en de FFT ervan. Zie dat de doorlaatband in het frequentiedomein tot bijna 0 Hz gaat.
+We weten dat RDS twee identieke BPSK signalen bevat gezien de vorm van de PSD (figuur :numref:`PSD`).  We moeten er een kiezen, dus we kiezen er willekeurig voor om het positieve deel te behouden door middel van een banddoorlaatfilter. Weer gebruiken we :code:`firwin()`, maar nu met  :code:`pass_zero=False` waarmee we aangeven dat het om een banddoorlaatfilter gaat. Er zijn dus twee kantelfrequenties nodig. Omdat we 0 Hz niet als kantelfrequentie kunnen opgeven, kiezen we voor 50 Hz. Als laatste verhogen we ook het aantal coëfficiënten zodat we een scherp filter krijgen. We kunnen deze instelling verifiëren door het filter in het tijd- en frequentiedomein te bekijken, d.m.v. de coëfficiënten en de FFT ervan. Zie dat de doorlaatband in het frequentiedomein tot bijna 0 Hz gaat.
 
 .. image:: ../_images/bandpass_filter_taps.svg
    :align: center 
@@ -289,7 +289,7 @@ Eindelijk kunnen we de symbool/tijdsynchronisatie gaan toepassen. We gebruiken e
    :scale: 80 % 
    :align: center 
 
-Mocht je een eigen FM-signaal gebruiken, en je krijgt nu niet twee aparte clusters van complexe samples, dan kan het synchronisatiealgoritme van hierboven niet synchroniseren of je hebt in de eerdere stappen een fout gemaakt. Je hoeft de constellatie niet te animeren, maar probeer niet alle samples te weergeven want dan zie je alleen een cirkel. Als je 100 of 200 samples per keer laat zien dan heb je een beter gevoel of dat er twee clusters zijn of niet, zelfs als ze ronddraaien.
+Mocht je een eigen FM-signaal gebruiken, en je krijgt nu niet twee aparte clusters van complexe samples, dan kan het synchronisatie-algoritme van hierboven niet synchroniseren of je hebt in de eerdere stappen een fout gemaakt. Je hoeft de constellatie niet te animeren, maar probeer niet alle samples te weergeven want dan zie je alleen een cirkel. Als je 100 of 200 samples per keer laat zien dan heb je een beter gevoel of dat er twee clusters zijn of niet, zelfs als ze ronddraaien.
 
 ********************************
 Fijne Frequentiesynchronisatie
@@ -324,8 +324,8 @@ Fijne Frequentiesynchronisatie
  x = out
 
 We kopiëren ook de fijne frequentiesynchronisatie-code van het :ref:`sync-chapter` hoofdstuk.
-We gebruiken dus een Costas-loop om enig overgebleven frequentieafwijking te corrigeren, alsmede het BPSK uitlijnen met de reële (I) as.
-Alles wat overblijft op de Q as komt waarschijnlijk door ruis, als de loop goed is afgesteld.
+We gebruiken dus een Costas-loop om enig overgebleven frequentieafwijking te corrigeren en BPSK uit te lijnen met de reële (I) as.
+Alles wat overblijft op de Q as komt waarschijnlijk door ruis, als de lus goed is afgesteld.
 Laten we dezelfde animatie als eerder bekijken maar met de frequentiesynchronisatie toegepast (het is gestopt met draaien!):
 
 .. image:: ../_images/constellation-animated-postcostas.gif
@@ -359,7 +359,7 @@ Differentieel decoderen
  bits = (bits[1:] - bits[0:-1]) % 2
  bits = bits.astype(np.uint8) # voor decoderen
 
-Toen het BPSK-signaal werd opgezet, is differentiële codering gebruikt. Dit betekent dat elke 1 en 0 van de originele data op zo'n manier is opgezet dat een bit verandering een 1 oplevert, en geen verandering een 0. Het grote voordeel van differentiële codering is dat je geen zorgen meer hebt over een mogelijke 180 graden fasedraaiing. Je kijkt dus niet meer of een 1 groter dan nul of minder dan nul moet zijn, je kijkt nu alleen of er een verschil is geweest tussen 1 en 0. Dit concept is misschien makkelijker te begrijpen door naar voorbeelddata te kijken. Hieronder zie je 10 symbolen voor en na differentiële decodering:
+Toen het BPSK-signaal werd opgezet, is differentiële codering gebruikt. Dit betekent dat elke 1 en 0 van de originele data op zo'n manier is opgezet dat een bit verandering een 1 oplevert, en geen verandering een 0. Het grote voordeel van differentiële codering is dat je geen zorgen meer hebt over een mogelijke 180 graden fasedraaiing. Je kijkt dus niet meer of een 1 groter of kleiner dan nul moet zijn, je kijkt nu alleen of er een verschil is geweest tussen 1 en 0. Dit concept is misschien makkelijker te begrijpen door naar voorbeelddata te kijken. Hieronder zie je 10 symbolen voor en na differentiële decodering:
 
 .. code-block:: python
 
@@ -377,13 +377,13 @@ Dit blok code neemt de 1'en en 0'en van hierboven en geeft aan de uitgang een li
 
 Het grootste gedeelte van de onderstaande code draait om het synchroniseren en de foutcontrole.
 Het werkt in blokken van 104 bits waarbij elk blok succesvol is ontvangen of fouten bevat (CRC controle). Elke 50 blokken controleert het of er meer dan 35 blokken een fout hadden, waarna het de synchronisatie probeert te herstarten.
-De CRC wordt uitgevoerd met een 10-bits controle, met de polynoom :math:`x^{10}+x^8+x^7+x^5+x^4+x^3+1`; dit vind plaats wanneer :code:`reg` met 0x5B9 wordt geXORt, het binaire equivalent van de polynoom.
+De CRC wordt uitgevoerd met een 10-bits controle, met de polynoom :math:`x^{10}+x^8+x^7+x^5+x^4+x^3+1`; dit vindt plaats wanneer :code:`reg` met 0x5B9 wordt geXORt, het binaire equivalent van de polynoom.
 In Python kun je bitoperaties uitvoeren met :code:`& | ~ ^` voor de functies [and, or, not, xor], net als in C/C++.
 Een bitverschuiving naar links is :code:`x << y` (het zelfde als x vermenigvuldigen met 2**y), en een bitverschuiving naar rechts is :code:`x >> y` (net als x delen door 2**y), net als in C/C++.  
 
 Je **hoeft niet** door alle code heen te lopen, of iets ervan, zeker als je focust op het leren van de fysieke (PHY) laag i.r.t. DSP en SDR, dit betreft *geen* signaalbewerking.
-De code is simpelweg een implementatie van een RDS-decodering en alleen toepasbaar op het RDS protocol. 
-Als je al bent uitgeput door dit hoofdstuk, voel je dan vrij om dit enorme stuk code gewoon over te slaan.
+De code is simpelweg een implementatie van een RDS-decodering en alleen toepasbaar op het RDS-protocol. 
+Als je door dit hoofdstuk bent uitgeput, voel je dan vrij om dit enorme stuk code gewoon over te slaan.
 Het heeft een vrij makkelijke functie maar lost het complex op.
 
 .. code-block:: python
@@ -1081,7 +1081,7 @@ Als je het audiosignaal ook wilt demoduleren kun je dit toevoegen nadat je het s
  # Save to wav file, you can open this in Audacity for example
  wavfile.write('fm.wav', int(sample_rate), x)
 
-Het meest ingewikkelde deel is het de-emphasis filter, `waar je hier meer over kunt lezen <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, maar die stap is optioneel als je het niet erg vind dat de audio een slechte bas/treble balans heeft. Hieronder zie je de filterresponsie van het IIR filter. Het is meer een vormgevend filter dan een scherp filter.
+Het meest ingewikkelde deel is het de-emphasis filter, `waar je hier meer over kunt lezen <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, maar die stap is optioneel als je het niet erg vindt dat de audio een slechte bas/treble balans heeft. Hieronder zie je de filterresponsie van het IIR filter. Het is meer een vormgevend filter dan een scherp filter.
 
 .. image:: ../_images/fm_demph_filter_freq_response.svg
    :align: center 
