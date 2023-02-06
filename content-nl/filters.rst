@@ -28,30 +28,21 @@ Het is echter belangrijk om te begrijpen dat veel filters analoog zullen zijn, z
 Het volgende figuur plaatst een schema van een analoog filter tegenover het schematisch ontwerp van een digitaal filter.
 
 .. annotate image in tikz with text.
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=1.5]{analog_digital_filter_nolabel.png}};
-   \begin{scope}[x={(image.south east)},y={(image.north west)}]
-      \node[] at (0.25,0.9) {Analoog filter};
-      \node[] at (0.75,0.9) {Digitaal filter};
-   \end{scope}
+.. .. tikz:: [font=\sffamily\Large\bfseries]
+..    \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=1.5]{analog_digital_filter_nolabel.png}};
+..    \begin{scope}[x={(image.south east)},y={(image.north west)}]
+..       \node[] at (0.25,0.9) {Analoog filter};
+..       \node[] at (0.75,0.9) {Digitaal filter};
+..    \end{scope}
+.. image:: ../_images/analog_digital_filter.png
+   :scale: 70 % 
+   :align: center 
   
 DSP's hebben signalen als in- en uitgangen. Een filter heeft een ingangssignaal en een uitgangssignaal:
 
-.. tikz:: [font=\sffamily\Large\bfseries, scale=2]
-   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
-   \node [draw,
-    color=white,
-    fill=babyblueeyes,
-    minimum width=4cm,
-    minimum height=2.4cm
-   ]  (filter) {Filter};
-   \draw[<-, very thick] (filter.west) -- ++(-2,0) node[left,align=center]{Ingang\\(tijddomein)} ;
-   \draw[->, very thick] (filter.east) -- ++(2,0) node[right,align=center]{Uitgang\\(tijddomein)};   
-   :libs: positioning
-
-.. .. image:: ../_images/filter.png
-..    :scale: 70 % 
-..    :align: center 
+.. image:: images/filter.svg
+   :scale: 100 % 
+   :align: center 
 
 Je kunt niet twee verschillende signalen in een enkel filter stoppen zonder ze eerst samen te voegen of een andere operatie uit te voeren.
 Op dezelfde manier zal de uitgang altijd een signaal betreffen, bijv. een 1D array van getallen.
@@ -69,61 +60,11 @@ Zolang de filters "reëel" zijn, zullen de filters gespiegeld zijn rondom 0 Hz.
    :scale: 70 % 
    :align: center 
 
+Inclusief negatieve frequenties:
 
-.. START OF FILTER TYPES TIKZ
-.. raw:: html
-
-   <table><tbody><tr><td>
-
-.. This draw the lowpass filter
-.. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
-   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Laag-doorlaat}};
-   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-2.5,0.5) (-1.5,3) (1.5,3) (2.5,0.5) (5,0)};
-   :xscale: 70
-
-.. raw:: html
-
-   </td><td  style="padding: 0px">
-
-.. this draws the highpass filter
-.. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
-   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Hoog-doorlaat}};
-   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-2.5,2.5) (-1.5,0.3) (1.5,0.3) (2.5,2.5) (5,3)};
-   :xscale: 70
-
-.. raw:: html
-
-   </td></tr><tr><td>
-
-.. this draws the bandpass filter
-.. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
-   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-doorlaat}};
-   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-4.5,0.3) (-3.5,3) (-2.5,3) (-1.5,0.3) (1.5, 0.3) (2.5,3) (3.5, 3) (4.5,0.3) (5,0)};
-   :xscale: 70
-
-.. raw:: html
-
-   </td><td>
-
-.. and finally the bandstop filter
-.. tikz:: [font=\sffamily\Large]    
-   \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequentie};
-   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Stop}};
-   \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-4.5,2.7) (-3.5,0.3) (-2.5,0.3) (-1.5,2.7) (1.5, 2.7) (2.5,0.3) (3.5, 0.3) (4.5,2.7) (5,3)};   
-   :xscale: 70
-
-.. raw:: html
-
-   </td></tr></tbody></table>
-
-.. .......................... end of filter plots in tikz
-
-.. .. image:: ../_images/filter_types.png
-..    :scale: 70 % 
-..    :align: center 
+.. image:: images/4filters_transfer.svg
+   :scale: 140 % 
+   :align: center 
 
 Elk filter laat bepaalde frequenties in een signaal door, terwijl het andere frequenties blokkeert.
 Het bereik aan frequenties wat wordt doorgelaten heet de "doorlaatband", en wat wordt geblokkeerd heet de "stopband".
@@ -168,48 +109,23 @@ Vergeet niet dat, terwijl we onze SDR afstemmen op een radiofrequentie, de sampl
 We moeten zelf onthouden op welke frequentie we de SDR hadden ingesteld.
 Dit zouden we dan kunnen ontvangen:
 
-.. annotate filter spectrum image in tikz with text.
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{filter_use_case_nolabel.png}};
-   \begin{scope}[x={(image.south east)},y={(image.north west)}]
-      \draw[red, ->] (0.3, 0.7) node[above left, align=center]{Gewenste\\signaal} -- (0.45, 0.6);
-      \draw[red, ->] (0.9, 0.8) node[above right, align=center]{Ongewenst\\signaal} -- (0.8, 0.7);
-      \draw[red, ->] (0.25, 0.2) node[below, align=center]{Ruisvloer} -- (0.3, 0.4);      
-   \end{scope}
-
-.. .. image:: ../_images/filter_use_case_nolabel.png
-..    :scale: 40 % 
-..    :align: center 
+.. image:: images/filter_use_case.svg
+   :align: center 
 
 We weten dat we een laagdoorlaatfilter nodig hebben omdat ons signaal al rond DC (0 Hz) is gecentreerd.
 We moeten de "kantelfrequentie" (Engels "cutoff") kiezen waar de doorlaatband overgaat in de stopband.
 De kantelfrequentie wordt altijd in Hz gegeven.
 In dit voorbeeld lijkt 3 kHz wel een goede waarde:
 
-.. annotate filter spectrum image in tikz with text.
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{filter_use_case_nolabel.png}};
-   \begin{scope}[x={(image.south east)},y={(image.north west)}]
-      \draw[red, ->] (0.3, 0.7) node[above left, align=center]{Gewenste\\signaal} -- (0.45, 0.6);
-      \draw[red, ->] (0.9, 0.8) node[above right, align=center]{Ongewenst\\signaal} -- (0.8, 0.7);
-      \draw[red, ->] (0.25, 0.2) node[below, align=center]{Ruisvloer} -- (0.3, 0.4); 
-      \draw[red, dashed, very thick] (0.62, 0.1) -- (0.62,0.7);
-   \end{scope}
+.. image:: images/filter_use_case_2.svg
+   :align: center 
 
 Maar, gezien hoe de meeste laagdoorlaatfilters werken, zal de negatieve kantelfrequentie ook op (-)3 kHz liggen.
 Het is dus symmetrisch rond DC (later zien we waarom).
 Onze kantelfrequenties zien er dan ongeveer zo uit (de doorlaatband ligt tussen):
 
-.. annotate filter spectrum image in tikz with text.
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{filter_use_case_nolabel.png}};
-   \begin{scope}[x={(image.south east)},y={(image.north west)}]
-      \draw[red, ->] (0.3, 0.7) node[above left, align=center]{Gewenste\\signaal} -- (0.45, 0.6);
-      \draw[red, ->] (0.9, 0.8) node[above right, align=center]{Ongewenst\\signaal} -- (0.8, 0.7);
-      \draw[red, ->] (0.25, 0.2) node[below, align=center]{Ruisvloer} -- (0.3, 0.4); 
-      \draw[red, dashed, very thick] (0.622, 0.1) -- (0.622,0.7);
-      \draw[red, dashed, very thick] (0.455, 0.1) -- (0.455,0.7);
-   \end{scope}
+.. image:: images/filter_use_case_3.svg
+   :align: center 
 
 Na het maken en toepassen van een filter met een kantelfrequentie van 3 kHz krijgen we:
 
@@ -332,21 +248,9 @@ Of de coëfficiënten reëel of complex zijn heeft niets te maken met de ingang,
 Wanneer de coëfficiënten reëel zijn dan is de frequentierespons symmetrisch rondom DC (0Hz).
 We gebruiken complexe coëfficiënten alleen wanneer we een asymmetrisch filter willen, wat niet vaak het geval is.
 
-.. draw real vs complex filter
-.. tikz:: [font=\sffamily\Large,scale=2] 
-   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}   
-   \draw[->, thick] (-5,0) node[below]{$-\frac{f_s}{2}$} -- (5,0) node[below]{$\frac{f_s}{2}$};
-   \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,1);
-   \draw[babyblueeyes, smooth, line width=3pt] plot[tension=0.1] coordinates{(-5,0) (-1,0) (-0.5,2) (0.5,2) (1,0) (5,0)};
-   \draw[->,thick] (6,0) node[below]{$-\frac{f_s}{2}$} -- (16,0) node[below]{$\frac{f_s}{2}$};
-   \draw[->,thick] (11,-0.5) node[below]{0 Hz} -- (11,1);
-   \draw[babyblueeyes, smooth, line width=3pt] plot[tension=0] coordinates{(6,0) (11,0) (11,2) (11.5,2) (12,0) (16,0)};
-   \draw[font=\huge\bfseries] (0,2.5) node[above,align=center]{Een laagdoorlaatfilter met\\reële coëfficiënten};
-   \draw[font=\huge\bfseries] (11,2.5) node[above,align=center]{Een laagdoorlaatfilter met\\complexe coëfficiënten};
-
-.. .. image:: ../_images/complex_taps.png
-..    :scale: 80 % 
-..    :align: center 
+.. image:: images/complex_taps.svg
+   :scale: 80 % 
+   :align: center 
 
 Als een voorbeeld voor complexe coëfficiënten nemen we het eerdere spectrum, maar deze keer zullen we het andere signaal proberen te ontvangen zonder de SDR opnieuw in te stellen.
 Dit betekent dat we een (niet symmetrisch) banddoorlaatfilter willen gebruiken.
@@ -391,19 +295,19 @@ Dus om ons banddoorlaatfilter te maken zullen we de coëfficiënten (de impulsre
 
 De impuls- en frequentierespons worden hieronder weergeven:
 
-.. annotate filter spectrum image in tikz with text.
-.. tikz:: [font=\sffamily\Large\bfseries]
-   \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{shifted_filter_nolabel.png}};
-   \begin{scope}[x={(image.south east)},y={(image.north west)}]
-      \draw 
-      (0.25, 0) node[align=center] {Tijddomein}
-      (0.25, 1) node[align=center] {Impulsrespons}
-      (0.75, 1) node[align=center] {Frequentierespons};
-   \end{scope}
+.. .. annotate filter spectrum image in tikz with text.
+.. .. tikz:: [font=\sffamily\Large\bfseries]
+..    \node[anchor=south west,inner sep=0](image) at (0,0) {\includegraphics[scale=0.7]{shifted_filter_nolabel.png}};
+..    \begin{scope}[x={(image.south east)},y={(image.north west)}]
+..       \draw 
+..       (0.25, 0) node[align=center] {Tijddomein}
+..       (0.25, 1) node[align=center] {Impulsrespons}
+..       (0.75, 1) node[align=center] {Frequentierespons};
+..    \end{scope}
 
-.. .. image:: ../_images/shifted_filter.png
-..    :scale: 60 % 
-..    :align: center 
+.. image:: ../_images/shifted_filter.png
+   :scale: 60 % 
+   :align: center 
 
 Omdat ons filter niet symmetrisch is rond de 0 Hz, moeten we complexe coëfficiënten gebruiken en hebben we twee lijnen nodig om het te weergeven.
 Deze complexe impulsrespons is aan de linkerkant van het bovenstaande figuur te zien.

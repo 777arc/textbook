@@ -1,0 +1,48 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\begin{document}
+\usetikzlibrary{positioning,shapes,arrows,snakes}
+\definecolor{yellowish}{HTML}{FFE699}
+\definecolor{grayish}{HTML}{D9D9D9} 
+\tikzset{
+   rect/.style={
+      align=center,
+      text=black,    
+      minimum width=2.5cm,
+      minimum height=2cm}
+}
+\tikzset{
+   done/.style={rect, fill=grayish }
+}
+\tikzset{
+   todo/.style={rect, fill=yellowish}
+}
+\tikzset{
+   arrow/.style={line width=1mm}
+}
+\tikzset{block/.style = {draw, fill=white, rectangle,
+                     minimum height=3em, minimum width=2cm},
+           input/.style = {coordinate},
+           output/.style = {coordinate},
+           pinstyle/.style = {pin edge={to-,t,black}}
+       }
+\centering
+
+\begin{tikzpicture}[auto, node distance=2cm,>=latex',font=\sffamily\small]
+   \node[block](tx)                            {zender};
+   \node[block,right = 6cm of tx](rx)          {ontvanger};
+   \node[antenna](txant) at (tx.north) {};
+   \node[antenna,xscale=-1](rxant) at (rx.north) {};
+   \draw[snake=expanding waves] 
+     (txant.east) -- ++(1,0) coordinate(begin);
+   \draw[ultra thick,gray] 
+     (begin) -- ++(2,0) coordinate(midden);
+   \draw[->,ultra thick, gray] 
+     (midden) -- ++(2,0) node[right,align=center]  {Ontvangen\\vermogen \textbf{Pr}};
+   \draw (midden) node[align=center, below]        {transmissieverlies\\\textbf{Lp}};
+   \node[above=1cm of txant.north,align=center]    {Antenneversterking\\zender \textbf{Gt}};
+   \node[above=1cm of rxant.north,align=center]    {Antenneversterking\\ontvanger \textbf{Gr}};
+   \node[above right = 1 cm of txant.east,align=center]     {Zendvermogen\\\textbf{Gt}};
+\end{tikzpicture}
+\end{document}

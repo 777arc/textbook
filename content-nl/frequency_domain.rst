@@ -259,21 +259,9 @@ Laten we zeggen dat :math:`x(t)` ons ontvangen signaal is.
 Laat :math:`Y(f)` het masker zijn wat we in het frequentiedomein willen toepassen. 
 Dat zou betekenen dat :math:`y(t)` de tijddomein-versie is van ons masker, en wanneer we dit convolueren met :math:`x(t)` het signaal "wegfilteren" dat we niet willen.
 
-.. This shows the carrier wave formula
-.. tikz:: [font=\Large\bfseries\sffamily]
-   \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
-   \draw (0,0) node[align=center,babyblueeyes]           {Bijv. ons ontvangen signaal};
-   \draw (0,-4) node[below, align=center,babyblueeyes]   {Bijv. ons masker}; 
-   \draw (0,-2) node[align=center,scale=2]{$\int x(\tau)y(t-\tau)d\tau \leftrightarrow X(f)Y(f)$};   
-   \draw[->,babyblueeyes,thick] (-4,0) -- (-5.5,-1.2);
-   \draw[->,babyblueeyes,thick] (2.5,-0.5) -- (3,-1.3);
-   \draw[->,babyblueeyes,thick] (-2.5,-4) -- (-3.8,-2.8);
-   \draw[->,babyblueeyes,thick] (3,-4) -- (5.2,-2.8);
-     
-
-.. .. image:: ../_images/masking-equation.png
-..    :scale: 100 % 
-..    :align: center 
+.. image:: images/masking-equation.svg
+   :scale: 100 % 
+   :align: center 
 
 Wanneer we filters gaan behandelen zal de convolutie eigenschap duidelijker worden.
 

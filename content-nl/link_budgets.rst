@@ -29,24 +29,10 @@ In dit hoofdstuk zullen we een richting behandelen, namelijk vanaf de zender (Tx
 We weten voor een gegeven systeem wat het zendvermogen is; dit is meestal een instelling bij de zender.
 Maar hoe bepalen we het vermogen wat aankomt bij de ontvanger?
 
-.. tikz:: [auto, node distance=2cm,>=latex',font=\sffamily]
-  \tikzset{block/.style = {draw, fill=white, rectangle,
-                    minimum height=3em, minimum width=2cm},
-          input/.style = {coordinate},
-          output/.style = {coordinate},
-          pinstyle/.style = {pin edge={to-,t,black}}
-      }
-  \node[block](tx)                          {zender};
-  \node[antenna](txant) at (tx.north) {};
-  \draw[snake=expanding waves] (txant.north east) -- ++(1,0);
-  \node[block,right = 6cm of tx](rx)        {ontvanger};
-  \node[antenna,xscale=-1] at (rx.north) {};
-  :libs: positioning,shapes,arrows,snakes
-  :xscale: 80
-
-.. .. image:: ../_images/tx_rx_system.svg
-..    :align: center 
-..    :target: ../_images/tx_rx_system.svg
+.. image:: images/tx_rx_system.svg
+   :align: center 
+   :scale: 140%
+   :target: images/tx_rx_system.svg
 
 We hebben vier systeemparameters nodig om het ontvangen vermogen te bepalen. Deze zijn hieronder opgesomd samen met de meest gebruikte (Engelstalige) afkortingen.
 We zullen ieder apart behandelen in dit hoofdstuk.
@@ -56,33 +42,10 @@ We zullen ieder apart behandelen in dit hoofdstuk.
 - **Gr** - Antenneversterking ontvanger (Gain receiver)
 - **Lt** - Afstand tussen zender en ontvanger dus hoeveelheid transmissieverlies (Path Loss)
 
-.. tikz:: [auto, node distance=2cm,>=latex',font=\sffamily\small]
-  \tikzset{block/.style = {draw, fill=white, rectangle,
-                    minimum height=3em, minimum width=2cm},
-          input/.style = {coordinate},
-          output/.style = {coordinate},
-          pinstyle/.style = {pin edge={to-,t,black}}
-      }
-  \node[block](tx)                            {zender};
-  \node[block,right = 6cm of tx](rx)          {ontvanger};
-  \node[antenna](txant) at (tx.north) {};
-  \node[antenna,xscale=-1](rxant) at (rx.north) {};
-  \draw[snake=expanding waves] 
-    (txant.east) -- ++(1,0) coordinate(begin);
-  \draw[ultra thick,gray] 
-    (begin) -- ++(2,0) coordinate(midden);
-  \draw[->,ultra thick, gray] 
-    (midden) -- ++(2,0) node[right,align=center]  {Ontvangen\\vermogen \textbf{Pr}};
-  \draw (midden) node[align=center, below]        {transmissieverlies\\\textbf{Lp}};
-  \node[above=1cm of txant.north,align=center]    {Antenneversterking\\zender \textbf{Gt}};
-  \node[above=1cm of rxant.north,align=center]    {Antenneversterking\\ontvanger \textbf{Gr}};
-  \node[above right = 1 cm of txant.east,align=center]     {Zendvermogen\\\textbf{Gt}};
-  :libs: positioning,shapes,arrows,snakes
-  :xscale: 100
-
-.. .. image:: ../_images/tx_rx_system_params.svg
-..    :align: center 
-..    :target: ../_images/tx_rx_system_params.svg
+.. image:: images/tx_rx_system_params.svg
+   :align: center 
+   :scale: 140%
+   :target: images/tx_rx_system_params.svg
 
 Zendvermogen
 #####################
