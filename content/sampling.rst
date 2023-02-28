@@ -86,7 +86,7 @@ We can see this visually by plotting I and Q equal to 1:
 
 We call the cos() the "in phase" component, hence the name I, and the sin() is the 90 degrees out of phase or "quadrature" component, hence Q.  Although if you accidentally mix it up and assign Q to the cos() and I to the sin(), it won't make a difference for most situations. 
 
-IQ sampling is more easily understood by using the transmitter's point of view, i.e., considering the task of transmitting a RF signal through the air.  What we do as the transmitter is add the sin() and cos().  Let's say x(t) is our signal to transmit:
+IQ sampling is more easily understood by using the transmitter's point of view, i.e., considering the task of transmitting an RF signal through the air.  We want to send a single sine wave at a certain phase, which can be done by sending the sum of a sin() and cos() with a phase of 0, because of the trig identity: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`.  Let's say x(t) is our signal to transmit:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
