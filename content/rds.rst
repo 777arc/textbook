@@ -976,15 +976,19 @@ For those interested in demodulating the actual audio signal, just add the follo
  bz, az = bilinear(1, [75e-6, 1], fs=sample_rate)
  x = lfilter(bz, az, x)
  
- # decimate filter to get mono audio
+ # decimate by 6 to get mono audio
  x = x[::6]
- sample_rate = sample_rate/6
+ sample_rate_audio = sample_rate/6
  
- # normalizes volume
- x /= x.std() 
+ # normalize volume so its between -1 and +1
+ x /= np.max(np.abs(x))
+ 
+ # some machines want int16s
+ x *= 32767
+ x = x.astype(np.int16)
  
  # Save to wav file, you can open this in Audacity for example
- wavfile.write('fm.wav', int(sample_rate), x)
+ wavfile.write('fm.wav', int(sample_rate_audio), x)
 
 The most complicated part is the de-emphasis filter, `which you can learn about here <https://wiki.gnuradio.org/index.php/FM_Preemphasis>`_, although it's actually an optional step if you are OK with audio that has a poor bass/treble balance.  For those curious, here is what the frequency response of the `IIR <https://en.wikipedia.org/wiki/Infinite_impulse_response>`_ de-emphasis filter looks like, it doesn't fully filter out any frequencies, it's more of a "shaping" filter.
 

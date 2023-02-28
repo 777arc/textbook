@@ -6,11 +6,8 @@ import matplotlib.pyplot as plt
 
 #x = np.fromfile('/home/marc/Downloads/fm_clip_for_rds.iq', dtype=np.complex64) # med SNR
 #x = np.fromfile('/home/marc/Downloads/fm_rds_250k.iq', dtype=np.complex64) # high SNR
-x = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64) # high SNR, shorter
-
+x = np.fromfile('fm_rds_250k_1Msamples.iq', dtype=np.complex64) # high SNR, shorter
 sample_rate = 250e3    # sample frequency
-
-
 
 # Add the following code right after the "Acquiring a Signal" section
 
@@ -25,13 +22,17 @@ x = lfilter(bz, az, x)
 
 # decimate by 6 to get mono audio
 x = x[::6]
-sample_rate = sample_rate/6
+sample_rate_audio = sample_rate/6
 
-# normalize volume
-x /= x.std() 
+# normalize volume so its between -1 and +1
+x /= np.max(np.abs(x))
+
+# some machines want int16s
+x *= 32767
+x = x.astype(np.int16)
 
 # Save to wav file, you can open this in Audacity for example
-wavfile.write('fm.wav', int(sample_rate), x)
+wavfile.write('fm.wav', int(sample_rate_audio), x)
 
 
 '''

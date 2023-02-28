@@ -6,7 +6,7 @@ from matplotlib.animation import FuncAnimation
 
 #samples = np.fromfile('/home/marc/Downloads/fm_clip_for_rds.iq', dtype=np.complex64) # med SNR
 #samples = np.fromfile('/home/marc/Downloads/fm_rds_250k.iq', dtype=np.complex64) # high SNR
-samples = np.fromfile('/home/marc/Downloads/fm_rds_250k_1Msamples.iq', dtype=np.complex64) # high SNR, shorter
+samples = np.fromfile('fm_rds_250k_1Msamples.iq', dtype=np.complex64) # high SNR, shorter
 
 # MAKE MY OWN RECORDING OF A COOLER STATION, JUST MAKE SURE ITS HIGH SNR AND SCALE IT TO THE SAME SIGNAL LEVEL AS THIS WORKING ONE
 
