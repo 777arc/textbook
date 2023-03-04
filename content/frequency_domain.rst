@@ -463,4 +463,79 @@ Which should produce the following, which is not the most interesting spectrogra
 
    </details>
 
+*********************
+FFT Implementation
+*********************
 
+Even though NumPy has already implemented the FFT for us, it's nice to know the basics of how it works under the hood.  The most popular FFT algorithm is the Cooley-Tukey FFT algorithm, first invented around 1805 by Carl Friedrich Gauss and then later rediscovered and popularized by James Cooley and John Tukey in 1965.
+
+The basic version of this algorithm works on power-of-two size FFTs, and is intended for complex inputs but can also work on real inputs.   The building block of this algorithm is known as the butterfly, which is essentially a N = 2 size FFT, consisting of two multiplies and two summations: 
+
+.. image:: ../_images/butterfly.svg
+   :align: center
+   :target: ../_images/butterfly.svg
+   :alt: Cooley-Tukey FFT algorithm butterfly radix-2
+
+or
+
+.. math::
+   y_0 = x_0 + x_1 w^k_N
+
+   y_1 = x_0 - x_1 w^k_N
+
+where :math:`w^k_N = e^{j2\pi k/N}` are known as twiddle factors (:math:`N` is the size of the sub-FFT and :math:`k` is the index).  Note that the input and output is intended to be complex, e.g., :math:`x_0` might be 0.6123 - 0.5213j, and the sums/multiplies are complex.
+
+The algorithm is recursive and breaks itself in half until all that is left is a series of butterflies, this is depicted below using a size 8 FFT:
+
+.. image:: ../_images/butterfly2.svg
+   :align: center
+   :target: ../_images/butterfly2.svg
+   :alt: Cooley-Tukey FFT algorithm size 8
+
+Each column in this pattern is a set of operations that can be done in parallel, and :math:`log_2(N)` steps are performed, which is why the computational complexity of the FFT is O(:math:`N\log N`) while a DFT is O(:math:`N^2`).
+
+For those who prefer to think in code rather than equations, the following shows a simple Python implementation of the FFT, along with an example signal consisting of a tone plus noise, to try the FFT out with.
+
+.. code-block:: python
+
+ import numpy as np
+ import matplotlib.pyplot as plt
+ 
+ def fft(x):
+     N = len(x)
+     if N == 1:
+         return x
+     twiddle_factors = np.exp(-2j * np.pi * np.arange(N//2) / N)
+     x_even = fft(x[::2]) # yay recursion!
+     x_odd = fft(x[1::2])
+     return np.concatenate([x_even + twiddle_factors * x_odd,
+                            x_even - twiddle_factors * x_odd])
+ 
+ # Simulate a tone + noise
+ sample_rate = 1e6
+ f_offset = 0.2e6 # 200 kHz offset from carrier
+ N = 1024
+ t = np.arange(N)/sample_rate
+ s = np.exp(2j*np.pi*f_offset*t)
+ n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # unity complex noise
+ r = s + n # 0 dB SNR
+ 
+ # Perform fft, fftshift, convert to dB
+ X = fft(r)
+ X_shifted = np.roll(X, N//2) # equivalent to np.fft.fftshift
+ X_mag = 10*np.log10(np.abs(X_shifted)**2)
+ 
+ # Plot results
+ f = np.linspace(sample_rate/-2, sample_rate/2, N)/1e6 # plt in MHz
+ plt.plot(f, X_mag)
+ plt.plot(f[np.argmax(X_mag)], np.max(X_mag), 'rx') # show max
+ plt.grid()
+ plt.xlabel('Frequency [MHz]')
+ plt.ylabel('Magnitude [dB]')
+ plt.show()
+
+
+.. image:: ../_images/fft_in_python.svg
+   :align: center
+   :target: ../_images/fft_in_python.svg
+   :alt: python implementation of fft example
