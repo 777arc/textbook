@@ -1,7 +1,5 @@
-from email.base64mime import header_length
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import signal
 
 num_symbols = 10
 sps = 8
@@ -19,7 +17,9 @@ for bit in bits:
 num_taps = 101
 beta = 0.35
 Ts = sps # Assume sample rate is 1 Hz, so sample period is 1, so *symbol* period is 8
-t = np.arange(-51, 52) # remember it's not inclusive of final number
+t = np.arange(num_taps) - (num_taps-1)//2
+print(t)
+print(len(t))
 h = np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
 
 # Filter our signal, in order to apply the pulse shaping
@@ -32,5 +32,5 @@ for i in range(num_symbols):
     plt.arrow(x=xpos, y=0, dx=0, dy=ypos, color="red", ls=(0, (5, 5)))
 plt.grid(True)
 ax.set_yticks([-1, 0, +1], minor=False)
-#plt.show()
-fig.savefig('../_images/pulse_shaping_python3.svg', bbox_inches='tight')
+plt.show()
+#fig.savefig('../_images/pulse_shaping_python3.svg', bbox_inches='tight')
