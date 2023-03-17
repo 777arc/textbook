@@ -208,7 +208,7 @@ Met de manier waarop de filtervergelijking werkt willen we het tijdstip 0 in het
     num_taps = 101
     beta = 0.35
     Ts = sps # sample rate is 1 Hz, periodetijd is 1, *symbool*periodetijd is 8
-    t = np.arange(-51, 52) # neemt laatste nummer niet mee
+    t = np.arange(num_taps) - (num_taps-1)//2 # neemt laatste nummer niet mee
     h = sps/Ts*np.sinc(t/Ts) * np.cos(np.pi*beta*t/Ts) / (1 - (2*beta*t/Ts)**2)
     plt.figure(1)
     plt.plot(t, h, '.')

@@ -89,7 +89,9 @@ Dit kunnen we ook grafisch weergeven door I en Q gelijk te stellen aan 1:
 
 De cos() noemen we het "in fase" component, daarom de I, en de sin() is het 90 graden uit fase of "kwadratuur" component, vandaar de Q. Maar als je per ongeluk de Q aan de cos() en de I aan de sin() koppelt, dan maakt dat in de meeste situaties niets uit.
 
-IQ-sampling is gemakkelijker te begrijpen bekeken vanuit de zender, dus vanuit het zenden van een RF signaal door de lucht. Wat we als zender doen is de sin() en cos() bij elkaar optellen. Laten we zeggen dat we het signaal x(t) willen versturen:
+IQ-sampling is gemakkelijker te begrijpen bekeken vanuit de zender, dus vanuit het zenden van een RF signaal door de lucht. 
+We willen een enkele sinus met bepaalde fase versturen, wat gedaan kan worden door een sin() en cos() zonder faseverschuiving bij elkaar op te tellen. Dit is mogelijk vanwege de volgende eigenschap: :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)`.
+Laten we zeggen dat we het signaal x(t) willen versturen:
 
 .. math::
   x(t) = I \cos(2\pi ft)  + Q \sin(2\pi ft)
@@ -332,7 +334,7 @@ De volgende zes operaties zijn nodig om de PSD te bepalen:
 1. Neem de FFT van onze samples. Met x samples is de lengte van de FFT standaard ook x. Laten we als voorbeeld de eerste 1024 samples gebruiken om een 1024-lengte FFT te maken. De uitgang bestaat dan uit 1024 complexe floats.
 2. Neem de modulus van de FFT uitgang, dit geeft ons 1024 reële floats.
 3. Kwadrateer de modulus vervolgens om vermogen te krijgen.
-4. Normaliseren: Deel door de FFT lengte (:math:`N`) en sample-frequentie (:math:`Fs`).
+4. Normaliseren: Deel door de FFT lengte in het kwadraat (:math:`N**2`).
 5. Zet het om naar dB met behulp van :math:`10 \log_{10}()`; we bekijken PSD's altijd in de log-schaal.
 6. Voer een FFT-shift uit, zoals is behandeld in het vorige hoofdstuk, om "0 Hz" in het midden, en de negatieve frequenties links van het midden, te plaatsen.
 
@@ -344,7 +346,7 @@ Die zes stappen in Python zien er zo uit:
  # x bevat onze array van IQ samples
  N = 1024
  x = x[0:N] # We nemen slechts de FFT van de eerst 1024 samples
- PSD = np.abs(np.fft.fft(x))**2 / (N*Fs)
+ PSD = np.abs(np.fft.fft(x))**2 / (N*N)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
@@ -394,7 +396,7 @@ Hieronder staat de volledige broncode, inclusief het genereren van een signaal (
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
- PSD = np.abs(np.fft.fft(r))**2 / (N*Fs)
+ PSD = np.abs(np.fft.fft(r))**2 / (N*N)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  

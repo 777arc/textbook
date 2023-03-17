@@ -1071,12 +1071,16 @@ Als je het audiosignaal ook wilt demoduleren kun je dit toevoegen nadat je het s
  bz, az = bilinear(1, [75e-6, 1], fs=sample_rate)
  x = lfilter(bz, az, x)
  
- # decimate filter to get mono audio
+ # decimate by 6 to get mono audio
  x = x[::6]
- sample_rate = sample_rate/6
+ sample_rate_audio = sample_rate/6
  
- # normalizes volume
- x /= x.std() 
+ # normalize volume so its between -1 and +1
+ x /= np.max(np.abs(x))
+ 
+ # some machines want int16s
+ x *= 32767
+ x = x.astype(np.int16)
  
  # Save to wav file, you can open this in Audacity for example
  wavfile.write('fm.wav', int(sample_rate), x)
