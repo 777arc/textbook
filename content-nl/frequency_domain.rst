@@ -548,9 +548,9 @@ Dit zou het volgende moeten opleveren, wat niet zo spannend is want er is geen t
 FFT Implementatie
 *********************
 
-Terwijl NumpPy de FFT al heeft geimplementeerd kan het toch goed zijn om de basis te begrijpen. Het meest populaire FFT algortime is Cooley-Tukey, in 1805 uitgevonden door Carl Friedrich en herondekt door James Cooley en John Tukey in 1965.
+Terwijl NumpPy de FFT al heeft geïmplementeerd kan het toch goed zijn om de basis te begrijpen. Het meest populaire FFT algoritme is Cooley-Tukey, in 1805 uitgevonden door Carl Friedrich en herontdekt door James Cooley en John Tukey in 1965.
 
-De standaard versie van dit algoritme werkt met macht-van-twee FFT's en is bedoeld voor complexe ingangen, maar kan ook werken met reele ingangen. Het bouwblok voor dit algoritme is bekend als de vlinder, een N=2 FFT bestaande uit twee vermenigvuldigingen en twee optellingen:
+De standaard versie van dit algoritme werkt met macht-van-twee FFT's en is bedoeld voor complexe ingangen, maar kan ook werken met reële ingangen. Het bouwblok voor dit algoritme is bekend als de vlinder, een N=2 FFT bestaande uit twee vermenigvuldigingen en twee optellingen:
 
 .. image:: ../_images/butterfly.svg
    :align: center
@@ -565,7 +565,7 @@ of
    y_1 = x_0 - x_1 w^k_N
 
 Hierbij zijn :math:`w^k_N = e^{j2\pi k/N}` bekend als twiddle factoren (:math:`N` is de grootte van deze sub-FFT en :math:`k` is de index).  
-Let op dat de in- en uitgangen en sommen/vermenigvuldingen allemaal complex zijn. :math:`x_0` kan bijvoorbeeld 0.6123 - 0.5213j zijn.
+Let op dat de in- en uitgangen en sommen/vermenigvuldigingen allemaal complex zijn. :math:`x_0` kan bijvoorbeeld 0.6123 - 0.5213j zijn.
 
 Het algoritme is recursief en halveert zichzelf totdat er alleen maar vlinders over zijn. Hieronder is dit gevisualiseerd voor een N=8 FFT:
 
@@ -574,9 +574,10 @@ Het algoritme is recursief en halveert zichzelf totdat er alleen maar vlinders o
    :target: ../_images/butterfly2.svg
    :alt: Cooley-Tukey FFT algorithm size 8
 
-Elke kolom in dit figuur laat berekeningen zien die paralel uitgevoerd kunnen worden en er worden :math:`log_2(N)` stappen uitgevoerd. De complexiteit van de berekening is dan ook O(:math:`N\log N`) i.p.v. O(:math:`N^2`) voor de standaard DFT.
+Elke kolom in dit figuur laat berekeningen zien die parallel uitgevoerd kunnen worden en er worden :math:`log_2(N)` stappen uitgevoerd. De complexiteit van de berekening is dan ook O(:math:`N\log N`) i.p.v. O(:math:`N^2`) voor de standaard DFT.
 
-Als je het liever ziet vanuit code dan is hieronder een simpele Python implementatie gegeven van de FFT samen met een signaal om het uit te testen.
+Als je het liever vanuit code bekijkt dan is hieronder een simpele Python implementatie gegeven samen met een signaal om het uit te testen.
+
 
 .. code-block:: python
 
