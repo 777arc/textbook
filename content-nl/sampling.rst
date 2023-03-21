@@ -331,12 +331,16 @@ In het vorige hoofdstuk hebben we geleerd dat je een signaal met een FFT kunt om
 Maar om de PSD van een stapel samples echt te vinden en te plotten, moeten we meer doen dan alleen een FFT nemen.
 De volgende zes operaties zijn nodig om de PSD te bepalen:
 
-1. Neem de FFT van onze samples. Met x samples is de lengte van de FFT standaard ook x. Laten we als voorbeeld de eerste 1024 samples gebruiken om een 1024-lengte FFT te maken. De uitgang bestaat dan uit 1024 complexe floats.
-2. Neem de modulus van de FFT uitgang, dit geeft ons 1024 reële floats.
-3. Kwadrateer de modulus vervolgens om vermogen te krijgen.
-4. Normaliseren: Deel door de FFT lengte in het kwadraat (:math:`N**2`).
-5. Zet het om naar dB met behulp van :math:`10 \log_{10}()`; we bekijken PSD's altijd in de log-schaal.
-6. Voer een FFT-shift uit, zoals is behandeld in het vorige hoofdstuk, om "0 Hz" in het midden, en de negatieve frequenties links van het midden, te plaatsen.
+#. Neem de FFT van onze samples. Met x samples is de lengte van de FFT standaard ook x. Laten we als voorbeeld de eerste 1024 samples gebruiken om een 1024-lengte FFT te maken. De uitgang bestaat dan uit 1024 complexe floats.
+#. Neem de modulus van de FFT uitgang, dit geeft ons 1024 reële floats.
+#. Kwadrateer de modulus vervolgens om vermogen te krijgen.
+#. Normaliseren:
+
+   * Deel door de FFT lengte (N) en sample-frequentie (Fs) voor de PSD in V^2/Hz. Dit is beter voor breedbandige signalen zoals ruis om het onafhankelijk te maken van Fs.
+   * Deel het door de FFT lengte in het kwadraat (:math:`N*N`) voor het vermogensspectrum in V^2/bin. Dit is beter voor periodieke signalen, maar de ruis wordt nu afhankelijk van Fs.
+   
+#. Zet het om naar dB met behulp van :math:`10 \log_{10}()`; we bekijken PSD's altijd in de log-schaal.
+#. Voer een FFT-shift uit, zoals is behandeld in het vorige hoofdstuk, om "0 Hz" in het midden, en de negatieve frequenties links van het midden, te plaatsen.
 
 Die zes stappen in Python zien er zo uit:
 
@@ -346,7 +350,7 @@ Die zes stappen in Python zien er zo uit:
  # x bevat onze array van IQ samples
  N = 1024
  x = x[0:N] # We nemen slechts de FFT van de eerst 1024 samples
- PSD = np.abs(np.fft.fft(x))**2 / (N*N)
+ PSD = np.abs(np.fft.fft(x))**2 / (N*Fs) # of / (N*N) voor PS
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
@@ -396,7 +400,10 @@ Hieronder staat de volledige broncode, inclusief het genereren van een signaal (
  noise_power = 2
  r = x + n * np.sqrt(noise_power)
  
- PSD = np.abs(np.fft.fft(r))**2 / (N*N)
+ #PSD in (V^2/Hz)
+ PSD = np.abs(np.fft.fft(r))**2 / (N*Fs)
+ #of.. het vermogen spectrum in (V^2/bin)
+ #PSD = np.abs(np.fft.fft(r))**2 / (N*N)
  PSD_log = 10.0*np.log10(PSD)
  PSD_shifted = np.fft.fftshift(PSD_log)
  
@@ -418,5 +425,6 @@ Extra Leesmateriaal
 ********************
 
 #. http://rfic.eecs.berkeley.edu/~niknejad/ee242/pdf/eecs242_lect3_rxarch.pdf
+#. https://appliedacousticschalmers.github.io/scaling-of-the-dft/AES2020_eBrief/
 
 
