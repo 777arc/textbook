@@ -4,9 +4,7 @@
 DOA & Beamforming
 ####################################
 
-Direction-of-Arrival or DOA
-
-mention element = antenna and they are usually omni
+Direction-of-Arrival (DOA) within DSP/SDR refers to the process of using an array of antennas to estimate the DOA of one or more signals received by that array.  Once we know the direction a signal of interest is arriving from, we can isolate it from other signals/interference/jamming.  It is just like isolating a signal in the frequency domain by filtering it, except we are now working in the spatial domain (you can certainly combine both!).  We typically refer to the antennas that make up an array as elements, and sometimes the array is called a "sensor" instead.  These array elements are most often omnidirectional antennas, equally spaced in either a line or across two dimensions.  DOA is a subset of beamforming techniques, where as the receiver, we are trying to steer a beam (our receiver's antenna beam) towards the direction of an emitter.  We may also steer a beam blindly across a wide range (e.g., 0 to 360 degrees) to figure out what signals are being received and from what direction.  
 
 To get to the fun part we have to get through a little bit of math, but the following section has been written so that the math is extremely simple and has diagrams to go along with it, only the most basic trig and exponential properties are used.  It's important to understand the basic math behind what we'll do in Python to perform DOA.
 
@@ -16,7 +14,7 @@ Consider a 1D three-element uniformly spaced array:
    :align: center 
    :target: ../_images/doa.svg
 
-In this example a signal is coming in from the right side, so it's hitting the right-most element first.  Let's calculate the delay between when the signal hits that first element and when it reaches the next element.  We can do this by forming the following trig problem, try to visualize how this triangle was formed from the diagram above.  The segmnet highlighted in red represents the distance the signal has to travel *after* it has reached the first element, before it hits the next one.
+In this example a signal is coming in from the right side, so it's hitting the right-most element first.  Let's calculate the delay between when the signal hits that first element and when it reaches the next element.  We can do this by forming the following trig problem, try to visualize how this triangle was formed from the diagram above.  The segment highlighted in red represents the distance the signal has to travel *after* it has reached the first element, before it hits the next one.
 
 .. image:: ../_images/doa_trig.svg
    :align: center 
@@ -27,7 +25,7 @@ If you recall SOH CAH TOA, in this case we are interested in the "adjacent" side
 .. math::
   \cos(90 - \theta) = \frac{\mathrm{adjacent}}{\mathrm{hypotenuse}}
 
-We must solve for adjacent, as that is what will tell us how far the signal must travel between hitting the first and second element, so it becomes adjacent :math:`= d \cos(90 - \theta)`.  Now there is a trig identity that lets us convert this to adjacent :math:`= d \sin(\theta)`.  This is just a distance though, we need to convert this to a time, using the speed of light: time elapsed :math:`= d \sin(\theta) / c` [seconds].  This equation applies between any adjacent elements of our array, although we can multiply the whole thing by an integer to calculate between non-adjanct elements since they are uniformly spaced (we'll do this later).  
+We must solve for adjacent, as that is what will tell us how far the signal must travel between hitting the first and second element, so it becomes adjacent :math:`= d \cos(90 - \theta)`.  Now there is a trig identity that lets us convert this to adjacent :math:`= d \sin(\theta)`.  This is just a distance though, we need to convert this to a time, using the speed of light: time elapsed :math:`= d \sin(\theta) / c` [seconds].  This equation applies between any adjacent elements of our array, although we can multiply the whole thing by an integer to calculate between non-adjacent elements since they are uniformly spaced (we'll do this later).  
 
 Now to connect this trig and speed of light math to the signal processing world.  Let's denote our transmit signal at baseband :math:`s(t)` and it's being transmitting at some carrier, :math:`f_c` , so the transmit signal is :math:`s(t) e^{2j \pi f_c t}`.  Lets say this signal hits the first element at time :math:`t = 0`, which means it hits the next element after :math:`d \sin(\theta) / c` [seconds] like we calculated above.  This means the 2nd element receives:
 
@@ -57,7 +55,7 @@ Let's keep going with this math but we'll start representing things in discrete 
 .. math::
  = s[n] e^{-2j \pi f_c d \sin(\theta) / c}
 
-We're almost done, but luckily there's one more simplification we can make.  Recall the relationship between center frequency and wavelgnth: :math:`\lambda = \frac{c}{f_c}` or the form we'll use: :math:`f_c = \frac{c}{\lambda}`.  Plugging this in we get:
+We're almost done, but luckily there's one more simplification we can make.  Recall the relationship between center frequency and wavelength: :math:`\lambda = \frac{c}{f_c}` or the form we'll use: :math:`f_c = \frac{c}{\lambda}`.  Plugging this in we get:
 
 .. math::
  s[n] e^{-2j \pi \frac{c}{\lambda} d \sin(\theta) / c}
@@ -66,7 +64,7 @@ We're almost done, but luckily there's one more simplification we can make.  Rec
  = s[n] e^{-2j \pi d \sin(\theta) / \lambda}
 
 
-In DOA what we like to do is represent :math:`d`, the distance between adjacent elements, as a fraction of wavelenght (instead of meters), the most common value chosen for :math:`d` during the array design process is to use one half the wavelength. Regardless of what :math:`d` is, from this point on we're going to represent :math:`d` as a fraction of wavelgnth instead of meters, making the equation and all our code simpler:
+In DOA what we like to do is represent :math:`d`, the distance between adjacent elements, as a fraction of wavelength (instead of meters), the most common value chosen for :math:`d` during the array design process is to use one half the wavelength. Regardless of what :math:`d` is, from this point on we're going to represent :math:`d` as a fraction of wavelength instead of meters, making the equation and all our code simpler:
 
 .. math::
  s[n] e^{-2j \pi d \sin(\theta)}
@@ -101,18 +99,18 @@ Let's use this array factor concept to simulate a signal arriving at an array.  
  f_tone = 0.02e6
  tx = np.exp(2j * np.pi * f_tone * t)
 
-Now let's simulate an array consisting of three omnidirectional antennas in a line, with 1/2 wavelength between adjancent ones (a.k.a. "half-wavelength spacing").  We will simulate the transmitter's signal arriving at this array at a certain angle, theta:
+Now let's simulate an array consisting of three omnidirectional antennas in a line, with 1/2 wavelength between adjacent ones (a.k.a. "half-wavelength spacing").  We will simulate the transmitter's signal arriving at this array at a certain angle, theta:
 
 .. code-block:: python
 
- d = 0.5 # half wavelenght spacing
+ d = 0.5 # half wavelength spacing
  Nr = 3
  theta_degrees = 20 # direction of arrival (feel free to change this, it's arbitrary)
  theta = theta_degrees / 180 * np.pi # convert to radians
  a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # array factor
  print(a) # note that it's a 1x3, it's complex, and the first element is 1+0j
 
-To apply the array factor we have to do a matrix multiplication of :code:`a` and :code:`tx`, so first let's convert both to matrices, as numpy arrays which dont let us do 1D matrix math that we need for beamforming/DOA.  We then perform the matrix multiply, note that the @ symbol in Python means matrix multiply (it's a NumPy thing).  We also have to convert :code:`a` from a row vector to a column vector (picture it rotating 90 degrees) so that the matrix multiply inner dimensions match.
+To apply the array factor we have to do a matrix multiplication of :code:`a` and :code:`tx`, so first let's convert both to matrices, as NumPy arrays which don't let us do 1D matrix math that we need for beamforming/DOA.  We then perform the matrix multiply, note that the @ symbol in Python means matrix multiply (it's a NumPy thing).  We also have to convert :code:`a` from a row vector to a column vector (picture it rotating 90 degrees) so that the matrix multiply inner dimensions match.
 
 .. code-block:: python
 
@@ -122,7 +120,7 @@ To apply the array factor we have to do a matrix multiplication of :code:`a` and
  r = a.T @ tx  # dont get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
  print(r.shape) # r is now going to be a 2D array, 1D is time and 1D is the spatial dimension
 
-At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of Python is having to switch to matrix type for matrix math, then having to switch back to normal numpy arrays, we need to add the .squeeze() to get it back to a normal 1D numpy array.
+At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of Python is having to switch to matrix type for matrix math, then having to switch back to normal NumPy arrays, we need to add the .squeeze() to get it back to a normal 1D NumPy array.
 
 .. code-block:: python
 
@@ -138,7 +136,7 @@ At this point :code:`r` is a 2D array, size 3 x 10000 because we have three arra
 Note the phase shifts between elements like we expect to happen (unless the signal arrives at boresight in which case it will reach all elements at the same time and there wont be a shift, set theta to 0 to see).  Element 0 appears to arrive first, with the others slightly delayed.  Try adjusting the angle and see what happens.
 
 
-One thing we didnt bother doing yet- let's add noise to this recieved signal.  AWGN with a phase shift applied is still AWGN, and we want to apply the noise after the array factor is applied, because each element experiences an independent noise signal.  
+One thing we didn't bother doing yet- let's add noise to this received signal.  AWGN with a phase shift applied is still AWGN, and we want to apply the noise after the array factor is applied, because each element experiences an independent noise signal.  
 
 .. code-block:: python
 
@@ -149,9 +147,9 @@ One thing we didnt bother doing yet- let's add noise to this recieved signal.  A
    :align: center 
    :target: ../_images/doa_time_domain_with_noise.svg
 
-So far this has been simulating the recieving of a signal from a certain angle of arrival.  In your typical DOA problem you are given samples and have to estimate the angle of arrival(s).  There are also problems where you have multiple received signals from different directions and one is the signal-of-interest (SOI) while another might be a jammer or interferer you have to null out to extract the SOI with at as high SNR as possible.
+So far this has been simulating the receiving of a signal from a certain angle of arrival.  In your typical DOA problem you are given samples and have to estimate the angle of arrival(s).  There are also problems where you have multiple received signals from different directions and one is the signal-of-interest (SOI) while another might be a jammer or interferer you have to null out to extract the SOI with at as high SNR as possible.
 
-Next let's use this signal :code:`r` but pretend we don't know which direction the signal is coming in from, let's try to figure it out with DSP and some Python code!  We'll start with the "conventional" beamforming approach, which involves scanning through (sampling) all directions of arrival from -pi to +pi (-180 to +180 degrees).  At each direction we point the array towards that angle by applying the weights associated with pointing in that direction; applying the weights will give us a 1D array of samples, as if we recieved it with 1 directional antenna.  You're probably starting to realize where the term electrically steered array comes in.  This conventional beamforming method involves calculating the mean of the magnitude squared, as if we were making an energy detector.  We'll apply the beamforming weights and do this calculation at a ton of different angles, so that we can check which angle gave us the max energy.
+Next let's use this signal :code:`r` but pretend we don't know which direction the signal is coming in from, let's try to figure it out with DSP and some Python code!  We'll start with the "conventional" beamforming approach, which involves scanning through (sampling) all directions of arrival from -pi to +pi (-180 to +180 degrees).  At each direction we point the array towards that angle by applying the weights associated with pointing in that direction; applying the weights will give us a 1D array of samples, as if we received it with 1 directional antenna.  You're probably starting to realize where the term electrically steered array comes in.  This conventional beamforming method involves calculating the mean of the magnitude squared, as if we were making an energy detector.  We'll apply the beamforming weights and do this calculation at a ton of different angles, so that we can check which angle gave us the max energy.
 
 .. code-block:: python
 
@@ -195,8 +193,15 @@ If you prefer viewing angle on a polar plot, use the following code:
    :align: center 
    :target: ../_images/doa_conventional_beamformer_polar.svg
 
-Now for the big question- why is there a second peak at 160 degrees?  Picture three omnidirectional antennas in a line placed on a table.  The array's boresight is 90 degrees to the axis of the array, as labeled in the first diagram in this chapter.  Now imagine the transmitter infront of the antennas, also on the (very large) table, such that its signal arrives at a +20 degree angle from boresight.  Well the array sees the same effect whether the signal is ariving with respect to its front or back, the phase delay is the same, as depicted below with the array elements in red and the two possible transmitter DOA's in green.  Therefore, when we perform the DOA algorithm, there will always be a 180 degree ambiguity like this, the only way around it is to have a 2D array, or a second 1D array positioned at any other angle w.r.t the first array.  You may be wondering if this means we might as well only calculate -90 to +90 degrees to save compute cycles, and you would be correct!
+Now for the big question- why is there a second peak at 160 degrees?  Picture three omnidirectional antennas in a line placed on a table.  The array's boresight is 90 degrees to the axis of the array, as labeled in the first diagram in this chapter.  Now imagine the transmitter in front of the antennas, also on the (very large) table, such that its signal arrives at a +20 degree angle from boresight.  Well the array sees the same effect whether the signal is arriving with respect to its front or back, the phase delay is the same, as depicted below with the array elements in red and the two possible transmitter DOA's in green.  Therefore, when we perform the DOA algorithm, there will always be a 180 degree ambiguity like this, the only way around it is to have a 2D array, or a second 1D array positioned at any other angle w.r.t the first array.  You may be wondering if this means we might as well only calculate -90 to +90 degrees to save compute cycles, and you would be correct!
 
 .. image:: ../_images/doa_from_behind.svg
    :align: center 
    :target: ../_images/doa_from_behind.svg
+
+Coming soon:
+
+* Capons (aka MVDR) beamformer
+* MUSIC (adaptive/subspace beamforming)
+* 2D DOA example
+* Steering nulls

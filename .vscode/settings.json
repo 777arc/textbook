@@ -1,3 +1,14 @@
 {
-    "esbonio.sphinx.confDir": ""
+    "esbonio.sphinx.confDir": "",
+    "cSpell.words": [
+        "arange",
+        "asarray",
+        "asmatrix",
+        "AWGN",
+        "baseband",
+        "beamforming",
+        "boresight",
+        "downconversion",
+        "mathrm"
+    ]
 }
