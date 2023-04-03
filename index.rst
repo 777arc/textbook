@@ -23,4 +23,5 @@ by :ref:`Dr. Marc Lichtman<author-chapter>`
    content/pulse_shaping
    content/sync
    content/rds
+   content/doa
    content/about_author
