@@ -201,6 +201,9 @@ Now for the big question- why is there a second peak at 160 degrees?  Picture th
 
 Coming soon:
 
+* sdr requirements (phase coherent rx channels)
+* uses in cellular and satellite ground stations and satellites
+* grating lobes when spacing is greater than half wavelenght, its like spatial aliasing because you arent sampling in space fine enough
 * Capons (aka MVDR) beamformer
 * MUSIC (adaptive/subspace beamforming)
 * 2D DOA example

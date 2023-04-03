@@ -1,15 +1,3 @@
-
-
-# Mention in chapter
-'''
-sdr requirements (phase coherent rx channels)
-transmit side beamforming is pretty easy its just pointing in a specific direction
-uses in cellular and satellite ground stations and satellites
-grating lobes when spacing is greater than half wavelenght, its like spatial aliasing because you arent sampling in space fine enough
-including beamforming in the title
-
-'''
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
