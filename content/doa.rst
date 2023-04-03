@@ -6,6 +6,8 @@ DOA & Beamforming
 
 Direction-of-Arrival or DOA
 
+mention element = antenna and they are usually omni
+
 To get to the fun part we have to get through a little bit of math, but the following section has been written so that the math is extremely simple and has diagrams to go along with it, only the most basic trig and exponential properties are used.  It's important to understand the basic math behind what we'll do in Python to perform DOA.
 
 Consider a 1D three-element uniformly spaced array:
@@ -84,6 +86,117 @@ And we're done! This equation above is what you'll see in DOA papers and impleme
 
 Note how element 0 results in a 1+0j (because :math:`e^{0}=1`); this makes sense because everything above was relative to that first element, so it's receiving the signal as-is without any relative phase shifts.  This is purely how the math works out, in reality any element could be thought of as the reference, but as you'll see in our math/code later on, what matters is the difference in phase/amplitude received between elements.  It's all relative.
 
+Let's use this array factor concept to simulate a signal arriving at an array.  For a transmit signal we'll just use a tone for now:
+
+.. code-block:: python
+
+ import numpy as np
+ import matplotlib.pyplot as plt
+ 
+ sample_rate = 1e6
+ N = 10000 # number of samples to simulate
+ 
+ # Create a tone to act as the transmitter signal
+ t = np.arange(N)/sample_rate # time vector
+ f_tone = 0.02e6
+ tx = np.exp(2j * np.pi * f_tone * t)
+
+Now let's simulate an array consisting of three omnidirectional antennas in a line, with 1/2 wavelength between adjancent ones (a.k.a. "half-wavelength spacing").  We will simulate the transmitter's signal arriving at this array at a certain angle, theta:
+
+.. code-block:: python
+
+ d = 0.5 # half wavelenght spacing
+ Nr = 3
+ theta_degrees = 20 # direction of arrival (feel free to change this, it's arbitrary)
+ theta = theta_degrees / 180 * np.pi # convert to radians
+ a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # array factor
+ print(a) # note that it's a 1x3, it's complex, and the first element is 1+0j
+
+To apply the array factor we have to do a matrix multiplication of :code:`a` and :code:`tx`, so first let's convert both to matrices, as numpy arrays which dont let us do 1D matrix math that we need for beamforming/DOA.  We then perform the matrix multiply, note that the @ symbol in Python means matrix multiply (it's a NumPy thing).  We also have to convert :code:`a` from a row vector to a column vector (picture it rotating 90 degrees) so that the matrix multiply inner dimensions match.
+
+.. code-block:: python
+
+ a = np.asmatrix(a)
+ tx = np.asmatrix(tx)
+
+ r = a.T @ tx  # dont get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
+ print(r.shape) # r is now going to be a 2D array, 1D is time and 1D is the spatial dimension
+
+At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of Python is having to switch to matrix type for matrix math, then having to switch back to normal numpy arrays, we need to add the .squeeze() to get it back to a normal 1D numpy array.
+
+.. code-block:: python
+
+ plt.plot(np.asarray(r[0,:]).squeeze().real[0:200]) # the asarray and squeeze are just annoyances we have to do because we came from a matrix
+ plt.plot(np.asarray(r[1,:]).squeeze().real[0:200])
+ plt.plot(np.asarray(r[2,:]).squeeze().real[0:200])
+ plt.show()
+
+.. image:: ../_images/doa_time_domain.svg
+   :align: center 
+   :target: ../_images/doa_time_domain.svg
+
+Note the phase shifts between elements like we expect to happen (unless the signal arrives at boresight in which case it will reach all elements at the same time and there wont be a shift, set theta to 0 to see).  Element 0 appears to arrive first, with the others slightly delayed.  Try adjusting the angle and see what happens.
 
 
+One thing we didnt bother doing yet- let's add noise to this recieved signal.  AWGN with a phase shift applied is still AWGN, and we want to apply the noise after the array factor is applied, because each element experiences an independent noise signal.  
 
+.. code-block:: python
+
+ n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
+ r = r + 0.1*n # r and n are both 3x10000
+
+.. image:: ../_images/doa_time_domain_with_noise.svg
+   :align: center 
+   :target: ../_images/doa_time_domain_with_noise.svg
+
+So far this has been simulating the recieving of a signal from a certain angle of arrival.  In your typical DOA problem you are given samples and have to estimate the angle of arrival(s).  There are also problems where you have multiple received signals from different directions and one is the signal-of-interest (SOI) while another might be a jammer or interferer you have to null out to extract the SOI with at as high SNR as possible.
+
+Next let's use this signal :code:`r` but pretend we don't know which direction the signal is coming in from, let's try to figure it out with DSP and some Python code!  We'll start with the "conventional" beamforming approach, which involves scanning through (sampling) all directions of arrival from -pi to +pi (-180 to +180 degrees).  At each direction we point the array towards that angle by applying the weights associated with pointing in that direction; applying the weights will give us a 1D array of samples, as if we recieved it with 1 directional antenna.  You're probably starting to realize where the term electrically steered array comes in.  This conventional beamforming method involves calculating the mean of the magnitude squared, as if we were making an energy detector.  We'll apply the beamforming weights and do this calculation at a ton of different angles, so that we can check which angle gave us the max energy.
+
+.. code-block:: python
+
+ theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 1000 different thetas between -180 and +180 degrees
+ results = []
+ for theta_i in theta_scan:
+     #print(theta_i)
+     w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
+     r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
+     r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+     results.append(np.mean(np.abs(r_weighted)**2)) # energy detector
+ 
+ # print angle that gave us the max value
+ print(theta_scan[np.argmax(results)] * 180 / np.pi) # 19.99999999999998
+ 
+ plt.plot(theta_scan*180/np.pi, results) # lets plot angle in degrees
+ plt.xlabel("Theta [Degrees]")
+ plt.ylabel("DOA Metric")
+ plt.grid()
+ plt.show()
+
+.. image:: ../_images/doa_conventional_beamformer.svg
+   :align: center 
+   :target: ../_images/doa_conventional_beamformer.svg
+
+We found our signal!  Try increasing the amount of noise to push it to its limit, you might need to simulate more samples being received for low SNRs.  Also try changing the direction of arrival.
+
+If you prefer viewing angle on a polar plot, use the following code:
+
+.. code-block:: python
+
+ fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+ ax.plot(theta_scan, results) # MAKE SURE TO USE RADIAN FOR POLAR
+ ax.set_theta_zero_location('N') # make 0 degrees point up
+ ax.set_theta_direction(-1) # increase clockwise
+ ax.set_rgrids([0,2,4,6,8]) 
+ ax.set_rlabel_position(22.5)  # Move grid labels away from other labels
+ plt.show()
+
+.. image:: ../_images/doa_conventional_beamformer_polar.svg
+   :align: center 
+   :target: ../_images/doa_conventional_beamformer_polar.svg
+
+Now for the big question- why is there a second peak at 160 degrees?  Picture three omnidirectional antennas in a line placed on a table.  The array's boresight is 90 degrees to the axis of the array, as labeled in the first diagram in this chapter.  Now imagine the transmitter infront of the antennas, also on the (very large) table, such that its signal arrives at a +20 degree angle from boresight.  Well the array sees the same effect whether the signal is ariving with respect to its front or back, the phase delay is the same, as depicted below with the array elements in red and the two possible transmitter DOA's in green.  Therefore, when we perform the DOA algorithm, there will always be a 180 degree ambiguity like this, the only way around it is to have a 2D array, or a second 1D array positioned at any other angle w.r.t the first array.  You may be wondering if this means we might as well only calculate -90 to +90 degrees to save compute cycles, and you would be correct!
+
+.. image:: ../_images/doa_from_behind.svg
+   :align: center 
+   :target: ../_images/doa_from_behind.svg
