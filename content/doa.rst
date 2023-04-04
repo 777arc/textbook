@@ -247,13 +247,24 @@ Now what happens when d is less than λ/2, such as when we need to fit the array
    :scale: 100 %
    :align: center
 
-While the main lobe gets wider as d gets lower, it still has a maximum at 20 degrees, and there are no grating lobes, so in theory this would still work (at least at high SNR).  Let's repeat this experiment but with an additional signal arriving from -40 degrees:
+While the main lobe gets wider as d gets lower, it still has a maximum at 20 degrees, and there are no grating lobes, so in theory this would still work (at least at high SNR).  To better understand what breaks as d gets too small, let's repeat the experiment but with an additional signal arriving from -40 degrees:
 
 .. image:: ../_images/doa_d_is_small_animation2.gif
    :scale: 100 %
    :align: center
 
 Once we get lower than λ/4 there is no distinguishing between the two different paths, and the array performs poorly.  As we will see later in this chapter, there are beamforming techniques that provide more precise beams than conventional beamforming, but keeping d as close to λ/2 as possible will continue to be a theme.
+
+
+
+
+
+
+
+
+
+
+All code used to generate these figures can be found here asdasdasdasddsa 
 
 *******************
 Coming Soon

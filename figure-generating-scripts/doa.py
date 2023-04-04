@@ -162,16 +162,20 @@ if False:
 
 # varying d animations
 if False:
-    #ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 4.1, 0.05))) # d is large
-    ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 0.02, -0.01))) # d is small
+    ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 4.1, 0.05))) # d is large
+    #ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 0.02, -0.01))) # d is small
     
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000)
     results = np.zeros((len(ds), len(theta_scan)))
     for d_i in range(len(ds)):
         print(d_i)
 
-        # REMOVE FOR THE FIRST TWO ANIMATIONS
-        if True:
+        # Have to recalc r
+        a = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta)))
+        r = a.T @ tx
+
+        # DISABLE FOR THE FIRST TWO ANIMATIONS
+        if False:
             theta1 = 20 / 180 * np.pi
             theta2 = -40 / 180 * np.pi
             a1 = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta1)))
@@ -197,7 +201,7 @@ if False:
     def update(i):
         i = int(i)
         print(i)
-        results_i = results[i,:] / np.max(results[i,:]) * 10 # had to add this in for the last animation because it got too large
+        results_i = results[i,:] #/ np.max(results[i,:]) * 10 # had to add this in for the last animation because it got too large
         line.set_ydata(results_i)
         d_str = str(np.round(ds[i],2))
         if len(d_str) == 3:
@@ -205,7 +209,9 @@ if False:
         text.set_text('d = ' + d_str)
         return line, ax
     anim = FuncAnimation(fig, update, frames=np.arange(0, len(ds)), interval=100)
-    #anim.save('../_images/doa_d_is_large_animation.gif', dpi=80, writer='imagemagick')
+    anim.save('../_images/doa_d_is_large_animation.gif', dpi=80, writer='imagemagick')
     #anim.save('../_images/doa_d_is_small_animation.gif', dpi=80, writer='imagemagick')
-    anim.save('../_images/doa_d_is_small_animation2.gif', dpi=80, writer='imagemagick')
+    #anim.save('../_images/doa_d_is_small_animation2.gif', dpi=80, writer='imagemagick')
+
+
 
