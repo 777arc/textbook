@@ -6,6 +6,23 @@ DOA & Beamforming
 
 Direction-of-Arrival (DOA) within DSP/SDR refers to the process of using an array of antennas to estimate the DOA of one or more signals received by that array.  Once we know the direction a signal of interest is arriving from, we can isolate it from other signals/interference/jamming.  It is just like isolating a signal in the frequency domain by filtering it, except we are now working in the spatial domain (you can certainly combine both!).  We typically refer to the antennas that make up an array as elements, and sometimes the array is called a "sensor" instead.  These array elements are most often omnidirectional antennas, equally spaced in either a line or across two dimensions.  DOA is a subset of beamforming techniques, where as the receiver, we are trying to steer a beam (our receiver's antenna beam) towards the direction of an emitter.  We may also steer a beam blindly across a wide range (e.g., 0 to 360 degrees) to figure out what signals are being received and from what direction.  
 
+*******************
+Common Applications
+*******************
+
+Coming soon!
+
+* cellular
+* satellites
+* satellite ground stations
+
+*******************
+SDR Requirements
+*******************
+
+Coming soon!
+
+* explain phase coherent receive channels and give some examples of whats available
 
 *******************
 Array Factor Math
@@ -255,27 +272,53 @@ While the main lobe gets wider as d gets lower, it still has a maximum at 20 deg
 
 Once we get lower than λ/4 there is no distinguishing between the two different paths, and the array performs poorly.  As we will see later in this chapter, there are beamforming techniques that provide more precise beams than conventional beamforming, but keeping d as close to λ/2 as possible will continue to be a theme.
 
-
-
-
-
-
-
-
-
-
-All code used to generate these figures can be found here asdasdasdasddsa 
-
 *******************
-Coming Soon
+Antennas
 *******************
 
-* sdr requirements (phase coherent rx channels)
-* uses in cellular and satellite ground stations and satellites
+Coming soon!
+
 * common antenna types used for arrays (eg patch, monopole)
+
+*******************
+Capons Beamformer
+*******************
+
+Coming soon!
+
 * Capons (aka MVDR) beamformer
+
+
+*******************
+Number of Elements
+*******************
+
+Coming soon!
+
+*******************
+MUSIC
+*******************
+
+Coming soon!
+
 * MUSIC (adaptive/subspace beamforming)
-* number of elements
-* recieve at the broadside of array
-* 2D DOA example
-* Steering nulls
+
+*******************
+2D DOA
+*******************
+
+Coming soon!
+
+*******************
+Steering Nulls
+*******************
+
+Coming soon!
+
+*************************
+Conclusion and References
+*************************
+
+All Python code, including code used to generate the figures/animations, can be found `on the textbook's GitHub page <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/doa.py>`_.
+
+* DOA implementation in GNU Radio - https://github.com/EttusResearch/gr-doa
