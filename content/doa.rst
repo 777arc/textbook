@@ -280,13 +280,6 @@ Coming soon!
 
 * common antenna types used for arrays (eg patch, monopole)
 
-*******************
-Capons Beamformer
-*******************
-
-Coming soon!
-
-* Capons (aka MVDR) beamformer
 
 
 *******************
@@ -294,6 +287,79 @@ Number of Elements
 *******************
 
 Coming soon!
+
+
+*******************
+Capon's Beamformer
+*******************
+
+In the basic DOA example we swept across all angles, multiplying :code:`r` by the weights :code:`w`, applying an energy detector to the resulting 1D array.  In that example, :code:`w` was equal to the array factor, :code:`a`, so we were essentially just multiplying :code:`r` by :code:`a`.  We will now look at a beamformer that is slightly more complicated but tends to perform much better, called Capon's Beamformer, a.k.a. the minimum variance distortionless response (MVDR) beamformer.  This beamformer can be summarized in the following equation:
+
+.. math::
+ \hat{\theta} = \mathrm{argmax}\left(\frac{1}{a^T R^{-1} a}\right)
+
+where :math:`R` is the sample covariance matrix, calculated by multiplying r with the transpose of itself, :math:`R = r r^T`, and the result will be a :code:`Nr` x :code:`Nr` size matrix (3x3 in the examples we have seen so far).  This covariance matrix tells us how similar the samples received from the three elements are, although to use Capon's method we don't have to fully understand how that works.  In textbooks and other resources you might see the Capon's equation with some terms in the numerator; these are purely for scaling/normalization and they don't change the results.
+
+We can implement the equations above in Python fairly easily:
+
+.. code-block:: python
+
+ theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # between -180 and +180 degrees
+ results = []
+ for theta_i in theta_scan:
+     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # array factor
+     a = a.T # needs to be a column vector for the math below
+ 
+     # Calc covariance matrix
+     R = r @ r.T # gives a Nr x Nr covariance matrix of the samples
+ 
+     Rinv = np.linalg.pinv(R) # pseudo-inverse tends to work better than a true inverse
+ 
+     metric = 1/(a.T @ Rinv @ a) # Capon's method!
+     metric = metric[0,0] # convert the 1x1 matrix to a Python scalar, it's still complex though
+     metric = np.abs(metric) # take magnitude
+     metric = 10*np.log10(metric) # convert to dB so its easier to see small and large lobes at the same time
+     results.append(metric)
+ 
+ results /= np.max(results) # normalize
+
+When applied to the previous DOA example code, we get the following:
+
+.. image:: ../_images/doa_capons.svg
+   :align: center 
+   :target: ../_images/doa_capons.svg
+
+It's obviously a much narrower lobe, but to really compare this with using an energy detector we'll have to create a more interesting problem.  Let's set up a simulation with an 8-element array receiving three signals from different angles: 20, 25, and 40 degrees, with the 40 degree one received at a much lower power than the other two.   Our goal will be to detect all three.  The code to generate this new scenario is as follows:
+
+.. code-block:: python
+
+ Nr = 8 # 8 elements
+ theta1 = 20 / 180 * np.pi # convert to radians
+ theta2 = 25 / 180 * np.pi
+ theta3 = -40 / 180 * np.pi
+ a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
+ a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
+ a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+ # we'll use 3 different frequencies
+ r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
+     a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
+     0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+ n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
+ r = r + 0.1*n
+
+And if we run our Capon's beamformer on this new scenario we get the following results:
+
+.. image:: ../_images/doa_capons2.svg
+   :align: center 
+   :target: ../_images/doa_capons2.svg
+
+It works pretty well, we can see the two signals received only 5 degrees apart, and we can also see the 3rd signal (at -40 or 320 degrees) that was received at one tenth the power of the others.  There are some other spikes, but if you were to run this detector on several batches of samples and average the results, the extra spikes would get averaged out.  Now let's run the simple beamformer which is just an energy detector on this new scenario:
+
+.. image:: ../_images/doa_complex_scenario.svg
+   :align: center 
+   :target: ../_images/doa_complex_scenario.svg
+
+While it might be a pretty shape, it's not finding all three signals at all...  By comparing these two results we can see the benefit from using a more complex beamformer.  There are many more beamformers out there, but next we are going to dive into a different class of beamformer that use the "subspace" method, often called adaptive beamforming.  
 
 *******************
 MUSIC

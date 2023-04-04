@@ -84,6 +84,7 @@ if False:
     r[2, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_2.bin', dtype=np.complex64)
 
 
+# conventional beamforming
 if False:
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
     results = []
@@ -215,3 +216,97 @@ if False:
 
 
 
+# Capons beamformer
+if False:
+    if False: # use for doacompons2
+        # more complex scenario
+        Nr = 8 # 8 elements
+        theta1 = 20 / 180 * np.pi # convert to radians
+        theta2 = 25 / 180 * np.pi
+        theta3 = -40 / 180 * np.pi
+        a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
+        a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
+        a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+        # we'll use 3 different frequencies
+        r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
+            a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
+            0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+        n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
+        r = r + 0.01*n
+
+    theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
+    results = []
+    for theta_i in theta_scan:
+        a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)))
+        a = a.T
+
+        # Calc covariance matrix
+        R = r @ r.T # gives a Nr x Nr covariance matrix of the samples
+
+        Rinv = np.linalg.pinv(R)
+
+        w = 1/(a.T @ Rinv @ a)
+        metric = np.abs(w[0,0]) # take magnitude
+        metric = 10*np.log10(metric)
+
+        #numerator = Rinv @ a
+        #denominator = a.T @ Rinv @ a
+        #w = np.divide(numerator, denominator)
+        #r_weighted = np.conj(w.T) @ r # apply our weights
+        #r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+        #metric = np.mean(np.abs(r_weighted)**2) # energy detector
+
+        results.append(metric) 
+
+    results /= np.max(results) # normalize
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    ax.plot(theta_scan, results) # MAKE SURE TO USE RADIAN FOR POLAR
+    ax.set_theta_zero_location('N') # make 0 degrees point up
+    ax.set_theta_direction(-1) # increase clockwise
+    ax.set_rlabel_position(30)  # Move grid labels away from other labels
+    plt.show()
+    fig.savefig('../_images/doa_capons.svg', bbox_inches='tight')
+    #fig.savefig('../_images/doa_capons2.svg', bbox_inches='tight')
+
+    exit()
+
+
+# plugging complex scenario into simple DOA approach
+if True:
+    # more complex scenario
+    Nr = 8 # 8 elements
+    theta1 = 20 / 180 * np.pi # convert to radians
+    theta2 = 25 / 180 * np.pi
+    theta3 = -40 / 180 * np.pi
+    a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
+    a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
+    a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+    # we'll use 3 different frequencies
+    r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
+        a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
+        0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+    n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
+    r = r + 0.01*n
+
+    theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
+    results = []
+    for theta_i in theta_scan:
+        w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
+        r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
+        r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+        metric = np.mean(np.abs(r_weighted)**2) # energy detector
+        metric = 10*np.log10(metric)
+        results.append(metric) 
+
+    results /= np.max(results) # normalize
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    ax.plot(theta_scan, results) # MAKE SURE TO USE RADIAN FOR POLAR
+    ax.set_theta_zero_location('N') # make 0 degrees point up
+    ax.set_theta_direction(-1) # increase clockwise
+    ax.set_rlabel_position(30)  # Move grid labels away from other labels
+    plt.show()
+    fig.savefig('../_images/doa_complex_scenario.svg', bbox_inches='tight')
+
+    exit()
