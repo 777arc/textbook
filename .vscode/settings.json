@@ -6,9 +6,16 @@
         "asmatrix",
         "AWGN",
         "baseband",
+        "beamformer",
         "beamforming",
         "boresight",
         "downconversion",
-        "mathrm"
+        "linspace",
+        "mathrm",
+        "rgrids",
+        "rlabel",
+        "savefig",
+        "xdata",
+        "ydata"
     ]
 }

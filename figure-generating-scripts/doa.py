@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
+from matplotlib.animation import FuncAnimation
 
 sample_rate = 1e6
 N = 10000 # number of samples to simulate
@@ -74,14 +75,14 @@ if False:
 # we then calc the mean of the magnitude squared as if we were doing an energy detector
 # repeat for a ton of different angles and we can see which angle gave us the max
 
+if False:
+    # signal from hack-a-sat 4 where we wanted to find the direction of the least energy because there were jammers
+    N = 880 # num samples
+    r = np.zeros((Nr,N), dtype=np.complex64)
+    r[0, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_0.bin', dtype=np.complex64)
+    r[1, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_1.bin', dtype=np.complex64)
+    r[2, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_2.bin', dtype=np.complex64)
 
-''' signal from hack-a-sat 4 where we wanted to find the direction of the least energy because there were jammers
-N = 880 # num samples
-r = np.zeros((Nr,N), dtype=np.complex64)
-r[0, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_0.bin', dtype=np.complex64)
-r[1, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_1.bin', dtype=np.complex64)
-r[2, :] = np.fromfile('/home/marc/hackasat4/darkside/dishy/Receiver_2.bin', dtype=np.complex64)
-'''
 
 if False:
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
@@ -103,7 +104,7 @@ if False:
     ax1.set_ylabel("DOA Metric")
     ax1.grid()
     plt.show()
-    fig.savefig('../_images/doa_conventional_beamformer.svg', bbox_inches='tight')
+    #fig.savefig('../_images/doa_conventional_beamformer.svg', bbox_inches='tight')
 
     fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
     ax.plot(theta_scan, results) # MAKE SURE TO USE RADIAN FOR POLAR
@@ -112,5 +113,99 @@ if False:
     ax.set_rgrids([0,2,4,6,8]) 
     ax.set_rlabel_position(22.5)  # Move grid labels away from other labels
     plt.show()
+    #fig.savefig('../_images/doa_conventional_beamformer_polar.svg', bbox_inches='tight')
 
-    fig.savefig('../_images/doa_conventional_beamformer_polar.svg', bbox_inches='tight')
+    exit()
+
+# sweeping angle of arrival
+if False:
+    theta_txs = np.concatenate((np.repeat(-90, 10), np.arange(-90, 90, 2), np.repeat(90, 10)))
+    
+    theta_scan = np.linspace(-1*np.pi, np.pi, 300)
+    results = np.zeros((len(theta_txs), len(theta_scan)))
+    for t_i in range(len(theta_txs)):
+        print(t_i)
+
+        theta = theta_txs[t_i] / 180 * np.pi
+        a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)))
+        r = a.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t))
+
+        for theta_i in range(len(theta_scan)):
+            w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_scan[theta_i]))) # look familiar?
+            r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
+            r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+            results[t_i, theta_i]  = np.mean(np.abs(r_weighted)**2) # energy detector
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5), subplot_kw={'projection': 'polar'})
+    fig.set_tight_layout(True)
+    line, = ax.plot(theta_scan, results[0,:])
+    ax.set_theta_zero_location('N') # make 0 degrees point up
+    ax.set_theta_direction(-1) # increase clockwise
+    ax.set_rlabel_position(22.5)  # Move grid labels away from other labels
+    text = ax.text(0.4, 12, 'fillmein', fontsize=16)
+    text2 = ax.text(np.pi/-2, 19, 'broadside →', fontsize=16)
+    text3 = ax.text(np.pi/2, 12, '← broadside', fontsize=16)
+    def update(i):
+        i = int(i)
+        print(i)
+        results_i = results[i,:] / np.max(results[i,:]) * 9 # had to add this in for the last animation because it got too large
+        line.set_ydata(results_i)
+        d_str = str(np.round(theta_txs[i],2))
+        text.set_text('AoA = ' + d_str + '°')
+        return line, ax
+    anim = FuncAnimation(fig, update, frames=np.arange(0, len(theta_txs)), interval=100)
+    anim.save('../_images/doa_sweeping_angle_animation.gif', dpi=80, writer='imagemagick')
+
+
+
+
+
+# varying d animations
+if False:
+    #ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 4.1, 0.05))) # d is large
+    ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 0.02, -0.01))) # d is small
+    
+    theta_scan = np.linspace(-1*np.pi, np.pi, 1000)
+    results = np.zeros((len(ds), len(theta_scan)))
+    for d_i in range(len(ds)):
+        print(d_i)
+
+        # REMOVE FOR THE FIRST TWO ANIMATIONS
+        if True:
+            theta1 = 20 / 180 * np.pi
+            theta2 = -40 / 180 * np.pi
+            a1 = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta1)))
+            a2 = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta2)))
+            # two tones at diff frequencies and angles of arrival (not sure it actually had to be 2 diff freqs...)
+            r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + a2.T @ np.asmatrix(np.exp(2j*np.pi*-0.02e6*t))
+
+        for theta_i in range(len(theta_scan)):
+            w = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta_scan[theta_i]))) # look familiar?
+            r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
+            r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+            results[d_i, theta_i]  = np.mean(np.abs(r_weighted)**2) # energy detector
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    fig.set_tight_layout(True)
+    line, = ax.plot(theta_scan, results[0,:])
+    ax.set_thetamin(-90) # only show top half
+    ax.set_thetamax(90) 
+    ax.set_theta_zero_location('N') # make 0 degrees point up
+    ax.set_theta_direction(-1) # increase clockwise
+    ax.set_rlabel_position(22.5)  # Move grid labels away from other labels
+    text = ax.text(0.6, 12, 'fillmein', fontsize=16)
+    def update(i):
+        i = int(i)
+        print(i)
+        results_i = results[i,:] / np.max(results[i,:]) * 10 # had to add this in for the last animation because it got too large
+        line.set_ydata(results_i)
+        d_str = str(np.round(ds[i],2))
+        if len(d_str) == 3:
+            d_str += '0'
+        text.set_text('d = ' + d_str)
+        return line, ax
+    anim = FuncAnimation(fig, update, frames=np.arange(0, len(ds)), interval=100)
+    #anim.save('../_images/doa_d_is_large_animation.gif', dpi=80, writer='imagemagick')
+    #anim.save('../_images/doa_d_is_small_animation.gif', dpi=80, writer='imagemagick')
+    anim.save('../_images/doa_d_is_small_animation2.gif', dpi=80, writer='imagemagick')
+
