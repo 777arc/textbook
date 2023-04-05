@@ -12,6 +12,9 @@
         "boresight",
         "downconversion",
         "dtype",
+        "figsize",
+        "fillmein",
+        "fontsize",
         "linalg",
         "linspace",
         "mathrm",
@@ -19,7 +22,11 @@
         "Rinv",
         "rlabel",
         "savefig",
+        "thetamax",
+        "thetamin",
         "xdata",
-        "ydata"
+        "xlabel",
+        "ydata",
+        "ylabel"
     ]
 }

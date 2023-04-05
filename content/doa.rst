@@ -296,9 +296,9 @@ Capon's Beamformer
 In the basic DOA example we swept across all angles, multiplying :code:`r` by the weights :code:`w`, applying an energy detector to the resulting 1D array.  In that example, :code:`w` was equal to the array factor, :code:`a`, so we were essentially just multiplying :code:`r` by :code:`a`.  We will now look at a beamformer that is slightly more complicated but tends to perform much better, called Capon's Beamformer, a.k.a. the minimum variance distortionless response (MVDR) beamformer.  This beamformer can be summarized in the following equation:
 
 .. math::
- \hat{\theta} = \mathrm{argmax}\left(\frac{1}{a^T R^{-1} a}\right)
+ \hat{\theta} = \mathrm{argmax}\left(\frac{1}{a^H R^{-1} a}\right)
 
-where :math:`R` is the sample covariance matrix, calculated by multiplying r with the transpose of itself, :math:`R = r r^T`, and the result will be a :code:`Nr` x :code:`Nr` size matrix (3x3 in the examples we have seen so far).  This covariance matrix tells us how similar the samples received from the three elements are, although to use Capon's method we don't have to fully understand how that works.  In textbooks and other resources you might see the Capon's equation with some terms in the numerator; these are purely for scaling/normalization and they don't change the results.
+where :math:`R` is the sample covariance matrix, calculated by multiplying r with the complex conjugate transpose of itself, :math:`R = r r^H`, and the result will be a :code:`Nr` x :code:`Nr` size matrix (3x3 in the examples we have seen so far).  This covariance matrix tells us how similar the samples received from the three elements are, although to use Capon's method we don't have to fully understand how that works.  In textbooks and other resources you might see the Capon's equation with some terms in the numerator; these are purely for scaling/normalization and they don't change the results.
 
 We can implement the equations above in Python fairly easily:
 
@@ -365,9 +365,70 @@ While it might be a pretty shape, it's not finding all three signals at all...  
 MUSIC
 *******************
 
-Coming soon!
+We will now change gears and talk about a different kind of beamformer. All of the previous ones have fallen in the "delay-and-sum" category, but now we will dive into "sub-space" methods.  These involve dividing the signal subspace and noise subspace, which means we must estimate how many signals are being received by the array, to get a good result.  MUltiple SIgnal Classification (MUSIC) is a very popular sub-space method that involves calculating the eigenvectors of the covariance matrix (which is a computationally intensive operation by the way).  We split the eigenvectors into two groups: signal sub-space and noise-subspace, then project steering vectors into the noise sub-space and steer for nulls.  That might seem confusing at first, which is part of why MUSIC seems like black magic!
 
-* MUSIC (adaptive/subspace beamforming)
+The core MUSIC equation is the following:
+
+.. math::
+ \hat{\theta} = \mathrm{argmax}\left(\frac{1}{a^H V_n V^H_n a}\right)
+
+where :math:`V_n` is that list of noise sub-space eigenvectors we mentioned (a 2D matrix).  It is found by first calculating the eigenvectors of :math:`R`, which is done simply by :code:`w, v = np.linalg.eig(R)` in Python, and then splitting up the vectors (:code:`w`) based on how many signals we think the array is receiving.  There is a trick for estimating the number of signals that we'll talk about later, but it must be between 1 and :code:`Nr - 1`.  I.e., if you are designing an array, when you are choosing the number of elements you must have one more than the number of anticipated signals.  One thing to note about the equation above is :math:`V_n` does not depend on the array factor :math:`a`, so we can precalculate it before we start looping through theta.  The full MUSIC code is as follows:
+
+.. code-block:: python
+
+ num_expected_signals = 3 # Try changing this!
+ 
+ # part that doesn't change with theta_i
+ R = r @ r.H # Calc covariance matrix, it's Nr x Nr
+ w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
+ eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
+ v = v[:, eig_val_order] # sort eigenvectors using this order
+ # We make a new eigenvector matrix representing the "noise subspace", it's just the rest of the eigenvalues
+ V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64))
+ for i in range(Nr - num_expected_signals):
+    V[:, i] = v[:, i]
+ 
+ theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # -180 to +180 degrees
+ results = []
+ for theta_i in theta_scan:
+     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # array factor
+     a = a.T
+     metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
+     metric = np.abs(metric[0,0]) # take magnitude
+     metric = 10*np.log10(metric) # convert to dB
+     results.append(metric) 
+ 
+ results /= np.max(results) # normalize
+
+Running this algorithm on the complex scenario we have been using, we get the following very precise results, showing the power of MUSIC:
+
+.. image:: ../_images/doa_music.svg
+   :align: center 
+   :target: ../_images/doa_music.svg
+
+Now what if we had no idea how many signals were present?  Well there is a trick; you sort the eigenvalue magnitudes from highest to lowest, and plot them (it may help to plot them in dB):
+
+.. code-block:: python
+
+ plot(10*np.log10(np.abs(w)),'.-')
+
+.. image:: ../_images/doa_eigenvalues.svg
+   :align: center 
+   :target: ../_images/doa_eigenvalues.svg
+
+The eigenvalues associated with the noise-subspace are going to be the smallest, and they will all tend around the same value, so we can treat these low values like a "noise floor", and any eigenvalue above the noise floor represents a signal.  Here we can clearly see there are three signals being received, and adjust our MUSIC algorithm accordingly.  If you don't have a lot of IQ samples to process or the signals are at low SNR, the number of signals might not be as obvious.  Feel free to play around by adjusting :code:`num_expected_signals` between 1 and 7, you'll find that underestimating the number will lead to missing signal(s) while overestimating will only slightly hurt performance.
+
+Another experiment worth trying with MUSIC is to see how close two signals can arrive at (in angle) while still distinguishing between them; sub-space techniques are especially good at that.  The animation below shows an example, with one signal at 18 degrees and another slowly sweeping angle of arrival.
+
+.. image:: ../_images/doa_music_animation.gif
+   :scale: 100 %
+   :align: center
+
+*******************
+ESPRIT
+*******************
+
+Coming soon!
 
 *******************
 2D DOA

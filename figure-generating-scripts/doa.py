@@ -305,7 +305,7 @@ if False:
     exit()
 
 # MUSIC with complex scenario
-if True:
+if False:
     Nr = 8 # 8 elements
     theta1 = 20 / 180 * np.pi # convert to radians
     theta2 = 25 / 180 * np.pi
@@ -318,12 +318,22 @@ if True:
         a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
         0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
     n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
-    r = r + 0.01*n
+    r = r + 0.04*n
 
     # MUSIC Algorithm (part that doesn't change with theta_i)
     num_expected_signals = 3 # Try changing this!
-    R = r @ r.T # Calc covariance matrix, it's Nr x Nr
+    R = r @ r.H # Calc covariance matrix, it's Nr x Nr
     w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
+
+    if False:
+        fig, (ax1) = plt.subplots(1, 1, figsize=(7, 3))
+        ax1.plot(10*np.log10(np.abs(w)),'.-')
+        ax1.set_xlabel('Index')
+        ax1.set_ylabel('Eigenvalue [dB]')
+        plt.show()
+        #fig.savefig('../_images/doa_eigenvalues.svg', bbox_inches='tight') # I EDITED THIS ONE IN INKSCAPE!!!
+        exit()
+
     eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
     v = v[:, eig_val_order] # sort eigenvectors using this order
     V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64)) # Noise subspace is the rest of the eigenvalues
@@ -348,6 +358,58 @@ if True:
     ax.set_theta_direction(-1) # increase clockwise
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
-    fig.savefig('../_images/doa_music.svg', bbox_inches='tight')
+    #fig.savefig('../_images/doa_music.svg', bbox_inches='tight')
 
+    exit()
+
+
+# MUSIC animation changing angle of two
+if False:
+    Nr = 8 # 8 elements
+    num_expected_signals = 2
+
+    theta2s = np.arange(15,21,0.05) / 180 * np.pi
+    theta_scan = np.linspace(-1*np.pi, np.pi, 2000)
+    results = np.zeros((len(theta2s), len(theta_scan)))
+    for theta2s_i in range(len(theta2s)):
+        theta1 = 18 / 180 * np.pi # convert to radians
+        theta2 = theta2s[theta2s_i]
+        a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
+        a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
+        r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t))
+        n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
+        r = r + 0.01*n
+        R = r @ r.H # Calc covariance matrix, it's Nr x Nr
+        w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
+        eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
+        v = v[:, eig_val_order] # sort eigenvectors using this order
+        V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64)) # Noise subspace is the rest of the eigenvalues
+        for i in range(Nr - num_expected_signals):
+            V[:, i] = v[:, i]
+        for theta_i in range(len(theta_scan)):
+            a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_scan[theta_i]))) # look familiar?
+            a = a.T
+            metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
+            metric = np.abs(metric[0,0]) # take magnitude
+            metric = 10*np.log10(metric) # convert to dB
+            results[theta2s_i, theta_i] = metric
+
+        results[theta2s_i,:] /= np.max(results[theta2s_i,:]) # normalize
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    fig.set_tight_layout(True)
+    line, = ax.plot(theta_scan, results[0,:])
+    ax.set_thetamin(0)
+    ax.set_thetamax(30) 
+    ax.set_theta_zero_location('N') # make 0 degrees point up
+    ax.set_theta_direction(-1) # increase clockwise
+    ax.set_rlabel_position(22.5)  # Move grid labels away from other labels
+    def update(i):
+        i = int(i)
+        print(i)
+        results_i = results[i,:] #/ np.max(results[i,:]) * 10 # had to add this in for the last animation because it got too large
+        line.set_ydata(results_i)
+        return line, ax
+    anim = FuncAnimation(fig, update, frames=np.arange(0, len(theta2s)), interval=100)
+    anim.save('../_images/doa_music_animation.gif', dpi=80, writer='imagemagick')
     exit()
