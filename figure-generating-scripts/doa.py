@@ -218,7 +218,7 @@ if False:
 
 # Capons beamformer
 if False:
-    if False: # use for doacompons2
+    if True: # use for doacompons2
         # more complex scenario
         Nr = 8 # 8 elements
         theta1 = 20 / 180 * np.pi # convert to radians
@@ -249,13 +249,6 @@ if False:
         metric = np.abs(w[0,0]) # take magnitude
         metric = 10*np.log10(metric)
 
-        #numerator = Rinv @ a
-        #denominator = a.T @ Rinv @ a
-        #w = np.divide(numerator, denominator)
-        #r_weighted = np.conj(w.T) @ r # apply our weights
-        #r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
-        #metric = np.mean(np.abs(r_weighted)**2) # energy detector
-
         results.append(metric) 
 
     results /= np.max(results) # normalize
@@ -266,14 +259,14 @@ if False:
     ax.set_theta_direction(-1) # increase clockwise
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
-    fig.savefig('../_images/doa_capons.svg', bbox_inches='tight')
+    #fig.savefig('../_images/doa_capons.svg', bbox_inches='tight')
     #fig.savefig('../_images/doa_capons2.svg', bbox_inches='tight')
 
     exit()
 
 
 # plugging complex scenario into simple DOA approach
-if True:
+if False:
     # more complex scenario
     Nr = 8 # 8 elements
     theta1 = 20 / 180 * np.pi # convert to radians

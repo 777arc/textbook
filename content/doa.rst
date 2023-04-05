@@ -388,3 +388,4 @@ Conclusion and References
 All Python code, including code used to generate the figures/animations, can be found `on the textbook's GitHub page <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/doa.py>`_.
 
 * DOA implementation in GNU Radio - https://github.com/EttusResearch/gr-doa
+* DOA implementation used by KrakenSDR - https://github.com/krakenrf/krakensdr_doa/blob/main/_signal_processing/krakenSDR_signal_processor.py
