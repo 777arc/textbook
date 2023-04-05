@@ -311,11 +311,11 @@ We can implement the equations above in Python fairly easily:
      a = a.T # needs to be a column vector for the math below
  
      # Calc covariance matrix
-     R = r @ r.T # gives a Nr x Nr covariance matrix of the samples
+     R = r @ r.H # gives a Nr x Nr covariance matrix of the samples
  
      Rinv = np.linalg.pinv(R) # pseudo-inverse tends to work better than a true inverse
  
-     metric = 1/(a.T @ Rinv @ a) # Capon's method!
+     metric = 1/(a.H @ Rinv @ a) # Capon's method!
      metric = metric[0,0] # convert the 1x1 matrix to a Python scalar, it's still complex though
      metric = np.abs(metric) # take magnitude
      metric = 10*np.log10(metric) # convert to dB so its easier to see small and large lobes at the same time
@@ -329,7 +329,7 @@ When applied to the previous DOA example code, we get the following:
    :align: center 
    :target: ../_images/doa_capons.svg
 
-It's obviously a much narrower lobe, but to really compare this with using an energy detector we'll have to create a more interesting problem.  Let's set up a simulation with an 8-element array receiving three signals from different angles: 20, 25, and 40 degrees, with the 40 degree one received at a much lower power than the other two.   Our goal will be to detect all three.  The code to generate this new scenario is as follows:
+Works fine, but to really compare this to other techniques we'll have to create a more interesting problem.  Let's set up a simulation with an 8-element array receiving three signals from different angles: 20, 25, and 40 degrees, with the 40 degree one received at a much lower power than the other two.  Our goal will be to detect all three.  The code to generate this new scenario is as follows:
 
 .. code-block:: python
 
@@ -345,7 +345,7 @@ It's obviously a much narrower lobe, but to really compare this with using an en
      a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
      0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
  n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
- r = r + 0.1*n
+ r = r + 0.04*n
 
 And if we run our Capon's beamformer on this new scenario we get the following results:
 
@@ -353,7 +353,7 @@ And if we run our Capon's beamformer on this new scenario we get the following r
    :align: center 
    :target: ../_images/doa_capons2.svg
 
-It works pretty well, we can see the two signals received only 5 degrees apart, and we can also see the 3rd signal (at -40 or 320 degrees) that was received at one tenth the power of the others.  There are some other spikes, but if you were to run this detector on several batches of samples and average the results, the extra spikes would get averaged out.  Now let's run the simple beamformer which is just an energy detector on this new scenario:
+It works pretty well, we can see the two signals received only 5 degrees apart, and we can also see the 3rd signal (at -40 or 320 degrees) that was received at one tenth the power of the others.   Now let's run the simple beamformer which is just an energy detector on this new scenario:
 
 .. image:: ../_images/doa_complex_scenario.svg
    :align: center 

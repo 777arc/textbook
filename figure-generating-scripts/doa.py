@@ -232,7 +232,7 @@ if False:
             a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
             0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
         n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
-        r = r + 0.01*n
+        r = r + 0.04*n
 
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
     results = []
@@ -241,11 +241,11 @@ if False:
         a = a.T
 
         # Calc covariance matrix
-        R = r @ r.T # gives a Nr x Nr covariance matrix of the samples
+        R = r @ r.H # gives a Nr x Nr covariance matrix of the samples
 
         Rinv = np.linalg.pinv(R)
 
-        w = 1/(a.T @ Rinv @ a)
+        w = 1/(a.H @ Rinv @ a)
         metric = np.abs(w[0,0]) # take magnitude
         metric = 10*np.log10(metric)
 
@@ -260,7 +260,7 @@ if False:
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
     #fig.savefig('../_images/doa_capons.svg', bbox_inches='tight')
-    #fig.savefig('../_images/doa_capons2.svg', bbox_inches='tight')
+    fig.savefig('../_images/doa_capons2.svg', bbox_inches='tight')
 
     exit()
 
@@ -280,7 +280,7 @@ if False:
         a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
         0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
     n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
-    r = r + 0.01*n
+    r = r + 0.04*n
 
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
     results = []
@@ -301,5 +301,53 @@ if False:
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
     fig.savefig('../_images/doa_complex_scenario.svg', bbox_inches='tight')
+
+    exit()
+
+# MUSIC with complex scenario
+if True:
+    Nr = 8 # 8 elements
+    theta1 = 20 / 180 * np.pi # convert to radians
+    theta2 = 25 / 180 * np.pi
+    theta3 = -40 / 180 * np.pi
+    a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
+    a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
+    a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+    # we'll use 3 different frequencies
+    r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
+        a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
+        0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+    n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
+    r = r + 0.01*n
+
+    # MUSIC Algorithm (part that doesn't change with theta_i)
+    num_expected_signals = 3 # Try changing this!
+    R = r @ r.T # Calc covariance matrix, it's Nr x Nr
+    w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
+    eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
+    v = v[:, eig_val_order] # sort eigenvectors using this order
+    V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64)) # Noise subspace is the rest of the eigenvalues
+    for i in range(Nr - num_expected_signals):
+        V[:, i] = v[:, i]
+
+    theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
+    results = []
+    for theta_i in theta_scan:
+        a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
+        a = a.T
+        metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
+        metric = np.abs(metric[0,0]) # take magnitude
+        metric = 10*np.log10(metric) # convert to dB
+        results.append(metric) 
+
+    results /= np.max(results) # normalize
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    ax.plot(theta_scan, results) # MAKE SURE TO USE RADIAN FOR POLAR
+    ax.set_theta_zero_location('N') # make 0 degrees point up
+    ax.set_theta_direction(-1) # increase clockwise
+    ax.set_rlabel_position(30)  # Move grid labels away from other labels
+    plt.show()
+    fig.savefig('../_images/doa_music.svg', bbox_inches='tight')
 
     exit()

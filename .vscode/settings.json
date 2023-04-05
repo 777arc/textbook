@@ -2,6 +2,7 @@
     "esbonio.sphinx.confDir": "",
     "cSpell.words": [
         "arange",
+        "argsort",
         "asarray",
         "asmatrix",
         "AWGN",
@@ -10,6 +11,7 @@
         "beamforming",
         "boresight",
         "downconversion",
+        "dtype",
         "linalg",
         "linspace",
         "mathrm",
