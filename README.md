@@ -30,7 +30,7 @@ sudo apt-get install -y latexmk
 sphinx-build -b latex . _build/latex
 make latexpdf
 NEED TO REMOVE ALL GIFS FOR IT TO NOT ERROR OUT
-``
+```
 
 ## Misc
 
