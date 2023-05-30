@@ -250,7 +250,7 @@ How do we actually plot this output?  As an example let's say that our sample ra
    :align: center
    :target: ../_images/negative-frequencies.svg
 
-It is always the case; the output of the FFT will always show :math:`\text{-} f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  I.e., the output will always have a negative portion and positive portion.  If the input is complex, the negative and positive portions will be different, but if it real then they will be identical. 
+It is always the case; the output of the FFT will always show :math:`\text{-} f_s/2` to :math:`f_s/2` where :math:`f_s` is the sample rate.  I.e., the output will always have a negative portion and positive portion.  If the input is complex, the negative and positive portions will be different, but if it's real then they will be identical. 
 
 Regarding the frequency interval, each bin corresponds to :math:`f_s/N` Hz, i.e., feeding in more samples to each FFT will lead to more granular resolution in your output.  A very minor detail that can be ignored if you are new: mathematically, the very last index does not correspond to *exactly* :math:`f_s/2`, rather it's :math:`f_s/2 - f_s/N` which for a large :math:`N` will be approximately :math:`f_s/2`.
 
