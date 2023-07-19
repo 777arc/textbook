@@ -193,7 +193,7 @@ We typically shoot for an SNR > 10 dB, although it really depends on the applica
 Example Link Budget: ADS-B
 ***************************
 
-Automatic Dependent Surveillance-Broadcast (ADS-B) is a technology used by aircraft to broadcast signals that share their position and other status with air traffic control ground stations and other aircraft.  ADS–B is automatic in that it requires no pilot or external input; it depends on data from the aircraft's navigation system and other computers.  The messages are not encrypted (yay!).  ADS–B equipment is currently mandatory in portions of Australian airspace, while the United States requires some aircraft to be equipped, depending on the size.
+Automatic Dependent Surveillance-Broadcast (ADS-B) is a technology used by aircraft to broadcast signals that share their position and other status with air traffic control ground stations and other aircraft.  ADS-B is automatic in that it requires no pilot or external input; it depends on data from the aircraft's navigation system and other computers.  The messages are not encrypted (yay!).  ADS-B equipment is currently mandatory in portions of Australian airspace, while the United States requires some aircraft to be equipped, depending on the size.
 
 .. image:: ../_images/adsb.jpg
    :scale: 120 % 
@@ -202,10 +202,11 @@ Automatic Dependent Surveillance-Broadcast (ADS-B) is a technology used by aircr
 The Physical (PHY) Layer of ADS-B has the following characteristics:
 
 - Transmitted on 1,090 MHz
-- Signal has 50 kHz of bandwidth (which is very small)
+- Signal bandwidth around 2 MHz
 - PPM modulation
-- Messages carry 15 bytes of data each, so multiple messages are usually needed
-- Multiple access is achieved by having messages broadcast with a period that ranges randomly between 0.4 and 0.6 seconds.  This randomization is designed to prevent aircraft from having all of their transmissions on top of each other (some may still collide but that’s fine)
+- Data rate of 1 Mbit/s, with messages between 56 - 112 microseconds
+- Messages carry 15 bytes of data each, so multiple messages are usually needed for the entire aircraft information
+- Multiple access is achieved by having messages broadcast with a period that ranges randomly between 0.4 and 0.6 seconds.  This randomization is designed to prevent aircraft from having all of their transmissions on top of each other (some may still collide but that's fine)
 - ADS-B antennas are vertically polarized
 - Transmit power varies, but should be in the ballpark of 100 W (20 dBW)
 - Transmit antenna gain is omnidirectional but only pointed downward, so let's say 3 dB
@@ -243,32 +244,13 @@ Now because we definitely won't have free space, let's add another 3 dB of misce
 
 For our noise budget:
 
-- B = 50 kHz = 50e3 = 47 dBHz
+- B = 2 MHz = 2e6 = 63 dBHz
 - T we have to approximate, let's say 300 K, which is 24.8 dBK.  It will vary based on quality of the receiver
 - k is always -228.6 dBW/K/Hz 
 
 .. math::
- P_{noise} = k + T + B = -156.8 \quad \mathrm{dBW}
+ P_{noise} = k + T + B = -140.8 \quad \mathrm{dBW}
  
-Therefore our SNR is -105.7 - (-156.8) = **51.1 dB**.  It's not surprising it is a huge number, considering we are claiming to only be 30 km from the aircraft under free space.  If ADS-B signals couldn't reach 30 km then ADS-B wouldn't be a very effective system--no one would hear each other until they were very close.  Under this example we can easily decode the signals; pulse-position modulation (PPM) is fairly robust and does not require that high an SNR.  What's difficult is when you try to receive ADS-B while inside a classroom, with an antenna that is very poorly matched, and a strong FM radio station nearby causing interference.  Those factors could easily lead to 20-30 dB of losses.
+Therefore our SNR is -105.7 - (-140.8) = **35.1 dB**.  It's not surprising it is a huge number, considering we are claiming to only be 30 km from the aircraft under free space.  If ADS-B signals couldn't reach 30 km then ADS-B wouldn't be a very effective system--no one would hear each other until they were very close.  Under this example we can easily decode the signals; pulse-position modulation (PPM) is fairly robust and does not require that high an SNR.  What's difficult is when you try to receive ADS-B while inside a classroom, with an antenna that is very poorly matched, and a strong FM radio station nearby causing interference.  Those factors could easily lead to 20-30 dB of losses.
 
 This example was really just a back-of-the-envelope calculation, but it demonstrated the basics of creating a link budget and understanding the important parameters of a comms link. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
