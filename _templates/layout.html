@@ -8,6 +8,31 @@
   gtag('js', new Date());
 
   gtag('config', 'G-TGRQK1JJYD');
+</script> 
+
+<div id="topBanner" class="modal">
+  <div class="modal-content">
+    <div class="modal-header" style="background-color: rgb(255, 240, 129); text-align:center;">
+      <i>-- Announcement from Marc --</i><br>I'm leading a new education-oriented open-source project called <a target="_blank" href="https://iqengine.org">IQEngine</a>!<br>It's a web-based SDR toolkit for analyzing, processing, and sharing RF recordings.  Checkout out our <a target="_blank" href="https://github.com/IQEngine/IQEngine">GitHub</a> and <a target="_blank" href="https://discord.gg/k7C8kp3b76">Discord</a>
+      <div class="closeButton">
+        <span style="font-size:30px; position:absolute; top:0px; right:5px; cursor:pointer; ">&times;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var banner = document.getElementById("topBanner");
+  var closeButton = document.getElementsByClassName("closeButton")[0];
+  // Close banner if they have already clicked the close button in the past
+  if (localStorage.getItem('pysdrvisited')){
+    banner.style.display = "none";
+  }
+  // When they click the close button
+  closeButton.onclick = function() {
+    banner.style.display = "none";
+    localStorage.setItem('pysdrvisited', true);
+  }
 </script>
 
 <div style="float: right; padding-bottom: 0;">
