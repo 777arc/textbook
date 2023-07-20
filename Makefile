@@ -56,6 +56,10 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel,sphinxcontrib.tikz -D imgmath_latex=latex -D tikz_includegraphics_path=_images -D tikz_tikzlibraries=positioning,shapes,arrows,snakes $(BUILDDIR)
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo replacing title of index page
+	sed -i 's/PySDR: A Guide to SDR and DSP using Python &#8212; PySDR: A Guide to SDR and DSP using Python/PySDR: A Guide to SDR and DSP using Python/g' $(BUILDDIR)/index.html
+	@echo removing chapter number from titles of each page
+	sed -i -E "s/<title>[0-9]{1,2}\. /<title>/g" $(BUILDDIR)/content/*
 
 #make sure you install sphinxcontrib-tikz python module and pdf2svg application
 .PHONY: html-nl
