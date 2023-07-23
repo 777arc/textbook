@@ -15,6 +15,7 @@ To understand RDS we must first review FM radio broadcasts and how their signals
 .. image:: ../_images/fm_psd.svg
    :align: center 
    :target: ../_images/fm_psd.svg
+   :alt: Power spectral density (PSD) of an FM radio signal after the FM demodulation, showing RDS
 
 By looking at the signal in the frequency domain, we notice the following individual signals:
 
@@ -29,6 +30,7 @@ This is essentially all we are able to determine by just looking at the PSD, and
 .. image:: ../_images/fm_before_demod.svg
    :align: center 
    :target: ../_images/fm_before_demod.svg
+   :alt: Power spectral density (PSD) of an FM radio signal before any demodulation
    
 That being said, it's important to understand that when you FM modulate a signal, a higher frequency in the data signal will lead to a higher frequency in the resulting FM signal.  So that signal centered at 67 kHz being present is increasing the total bandwidth occupied by the transmitted FM signal, as the maximum frequency component is now around 75 kHz as shown in the first PSD above.  `Carson's bandwidth rule <https://en.wikipedia.org/wiki/Carson_bandwidth_rule>`_ applied to FM tells us that FM stations occupy roughly 250 kHz of spectrum, which is why we usually sample at 250 kHz (recall that when using quadrature/IQ sampling, your received bandwidth equals your sampling rate).
 
@@ -36,7 +38,8 @@ As a quick aside, some readers may be familiar with looking at the FM band using
 
 .. image:: ../_images/fm_band_psd.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Spectrogram of the FM band
 
 It turns out that those block-y signals are actually HD Radio, a digital version of the same FM radio signal (same audio content).  This digital version leads to a higher quality audio signal at the receiver because analog FM will always include some noise after demodulation, since it's an analog scheme, but the digital signal can be demodulated/decoded with zero noise, assuming there are zero bit errors.  
 
@@ -44,7 +47,8 @@ Back to the five signals we discovered in our PSD; the following diagram labels 
 
 .. image:: ../_images/fm_components.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Components within an FM radio signal, including mono and stereo audio, RDS, and DirectBand signals
 
 Going through each of these signals in no particular order:
 
@@ -222,7 +226,8 @@ We are finally ready for our symbol/time synchronization, here we will use the e
 
 .. image:: ../_images/constellation-animated.gif
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Animation of BPSK rotating because fine frequency sync hasn't been performed yet
 
 If you are using your own FM signal and are not getting two distinct clusters of complex samples at this point, it means either the symbol sync above failed to achieve sync, or there is something wrong with one of the previous steps.  You don't need to animate the constellation, but if you plot it, make sure to avoid plotting all the samples, because it will just look like a circle.  If you plot only 100 or 200 samples at a time, you will get a better feel for whether they are in two clusters or not, even if they are spinning.
 
@@ -262,13 +267,15 @@ We will also copy the fine frequency synchronization Python code from the :ref:`
 
 .. image:: ../_images/constellation-animated-postcostas.gif
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Animation of the frequency sync process using a Costas Loop
 
 Additionally, we can look at the estimated frequency error over time to see the Costas loop working, note how we logged it in the code above.  It appears that there was about 13 Hz of frequency offset, either due to the transmitter's oscillator/LO being off or the receiver's LO (most likely the receiver).  If you are using your own FM signal, you may need to tweak :code:`alpha` and :code:`beta` until the curve looks similar, it should achieve synchronization fairly quickly (e.g., a few hundred symbols) and maintain it with minimal oscillation.  The pattern you see below after it finds its steady state is frequency jitter, not oscillation.
 
 .. image:: ../_images/freq_error.png
    :scale: 40 % 
-   :align: center 
+   :align: center
+   :alt: The frequency sync process using a Costas Loop showing the estimated frequency offset over time
 
 ********************************
 Demodulate the BPSK

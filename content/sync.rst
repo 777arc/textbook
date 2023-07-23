@@ -15,6 +15,7 @@ We have discussed how to transmit digitally over the air, utilizing a digital mo
 .. image:: ../_images/sync-diagram.svg
    :align: center 
    :target: ../_images/sync-diagram.svg
+   :alt: The transmit receive chain, with the blocks discussed in this chapter highlighted in yellow, including time and frequency synchronization
 
 ***************************
 Simulating Wireless Channel
@@ -108,6 +109,7 @@ Below demonstrates the signal before and after the frequency offset is applied.
 .. image:: ../_images/sync-freq-offset.svg
    :align: center
    :target: ../_images/sync-freq-offset.svg
+   :alt: Python simulation showing a signal before and after applying a frequency offset
 
 We have not been graphing the Q portion since we were transmitting BPSK, making the Q portion always zero.  Now that we're adding a frequency shift to simulate wireless channels, the energy spreads across I and Q.  From this point on we should be plotting both I and Q.  Feel free to substitute a different frequency offset for your code.  If you lower the offset to around 1 kHz, you will be able to see the sinusoid in the envelope of the signal because it's oscillating slow enough to span several symbols.
 
@@ -198,6 +200,7 @@ If we zoom *way* in, we see that it's the same signal, just with 16x as many poi
 .. image:: ../_images/time-sync-interpolated-samples.svg
    :align: center
    :target: ../_images/time-sync-interpolated-samples.svg
+   :alt: Example of interpolation a signal, using Python
 
 Hopefully the reason we need to interpolate inside of the time-sync block is becoming clear.  These extra samples will let us take into account a fraction of a sample delay.  In addition to calculating :code:`samples_interpolated`, we also have to modify one line of code in our time synchronizer.  We will change the first line inside the while loop to become:
 
@@ -216,6 +219,7 @@ If we enable only the frequency offset using a frequency of 1 kHz, we get the fo
 .. image:: ../_images/time-sync-output2.svg
    :align: center
    :target: ../_images/time-sync-output2.svg
+   :alt: A python simulated signal with a slight frequency offset
 
 It might be hard to see, but the time sync is still working just fine.  It takes about 20 to 30 symbols before it's locked in.  However, there's a sinusoid pattern because we still have a frequency offset, and we will learn how to deal with it in the next section.
 
@@ -224,11 +228,14 @@ Below shows the IQ plot (a.k.a. constellation plot) of the signal before and aft
 .. image:: ../_images/time-sync-constellation.svg
    :align: center
    :target: ../_images/time-sync-constellation.svg
+   :alt: An IQ plot of a signal before and after time synchronization
     
 To gain even more insight, we can look at the constellation over time to discern what's actually happening to the symbols.  At the very beginning, for a short period of time, the symbols are not 0 or on the unit circle.  That is the period in which time sync is finding the right delay.  It's very quick, watch closely!  The spinning is just the frequency offset.  Frequency is a constant change in phase, so a frequency offset causes spinning of the BPSK (creating a circle in the static/persistent plot above).
 
 .. image:: ../_images/time-sync-constellation-animated.gif
-   :align: center 
+   :align: center
+   :target: ../_images/time-sync-constellation-animated.gif
+   :alt: Animation of an IQ plot of BPSK with a frequency offset, showing spinning clusters
 
 Hopefully by seeing an example of time sync actually happening, you have a feel for what it does and a general idea of how it works.  In practice, the while loop we created would only work on a small number of samples at a time (e.g., 1000).  You have to remember the value of :code:`mu` in between calls to the sync function, as well as the last couple values of :code:`out` and :code:`out_rail`.
 
@@ -348,6 +355,7 @@ We will use a technique called a Costas Loop.  It is a form of PLL that is speci
 .. image:: ../_images/costas-loop.svg
    :align: center 
    :target: ../_images/costas-loop.svg
+   :alt: Costas loop diagram including math expressions, it is a form of PLL used in RF signal processing
 
 The voltage controlled oscillator (VCO) is simply a sin/cos wave generator that uses a frequency based on the input.  In our case, since we are simulating a wireless channel, it isn't a voltage, but rather a level represented by a variable.  It determines the frequency and phase of the generated sine and cosine waves.  What it's doing is multiplying the received signal by an internally-generated sinusoid, in an attempt to undo the frequency and phase offset.  This behavior is similar to how an SDR downconverts and creates the I and Q branches.
 
@@ -422,6 +430,7 @@ Our signal before and after the Costas Loop looks like this:
 .. image:: ../_images/costas-loop-output.svg
    :align: center
    :target: ../_images/costas-loop-output.svg
+   :alt: Python simulation of a signal before and after using a Costas Loop
 
 And the frequency offset estimation over time, settling on the correct offset (a -300 Hz offset was used in this example signal):
 
@@ -436,7 +445,9 @@ The Costas Loop, in addition to removing the frequency offset, aligned our BPSK 
 Below is an animation of the time sync plus frequency sync running, the time sync actually happens almost immediately but the frequency sync takes nearly the entire animation to fully settle, and this was because :code:`alpha` and :code:`beta` were set too low, to 0.005 and 0.001 respectively.  The code used to generate this animation can be found `here <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/costas_loop_animation.py>`_. 
 
 .. image:: ../_images/costas_animation.gif
-   :align: center 
+   :align: center
+   :target: ../_images/costas_animation.gif
+   :alt: Costas loop animation
 
 ***************************
 Frame Synchronization

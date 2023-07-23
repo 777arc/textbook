@@ -15,7 +15,9 @@ Before jumping into IQ sampling, let's discuss what sampling actually means. You
 Whether we are dealing with audio or radio frequencies, we must sample if we want to capture, process, or save a signal digitally.  Sampling might seem straightforward, but there is a lot to it.  A more technical way to think of sampling a signal is grabbing values at moments in time and saving them digitally. Let's say we have some random function, :math:`S(t)`, which could represent anything, and it's a continuous function that we want to sample:
 
 .. image:: ../_images/sampling.svg
-   :align: center 
+   :align: center
+   :target: ../_images/sampling.svg
+   :alt: Concept of sampling a signal, showing sample period T, the samples are the blue dots
 
 We record the value of :math:`S(t)` at regular intervals of :math:`T` seconds, known as the **sample period**.  The frequency at which we sample, i.e., the number of samples taken per second, is simply :math:`\frac{1}{T}`.  We call this the **sample rate**, and its the inverse of the sample period.  For example, if we have a sample rate of 10 Hz, then the sample period is 0.1 seconds; there will be 0.1 seconds between each sample.  In practice our sample rates will be on the order of hundreds of kHz to tens of MHz or even higher.  When we sample signals, we need to be mindful of the sample rate, it's a very important parameter. 
 
@@ -42,7 +44,8 @@ Once again, there is a different signal that could fit these samples. This ambig
 How about sampling at Fs = 1.5f:
 
 .. image:: ../_images/sampling_Fs_0.45.svg
-   :align: center 
+   :align: center
+   :alt: Example of sampling ambiguity when a signal is not sampled fast enough (below the Nyquist rate)
 
 Still not fast enough!  According to a piece of DSP theory we won't dive into, you have to sample at **twice** the frequency of the signal in order to remove the ambiguity we are experiencing:
 
@@ -54,7 +57,9 @@ There's no incorrect signal this time because we sampled fast enough that no sig
 In the above example our signal was just a simple sine wave, most actual signals will have many frequency components to them.  To accurately sample any given signal, the sample rate must be "at least twice the frequency of the maximum frequency component".  Here's a visualization using an example frequency domain plot, note that there will always be a noise floor so the highest frequency is usually an approximation:
 
 .. image:: ../_images/max_freq.svg
-   :align: center 
+   :align: center
+   :target: ../_images/max_freq.svg
+   :alt: Nyquist sampling means that your sample rate is higher than the signal's maximum bandwidth
    
 We must identify the highest frequency component, then double it, and make sure we sample at that rate or faster.  The minimum rate in which we can sample is known as the Nyquist Rate.  In other words, the Nyquist Rate is the minimum rate at which a (finite bandwidth) signal needs to be sampled to retain all of its information.  It is an extremely important piece of theory within DSP and SDR that serves as a bridge between continuous and discrete signals.
 
@@ -82,7 +87,8 @@ We can see this visually by plotting I and Q equal to 1:
 
 .. image:: ../_images/IQ_wave.png
    :scale: 70% 
-   :align: center 
+   :align: center
+   :alt: I and Q visualized as amplitudes of sinusoids that get summed together
 
 We call the cos() the "in phase" component, hence the name I, and the sin() is the 90 degrees out of phase or "quadrature" component, hence Q.  Although if you accidentally mix it up and assign Q to the cos() and I to the sin(), it won't make a difference for most situations. 
 
@@ -95,7 +101,9 @@ What happens when we add a sine and cosine?  Or rather, what happens when we add
 
 .. image:: ../_images/IQ3.gif
    :scale: 100% 
-   :align: center 
+   :align: center
+   :target: ../_images/IQ3.gif
+   :alt: GNU Radio animation showing I and Q as amplitudes of sinusoids that get summed together
 
 (The code used for this pyqtgraph-based Python app can be found `here <https://raw.githubusercontent.com/777arc/textbook/master/figure-generating-scripts/sin_plus_cos.py>`_)
 
@@ -103,7 +111,8 @@ The important take-aways are that when we add the cos() and sin(), we get anothe
 
 .. image:: ../_images/IQ_diagram.png
    :scale: 80% 
-   :align: center 
+   :align: center
+   :alt: Diagram showing how I and Q are modulated onto a carrier
 
 We only need to generate one sine wave and shift it by 90 degrees to get the Q portion.
 
@@ -122,6 +131,7 @@ A complex number is really just two numbers together, a real and an imaginary po
 .. image:: ../_images/complex_plane_2.png
    :scale: 70% 
    :align: center
+   :alt: A vector on the complex plane
 
 This representation of a sinusoid is known as a "phasor diagram".  It's simply plotting complex numbers and treating them as vectors.  Now what is the magnitude and phase of our example complex number 0.7-0.4j?  For a given complex number where :math:`a` is the real part and :math:`b` is the imaginary part:
 
@@ -167,6 +177,7 @@ Now let's take the perspective of a radio receiver that is trying to receive a s
 .. image:: ../_images/IQ_diagram_rx.png
    :scale: 70% 
    :align: center
+   :alt: Receiving IQ samples by directly multiplying the input signal by a sine wave and a 90 degree shifted version of that sine wave
 
 What comes in is a real signal received by our antenna, and those are transformed into IQ values.  What we do is sample the I and Q branches individually, using two ADCs, and then we combine the pairs and store them as complex numbers.  In other words, at each time step, you will sample one I value and one Q value and combine them in the form :math:`I + jQ` (i.e., one complex number per IQ sample).  There will always be a "sample rate", the rate at which sampling is performed.  Someone might say, "I have an SDR running at 2 MHz sample rate." What they mean is that the SDR receives two million IQ samples per second.
 
@@ -211,6 +222,7 @@ Let's visualize downconversion in the frequency domain:
 .. image:: ../_images/downconversion.png
    :scale: 60% 
    :align: center
+   :alt: The downconversion process where a signal is frequency shifted from RF to 0 Hz or baseband
 
 When we are centered around 0 Hz, the maximum frequency is no longer 2.4 GHz but is based on the signal's characteristics since we removed the carrier.  Most signals are around 100 kHz to 40 MHz wide in bandwidth, so through downconversion we can sample at a *much* lower rate. Both the B2X0 USRPs and PlutoSDR contain an RF integrated circuit (RFIC) that can sample up to 56 MHz, which is high enough for most signals we will encounter.
 
@@ -231,6 +243,8 @@ The figure in the "Receiver Side" section demonstrates how the input signal is d
 
 .. image:: ../_images/receiver_arch_diagram.svg
    :align: center
+   :target: ../_images/receiver_arch_diagram.svg
+   :alt: Three common receiver architectures: direct sampling, direct conversion, and superheterodyne
 
 ***********************************
 Baseband and Bandpass Signals
@@ -240,6 +254,7 @@ We refer to a signal centered around 0 Hz as being at "baseband".  Conversely, "
 .. image:: ../_images/baseband_bandpass.png
    :scale: 50% 
    :align: center
+   :alt: Baseband vs bandpass
 
 You may also hear the term intermediate frequency (abbreviated as IF); for now, think of IF as an intermediate conversion step within a radio between baseband and bandpass/RF.
 
@@ -259,6 +274,7 @@ Here's an example of a DC spike:
 .. image:: ../_images/dc_spike.png
    :scale: 50% 
    :align: center
+   :alt: DC spike shown in a power spectral density (PSD)
    
 Because the SDR tunes to a center frequency, the 0 Hz portion of the FFT corresponds to the center frequency.
 That being said, a DC spike doesn't necessarily mean there is energy at the center frequency.
@@ -273,6 +289,7 @@ Instead what we can do is sample at 20 MHz at a center frequency of 95 MHz.
 .. image:: ../_images/offtuning.png
    :scale: 40 %
    :align: center
+   :alt: The offset tuning process to avoid the DC spike
    
 The blue box above shows what is actually sampled by the SDR, and the green box displays the portion of the spectrum we want.  Our LO will be set to 95 MHz because that is the frequency to which we ask the SDR to tune. Since 95 MHz is outside of the green box, we won't get any DC spike.
 

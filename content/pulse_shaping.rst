@@ -17,6 +17,7 @@ When we transmit digital symbols, we transmit them back-to-back (as opposed to w
 .. image:: ../_images/pulse_train.svg
    :align: center 
    :target: ../_images/pulse_train.svg
+   :alt: A pulse train of sinc pulses
 
 As you can see at every interval of :math:`T`, there is one peak of a pulse while rest of the pulses are at 0 (they cross the x-axis).  When the receiver samples the signal, it does so at the perfect time (at the peak of the pulses), meaning that is the only point in time which matters.  Usually there is a symbol synchronization block at the receiver that ensures the symbols are sampled at the peaks.
 
@@ -64,7 +65,7 @@ Below shows a simplified diagram of a transmit and receive chain, with a Raised 
 .. image:: ../_images/splitting_rc_filter.svg
    :align: center 
    :target: ../_images/splitting_rc_filter.svg
-
+   :alt: A diagram of a transmit and receive chain, with a Raised Cosine (RC) filter being split into two Root Raised Cosine (RRC) filters
 
 **********************************
 Specific Pulse Shaping Filters
@@ -86,12 +87,14 @@ The most popular pulse-shaping filter seems to be the "raised-cosine" filter.  I
 .. image:: ../_images/raised_cosine.svg
    :align: center 
    :target: ../_images/raised_cosine.svg
+   :alt: The raised cosine filter in the time domain with a variety of roll-off values
 
 Note that the above plot is in the time domain. It depicts the impulse response of the filter.  The :math:`\beta` parameter is the only parameter for the raised-cosine filter, and it determines how quickly the filter tapers off in the time domain, which will be inversely proportional with how quickly it tapers off in frequency:
 
 .. image:: ../_images/raised_cosine_freq.svg
    :align: center 
    :target: ../_images/raised_cosine_freq.svg
+   :alt: The raised cosine filter in the frequency domain with a variety of roll-off values
 
 The reason it's called the raised-cosine filter is because the frequency domain when :math:`\beta = 1` is a half-cycle of a cosine wave, raised up to sit on the x-axis.
 
@@ -129,6 +132,7 @@ Let's scrutinize the parameter :math:`\beta`.  It is a number between 0 and 1, a
 .. image:: ../_images/rrc_rolloff.svg
    :align: center 
    :target: ../_images/rrc_rolloff.svg
+   :alt: Plot of the raised cosine roll-off parameter
 
 More filter taps are required the lower :math:`\beta` gets.  When :math:`\beta = 0` the impulse response never fully hits zero, so we try to get :math:`\beta` as low as possible without causing other issues.  The lower the roll-off, the more compact in frequency we can create our signal for a given symbol rate, which is always important.
 
@@ -170,7 +174,8 @@ In this simulation we will use 8 samples per symbol, and instead of using a squa
 
 .. image:: ../_images/pulse_shaping_python1.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: A pulse train of impulses in the time domain simulated in Python
 
 At this point our symbols are still 1's and -1's.  Don't be caught up in the fact we used impulses.  In fact, it might be easier to *not* visualize the impulses response but rather think of it as an array:
 
@@ -237,13 +242,15 @@ The below graph represents the ideal position in time to sample, along with the 
 
 .. image:: ../_images/symbol_sync2.png
    :scale: 40 % 
-   :align: center 
+   :align: center
+   :alt: GNU Radio simulation showing perfect sampling as far as timing
 
 Compare that to the worst time to sample.  Notice the three clusters in the constellation.  We are sampling directly in between each symbol; our samples are going to be way off.
 
 .. image:: ../_images/symbol_sync3.png
    :scale: 40 % 
    :align: center 
+   :alt: GNU Radio simulation showing imperfect sampling as far as timing
 
 Here is another example of a poor sample time, somewhere in between our ideal and worst cases. Heed the four clusters.  With a high SNR we might be able to get away with this sampling time interval, though it isn't advisable.
 
