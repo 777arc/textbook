@@ -14,7 +14,8 @@ As we learned in the :ref:`noise-chapter` chapter, wireless channels are noisy, 
 
 .. image:: ../_images/qpsk_vs_16qam.png
    :scale: 90 % 
-   :align: center 
+   :align: center
+   :alt: Comparing noisy QPSK and 16QAM to demonstrate why forward error correction, a.k.a. channel coding, is needed
    
 A failed CRC usually results in a retransmission, at least when using a protocol like TCP.  If Alice is sending a message to Bob, we would rather not have to make Bob send a message back to Alice requesting the information again.  The purpose of channel coding is to transmit **redundant** information. The redundancy is a failsafe that reduces the amount of erroneous packets, retransmissions, or dropped data.
 
@@ -23,6 +24,7 @@ We discussed why we need channel coding, so let's see where it occurs in the tra
 .. image:: ../_images/tx_rx_chain.svg
    :align: center 
    :target: ../_images/tx_rx_chain.svg
+   :alt: The wireless communications transmit receive chain showing both sides of a transceiver
 
 Observe that there are multiple encoding steps in the transmit-receive chain. Source coding, our first step, is not the same as channel coding; source coding is meant to compress the data to be transmitted as much as possible, just like when you zip files to reduce the space taken.  Namely the output of the source encoding block should be **smaller** than the data input, but the output of channel encoding will be larger than its input because redundancy is added.
 
@@ -67,12 +69,14 @@ Modern communications adaptively change the MCS in real-time based on the wirele
 .. image:: ../_images/adaptive_mcs.svg
    :align: center 
    :target: ../_images/adaptive_mcs.svg
+   :alt: Modulation and coding scheme (MCS) visualized using a cellular base station where each ring represents the boundary of a MCS scheme to operate without error
 
 When using adaptive MCS, if you plot throughput over SNR, you get a staircase-shaped curve like the graph below.  Protocols like LTE often have a table indicating which MCS should be used at what SNR.
 
 .. image:: ../_images/adaptive_mcs2.svg
    :align: center 
    :target: ../_images/adaptive_mcs2.svg
+   :alt: Plot of throughput over SNR for various modulation and coding schemes (MCS), leading to a staircase or step shape
 
 ***************************
 Hamming Code
@@ -85,12 +89,14 @@ In Hamming Codes, extra bits, called parity bits or check bits, are added to inf
 .. image:: ../_images/hamming.svg
    :align: center 
    :target: ../_images/hamming.svg
+   :alt: Hamming code pattern showing how parity bit coverage works
 
 Hamming codes are block codes so they operate on N data bits at a time.  So with three parity bits we can operate on blocks of four data bits at a time.  We represent this error encoding scheme as Hamming(7,4), where the first argument is the total bits transmitted and the second argument is the bits of data.
 
 .. image:: ../_images/hamming2.svg
    :align: center 
    :target: ../_images/hamming2.svg
+   :alt: Example of Hamming 7,4 which has three parity bits
 
 The following are three important properties of Hamming codes:
 
@@ -102,12 +108,15 @@ Algorithmically, the coding process can be done using a simple matrix multiply, 
 
 .. image:: ../_images/hamming3.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Matrix multiplication used to encode bits with a generator matrix, using Hamming codes
 
 The point of diving into Hamming codes was to give a taste of how error coding works.  Block codes tend to follow this type of pattern.  Convolutional codes work differently, but we won't get into it here; they often use Trellis-style decoding, which can be displayed in a diagram that looks like this:
 
 .. image:: ../_images/trellis.svg
-   :align: center 
+   :align: center
+   :scale: 80% 
+   :alt: A trellis diagram or graph is used within convolutional coding to show connection between nodes
 
 ***************************
 Soft vs Hard Decoding
@@ -142,7 +151,9 @@ This equation represents the best any MCS can do when operating at a high enough
 with SNR in linear terms (not dB).  However, when plotting it, we usually represent SNR in dB for convenience:
 
 .. image:: ../_images/shannon_limit.svg
-   :align: center 
+   :align: center
+   :target: ../_images/shannon_limit.svg
+   :alt: Plot of the Shannon Limit in bits per second per Hz over SNR in dB
 
 If you see Shannon limit plots elsewhere that look a little different, they are probably using an x-axis of "energy per bit" or :math:`E_b/N_0`, which is just an alternative to working in SNR.
 
@@ -155,6 +166,7 @@ The proof behind the Shannon limit is pretty crazy; it involves math that looks 
 .. image:: ../_images/shannon_limit_proof.png
    :scale: 70 % 
    :align: center
+   :alt: Example of the math involved in the Shannon Limit proof
 
 For more information see `here <https://en.wikipedia.org/wiki/Shannon%E2%80%93Hartley_theorem>`_.
 

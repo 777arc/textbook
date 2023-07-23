@@ -16,6 +16,7 @@ University of Maryland faculty page: `cs.umd.edu/people/sdr <https://www.cs.umd.
 
 .. image:: ../_images/silly_marc.jpg
    :scale: 100 % 
-   :align: center 
+   :align: center
+   :alt: Photo of Marc Lichtman, the author of PySDR, with his cat in a silly pose
    
 

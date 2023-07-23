@@ -17,13 +17,15 @@ As a simplified example, let's say we have a wire and are sending 1's and 0's us
 
 .. image:: ../_images/symbols.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Pulse train of ones and zeros depicting the concept of a digital symbol that carries information
 
 In the above example each symbol represents one bit.  How can we convey more than one bit per symbol?  Let's study the signals that travel down Ethernet cables, which is defined in an IEEE standard called IEEE 802.3 1000BASE-T.  The common operating mode of ethernet uses a 4-level amplitude modulation (2 bits per symbol) with 8 ns symbols.
 
 .. image:: ../_images/ethernet.svg
    :align: center 
    :target: ../_images/ethernet.svg
+   :alt: Plot of IEEE 802.3 1000BASE-T ethernet voltage signal showing 4-level amplitude shift keying (ASK)
 
 Take a moment to try to answer these questions:
 
@@ -57,6 +59,7 @@ Question: Why can’t we directly transmit the ethernet signal shown in the figu
 .. image:: ../_images/square-wave.svg
    :align: center 
    :target: ../_images/square-wave.svg
+   :alt: A square wave in time and frequency domain showing the large amount of bandwidth that a square wave uses
    
 What we do for wireless signals is start with a carrier, which is just a sinusoid.  E.g., FM radio uses a carrier like 101.1 MHz or 100.3 MHz.  We modulate that carrier in some way (there are many).  For FM radio it’s an analog modulation, not digital, but it’s the same concept as digital modulation.
 
@@ -77,6 +80,7 @@ Amplitude Shift Keying (ASK) is the first digital modulation scheme we will disc
 .. image:: ../_images/ASK.svg
    :align: center
    :target: ../_images/ASK.svg
+   :alt: Example of amplitude shift keying (ASK) in the time domain, specifically 2-ASK
 
 Note how the average value is zero; we always prefer this whenever possible. 
 
@@ -85,6 +89,7 @@ We can use more than two levels, allowing for more bits per symbol.  Below shows
 .. image:: ../_images/ask2.svg
    :align: center
    :target: ../_images/ask2.svg
+   :alt: Example of amplitude shift keying (ASK) in the time domain, specifically 4-ASK
 
 Question: How many symbols are shown in the signal snippet above?  How many bits are represented total?
 
@@ -104,6 +109,7 @@ How do we actually create this signal digitally, through code?  All we have to d
 .. image:: ../_images/ask3.svg
    :align: center
    :target: ../_images/ask3.svg
+   :alt: Samples per symbol depiction using 2-ASK in the time domain, with 10 samples per symbol (sps)
 
 The top plot shows the discrete samples represented by red dots, i.e., our digital signal.  The bottom plot shows what the resulting modulated signal looks like, which could be transmitted over the air.  In real systems, the frequency of the carrier is usually much much higher than the rate the symbols are changing.  In this example there are only three cycles of the sinusoid in each symbol, but in practice there may be thousands, depending on how high in the spectrum the signal is being transmitted.
 
@@ -121,12 +127,14 @@ Example of BPSK (note the phase changes):
 .. image:: ../_images/bpsk.svg
    :align: center 
    :target: ../_images/bpsk.svg
+   :alt: Simple example of binary phase shift keying (BPSK) in the time domain, showing a modulated carrier
 
 It’s not very fun to look at plots like this:
 
 .. image:: ../_images/bpsk2.svg
    :align: center 
    :target: ../_images/bpsk2.svg
+   :alt: Phase shift keying like BPSK in the time domain is difficult to read, so we tend to use a constellation plot or complex plane
 
 Instead we usually represent the phase in the complex plane.  
 
@@ -138,7 +146,8 @@ You have seen IQ plots before in the complex numbers subsection of the :ref:`sam
 
 .. image:: ../_images/bpsk_iq.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: IQ plot or constellation plot of BPSK
 
 The above IQ plot shows what we will transmit, or rather the set of symbols we will transmit from.  It does not show the carrier, so you can think about it as representing the symbols at baseband.  When we show the set of possible symbols for a given modulation scheme, we call it the "constellation".  Many modulation schemes can be defined by their constellation.  
 
@@ -146,25 +155,29 @@ To receive and decode BPSK we can use IQ sampling, like we learned about last ch
 
 .. image:: ../_images/bpsk3.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: A random phase rotation of BPSK occurs as the wireless signal travels through the air
 
 Back to PSK.  What if we want four different levels of phase?  I.e., 0, 90, 180, and 270 degrees.  In this case it would be represented like so on the IQ plot, and it forms a modulation scheme we call Quadrature Phase Shift Keying (QPSK):
 
 .. image:: ../_images/qpsk.png
    :scale: 60 % 
    :align: center 
+   :alt: Example of Quadrature Phase Shift Keying (QPSK) in the IQ plot or constellation plot
 
 For PSK we always have N different phases, equally spaced around 360 degrees for best results.  We often show the unit circle to emphasize that all points have the same magnitude:
 
 .. image:: ../_images/psk_set.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Phase shift keying uses equally spaced constellation points on the IQ plot
 
 Question: What’s wrong with using a PSK scheme like the one in the below image?  Is it a valid PSK modulation scheme?
 
 .. image:: ../_images/weird_psk.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Example of non-uniformly spaced PSK constellation plot
 
 .. raw:: html
 
@@ -181,7 +194,8 @@ Let's detour back to ASK for a moment.  Note that we can show ASK on the IQ plot
 
 .. image:: ../_images/ask_set.png
    :scale: 50 % 
-   :align: center 
+   :align: center
+   :alt: Bipolar and unipolar amplitude shift keying (ASK) constellation or IQ plots
 
 As you may have noticed, bipolar 2-ASK and BPSK are the same. A 180 degree phase shift is the same as multiplying the sinusoid by -1.  We call it BPSK, probably because PSK is used way more than ASK.
 
@@ -192,25 +206,29 @@ What if we combine ASK and PSK?  We call this modulation scheme Quadrature Ampli
 
 .. image:: ../_images/64qam.png
    :scale: 90 % 
-   :align: center 
+   :align: center
+   :alt: Example of Quadrature Amplitude Modulation (QAM) on the IQ or constellation plot
    
 Here are some other examples of QAM:
 
 .. image:: ../_images/qam.png
    :scale: 50 % 
-   :align: center 
+   :align: center
+   :alt: Example of 16QAM, 32QAM, 64QAM, and 256QAM on the IQ or constellation plot
 
 For a QAM modulation scheme, we can technically put points wherever we want to on the IQ plot since the phase *and* amplitude are modulated.  The "parameters" of a given QAM scheme are best defined by showing the QAM constellation. Alternatively, you may list the I and Q values for each point, like below for QPSK:
 
 .. image:: ../_images/qpsk_list.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Constellation or IQ plots can also be represented using a table of symbols
 
 Note that most modulation schemes, except the various ASKs and BPSK, are pretty hard to "see" in the time domain.  To prove my point, here is an example of QAM in time domain. Can you distinguish between the phase of each symbol in the below image? It's tough.
 
 .. image:: ../_images/qam_time_domain.png
    :scale: 50 % 
-   :align: center 
+   :align: center
+   :alt: Looking at QAM in the time domain is difficult which is why we use constellation or IQ plots
 
 Given the difficulty discerning modulation schemes in the time domain, we prefer to use IQ plots over displaying the time domain signal.  We might, nonetheless, show the time domain signal if there's a certain packet structure or the sequence of symbols matters.
 
@@ -230,6 +248,7 @@ The example above would be 4-FSK, and there would be two bits per symbol.  A 4-F
 .. image:: ../_images/fsk.svg
    :align: center 
    :target: ../_images/fsk.svg
+   :alt: Example of Frequency Shift Keying (FSK), specifically 4FSK
 
 If you use FSK, you must ask a critical question: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f` in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  The faster we transmit symbols, the wider each carrier will get, and consequently the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
 
@@ -238,12 +257,14 @@ IQ plots can't be used to show different frequencies. They show magnitude and ph
 .. image:: ../_images/fsk2.svg
    :align: center
    :target: ../_images/fsk2.svg
+   :alt: Frequency Shift Keying (FSK) or 2FSK in the time domain
 
 As an aside, note that FM radio uses Frequency Modulation (FM) which is like an analog version of FSK.  Instead of having discrete frequencies we jump between, FM radio uses a continuous audio signal to modulate the frequency of the carrier.  Below is an example of FM and AM modulation where the "signal" at the top is the audio signal being modulated onto to the carrier.
 
 .. image:: ../_images/Carrier_Mod_AM_FM.webp
    :align: center
    :target: ../_images/Carrier_Mod_AM_FM.webp
+   :alt: Animation of a carrier, amplitude modulation (AM), and frequency modulation (FM) in the time domain
 
 In this textbook we are mainly concerned about digital forms of modulation.
 
@@ -258,6 +279,7 @@ Instead of having to mix pilot symbols into the transmitted waveform, we can cho
 .. image:: ../_images/differential_coding.svg
    :align: center
    :target: ../_images/differential_coding.svg
+   :alt: Demonstration of differential coding using sequence of encoded and decoded bits
 
 
 The big downside to using differential coding is that if you have a bit error, it will lead to two bit errors.  The alternative to using differential coding for BPSK is to add pilot symbols periodically, which are symbols already known by the receiver, and it can use the known values to not only figure out which cluster is 1 and which is 0, but also reverse multipath caused by the channel.  One problem with pilot symbols is that the wireless channel can change very quickly, on the order of tens or hundreds of symbols if it's a moving receiver and/or transmitter, so you would need pilot symbols often enough to reflect the changing channel.  So if a wireless protocol is putting high emphasis on reducing the complexity of the receiver, such as RDS which we study in the :ref:`rds-chapter` chapter, it may choose to use differential coding.
@@ -288,6 +310,7 @@ Even though we could generate the complex symbols directly, let's start from the
 .. image:: ../_images/qpsk_python.svg
    :align: center 
    :target: ../_images/qpsk_python.svg
+   :alt: QPSK generated or simulated in Python
 
 Observe how all the symbols we generated overlap. There's no noise so the symbols all have the same value.  Let's add some noise:
 
@@ -303,8 +326,9 @@ Observe how all the symbols we generated overlap. There's no noise so the symbol
 .. image:: ../_images/qpsk_python2.svg
    :align: center
    :target: ../_images/qpsk_python2.svg
+   :alt: QPSK with AWGN noise generated or simulated in Python
 
-Consider how additive white Gaussian noise (AGWN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
+Consider how additive white Gaussian noise (AWGN) produces a uniform spread around each point in the constellation.  If there's too much noise then symbols start passing the boundary (the four quadrants) and will be interpreted by the receiver as an incorrect symbol.  Try increasing :code:`noise_power` until that happens.
 
 For those interested in simulating phase noise, which could result from phase jitter within the local oscillator (LO), replace the :code:`r` with:
 
@@ -316,12 +340,14 @@ For those interested in simulating phase noise, which could result from phase ji
 .. image:: ../_images/phase_jitter.svg
    :align: center
    :target: ../_images/phase_jitter.svg
+   :alt: QPSK with phase jitter generated or simulated in Python
 
 You could even combine phase noise with AWGN to get the full experience:
 
 .. image:: ../_images/phase_jitter_awgn.svg
    :align: center
    :target: ../_images/phase_jitter_awgn.svg
+   :alt: QPSK with AWGN noise and phase jitter generated or simulated in Python
 
 We're going to stop at this point.  If we wanted to see what the QPSK signal looked like in the time domain, we would need to generate multiple samples per symbol (in this exercise we just did 1 sample per symbol). You will learn why you need to generate multiple samples per symbol once we discuss pulse shaping.  The Python exercise in the :ref:`pulse-shaping-chapter` chapter will continue where we left off here.
 
