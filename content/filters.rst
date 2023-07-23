@@ -22,11 +22,12 @@ You may think we only care about digital filters; this textbook explores DSP, af
 
 .. image:: ../_images/analog_digital_filter.png
    :scale: 70 % 
-   :align: center 
+   :align: center
+   :alt: Analog vs digital filters
    
 In DSP, where the input and output are signals, a filter has one input signal and one output signal:
 
-.. tikz:: [font=\sffamily\Large\bfseries, scale=2]
+.. tikz:: [font=\sffamily\Large, scale=2]
    \definecolor{babyblueeyes}{rgb}{0.36, 0.61, 0.83}
    \node [draw,
     color=white,
@@ -45,7 +46,8 @@ There are four basic types of filters: low-pass, high-pass, band-pass, and band-
 
 .. image:: ../_images/filter_types.png
    :scale: 70 % 
-   :align: center 
+   :align: center
+   :alt: Filter types, including low-pass, high-pass, band-pass, and band-stop filtering in the frequency domain
 
 
 .. START OF FILTER TYPES TIKZ
@@ -54,44 +56,44 @@ There are four basic types of filters: low-pass, high-pass, band-pass, and band-
    <table><tbody><tr><td>
 
 .. This draw the lowpass filter
-.. tikz:: [font=\sffamily\Large]    
+.. tikz:: [font=\sffamily\large]    
    \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Low-Pass}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-2.5,0.5) (-1.5,3) (1.5,3) (2.5,0.5) (5,0)};
-   :xscale: 70
+   :xscale: 100
 
 .. raw:: html
 
    </td><td  style="padding: 0px">
 
 .. this draws the highpass filter
-.. tikz:: [font=\sffamily\Large]    
+.. tikz:: [font=\sffamily\large]    
    \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{High-Pass}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-2.5,2.5) (-1.5,0.3) (1.5,0.3) (2.5,2.5) (5,3)};
-   :xscale: 70
+   :xscale: 100
 
 .. raw:: html
 
    </td></tr><tr><td>
 
 .. this draws the bandpass filter
-.. tikz:: [font=\sffamily\Large]    
+.. tikz:: [font=\sffamily\large]    
    \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Pass}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,0) (-4.5,0.3) (-3.5,3) (-2.5,3) (-1.5,0.3) (1.5, 0.3) (2.5,3) (3.5, 3) (4.5,0.3) (5,0)};
-   :xscale: 70
+   :xscale: 100
 
 .. raw:: html
 
    </td><td>
 
 .. and finally the bandstop filter
-.. tikz:: [font=\sffamily\Large]    
+.. tikz:: [font=\sffamily\large]    
    \draw[->, thick] (-5,0) -- (5,0) node[below]{Frequency};
    \draw[->, thick] (0,-0.5) node[below]{0 Hz} -- (0,5) node[left=1cm]{\textbf{Band-Stop}};
    \draw[red, thick, smooth] plot[tension=0.5] coordinates{(-5,3) (-4.5,2.7) (-3.5,0.3) (-2.5,0.3) (-1.5,2.7) (1.5, 2.7) (2.5,0.3) (3.5, 0.3) (4.5,2.7) (5,3)};   
-   :xscale: 70
+   :xscale: 100
 
 .. raw:: html
 
@@ -133,7 +135,8 @@ To learn how filters are used, let's look an an example where we tune our SDR to
 
 .. image:: ../_images/filter_use_case.png
    :scale: 70 % 
-   :align: center 
+   :align: center
+   :alt: GNU Radio frequency domain plot of signal of interest and an interfering signal and noise floor
 
 Because our signal is already centered at DC (0 Hz), we know we want a low-pass filter.  We must choose a "cutoff frequency" (a.k.a. corner frequency), which will determine when the passband transitions to stopband.  Cutoff frequency will always be in units of Hz.  In this example, 3 kHz seems like a good value:
 
@@ -152,6 +155,7 @@ After creating and applying the filter with a cutoff freq of 3 kHz, we now have:
 .. image:: ../_images/filter_use_case4.png
    :scale: 70 % 
    :align: center 
+   :alt: GNU Radio frequency domain plot of signal of interest and an interfering signal and noise floor, with interference filtered out
 
 This filtered signal will look confusing until you recall that our noise floor *was* at the green line around -65 dB.  Even though we can still see the interfering signal centered at 10 kHz, we have *severely* decreased the power of that signal. It's now below where the noise floor was!  We also removed most of the noise that existed in the stopband.
 
@@ -161,7 +165,8 @@ Let's visualize transition width.  In the diagram below, the :green:`green` line
 
 .. image:: ../_images/realistic_filter.png
    :scale: 100 % 
-   :align: center 
+   :align: center
+   :alt: Frequency response of a low-pass filter, showing ripple and transition width
 
 You might be wondering why we wouldn't just set the transition width as small as possible.  The reason is mainly that a smaller transition width results in more taps, and more taps means more computations--we will see why shortly.  A 50-tap filter can run all day long using 1% of the CPU on a Raspberry Pi.  Meanwhile, a 50,000 tap filter will cause your CPU to explode!
 Typically we use a filter designer tool, then see how many taps it outputs, and if it's way too many (e.g., more than 100) we increase the transition width.  It all depends on the application and hardware running the filter, of course.
@@ -230,7 +235,8 @@ Simply plotting this array of floats gives us the filter's impulse response:
 
 .. image:: ../_images/impulse_response.png
    :scale: 100 % 
-   :align: center 
+   :align: center
+   :alt: Example of impulse response of a filter, plotting the taps in the time domain
 
 And here is the code that was used to produce the frequency response, shown earlier.  It's a little more complicated because we have to create the x-axis array of frequencies. 
 
@@ -313,7 +319,8 @@ We aren't going to dive too deeply into the implementation of filters. Rather, I
 
 .. image:: ../_images/discrete_convolution.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Implementation of a finite impulse response (FIR) filter with delays and taps and summations
 
 You might be able to see why we call them filter "taps" now, based on the way the filter itself is implemented. 
 
@@ -331,7 +338,8 @@ Below is an example frequency response, comparing an FIR and IIR filter that do 
 
 .. image:: ../_images/FIR_IIR.png
    :scale: 70 % 
-   :align: center 
+   :align: center
+   :alt: Comparing finite impulse response (FIR) and infinite impulse response (IIR) filters by observing frequency response
 
 The lesson is that the FIR filter requires vastly more computational resources than the IIR to perform roughly the same filtering operation.
 
@@ -576,7 +584,8 @@ So what we do is we "pulse shape" these blocky-looking symbols so that they take
 
 .. image:: ../_images/pulse_shaping_freq.png
    :scale: 90 % 
-   :align: center 
+   :align: center
+   :alt: Demonstration of pulse shaping of an RF signal to reduce occupied bandwidth
 
 Note how much quicker the signal drops off in frequency. The sidelobes are ~30 dB lower after pulse shaping; that's 1,000x less!  And more importantly, the main lobe is narrower, so less spectrum is used for the same amount of bits per second.
 

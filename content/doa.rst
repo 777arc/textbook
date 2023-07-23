@@ -35,12 +35,14 @@ Consider a 1D three-element uniformly spaced array:
 .. image:: ../_images/doa.svg
    :align: center 
    :target: ../_images/doa.svg
+   :alt: Diagram showing direction of arrival (DOA) of a signal impinging on a uniformly spaced antenna array, showing boresight angle and distance between elements or apertures
 
 In this example a signal is coming in from the right side, so it's hitting the right-most element first.  Let's calculate the delay between when the signal hits that first element and when it reaches the next element.  We can do this by forming the following trig problem, try to visualize how this triangle was formed from the diagram above.  The segment highlighted in red represents the distance the signal has to travel *after* it has reached the first element, before it hits the next one.
 
 .. image:: ../_images/doa_trig.svg
    :align: center 
    :target: ../_images/doa_trig.svg
+   :alt: Trig associated with direction of arrival (DOA) of uniformly spaced array
 
 If you recall SOH CAH TOA, in this case we are interested in the "adjacent" side and we have the length of the hypotenuse (:math:`d`), so we need to use a cosine:
 
@@ -143,7 +145,7 @@ To apply the array factor we have to do a matrix multiplication of :code:`a` and
  a = np.asmatrix(a)
  tx = np.asmatrix(tx)
 
- r = a.T @ tx  # dont get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
+ r = a.T @ tx  # don't get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
  print(r.shape) # r is now going to be a 2D array, 1D is time and 1D is the spatial dimension
 
 At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of Python is having to switch to matrix type for matrix math, then having to switch back to normal NumPy arrays, we need to add the .squeeze() to get it back to a normal 1D NumPy array.
@@ -221,6 +223,7 @@ If you prefer viewing angle on a polar plot, use the following code:
 .. image:: ../_images/doa_conventional_beamformer_polar.svg
    :align: center 
    :target: ../_images/doa_conventional_beamformer_polar.svg
+   :alt: Example polar plot of performing direction of arrival (DOA) showing the beam pattern and 180 degree ambiguity
 
 ********************
 180 Degree Ambiguity
@@ -241,8 +244,9 @@ To demonstrate this next concept, let's try sweeping the angle of arrival (AoA) 
 .. image:: ../_images/doa_sweeping_angle_animation.gif
    :scale: 100 %
    :align: center
+   :alt: Animation of direction of arrival (DOA) showing the broadside of the array
 
-As we approach the broadside of the array (a.k.a. endfire), which is when the signal arrives at or near the axis of the array, performance drops.  We see two main degredations: 1) the main lobe gets wider and 2) we get ambiguity and don't know whether the signal is coming from the left or the right.  This ambiguity adds to the 180 degree ambiguity discussed earlier, where we get an extra lobe at 180 - theta, causing certain AoA to lead to three lobes of roughly equal size.  This broadside ambiguity makes sense though, the phase shifts that occur between elements are identical whether the signal arrives from the left or right side w.r.t. the array axis.  Just like with the 180 degree ambiguity, the solution is to use a 2D array or two 1D arrays at different angles.  In general, beamforming works best when the angle is closer to the boresight.
+As we approach the broadside of the array (a.k.a. endfire), which is when the signal arrives at or near the axis of the array, performance drops.  We see two main degradations: 1) the main lobe gets wider and 2) we get ambiguity and don't know whether the signal is coming from the left or the right.  This ambiguity adds to the 180 degree ambiguity discussed earlier, where we get an extra lobe at 180 - theta, causing certain AoA to lead to three lobes of roughly equal size.  This broadside ambiguity makes sense though, the phase shifts that occur between elements are identical whether the signal arrives from the left or right side w.r.t. the array axis.  Just like with the 180 degree ambiguity, the solution is to use a 2D array or two 1D arrays at different angles.  In general, beamforming works best when the angle is closer to the boresight.
 
 *******************
 When d is not λ/2
@@ -255,6 +259,7 @@ Let's examine when the spacing is greater than λ/2, i.e., too much spacing, by 
 .. image:: ../_images/doa_d_is_large_animation.gif
    :scale: 100 %
    :align: center
+   :alt: Animation of direction of arrival (DOA) showing what happens when distance d is much more than half-wavelength
 
 As you can see, in addition to the 180 degree ambiguity we discussed earlier, we now have additional ambiguity, and it gets worse as d gets higher (extra/incorrect lobes form).  These extra lobes are known as grating lobes, and they are a result of "spatial aliasing".  As we learned in the :ref:`sampling-chapter` chapter, when we don't sample fast enough we get aliasing.  The same thing happens in the spatial domain; if our elements are not spaced close enough together w.r.t. the carrier frequency of the signal being observed, we get garbage results in our analysis.  You can think of spacing out antennas as sampling space!  In this example we can see that the grating lobes don't get too problematic until d > λ, but they will occur as soon as you go above λ/2 spacing.
 
@@ -263,12 +268,14 @@ Now what happens when d is less than λ/2, such as when we need to fit the array
 .. image:: ../_images/doa_d_is_small_animation.gif
    :scale: 100 %
    :align: center
+   :alt: Animation of direction of arrival (DOA) showing what happens when distance d is much less than half-wavelength
 
 While the main lobe gets wider as d gets lower, it still has a maximum at 20 degrees, and there are no grating lobes, so in theory this would still work (at least at high SNR).  To better understand what breaks as d gets too small, let's repeat the experiment but with an additional signal arriving from -40 degrees:
 
 .. image:: ../_images/doa_d_is_small_animation2.gif
    :scale: 100 %
    :align: center
+   :alt: Animation of direction of arrival (DOA) showing what happens when distance d is much less than half-wavelength and there are two signals present
 
 Once we get lower than λ/4 there is no distinguishing between the two different paths, and the array performs poorly.  As we will see later in this chapter, there are beamforming techniques that provide more precise beams than conventional beamforming, but keeping d as close to λ/2 as possible will continue to be a theme.
 
@@ -405,6 +412,7 @@ Running this algorithm on the complex scenario we have been using, we get the fo
 .. image:: ../_images/doa_music.svg
    :align: center 
    :target: ../_images/doa_music.svg
+   :alt: Example of direction of arrival (DOA) using MUSIC algorithm beamforming
 
 Now what if we had no idea how many signals were present?  Well there is a trick; you sort the eigenvalue magnitudes from highest to lowest, and plot them (it may help to plot them in dB):
 
