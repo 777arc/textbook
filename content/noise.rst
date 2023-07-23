@@ -24,6 +24,7 @@ We call this type of noise "Gaussian noise". It's a good model for the type of n
 .. image:: ../_images/central_limit_theorem.svg
    :align: center 
    :target: ../_images/central_limit_theorem.svg
+   :alt: Central limit theorem visualized as the sum of many random processes leading to a normal distribution (a.k.a. gaussian distribution)
 
 The Gaussian distribution is also called the "Normal" distribution (recall a bell curve).
 
@@ -49,7 +50,8 @@ To further illustrate the problems of scale we encounter in signal processing, c
 
 .. image:: ../_images/linear_vs_log.png
    :scale: 70 % 
-   :align: center 
+   :align: center
+   :alt: Depiction of why it's important to understand dB or decibels, showing a spectrogram using linear vs log scale
 
 For a given value x, we can represent x in dB using the following formula:
 
@@ -129,7 +131,8 @@ In the :ref:`freq-domain-chapter` chapter we tackled "Fourier pairs", i.e., what
 
 .. image:: ../_images/noise_freq.png
    :scale: 110 % 
-   :align: center 
+   :align: center
+   :alt: AWGN in the time domain is also Gaussian noise in the frequency domain, although it looks like a flat line when you take the magnitude and perform averaging
 
 We can see that it looks roughly the same across all frequencies and is fairly flat.  It turns out that Gaussian noise in the time domain is also Gaussian noise in the frequency domain.  So why don't the two plots above look the same?  It's because the frequency domain plot is showing the magnitude of the FFT, so there will only be positive numbers. Importantly, it's using a log scale, or showing the magnitude in dB.  Otherwise these graphs would look the same.  We can prove this to ourselves by generating some noise (in the time domain) in Python and then taking the FFT.
 
@@ -152,7 +155,8 @@ Take note that the randn() function by default uses mean = 0 and variance = 1.  
 
 .. image:: ../_images/noise_python.png
    :scale: 100 % 
-   :align: center 
+   :align: center
+   :alt: Example of white noise simulated in Python
 
 You can then produce the flat PSD that we had in GNU Radio by taking the log and averaging a bunch together.  The signal we generated and took the FFT of was a real signal (versus complex), and the FFT of any real signal will have matching negative and positive portions, so that's why we only saved the positive portion of the FFT output (the 2nd half).  But why did we only generate "real" noise, and how do complex signals work into this?
 
@@ -192,7 +196,8 @@ To plot complex noise in the time domain, like any complex signal we need two li
 
 .. image:: ../_images/noise3.png
    :scale: 80 % 
-   :align: center 
+   :align: center
+   :alt: Complex noise simulated in Python
 
 You can see that the real and imaginary portions are completely independent.
 
@@ -207,13 +212,15 @@ What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot 
 
 .. image:: ../_images/noise_iq.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Complex noise on an IQ or constellation plot, simulated in Python
 
 It looks how we would expect; a random blob centered around 0 + 0j, or the origin.  Just for fun, let's try adding noise to a QPSK signal to see what the IQ plot looks like:
 
 .. image:: ../_images/noisey_qpsk.png
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Noisy QPSK simulated in Python
 
 Now what happens when the noise is stronger?  
 

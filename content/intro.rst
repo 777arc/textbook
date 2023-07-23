@@ -30,6 +30,7 @@ An example is a Computer Science student interested in a job involving wireless 
 .. image:: ../_images/fft_logo_wide.gif
    :scale: 70 %   
    :align: center
+   :alt: The PySDR logo created using a Fourier transform
    
 This textbook is meant to introduce concepts quickly and smoothly, enabling the reader to perform DSP and use SDRs intelligently.  It's not meant to be a reference textbook for all DSP/SDR topics; there are plenty of great textbooks already out there, such as `Analog Device's SDR textbook
 <https://www.analog.com/en/education/education-library/software-defined-radio-for-engineers.html>`_ and `dspguide.com <http://www.dspguide.com/>`_.  You can always use Google to recall trig identities or the Shannon limit.  Think of this textbook like a gateway into the world of DSP and SDR: it's lighter and less of a time and monetary commitment, when compared to more traditional courses and textbooks.

@@ -123,7 +123,8 @@ A signal that is saturated will look choppy in the time domain, like this:
 
 .. image:: ../_images/saturated_time.png
    :scale: 30 % 
-   :align: center 
+   :align: center
+   :alt: Example of a saturated receiver where the signal is clipped
 
 Because of the sudden changes in time domain, due to the truncation, the frequency domain might look smeared.  In other words, the frequency domain will include false features; features that resulted from the saturation and are not actually part of the signal, which can throw people off when analyzing a signal. 
 
@@ -230,6 +231,7 @@ A little bonus for those who read this far; the SigMF logo is actually stored as
 .. image:: ../_images/sigmf_logo.gif
    :scale: 100 %   
    :align: center
+   :alt: The SigMF logo animation
 
 The Python code used to read in the logo file (located `here <https://github.com/gnuradio/SigMF/tree/master/logo>`_) and produce the animated gif above is shown below, for those curious:
 

@@ -36,6 +36,7 @@ We need four system parameters to determine the received power, which are provid
 .. image:: ../_images/tx_rx_system_params.svg
    :align: center 
    :target: ../_images/tx_rx_system_params.svg
+   :alt: Parameters within a link budget depicted
 
 Transmit Power
 #####################
@@ -127,6 +128,7 @@ The plot below shows atmospheric loss in dB/km over frequency (we will usually b
 .. image:: ../_images/atmospheric_attenuation.svg
    :align: center 
    :target: ../_images/atmospheric_attenuation.svg
+   :alt: Plot of atmospheric attenuation in dB/km over frequency showing the spikes from H2O (water) and O2 (oxygen)
 
 Signal Power Equation
 #####################

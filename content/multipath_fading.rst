@@ -15,6 +15,7 @@ All realistic wireless channels include many "reflectors", given that RF signals
 .. image:: ../_images/multipath.svg
    :align: center 
    :target: ../_images/multipath.svg
+   :alt: Simple depiction of multipath, showing the line-of-sight (LOS) path and a single multipath
 
 Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in physics class.  In wireless systems when the paths destructively combine, we call this interference "deep fade" because our signal briefly disappears.
 
@@ -27,6 +28,7 @@ Paths can also add up constructively, causing a strong signal to be received.  E
 .. image:: ../_images/multipath2.svg
    :align: center 
    :target: ../_images/multipath2.svg
+   :alt: Multipath visualized including the power delay profile plot over time
 
 The first path, the one closest to the y-axis, will always be the LOS path (assuming there is one) because there's no way for any other path to reach the receiver faster than the LOS path.  Typically the magnitude will decrease as the delay increases, since a path that took longer to show up at the receiver will have traveled further.
 
@@ -38,7 +40,8 @@ What tends to happen is we get a mix of constructive and destructive interferenc
 
 .. image:: ../_images/multipath_fading.png
    :scale: 100 % 
-   :align: center 
+   :align: center
+   :alt: Multipath fading causes deep fades or nulls periodically where the SNR drops extremely low
 
 There are two types of fading from a **time** domain perspective:
 
@@ -55,13 +58,15 @@ In the figure below, the :red:`red` shape shows our signal in the frequency doma
 
 .. image:: ../_images/flat_vs_freq_selective.png
    :scale: 70 % 
-   :align: center 
+   :align: center
+   :alt: Flat fading vs frequency selective fading
 
 Here is an example of a 16 MHz wide signal that is continuously transmitting.  There are several moments in the middle where there's a period of time a piece of signal is missing.  This example depicts frequency selective fading, which causes holes in the signal that wipe out some frequencies but not others.
 
 .. image:: ../_images/fading_example.jpg
    :scale: 60 % 
-   :align: center 
+   :align: center
+   :alt: Example of frequency selective fading on a spectrogram (a.k.a. waterfall plot) showing smearing and a hole in the spectrogram where a deep null is
    
 **************************
 Simulating Rayleigh Fading
@@ -121,6 +126,7 @@ If you are intending to use this channel model as part of a larger simulation, y
 .. image:: ../_images/rayleigh.svg
    :align: center 
    :target: ../_images/rayleigh.svg
+   :alt: Simulation of Rayleigh Fading
 
 Note the deep fades that occur briefly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
 
