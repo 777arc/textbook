@@ -44,11 +44,9 @@ Code examples are provided in Python.  They utilize NumPy, which is Python's sta
 Contributing
 ***************
 
-If you get through any amount of this textbook and email me at pysdr@vt.edu with questions/comments/suggestions, then congratulations, you will have contributed to this textbook!
+If you get through any amount of this textbook and email me at pysdr@vt.edu with questions/comments/suggestions, then congratulations, you will have contributed to this textbook!  You can also edit the source material directly on the `textbook's GitHub page <https://github.com/777arc/textbook/tree/master/content>`_ (your change will start a new pull request).  Feel free to submit an issue or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes will be permanently added to the acknowledgments section below.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
 
-But on a more grand scale, you can help contribute to this textbook in the same way as any open source software project- through Git.  This textbook might be in the form of a website, but the source material it's generated from all lives on the `textbook's GitHub page <https://github.com/777arc/textbook>`_.  Feel free to submit an issue or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes will be permanently added to the acknowledgments section below.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
-
-The website this textbook is hosted on is ad-free because we all hate ads.  I also don't provide a PayPal or Bitcoin address where I accept donations.  There is literally no way for me to get paid for this textbook.  Instead, I merely suggest sharing this textbook with colleagues, students, and other lifelong learners who may be interested in the material.
+If you got value from PySDR, please share it with colleagues, students, and other lifelong learners who may be interested in the material.  There is also a donate button on the left that can be used as a way to say thanks.
 
 *****************
 Acknowledgements

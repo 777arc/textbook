@@ -11,10 +11,25 @@ div.sphinxsidebar {
     overflow-y: auto;
 }
 
+/* remove extra padding to keep sidebar slim */
+div.sphinxsidebarwrapper {
+    padding-right: 0px;
+}
+
 /* Remove the extra 30 pixels of margin at the top of the page */
 div.document {
     margin-top: 0px;
 }
+
+/* Quick Search */
+#searchlabel {
+    display: none;
+}
+
+.search {
+    padding-right: 40px;
+}
+
 
 /* Colors and text decoration.
  For example, :black:`text in black` or :blink:`text blinking` in rST. */

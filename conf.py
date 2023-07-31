@@ -167,7 +167,7 @@ html_theme_options = {'description':'By <a href="https://pysdr.org/content/about
                       'page_width': 'auto', # makes body width fill the window nicely, but for some reason there's a max around 1000px
                       'sidebar_width': '290px', # width of sidebar
                       'show_powered_by': False,
-                      'extra_nav_links':{'Online Python Console':'https://trinket.io/embed/python3'},
+                      'extra_nav_links':{'Online Python Console':'https://trinket.io/embed/python3', 'Donate through PayPal':'https://www.paypal.com/donate/?business=AHW8EDXSCNMKC&no_recurring=0&item_name=Thank+you+for+supporting+PySDR%21++Your+contribution+helps+keep+it+ad-free%2C+and+promotes+future+content+creation+and+refinement.+&currency_code=USD'},
                       'show_relbars': True} # previous and next links at top and bottom (can also use show_relbar_bottom)
 
 

@@ -60,6 +60,8 @@ html:
 	sed -i 's/PySDR: A Guide to SDR and DSP using Python &#8212; PySDR: A Guide to SDR and DSP using Python/PySDR: A Guide to SDR and DSP using Python/g' $(BUILDDIR)/index.html
 	@echo removing chapter number from titles of each page
 	sed -i -E "s/<title>[0-9]{1,2}\. /<title>/g" $(BUILDDIR)/content/*
+	@echo changing search button text
+	sed -i 's/value="Go"/value="Search"/g' $(BUILDDIR)/*/*.html
 
 #make sure you install sphinxcontrib-tikz python module and pdf2svg application
 .PHONY: html-nl
