@@ -118,7 +118,7 @@ Time to hack! Open a terminal (either host or VM, doesn't matter):
 
  ssh root@192.168.2.1
 
-The default password is analog.
+The default password is :code:`analog`
 
 You should see the PlutoSDR welcome screen. You have now SSHed into the ARM CPU on the Pluto itself!
 If you have a Pluto with firmware version 0.31 or lower, type the following commands in:

@@ -97,12 +97,12 @@ Next let's look at the time and frequency domain plots of a square wave:
    :target: ../_images/square-wave.svg
    :alt: The time-frequency Fourier pair of a square wave, which is a sinc (sin(x)/x function) in the frequency domain
 
-This one is also less intuitive, but we can see that the frequency domain has a strong spike at 10 Hz, which is the frequency of the square wave, but it also seems to keep going.  It is due to the quick change in time domain, just like in the previous example.  But it's not flat in frequency. It has spikes at intervals, and the level slowly decays (although it will continue forever).  A square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).
+This one is also less intuitive, but we can see that the frequency domain has a strong spike, which happens to be at the frequency of the square wave, but there are more spikes as we go higher in frequency.  It is due to the quick change in time domain, just like in the previous example.  But it's not flat in frequency. It has spikes at intervals, and the level slowly decays (although it will continue forever).  A square wave in time domain has a sin(x)/x pattern in the frequency domain (a.k.a. the sinc function).
 
 Now what if we have a constant signal in the time domain?  A constant signal has no "frequency".   Let's see:
 
 .. image:: ../_images/dc-signal.png
-   :scale: 100 % 
+   :scale: 80 % 
    :align: center 
    :alt: The time-frequency Fourier pair of a DC signal, which is an impulse at 0 Hz in the frequency domain
 
@@ -186,7 +186,7 @@ On the left hand side of the equation, we can see that we are scaling our signal
    :target: ../_images/time-scaling.svg
    :alt: Depiction of the time scaling Fourier transform property in both time and frequency domain
 
-Scaling in time essentially shrinks or expands the signal in the x-axis.  What this property tells us is that scaling in the time domain causes inverse scaling in the frequency domain.  For example, when we transmit bits faster we have to use more frequencies.  The property helps to explain why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional, cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
+Scaling in time essentially shrinks or expands the signal in the x-axis.  What this property tells us is that scaling in the time domain causes inverse scaling in the frequency domain.  For example, when we transmit bits faster we have to use more bandwidth.  The property helps to explain why higher data rate signals take up more bandwidth/spectrum.  If time-frequency scaling was proportional instead of inversely proportional, cellular carriers would be able to transmit all the bits per second they wanted without paying billions for spectrum!  Unfortunately that's not the case.
 
 Those already familiar with this property may notice a scaling factor missing; it is left out for the sake of simplicity. For practical purposes it doesn't make a difference.
 

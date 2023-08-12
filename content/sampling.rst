@@ -160,7 +160,7 @@ We can use trig identity :math:`a \cos(x) + b \sin(x) = A \cos(x-\phi)` where :m
 .. math::
   x(t) = 0.806 \cos(2\pi ft + 0.519)
 
-Even though we started with a complex number, what we are transmitting is real, which is good because you can't actually transmit something imaginary with electromagnetic waves.  We just use imaginary/complex numbers to represent *what* we are transmitting.  We will talk about the :math:`f` shortly.
+Even though we started with a complex number, what we are transmitting is a real signal with a certain magnitude and phase; you can't actually transmit something imaginary with electromagnetic waves.  We just use imaginary/complex numbers to represent *what* we are transmitting.  We will talk about the :math:`f` shortly.
 
 *************************
 Complex Numbers in FFTs
@@ -192,7 +192,7 @@ One last important note: the figure above shows what's happening **inside** of t
 Carrier and Downconversion
 **************************
 
-Until this point we have not discussed frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the frequency of the sine wave we actually send through the air (the electromagnetic wave's frequency).  We refer to it as the "carrier" because it carries our information on a certain frequency.  When we tune to a frequency with our SDR and receive samples, our information is stored in I and Q; this carrier does not show up in I and Q, assuming we tuned to the carrier.
+Until this point we have not discussed frequency, but we saw there was an :math:`f` in the equations involving the cos() and sin().  This frequency is the center frequency of the signal we actually send through the air (the electromagnetic wave's frequency).  We refer to it as the "carrier" because it carries our signal on a certain RF frequency.  When we tune to a frequency with our SDR and receive samples, our information is stored in I and Q; this carrier does not show up in I and Q, assuming we tuned to the carrier.
 
 .. This shows the carrier wave formula
 .. tikz:: [font=\Large\bfseries\sffamily]
@@ -207,6 +207,8 @@ For reference, radio signals such as FM radio, WiFi, Bluetooth, LTE, GPS, etc., 
 When we change our IQ values quickly and transmit our carrier, it's called "modulating" the carrier (with data or whatever we want).  When we change I and Q, we change the phase and amplitude of the carrier.  Another option is to change the frequency of the carrier, i.e., shift it slightly up or down, which is what FM radio does. 
 
 As a simple example, let's say we transmit the IQ sample 1+0j, and then we switch to transmitting 0+1j.  We go from sending :math:`\cos(2\pi ft)` to :math:`\sin(2\pi ft)`, meaning our carrier shifts phase by 90 degrees when we switch from one sample to another. 
+
+It is easy to get confused between the signal we want to transmit (which typically contains many frequency components), and the frequency we transmit it on (our carrier frequency).  This will hopefully get cleared up when we cover baseband vs. bandpass signals. 
 
 Now back to sampling for a second.  Instead of receiving samples by multiplying what comes off the antenna by a cos() and sin() then recording I and Q, what if we fed the signal from the antenna into a single ADC, like in the direct sampling architecture we just discussed?  Say the carrier frequency is 2.4 GHz, like WiFi or Bluetooth.  That means we would have to sample at 4.8 GHz, as we learned.  That's extremely fast! An ADC that samples that fast costs thousands of dollars.  Instead, we "downconvert" the signal so that the signal we want to sample is centered around DC or 0 Hz. This downconversion happens before we sample.  We go from:
 
@@ -311,7 +313,7 @@ For SDR-specific information about performing sampling, see one of the following
 Calculating Average Power
 *************************
 
-For a discrete complex signal, i.e., one we have sampled, we can find the average power by taking the magnitude of each sample, squaring it, and then finding the mean:
+In RF DSP, we often like to calculate the power of a signal, such as detecting the presence of the signal before attempting to do further DSP.  For a discrete complex signal, i.e., one we have sampled, we can find the average power by taking the magnitude of each sample, squaring it, and then finding the mean:
 
 .. math::
    P = \frac{1}{N} \sum_{n=1}^{N} |x[n]|^2
@@ -338,6 +340,7 @@ Calculating Power Spectral Density
 **********************************
 
 Last chapter we learned that we can convert a signal to the frequency domain using an FFT, and the result is called the Power Spectral Density (PSD).
+The PSD is an extremely useful tool for visualizing signals in the frequency domain, and many DSP algorithms are performed in the frequency domain.
 But to actually find the PSD of a batch of samples and plot it, we do more than just take an FFT.
 We must do the following six operations to calculate PSD:
 

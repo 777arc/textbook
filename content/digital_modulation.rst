@@ -53,7 +53,7 @@ Wireless Symbols
 *******************
 Question: Why can’t we directly transmit the ethernet signal shown in the figure above?  There are many reasons, the biggest two being:
 
-1. Low frequencies require *huge* antennas
+1. Low frequencies require *huge* antennas, and the signal above contains frequencies down to DC (0 Hz).  We can’t transmit DC.
 2. Square waves take an excessive amount of spectrum for the bits per second--recall from the :ref:`freq-domain-chapter` chapter that sharp changes in time domain use a large amount of bandwidth/spectrum:
 
 .. image:: ../_images/square-wave.svg
@@ -250,7 +250,7 @@ The example above would be 4-FSK, and there would be two bits per symbol.  A 4-F
    :target: ../_images/fsk.svg
    :alt: Example of Frequency Shift Keying (FSK), specifically 4FSK
 
-If you use FSK, you must ask a critical question: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f` in Hz. We want to avoid overlap in the frequency domain, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  The faster we transmit symbols, the wider each carrier will get, and consequently the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
+If you use FSK, you must ask a critical question: What should the spacing between frequencies be?  We often denote this spacing as :math:`\Delta f` in Hz. We want to avoid overlap in the frequency domain so that the receiver knows which frequency a given symbol used, so :math:`\Delta f` must be large enough.  The width of each carrier in frequency is a function of our symbol rate.  More symbols per second means shorter symbols, which means wider bandwidth (recall the inverse relationship between time and frequency scaling).  The faster we transmit symbols, the wider each carrier will get, and consequently the larger we have to make :math:`\Delta f` to avoid overlapping carriers.  We won't go into any more details about the design of FSK in this textbook.
 
 IQ plots can't be used to show different frequencies. They show magnitude and phase.  While it is possible to show FSK in the time domain, any more than 2 frequencies makes it difficult to distinguish between symbols:
 

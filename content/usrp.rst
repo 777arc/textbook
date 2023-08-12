@@ -264,7 +264,7 @@ To receive or transmit on two channels at once, instead of using :code:`st_args.
 Syncing to 10 MHz and PPS
 **************************
 
-One of the huge advantages of using a USRP over other SDRs is their ability to synchronize to an external source or onboard `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_.  If you have connected an external 10 MHz and PPS source to your USRP, you will want to make sure to call these two lines after initializing your USRP:
+One of the huge advantages of using a USRP over other SDRs is their ability to synchronize to an external source or onboard `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_, allowing multi-receiver applications such as TDOA.  If you have connected an external 10 MHz and PPS source to your USRP, you will want to make sure to call these two lines after initializing your USRP:
 
 .. code-block:: python
 
