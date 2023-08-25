@@ -15,6 +15,15 @@ for bit in bits:
     pulse = np.zeros(sps)
     pulse[0] = bit * 2 - 1  # set the first value to either a 1 or -1
     pulse_train = np.concatenate((pulse_train, pulse))  # add the 8 samples to the signal
+# optionally, turn it into qpsk
+if False:
+    bits = np.random.randint(0, 2, num_symbols)  # Our data to be transmitted, 1's and 0's
+    pulse_train_q = np.array([])
+    for bit in bits:
+        pulse = np.zeros(sps)
+        pulse[0] = bit * 2 - 1  # set the first value to either a 1 or -1
+        pulse_train_q = np.concatenate((pulse_train_q, pulse))  # add the 8 samples to the signal
+    pulse_train = pulse_train + 1j * pulse_train_q
 fig, ax = plt.subplots(1, figsize=(8, 2))  # 7 is nearly full width
 plt.plot(pulse_train, '.-')
 plt.grid(True)
@@ -170,8 +179,8 @@ def rail_complex(x): # takes in a complex sample
 '''
 
 mu = 0  # initial estimate of phase of sample
-out = np.zeros(len(samples) + 10, dtype=np.complex)
-out_rail = np.zeros(len(samples) + 10, dtype=np.complex)  # stores values, each iteration we need the previous 2 values plus current value
+out = np.zeros(len(samples) + 10, dtype=np.complex64)
+out_rail = np.zeros(len(samples) + 10, dtype=np.complex64)  # stores values, each iteration we need the previous 2 values plus current value
 i_in = 0  # input samples index
 i_out = 2  # output index (let first two outputs be 0)
 while i_out < len(samples) and i_in < len(samples):
@@ -257,7 +266,6 @@ def phase_detector_4(sample):
         b = -1.0
     return a * sample.imag - b * sample.real
 
-
 '''convert in-line
 # For BPSK
 def phase_detector_2(sample):
@@ -273,13 +281,15 @@ alpha = (4 * damping * loop_bw) / (1.0 + (2.0 * damping * loop_bw) + loop_bw ** 
 beta = (4 * loop_bw ** 2) / (1.0 + (2.0 * damping * loop_bw) + loop_bw ** 2)
 print("alpha:", alpha)
 print("beta:", beta)
-out = np.zeros(N, dtype=np.complex)
+out = np.zeros(N, dtype=np.complex64)
 freq_log = []
 for i in range(N):
     out[i] = samples[i] * np.exp(-1j * phase)  # adjust the input sample by the inverse of the estimated phase offset
 
-    error = np.real(out[i]) * np.imag(out[i])  # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
-    # error = phase_detector_4(out[i])
+    if True:
+        error = np.real(out[i]) * np.imag(out[i])  # This is the error formula for 2nd order Costas Loop (e.g. for BPSK)
+    else:
+        error = phase_detector_4(out[i])
 
     # Limit error to the range -1 to 1
     # error = min(error, 1.0) # left out for sake of reducing code.  didnt seem to get anywhere near 1 or -1
