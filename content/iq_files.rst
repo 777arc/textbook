@@ -202,7 +202,7 @@ The Python code to write the .sigmf-meta file for the example towards the beginn
  })
  
  # check for mistakes and write to disk
- assert meta.validate()
+ meta.validate()
  meta.tofile('bpsk_in_noise.sigmf-meta') # extension is optional
 
 Simply replace :code:`8000000` and :code:`915000000` with the variables you used to store sample rate and center frequency respectively. 
