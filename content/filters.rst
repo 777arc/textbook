@@ -389,29 +389,45 @@ Click "Impulse Response" text above the graph to see the impulse response, which
 
 This app even includes the C++ source code to implement and use this filter.  The web app does not include any way to design IIR filters, which are in general much more difficult to design.
 
+.. _convolution-section:
 
-*************************
+***********
 Convolution
-*************************
+***********
 
 We will take a brief detour to introduce the convolution operator. Feel free to skip this section if you are already familiar with it.
 
-Adding two signals together is one way of combining two signals into one. In the :ref:`freq-domain-chapter` chapter we explored how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation.  In fact it is equivalent to a cross-correlation in many cases.
+Adding two signals together is one way of combining two signals into one. In the :ref:`freq-domain-chapter` chapter we explored how the linearity property applies when adding two signals together.  Convolution is another way to combine two signals into one, but it is very different than simply adding them.  The convolution of two signals is like sliding one across the other and integrating.  It is *very* similar to a cross-correlation, if you are familiar with that operation.  In fact it is equivalent to a cross-correlation in many cases.  We typically use the ::code::`*` symbol to refer to a convolution, especially in math equations.
 
 I believe the convolution operation is best learned through examples.  In this first example, we convolve two square pulses together:
 
-
-.. image:: ../_images/convolution_animation1.gif
-   :scale: 100 % 
+.. image:: ../_images/rect_rect_conv.gif
+   :scale: 90 % 
    :align: center 
    
-Because it's just a sliding integration, the result is a triangle with a maximum at the point where both square pulses lined up perfectly.  Let's look at what happens if we convolve a square pulse with a triangular pulse:
+We have two input signals (one red, one blue), and then the output of the convolution is displayed in black.  You can see that the output is the integration of the two signals as one slides across the other.  Because it's just a sliding integration, the result is a triangle with a maximum at the point where both square pulses lined up perfectly.  
 
-.. image:: ../_images/convolution_animation2.gif
-   :scale: 150 % 
+Let's look at a few more convolutions:
+
+.. image:: ../_images/rect_fat_rect_conv.gif
+   :scale: 90 % 
    :align: center 
 
-In both examples, we have two input signals (one red, one blue), and then the output of the convolution is displayed.  You can see that the output is the integration of the two signals as one slides across the other.  Because of this "sliding" nature, the length of the output is actually longer than the input.  If one signal is :code:`M` samples and the other signal is :code:`N` samples, the convolution of the two can produce :code:`N+M-1` samples.  However, functions such as :code:`numpy.convolve()` have a way to specify whether you want the whole output (:code:`max(M, N)` samples) or just the samples where the signals overlapped completely (:code:`max(M, N) - min(M, N) + 1` if you were curious).  No need to get caught up in this detail. Just know that the length of the output of a convolution is not just the length of the inputs.
+|
+
+.. image:: ../_images/rect_exp_conv.gif
+   :scale: 90 % 
+   :align: center 
+
+|
+
+.. image:: ../_images/gaussian_gaussian_conv.gif
+   :scale: 90 % 
+   :align: center 
+
+Note how a Gaussian convolved with a Gaussian is another Gaussian, but with a wider pulse and lower amplitude.
+
+Because of this "sliding" nature, the length of the output is actually longer than the input.  If one signal is :code:`M` samples and the other signal is :code:`N` samples, the convolution of the two can produce :code:`N+M-1` samples.  However, functions such as :code:`numpy.convolve()` have a way to specify whether you want the whole output (:code:`max(M, N)` samples) or just the samples where the signals overlapped completely (:code:`max(M, N) - min(M, N) + 1` if you were curious).  No need to get caught up in this detail. Just know that the length of the output of a convolution is not just the length of the inputs.
 
 So why does convolution matter in DSP?  Well for starters, to filter a signal, we can simply take the impulse response of that filter and convolve it with the signal.  FIR filtering is simply a convolution operation.
 
