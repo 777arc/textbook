@@ -23,6 +23,6 @@ by :ref:`Dr. Marc Lichtman<author-chapter>`
    content/pulse_shaping
    content/sync
    content/rds
-   content/phaser
    content/doa
+   content/phaser
    content/about_author

@@ -4,25 +4,51 @@
 DOA & Beamforming
 ####################################
 
-Direction-of-Arrival (DOA) within DSP/SDR refers to the process of using an array of antennas to estimate the DOA of one or more signals received by that array.  Once we know the direction a signal of interest is arriving from, we can isolate it from other signals/interference/jamming.  It is just like isolating a signal in the frequency domain by filtering it, except we are now working in the spatial domain (you can certainly combine both!).  We typically refer to the antennas that make up an array as elements, and sometimes the array is called a "sensor" instead.  These array elements are most often omnidirectional antennas, equally spaced in either a line or across two dimensions.  DOA is a subset of beamforming techniques, where as the receiver, we are trying to steer a beam (our receiver's antenna beam) towards the direction of an emitter.  We may also steer a beam blindly across a wide range (e.g., 0 to 360 degrees) to figure out what signals are being received and from what direction.  
+In this chapter we cover the concepts of beamforming, direction-of-arrival (DOA), and phased arrays in general.  Techniques such as Capon and MUSIC are discussed, using Python simulation examples. We cover beamforming vs. DOA, and go through the two different types of phased arrays (Passive electronically scanned array or PESA and Active electronically scanned array or AESA).
 
-*******************
-Common Applications
-*******************
+************************
+Overview and Terminology
+************************
 
-Coming soon!
+A phased array, a.k.a. electronically steered array, is an array of antennas that can be used on the transmit or receive side to form beams in one or more desired directions.  They are used in both communications and radar, and you'll find them on the ground, airborne, and on satellites.  
 
-* cellular
-* satellites
-* satellite ground stations
+Phased arrays can be broken down into three types:
+
+1. **Passive electronically scanned array (PESA)**, a.k.a. analog or traditional phased arrays, where analog phase shifters are used to steer the beam.  On the receive side, all elements are summed after phase shifting (and optionally, adjustable gain) and turned into a signal channel which is downconverted and received.  On the transmit side the inverse takes place; a single digital signal is outputted from the digital side, and on the analog side phase shifters and gain stages are used to produce the output going to each antenna.  These digital phase shifters will have a limited number of bits of resolution, and control latency.
+2. **Active electronically scanned array (AESA)**, a.k.a. fully digital arrays, where every single element has its own RF front end, and the beamforming is done entirely in the digital domain.  This is the most expensive approach, as RF components are expensive, but it provides much more flexibility and speed than PESAs.  Digital arrays are popular with SDRs, although the number of receive or transmit channels of the SDR limits the number of elements in your array.
+3. **Hybrid array**, which consists of subarrays that individually resemble PESAs, where each subarray has its own RF front end just like with AESAs.  This is the most common approach for modern phased arrays, as it provides the best of both worlds.
+
+An example of each of the types is shown below.
+
+.. image:: ../_images/beamforming_examples.svg
+   :align: center 
+   :target: ../_images/beamforming_examples.svg
+   :alt: Example of phased arrays including Passive electronically scanned array (PESA), Active electronically scanned array (AESA), Hybrid array, showing Raytheon's MIM-104 Patriot Radar, ELM-2084 Israeli Multi-Mission Radar, Starlink User Terminal, aka Dishy
+
+In this chapter we primarily focus on DSP for fully digital arrays, as they are more suited towards simulation and DSP, but in the next chapter we get hands-on with the "Phaser" array and SDR from Analog Devices that has 8 analog phase shifters feeding a Pluto.
+
+We typically refer to the antennas that make up an array as elements, and sometimes the array is called a "sensor" instead.  These array elements are most often omnidirectional antennas, equally spaced in either a line or across two dimensions. 
+
+A beamformer is essentially a spatial filter; it filters out signals from all directions except the desired direction(s).  Instead of taps, we use weights (a.k.a. coefficients) applied to each element of an array.  We then manipulate the weights to form the beam(s) of the array, hence the name beamforming!  We can steer these beams (and nulls) extremely fast; must faster than mechanically gimballed antennas which can be thought of as an alternative to phased arrays.  A single array can electronically track multiple signals at once while nulling out interferers, as long as it has enough elements.  We'll typically discuss beamforming within the context of a communications link, where the receiver aims to receive one or more signals at as high SNR as possible. 
+
+Beamforming approaches are typically broken down into conventional and adaptive.  With conventional beamforming you assume you already know the direction of arrival of the signal of interest, and the beamformer involves choosing weights to maximize gain in that direction.  This can be used on the receive or transmit side of a communication system.  Adaptive beamforming, on the other hand, involves constantly adjusting the weights based on the beamformer output, to optimize some criteria, often involving nulling out an interferer.  Due to the closed loop and adaptive nature, adaptive beamforming is typically just used on the receive side.  
+
+Direction-of-Arrival (DOA) within DSP/SDR refers to the process of using an array of antennas to estimate the DOA of one or more signals received by that array (versus traditional beamforming, where we are trying to receive a signal and possibly reject interference).  Although DOA certainly falls under the beamforming umbrella, so the terms can get confusing, just know that the term DOA will be used if the goal is to find the angles of arrival for one or more signals, versus beamforming used as a spatial filter to isolate and receive one or more signals for demodulation or other processing.  Some techniques such as MVDR will apply to both DOA and beamforming, while others like MUSIC are strictly for the purpose of DOA.
+
+Phased arrays and beamforming/DOA find use in all sorts of applications, although you will most often see them used in multiple forms of radar, mmWave communication within 5G, satellite communications, and jamming.  Any applications that require a high-gain antenna, or require a rapidly moving high-gain antenna, are good candidates for phased arrays.
 
 *******************
 SDR Requirements
 *******************
 
-Coming soon!
+As discussed, analog phased arrays involve an analog phase shifter (and usually adjustable gain) per channel, meaning an analog phased array is a dedicated piece of hardware that must go alongside an SDR.  On the other hand, any SDR that contains more than one channel can be used as a digital array with no extra hardware, as long as the channels are phase coherent and sampled using the same clock, which is typically the case for SDRs that have multiple recieve channels onboard.  There are many SDRs that contain **two** receive channels, such as the Ettus USRP B210 and Analog Devices Pluto (the 2nd channel is exposed using a uFL connector on the board itself).  Unfortunately, going beyond two channels involves entering the $10k+ segment of SDRs, at least as of 2023, such as the USRP N310.  The main problem is that low-cost SDRs are typically not able to be "chained" together to scale the number of channels.  The exception is the KerberosSDR (4 channels) and KrakenSDR (5 channels) which use multiple RTL-SDRs sharing an LO to form a low-cost digital array; the downside being the very limited sample rate (up to 2.56 MHz) and tuning range (up to 1766 MHz).  The KrakenSDR board and example antenna configuration is shown below.
 
-* explain phase coherent receive channels and give some examples of whats available
+.. image:: ../_images/krakensdr.jpg
+   :align: center 
+   :alt: The KrakenSDR
+   :target: ../_images/krakensdr.jpg
+
+In this chapter we don't use any specific SDRs; instead we simulate the receiving of signals using Python, and then go through the DSP used to perform beamforming/DOA for ditital arrays.
 
 *******************
 Array Factor Math

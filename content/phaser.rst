@@ -387,9 +387,3 @@ and here is an example of the Hamming window:
    :alt: Beamforming animation using the Phaser and a Hamming window
 
 Note the lack of sidelobes for Hamming.  In fact, every window aside from Rectangular will greatly reduce the sidelobes, but in return the main lobe will be a little wider.
-
-************************
-Next Steps
-************************
-
-In the next chapter we will cover digital beamforming, using pure simulation in Python, no Phaser needed!
