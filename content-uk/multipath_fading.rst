@@ -1,106 +1,107 @@
 .. _multipath-chapter:
 
 #######################
-Multipath Fading
+Багатопроменеві завмирання
 #######################
 
-In this chapter we introduce multipath, a propagation phenomenon that results in signals reaching the receiver by two or more paths, which we experience in real-world wireless systems.  So far we have only discussed the "AWGN Channel", i.e., a model for a wireless channel where the signal is simply added to noise, which really only applies to signals over a cable and some satellite communications systems. 
+У цій главі ми познайомимося з багатопроменевістю - явищем поширення, в результаті якого сигнали досягають приймача двома або більше шляхами, з яким ми стикаємося в реальних бездротових системах.  Досі ми обговорювали лише "канал AWGN", тобто модель бездротового каналу, де сигнал просто додається до шуму, що насправді застосовується лише до сигналів по кабелю та деяких систем супутникового зв'язку. 
 
 *************************
-Multipath
+Багатопроменева передача
 *************************
 
-All realistic wireless channels include many "reflectors", given that RF signals bounce.  Any object between or near the transmitter (Tx) or receiver (Rx) can cause additional paths the signal travels along.  Each path experiences a different phase shift (delay) and attenuation (amplitude scaling).  At the receiver, all of the paths add up.  They can add up constructively, destructively, or a mix of both.  We call this concept of multiple signal paths "multipath".  There is the Line-of-Sight (LOS) path, and then all other paths.  In the example below, we show the LOS path and a single non-LOS path:
+Всі реалістичні бездротові канали включають багато "відбивачів", враховуючи, що радіочастотні сигнали відбиваються.  Будь-який об'єкт між передавачем (Tx) або приймачем (Rx) або поблизу них може спричинити додаткові шляхи проходження сигналу.  Кожен шлях зазнає різного фазового зсуву (затримки) і ослаблення (масштабування амплітуди).  У приймачі всі ці шляхи складаються.  Вони можуть складатися конструктивно, деструктивно або поєднувати обидва способи.  Ми називаємо цю концепцію множинних шляхів проходження сигналу "багатопроменевістю".  Існує шлях прямої видимості (LOS), а потім всі інші шляхи.  У наведеному нижче прикладі ми показуємо шлях LOS і один шлях поза зоною прямої видимості:
+Всі реалістичні бездротові канали включають багато "відбивачів", враховуючи, що радіочастотні сигнали відбиваються.  Будь-який об'єкт між або поблизу передавача (Tx) або приймача (Rx) може спричинити додаткові шляхи проходження сигналу.  Кожен шлях зазнає різного фазового зсуву (затримки) і ослаблення (масштабування амплітуди).  У приймачі всі ці шляхи складаються.  Вони можуть складатися конструктивно, деструктивно або поєднувати обидва способи.  Ми називаємо цю концепцію множинних шляхів проходження сигналу "багатопроменевістю".  Існує шлях прямої видимості (LOS), а потім всі інші шляхи.  У наведеному нижче прикладі ми показуємо шлях LOS і один шлях поза зоною прямої видимості:
 
 .. image:: ../_images/multipath.svg
    :align: center 
    :target: ../_images/multipath.svg
-   :alt: Simple depiction of multipath, showing the line-of-sight (LOS) path and a single multipath
+   :alt: Просте зображення багатопроменевості, що показує шлях прямої видимості (LOS) і один багатопроменевий шлях
 
-Destructive interference can happen if you get unlucky with how the paths sum together.  Consider the example above with just two paths.  Depending on the frequency and the exact distance of the paths, the two paths can be received 180 degrees out of phase at roughly the same amplitude, causing them to null out each other (depicted below).  You may have learned about constructive and destructive interference in physics class.  In wireless systems when the paths destructively combine, we call this interference "deep fade" because our signal briefly disappears.
+Руйнівна інтерференція може виникнути, якщо вам не пощастило з тим, як ці шляхи складаються разом.  Розглянемо приклад вище з двома шляхами.  Залежно від частоти і точної відстані між ними, ці два сигнали можуть бути прийняті на 180 градусів у протифазі з приблизно однаковою амплітудою, що призведе до їх взаємного обнулення (як показано нижче).  На уроках фізики ви могли дізнатися про конструктивні та деструктивні інтерференції.  У бездротових системах, коли шляхи деструктивно об'єднуються, ми називаємо цю інтерференцію "глибоким завмиранням", оскільки наш сигнал ненадовго зникає.
 
 .. image:: ../_images/destructive_interference.svg
    :align: center 
    :target: ../_images/destructive_interference.svg
 
-Paths can also add up constructively, causing a strong signal to be received.  Each path has a different phase shift and amplitude, which we can visualize on a plot in the time domain called a "power delay profile":
+Шляхи також можуть конструктивно складатися, що призводить до отримання сильного сигналу.  Кожен шлях має різний фазовий зсув і амплітуду, які ми можемо візуалізувати на графіку в часовій області, який називається "профіль затримки потужності":
 
 .. image:: ../_images/multipath2.svg
    :align: center 
    :target: ../_images/multipath2.svg
-   :alt: Multipath visualized including the power delay profile plot over time
+   :alt: Візуалізація багатопроменевої лінії, включаючи графік профілю затримки потужності у часі
 
-The first path, the one closest to the y-axis, will always be the LOS path (assuming there is one) because there's no way for any other path to reach the receiver faster than the LOS path.  Typically the magnitude will decrease as the delay increases, since a path that took longer to show up at the receiver will have traveled further.
+Перший шлях, найближчий до осі y, завжди буде шляхом LOS (за умови, що він існує), тому що жоден інший шлях не може досягти приймача швидше, ніж шлях LOS.  Зазвичай величина зменшується зі збільшенням затримки, оскільки шлях, якому знадобилося більше часу, щоб з'явитися в приймачі, пройшов більшу відстань.
 
 *************************
-Fading
+Згасання
 *************************
 
-What tends to happen is we get a mix of constructive and destructive interference, and it changes over time as the Rx, Tx, or environment is moving/changing.  We use the term "fading" when referring to the effects of a multipath channel **changing** over time.  That's why we often refer to it as "multipath fading"; it's really the combination of constructive/destructive interference and a changing environment.  What we end up with is a SNR that varies over time; changes are usually on the order of milliseconds to microseconds, depending on how fast the Tx/Rx is moving.  Beneath is a plot of SNR over time in milliseconds that demonstrates multipath fading.
+Як правило, ми отримуємо суміш конструктивних і деструктивних завад, і вона змінюється з часом, коли Rx, Tx або навколишнє середовище рухаються/змінюються.  Ми використовуємо термін "завмирання", коли говоримо про ефекти багатопроменевого каналу, що **змінюються** з часом.  Ось чому ми часто називаємо це "багатопроменеві завмирання"; насправді це комбінація конструктивних/деструктивних завад і мінливого середовища.  В результаті ми отримуємо SNR, який змінюється з часом; зміни зазвичай становлять від мілісекунд до мікросекунд, залежно від того, наскільки швидко рухаються Tx/Rx.  Нижче наведено графік зміни SNR у часі в мілісекундах, який демонструє багатопроменеві завмирання.
 
 .. image:: ../_images/multipath_fading.png
    :scale: 100 % 
    :align: center
-   :alt: Multipath fading causes deep fades or nulls periodically where the SNR drops extremely low
+   :alt: Багатопроменеві завмирання спричиняють періодичні глибокі завмирання або нулі, де SNR падає надзвичайно низько
 
-There are two types of fading from a **time** domain perspective:
+Існує два типи завмирань з точки зору **часової** перспективи:
 
-- **Slow Fading:** The channel doesn't change within one packet's worth of data.  That is, a deep null during slow fading will wipe out the whole packet.
-- **Fast Fading:** The channel changes very quickly compared to the length of one packet.  Forward error correction, combined with interleaving, can combat fast fading.
+- **Повільні завмирання:** Канал не змінюється в межах одного пакета даних.  Тобто, глибокий нуль під час повільного згасання знищить весь пакет.
+- Швидкі завмирання:** Канал змінюється дуже швидко порівняно з довжиною одного пакета.  Пряма корекція помилок у поєднанні з чергуванням може боротися зі швидкими завмираннями.
 
-There are also two types of fading from a **frequency** domain perspective:
+Існує також два типи завмирань з точки зору **частотної** області:
 
-**Frequency Selective Fading**: The constructive/destructive interference changes within the frequency range of the signal.  When we have a wideband signal, we span a large range of frequencies.  Recall that wavelength determines whether it's constructive or destructive.  Well if our signal spans a wide frequency range, it also spans a wide wavelength range (since wavelength is the inverse of frequency).  Consequently we can get different channel qualities in different portions of our signal (in the frequency domain).  Hence the name frequency selective fading.
+**Частотно-селективні завмирання**: Конструктивні/деструктивні завади змінюються в межах частотного діапазону сигналу.  Коли ми маємо широкосмуговий сигнал, ми охоплюємо великий діапазон частот.  Пам'ятайте, що довжина хвилі визначає, чи є вона конструктивною або деструктивною.  Якщо наш сигнал охоплює широкий діапазон частот, він також охоплює широкий діапазон довжин хвиль (оскільки довжина хвилі - величина, обернена до частоти).  Отже, ми можемо отримати різні якості каналу в різних частинах нашого сигналу (в частотній області).  Звідси і назва - частотно-селективні завмирання.
 
-**Flat Fading**: Occurs when the signal's bandwidth is narrow enough that all frequencies experience roughly the same channel.  If there is a deep fade then the whole signal will disappear (for the duration of the deep fade).  
+**Плоскі завмирання: Виникає, коли смуга пропускання сигналу досить вузька, що всі частоти відчувають приблизно однаковий канал.  Якщо відбувається глибоке згасання, то весь сигнал зникає (на час глибокого згасання).  
 
-In the figure below, the :red:`red` shape shows our signal in the frequency domain, and the black curvy line shows the current channel condition over frequency.  Because the narrower signal is experiencing the same channel conditions throughout the whole signal, it's experiencing flat fading.  The wider signal is very much experiencing frequency selective fading.
+На рисунку нижче, червона фігура показує наш сигнал у частотній області, а чорна крива лінія показує поточний стан каналу по частоті.  Оскільки вужчий сигнал перебуває в однакових умовах каналу на всьому його протязі, він відчуває плоске згасання.  Ширший сигнал зазнає дуже сильних частотно-селективних завмирань.
 
 .. image:: ../_images/flat_vs_freq_selective.png
    :scale: 70 % 
    :align: center
-   :alt: Flat fading vs frequency selective fading
+   :alt: Пласке згасання проти частотно-селективного згасання
 
-Here is an example of a 16 MHz wide signal that is continuously transmitting.  There are several moments in the middle where there's a period of time a piece of signal is missing.  This example depicts frequency selective fading, which causes holes in the signal that wipe out some frequencies but not others.
+Ось приклад сигналу шириною 16 МГц, який передається безперервно.  Посередині є кілька моментів, коли протягом певного періоду часу відсутня частина сигналу.  Цей приклад демонструє частотно-селективні завмирання, які спричиняють появу дірок у сигналі, що знищують деякі частоти, але не знищують інші.
 
 .. image:: ../_images/fading_example.jpg
    :scale: 60 % 
    :align: center
-   :alt: Example of frequency selective fading on a spectrogram (a.k.a. waterfall plot) showing smearing and a hole in the spectrogram where a deep null is
+   :alt: Приклад частотно-селективного згасання на спектрограмі (так звана водоспадна ділянка), що показує розмазування і дірку в спектрограмі, де знаходиться глибокий нуль
    
 **************************
-Simulating Rayleigh Fading
+Моделювання релеївських завмирань
 **************************
 
-Rayleigh fading is used to model fading over time, when there is no significant LOS path.  When there is a dominant LOS path, the Rician fading model becomes more suitable, but we will be focusing on Rayleigh.  Note that Rayleigh and Rician models do not include the primarily path loss between the transmitter and receiver (such as the path loss calculated as part of a link budget), or any shadowing caused by large objects.  Their role is to model the multipath fading that occurs over time, as a result of movement and scatterers in the environment. 
+Релеєвське згасання використовується для моделювання згасання з часом, коли немає значного шляху LOS.  Коли є домінуючий шлях LOS, модель згасання Рікана стає більш придатною, але ми зосередимося на моделі Релея.  Зауважте, що моделі Релея і Рікана не враховують основні втрати на шляху між передавачем і приймачем (наприклад, втрати на шляху, що розраховуються як частина бюджету лінії зв'язку), або будь-які затінення, спричинені великими об'єктами.  Їх роль полягає в моделюванні багатопроменевих завмирань, які виникають з часом внаслідок руху і розсіювачів в навколишньому середовищі. 
 
-There is a lot of theory that comes out of the Rayleigh fading model, such as expressions for level crossing rate and average fade duration.  But the Rayleigh fading model doesn't directly tell us how to actually simulate a channel using the model.  To generate Rayleigh fading in simulation we have to use one of many published methods, and in the following Python example we will be using Clarke's "sum-of-sinusoids" method.
+Існує багато теорій, які випливають з моделі релеєвського згасання, наприклад, вирази для швидкості перетину рівня і середньої тривалості згасання.  Але модель релеєвських завмирань не дає нам прямих вказівок, як насправді моделювати канал за допомогою цієї моделі.  Щоб згенерувати релеєвські завмирання в симуляції, ми повинні використати один з багатьох опублікованих методів, і в наступному прикладі на Python ми будемо використовувати метод Кларка "сума синусоїд".
 
-To generate a Rayleigh fading channel in Python we need to first specify the max Doppler shift, in Hz, which is based on how fast the transmitter and/or receiver is moving, denoted :math:`\Delta v`.  When the velocity is small compared to the speed of light, which will always be the case in wireless communications, the Doppler shift can be calculated as:
+Щоб згенерувати канал релеєвських завмирань у Python, нам потрібно спочатку вказати максимальний допплерівський зсув у Гц, який базується на швидкості руху передавача та/або приймача, що позначається :math:`\Delta v`.  Якщо швидкість мала порівняно зі швидкістю світла, що завжди буде мати місце у бездротовому зв'язку, допплерівський зсув можна обчислити як:
 
-.. math::
+.. математично::
 
   f_D = \frac{\Delta v f_c}{c} 
   
-where :math:`c` is the speed of light, roughly 3e8 m/s, and :math:`f_c` is the carrier frequency being transmitted on.  
+де :math:`c` - швидкість світла, приблизно 3e8 м/с, а :math:`f_c` - несуча частота, на якій передається сигнал.  
 
-We also choose how many sinusoids to simulate, and there's no right answer because it's based on the number of scatterers in the environment, which we never actually know.  As part of the calculations we assume the phase of the received signal from each path is uniformly random between 0 and :math:`2\pi`.  The following code simulates a Rayleigh fading channel using Clarke's method:
+Ми також вибираємо кількість синусоїд для моделювання, і тут немає правильної відповіді, оскільки це залежить від кількості розсіювачів у навколишньому середовищі, яку ми ніколи не знаємо.  Під час обчислень ми припускаємо, що фаза сигналу, отриманого з кожного шляху, є рівномірно випадковою між 0 і :math:`2\pi`.  Наступний код моделює релеєвський канал із завмираннями за методом Кларка:
 
 .. code-block:: python
 
     import numpy as np
     import matplotlib.pyplot as plt
 
-    # Simulation Params, feel free to tweak these
-    v_mph = 60 # velocity of either TX or RX, in miles per hour
-    center_freq = 200e6 # RF carrier frequency in Hz
-    Fs = 1e5 # sample rate of simulation
-    N = 100 # number of sinusoids to sum
+    # Параметри моделювання, не соромтеся їх змінювати
+    v_mph = 60 # швидкість TX або RX, у милях на годину
+    center_freq = 200e6 # несуча частота радіосигналу в Гц
+    Fs = 1e5 # частота дискретизації симуляції
+    N = 100 # кількість синусоїд для підсумовування
 
-    v = v_mph * 0.44704 # convert to m/s
-    fd = v*center_freq/3e8 # max Doppler shift
-    print("max Doppler shift:", fd)
-    t = np.arange(0, 1, 1/Fs) # time vector. (start, stop, step)
+    v = v_mph * 0.44704 # перевести в м/с
+    fd = v*center_freq/3e8 # максимальний допплерівський зсув
+    print("максимальний допплерівський зсув:", fd)
+    t = np.arange(0, 1, 1/Fs) # вектор часу. (start, stop, step)
     x = np.zeros(len(t))
     y = np.zeros(len(t))
     for i in range(N):
@@ -109,50 +110,43 @@ We also choose how many sinusoids to simulate, and there's no right answer becau
         x = x + np.random.randn() * np.cos(2 * np.pi * fd * t * np.cos(alpha) + phi)
         y = y + np.random.randn() * np.sin(2 * np.pi * fd * t * np.cos(alpha) + phi)
 
-    # z is the complex coefficient representing channel, you can think of this as a phase shift and magnitude scale
-    z = (1/np.sqrt(N)) * (x + 1j*y) # this is what you would actually use when simulating the channel
-    z_mag = np.abs(z) # take magnitude for the sake of plotting
-    z_mag_dB = 10*np.log10(z_mag) # convert to dB
+        # z - комплексний коефіцієнт, що представляє канал, ви можете думати про це як про масштаб фазового зсуву та амплітуди
+    z = (1/np.sqrt(N)) * (x + 1j*y) # це те, що ви будете використовувати при моделюванні каналу
+    z_mag = np.abs(z) # беремо амплітуду для побудови графіку
+    z_mag_dB = 10*np.log10(z_mag) # перевести в дБ
 
-    # Plot fading over time
+    # побудувати графік затухання з часом
     plt.plot(t, z_mag_dB)
-    plt.plot([0, 1], [0, 0], ':r') # 0 dB
-    plt.legend(['Rayleigh Fading', 'No Fading'])
+    plt.plot([0, 1], [0, 0], ':r') # 0 дБ
+    plt.legend(['Релеєвське згасання', 'Немає згасання'])
     plt.axis([0, 1, -15, 5])
     plt.show()
 
-If you are intending to use this channel model as part of a larger simulation, you would simply multiply the received signal by the complex number :code:`z`, representing flat fading.   The value :code:`z` would then update every time step.  This means all frequency components of the signal experience the same channel at any given moment in time, so you would **not** be simulating frequency selective fading, that requires a multi-tap channel impulse response which we will not get into in this chapter.  If we look at the magnitude of :code:`z`, we can see the Rayleigh fading over time:
+Якщо ви маєте намір використовувати цю модель каналу як частину більшої симуляції, вам слід просто помножити отриманий сигнал на комплексне число :code:`z`, що представляє плоскі завмирання.   Значення :code:`z` буде оновлюватися на кожному часовому кроці.  Це означає, що всі частотні компоненти сигналу проходять через один і той самий канал у будь-який момент часу, тому ви **не** імітуєте частотно-селективні завмирання, які вимагають багатоканальної імпульсної характеристики каналу, яку ми не розглядатимемо в цій главі.  Якщо ми подивимося на величину :code:`z`, то побачимо релеєвське згасання з часом:
 
 .. image:: ../_images/rayleigh.svg
    :align: center 
    :target: ../_images/rayleigh.svg
-   :alt: Simulation of Rayleigh Fading
+   :alt: Імітація релеївського згасання
 
-Note the deep fades that occur briefly, as well as the small fraction of time where the channel is actually performing better than if there was no fading at all.  
-
+Зверніть увагу на глибокі згасання, які виникають на короткий час, а також на невеликий проміжок часу, коли канал працює краще, ніж якби згасання не було взагалі.  
 
 ****************************
-Mitigating Multipath Fading
+Зменшення багатопроменевих завмирань
 ****************************
 
-In modern communications, we have developed ways to combat multipath fading.  
+У сучасних засобах зв'язку ми розробили способи боротьби з багатопроменевими завмираннями.  
 
 CDMA
 #####
 
-3G cellular uses a technology called code division multiple access (CDMA).  With CDMA you take a narrowband signal and spread it over a wide bandwidth before transmitting it (using a spread spectrum technique called DSSS).  Under frequency selective fading, it's unlikely that all frequencies will be in a deep null at the same time.  At the receiver the spreading is reversed, and this de-spreading process greatly mitigates a deep null.
+Стільниковий зв'язок 3G використовує технологію під назвою множинний доступ з кодовим поділом каналів (CDMA).  За допомогою CDMA ви берете вузькосмуговий сигнал і поширюєте його на широку смугу частот перед передачею (використовуючи технологію розширення спектра, яка називається DSSS).  При частотно-селективних завмираннях малоймовірно, що всі частоти одночасно опиняться в глибокому нулі.  На приймачі розсіювання змінюється на протилежне, і цей процес розсіювання значно пом'якшує глибокий нуль.
 
 .. image:: ../_images/cdma.png
-   :scale: 100 % 
+   :масштаб: 100 % 
    :align: center 
 
 OFDM 
 #####
 
-4G cellular, WiFi, and many other technologies use a scheme called orthogonal frequency-division multiplexing (OFDM).  OFDM uses something called subcarriers, where we split up the signal in the frequency domain into a bunch of narrow signals squashed together.  To combat multipath fading we can avoid assigning data to subcarriers that are in a deep fade, although it requires the receiving end to send channel information back to the transmitter quick enough.  We can also assign high order modulation schemes to subcarriers with great channel quality to maximize our data rate.
-
-
-
-
-
-
+Стільниковий зв'язок 4G, WiFi та багато інших технологій використовують схему, яка називається ортогональним частотним мультиплексуванням (OFDM).  OFDM використовує так звані піднесучі, де ми розбиваємо сигнал у частотній області на кілька вузьких сигналів, стиснутих разом.  Для боротьби з багатопроменевими завмираннями ми можемо уникнути призначення даних на піднесучі, які перебувають у глибокому завмиранні, хоча це вимагає від приймача досить швидкого відправлення інформації про канал назад до передавача.  Ми також можемо призначити схеми модуляції високого порядку для піднесучих з високою якістю каналу, щоб максимізувати швидкість передачі даних.

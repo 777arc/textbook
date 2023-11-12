@@ -1,36 +1,36 @@
 .. _iq-files-chapter:
 
 ##################
-IQ Files and SigMF
+IQ файли та SigMF
 ##################
 
-In all our previous Python examples we stored signals as 1D NumPy arrays of type "complex float".  In this chapter we learn how signals can be stored to a file and then read back into Python, as well as introduce the SigMF standard.  Storing signal data in a file is extremely useful; you may want to record a signal to a file in order to manually analyze it offline, or share it with a colleague, or build a whole dataset.
+У всіх наших попередніх прикладах на Python ми зберігали сигнали у вигляді 1D NumPy масивів типу "complex float".  У цій главі ми дізнаємося, як зберігати сигнали у файлі, а потім зчитувати їх назад у Python, а також познайомимося зі стандартом SigMF.  Зберігання даних сигналів у файлі є надзвичайно корисним: ви можете записати сигнал у файл, щоб вручну проаналізувати його в автономному режимі, поділитися ним з колегою або створити цілий набір даних.
 
 *************************
-Binary Files
+Двійкові файли
 *************************
 
-Recall that a digital signal at baseband is a sequence of complex numbers.
+Нагадаємо, що цифровий сигнал у базовій смузі частот - це послідовність комплексних чисел.
 
-Example: [0.123 + j0.512,    0.0312 + j0.4123,    0.1423 + j0.06512, ...]
+Приклад: [0.123 + j0.512, 0.0312 + j0.4123, 0.1423 + j0.06512, ...].
 
-These numbers correspond to [I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, ...]
+Ці числа відповідають [I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, I+jQ, ...].
 
-When we want to save complex numbers to a file, we save them in the format IQIQIQIQIQIQIQIQ.  I.e., we store a bunch of floats in a row, and when we read them back we must separate them back into [I+jQ, I+jQ, ...].
+Коли ми хочемо зберегти комплексні числа у файл, ми зберігаємо їх у форматі IQIQIQIQIQIQIQIQIQIQIQ.  Тобто, ми зберігаємо купу чисел з плаваючою комою підряд, а коли ми їх зчитуємо, ми повинні розділити їх назад на [I+jQ, I+jQ, ...].
 
-While it's possible to store the complex numbers in a text file or csv file, we prefer to save them in what's called a "binary file" to save space.  At high sample rates your signal recordings could easily be multiple GB, and we want to be as memory efficient as possible.  If you have ever opened a file in a text editor and it looked incomprehensible like the screenshot below, it was probably binary.  Binary files contain a series of bytes, and you have to keep track of the format yourself.  Binary files are the most efficient way to store data, assuming all possible compression has been performed.  Because our signals usually appear like a random sequence of floats, we typically do not attempt to compress the data.  Binary files are used for plenty of other things, e.g., compiled programs (called "binaries").  When used to save signals, we call them binary "IQ files", utilizing the file extension .iq.
+Хоча комплексні числа можна зберігати в текстовому файлі або csv-файлі, ми вважаємо за краще зберігати їх у так званому "двійковому файлі", щоб заощадити місце.  При високій частоті дискретизації ваші записи сигналів можуть легко займати кілька гігабайт, і ми хочемо бути максимально ефективними в плані використання пам'яті.  Якщо ви коли-небудь відкривали файл у текстовому редакторі і він виглядав незрозуміло, як на скріншоті нижче, ймовірно, він був бінарним.  Бінарні файли містять серію байтів, і вам доведеться самостійно відстежувати формат.  Двійкові файли є найефективнішим способом зберігання даних, якщо припустити, що було виконано все можливе стиснення.  Оскільки наші сигнали зазвичай виглядають як випадкова послідовність чисел з плаваючою комою, ми зазвичай не намагаємося стискати дані.  Двійкові файли використовуються для багатьох інших речей, наприклад, для компіляції програм (так званих "бінарників").  Коли вони використовуються для збереження сигналів, ми називаємо їх двійковими "IQ-файлами", використовуючи розширення .iq.
 
 .. image:: ../_images/binary_file.png
-   :scale: 70 % 
+   :scale: 70 
    :align: center 
 
-In Python, the default complex type is np.complex128, which uses two 64-bit floats per sample.  But in DSP/SDR, we tend to use 32-bit floats instead because the ADCs on our SDRs don't have **that** much precision to warrant 64-bit floats.  In Python we will use **np.complex64**, which uses two 32-bit floats.  When you are simply processing a signal in Python it doesn't really matter, but when you go to save the 1d array to a file, you want to make sure it's an array of np.complex64 first.
+У Python за замовчуванням комплексним типом є np.complex128, який використовує два 64-бітних плаваючих числа на семпл.  Але в DSP/SDR ми, як правило, використовуємо 32-розрядні плаваючі числа, тому що АЦП на наших SDR не мають **такої** точності, щоб гарантувати 64-розрядні плаваючі числа.  У Python ми будемо використовувати **np.complex64**, який використовує два 32-бітних плаваючих числа.  Коли ви просто обробляєте сигнал у Python, це не має значення, але коли ви збираєтеся зберегти масив 1d у файл, ви хочете спочатку переконатися, що це масив np.complex64.
 
 *************************
-Python Examples
+Приклади на Python
 *************************
 
-In Python, and numpy specifically, we use the :code:`tofile()` function to store a numpy array to a file.  Here is a short example of creating a simple BPSK signal plus noise and saving it to a file in the same directory we ran our script from:
+У Python, зокрема у numpy, ми використовуємо функцію :code:`tofile()` для збереження масиву numpy у файл.  Ось короткий приклад створення простого BPSK-сигналу з шумом і збереження його у файлі в тому ж каталозі, звідки ми запускали наш скрипт:
 
 .. code-block:: python
 
@@ -39,63 +39,62 @@ In Python, and numpy specifically, we use the :code:`tofile()` function to store
 
     num_symbols = 10000
 
-    x_symbols = np.random.randint(0, 2, num_symbols)*2-1 # -1 and 1's
-    n = (np.random.randn(num_symbols) + 1j*np.random.randn(num_symbols))/np.sqrt(2) # AWGN with unity power
-    r = x_symbols + n * np.sqrt(0.01) # noise power of 0.01
+    x_symbols = np.random.randint(0, 2, num_symbols)*2-1 # -1 та 1
+    n = (np.random.randn(num_symbols) + 1j*np.random.randn(num_symbols))/np.sqrt(2) # AWGN з одиничним степенем
+    r = x_symbols + n * np.sqrt(0.01) # потужність шуму 0.01
     print(r)
     plt.plot(np.real(r), np.imag(r), '.')
     plt.grid(True)
     plt.show()
 
-    # Now save to an IQ file
-    print(type(r[0])) # Check data type.  Oops it's 128 not 64!
-    r = r.astype(np.complex64) # Convert to 64
-    print(type(r[0])) # Verify it's 64
-    r.tofile('bpsk_in_noise.iq') # Save to file
+    # Тепер зберігаємо у IQ-файл
+    print(type(r[0])) # Перевіряємо тип даних.  Упс, 128, а не 64!
+    r = r.astype(np.complex64) # Переводимо в 64
+    print(type(r[0])) # Переконатись, що це 64
+    r.tofile('bpsk_in_noise.iq') # Зберегти у файл
 
+Тепер подивіться на деталі створеного файлу і перевірте, скільки у ньому байт.  Він має бути num_symbols * 8, тому що ми використовували np.complex64, який має 8 байт на семпл, 4 байти на плаваючу комірку (2 плаваючі комірки на семпл).
 
-Now examine the details of the file produced and check how many bytes it is.  It should be num_symbols * 8 because we used np.complex64, which is 8 bytes per sample, 4 bytes per float (2 floats per sample).
-
-Using a new Python script, we can read in this file using :code:`np.fromfile()`, like so:
+Використовуючи новий скрипт Python, ми можемо прочитати цей файл за допомогою :code:`np.fromfile()`, наприклад, так:
 
 .. code-block:: python
 
     import numpy as np
     import matplotlib.pyplot as plt
 
-    samples = np.fromfile('bpsk_in_noise.iq', np.complex64) # Read in file.  We have to tell it what format it is
+    samples = np.fromfile('bpsk_in_noise.iq', np.complex64) # Читаємо у файл.  Треба вказати, у якому він форматі
     print(samples)
 
-    # Plot constellation to make sure it looks right
+    # Побудуємо сузір'я, щоб переконатися, що воно виглядає правильно
     plt.plot(np.real(samples), np.imag(samples), '.')
     plt.grid(True)
     plt.show()
 
-A big mistake is to forget to tell np.fromfile() the file format. Binary files don't include any information about their format.  By default, np.fromfile() assumes it is reading in an array of float64s.
+Велика помилка - забути вказати np.fromfile() формат файлу. Двійкові файли не містять жодної інформації про свій формат.  За замовчуванням np.fromfile() припускає, що він читає у форматі масиву float64.
 
-Most other languages have methods to read in binary files, e.g., in MATLAB you can use fread().  For visually analyzing an RF file see the section below.
+Більшість інших мов мають методи для читання у двійкових файлах, наприклад, у MATLAB ви можете використовувати fread().  Для візуального аналізу RF-файлу дивіться розділ нижче.
 
-If you ever find yourself dealing with int16's (a.k.a. short ints), or any other datatype that numpy doesn't have a complex equivalent for, you will be forced to read the samples in as real, even if they are actually complex.  The trick is to read them as real, but then interleave them back into the IQIQIQ... format yourself, a couple different ways of doing this are shown below:
+Якщо ви коли-небудь матимете справу з int16 (так званими короткими int) або будь-яким іншим типом даних, для якого numpy не має комплексного еквівалента, ви будете змушені читати приклади як справжні, навіть якщо вони насправді є комплексними.  Хитрість полягає у тому, щоб прочитати їх як дійсні, але потім перетворити їх назад у формат IQIQIQ... самостійно, кілька різних способів зробити це показано нижче:
 
 .. code-block:: python
 
  samples = np.fromfile('iq_samples_as_int16.iq', np.int16).astype(np.float32).view(np.complex64)
 
-or
+або
 
 .. code-block:: python
 
  samples = np.fromfile('iq_samples_as_int16.iq', np.int16)
- samples /= 32768 # convert to -1 to +1 (optional)
- samples = samples[::2] + 1j*samples[1::2] # convert to IQIQIQ...
+ samples /= 32768 # конвертуємо в -1 до +1 (необов'язково)
+ samples = samples[::2] + 1j*samples[1::2] # конвертувати в IQIQIQ...
 
 *****************************
-Visually Analyzing an RF File
+Візуальний аналіз радіочастотного файлу
 *****************************
 
-Although we learned how to create our own spectrogram plot in the :ref:`freq-domain-chapter` Chapter, nothing beats using an already created piece of software.  When it comes to analyzing RF recordings without having to install anything, the go-to website is `IQEngine <https://iqengine.org>`_ which is an entire toolkit for analyzing, processing, and sharing RF recordings.
+Хоча ми навчилися створювати власні графіки спектрограм у розділі :ref:`freq-domain-chapter`, ніщо не зрівняється з використанням вже створеного програмного забезпечення.  Коли справа доходить до аналізу радіочастотних записів без необхідності нічого встановлювати, найкращим сайтом є `IQEngine <https://iqengine.org>`_, який є цілим інструментарієм для аналізу, обробки та обміну радіочастотними записами.
 
-For those who want a desktop app, there is also `inspectrum <https://github.com/miek/inspectrum>`_.  Inspectrum is a fairly simple but powerful graphical tool for scanning through an RF file visually, with fine control over the colormap range and FFT size (zoom amount).  You can hold alt and use the scrollwheel to shift through time.  It has optional cursors to measure the delta-time between two bursts of energy, and the ability to export a slice of the RF file into a new file.  For installation on Debian-based platforms such as Ubuntu, use the following commands:
+Для тих, кому потрібен десктопний додаток, є також `inspectrum <https://github.com/miek/inspectrum>`_.  Inspectrum - це досить простий, але потужний графічний інструмент для візуального сканування радіочастотного файлу з тонким контролем діапазону кольорової карти і розміру БПФ (масштабу).  Ви можете утримувати клавішу Alt і використовувати колесо прокрутки для переміщення в часі.  Програма має додаткові курсори для вимірювання дельта-часу між двома сплесками енергії, а також можливість експортувати фрагмент радіочастотного файлу до нового файлу.  Для встановлення на платформах на основі Debian, таких як Ubuntu, скористайтеся наступними командами:
 
 .. code-block:: bash
 
@@ -105,7 +104,7 @@ For those who want a desktop app, there is also `inspectrum <https://github.com/
  mkdir build
  cd build
  cmake ..
- make
+ зробити
  sudo make install
  inspectrum
 
@@ -114,29 +113,30 @@ For those who want a desktop app, there is also `inspectrum <https://github.com/
    :align: center 
    
 *************************
-Max Values and Saturation
+Максимальні значення та насиченість
 *************************
 
-When receiving samples off a SDR it's important to know the maximum sample value.  Many SDRs will output the samples as floats using a maximum value of 1.0 and minimum value of -1.0.  Other SDRs will give you samples as integers, usually 16-bit, in which case the max and min values will be +32767 and -32768 (unless otherwise specified), and you can choose to divide by 32,768 to convert them to floats from -1.0 to 1.0.  The reason to be aware of the maximum value for your SDR is due to saturation: when receiving an extremely loud signal (or if the gain is set too high), the receiver will "saturate" and it will truncate the high values to whatever the maximum sample value is.  The ADCs on our SDRs have a limited number of bits.  When making an SDR app it's wise to always be checking for saturation, and when it happens you should indicate it somehow.
+При отриманні семплів з SDR важливо знати максимальне значення семплу.  Багато SDR виводять семпли як числа з плаваючою комою з максимальним значенням 1.0 і мінімальним -1.0.  Інші SDR надають вам вибірки як цілі числа, зазвичай 16-розрядні, в цьому випадку максимальне і мінімальне значення буде +32767 і -32768 (якщо не вказано інше), і ви можете розділити на 32,768, щоб перетворити їх у значення з плаваючою комою від -1.0 до 1.0.  Причина, по якій необхідно знати максимальне значення для вашого SDR, полягає в насиченні: при отриманні дуже гучного сигналу (або якщо коефіцієнт підсилення встановлено занадто високим), приймач "насититься" і обріже високі значення до того, яким би не було максимальне значення дискретизації.  АЦП на наших SDR мають обмежену кількість бітів.  При створенні SDR-додатків доцільно завжди перевіряти насичення, і коли це відбувається, ви повинні якось позначити це.
 
-A signal that is saturated will look choppy in the time domain, like this:
+Сигнал, який є насиченим, буде виглядати нестабільним у часовій області, як це показано нижче:
 
 .. image:: ../_images/saturated_time.png
    :scale: 30 % 
    :align: center
-   :alt: Example of a saturated receiver where the signal is clipped
+   :alt: Приклад насиченого приймача, де сигнал обрізано
 
-Because of the sudden changes in time domain, due to the truncation, the frequency domain might look smeared.  In other words, the frequency domain will include false features; features that resulted from the saturation and are not actually part of the signal, which can throw people off when analyzing a signal. 
+Через різкі зміни в часовій області, спричинені усіченням, частотна область може виглядати розмазаною.  Іншими словами, частотна область буде включати помилкові особливості; особливості, які є результатом насичення і насправді не є частиною сигналу, що може збити людей з пантелику при аналізі сигналу. 
 
 *****************************
-SigMF and Annotating IQ Files 
+SigMF та анотування IQ файлів 
 *****************************
 
-Since the IQ file itself doesn't have any metadata associated with it, it's common to have a 2nd file, containing information about the signal, with the same filename but a .txt or other file extension.  This should at a minimum include the sample rate used to collect the signal, and the frequency to which the SDR was tuned.  After analyzing the signal, the metadata file could include information about sample ranges of interesting features, such as bursts of energy.  The sample index is simply an integer that starts at 0 and increments every complex sample.  If you knew that there was energy from sample 492342 to 528492, then you could read in the file and pull out that portion of the array: :code:`samples[492342:528493]`.
+Оскільки сам IQ-файл не має жодних метаданих, пов'язаних з ним, зазвичай створюють 2-й файл, що містить інформацію про сигнал, з тим самим іменем, але з розширенням .txt або іншим.  Він повинен містити, як мінімум, частоту дискретизації, яка використовувалася для збору сигналу, і частоту, на яку було налаштовано SDR.  Після аналізу сигналу файл метаданих може містити інформацію про діапазони дискретизації цікавих особливостей, таких як сплески енергії.  Індекс вибірки - це просто ціле число, яке починається з 0 і збільшується з кожною складною вибіркою.  Якби ви знали, що є енергія від зразка 492342 до 528492, то ви могли б прочитати файл і витягнути цю частину масиву: :code:`samples[492342:528493]`.
 
-Luckily, there is now an open standard that specifies a metadata format used to describe signal recordings, known as `SigMF <https://github.com/gnuradio/SigMF>`_.  By using an open standard like SigMF, multiple parties can share RF recordings more easily, and use different tools to operate on the same datasets, such as `IQEngine <https://iqengine.org/sigmf>`_.  It also prevents "bitrot" of RF datasets where details of the capture are lost over time due to details of the recording not being collocated with the recording itself.  
+На щастя, зараз існує відкритий стандарт, який визначає формат метаданих для опису записів сигналів, відомий як `SigMF <https://github.com/gnuradio/SigMF>`_.  Використовуючи відкритий стандарт, такий як SigMF, різні сторони можуть легше обмінюватися записами радіосигналів і використовувати різні інструменти для роботи з тими самими наборами даних, такі як `IQEngine <https://iqengine.org/sigmf>`_.  Це також запобігає "бітротству" наборів радіочастотних даних, коли деталі захоплення втрачаються з часом через те, що деталі запису не співпадають із самим записом.  
 
-The most simple (and minimal) way to use the SigMF standard to describe a binary IQ file you have created is to rename the .iq file to .sigmf-data and create a new file with the same name but .sigmf-meta extension, and make sure the datatype field in the meta file matches the binary format of your data file.  This meta file is a plaintext file filled with json, so you can simply open it with a text editor and fill it out manually (later we will discuss doing this programmatically).  Here is an example .sigmf-meta file you can use as a template:
+
+Найпростіший (і мінімальний) спосіб використання стандарту SigMF для опису створеного вами бінарного IQ-файлу - перейменувати файл .iq на .sigmf-data і створити новий файл з тим самим ім'ям, але з розширенням .sigmf-meta, і переконатися, що поле типу даних у метафайлі відповідає бінарному формату вашого файлу даних.  Цей метафайл є звичайним текстовим файлом, заповненим json, тому ви можете просто відкрити його за допомогою текстового редактора і заповнити вручну (пізніше ми обговоримо, як зробити це програмно).  Ось приклад .sigmf-meta файлу, який ви можете використовувати як шаблон:
 
 .. code-block::
 
@@ -144,7 +144,7 @@ The most simple (and minimal) way to use the SigMF standard to describe a binary
      "global": {
          "core:datatype": "cf32_le",
          "core:sample_rate": 1000000,
-         "core:hw": "PlutoSDR with 915 MHz whip antenna",
+         "core:hw": "PlutoSDR з 915 МГц штирьовою антеною",
          "core:author": "Art Vandelay",
          "core:version": "1.0.0"
      },
@@ -157,11 +157,11 @@ The most simple (and minimal) way to use the SigMF standard to describe a binary
      "annotations": []
  }
 
-Note the :code:`core:cf32_le` indicates your .sigmf-data is of type IQIQIQIQ... with 32-bit floats, i.e., np.complex64 like we used previously.  Reference the specifications for other available datatypes, such as if you have real data instead of complex, or are using 16-bit integers instead of floats to save space.
+Зверніть увагу, що :code:`core:cf32_le` вказує на те, що ваші .sigmf-дані мають тип IQIQIQIQ... з 32-бітними числами з плаваючою комою, тобто np.complex64, як ми використовували раніше.  Зверніться до специфікацій інших доступних типів даних, наприклад, якщо ви використовуєте дійсні дані замість комплексних, або використовуєте 16-розрядні цілі числа замість плаваючих для економії місця.
 
-Aside from datatype, the most important lines to fill out are :code:`core:sample_rate` and :code:`core:frequency`.  It is good practice to also enter information about the hardware (:code:`core:hw`) used to capture the recording, such as the SDR type and antenna, as well as a description of what is known about the signal(s) in the recording in :code:`core:description`.  The :code:`core:version` is simply the version of the SigMF standard being used at the time the metadata file was created.
+Окрім типу даних, найважливішими рядками для заповнення є :code:`core:sample_rate` та :code:`core:frequency`.  Належною практикою є також введення інформації про апаратне забезпечення (:code:`core:hw`), яке було використано для захоплення запису, наприклад, тип SDR та антени, а також опис того, що відомо про сигнал(и) у записі у :code:`core:description`.  Поле :code:`core:version` - це просто версія стандарту SigMF, яка використовувалася на момент створення файлу метаданих.
 
-If you are capturing your RF recording from within Python, e.g., using the Python API for your SDR, then you can avoid having to manually create these metadata files by using the SigMF Python package.  This can be installed on an Ubuntu/Debian based OS as follows:
+Якщо ви записуєте радіосигнал з Python, наприклад, використовуючи API Python для SDR, ви можете уникнути необхідності створювати ці файли метаданих вручну, скориставшись пакетом SigMF Python.  Його можна встановити на ОС на базі Ubuntu/Debian наступним чином:
 
 .. code-block:: bash
 
@@ -170,7 +170,7 @@ If you are capturing your RF recording from within Python, e.g., using the Pytho
  cd SigMF
  sudo pip install .
 
-The Python code to write the .sigmf-meta file for the example towards the beginning of this chapter, where we saved bpsk_in_noise.iq, is shown below:
+Нижче наведено код Python для написання файлу .sigmf-meta для прикладу на початку цієї глави, куди ми зберегли bpsk_in_noise.iq:
 
 .. code-block:: python
 
@@ -178,62 +178,62 @@ The Python code to write the .sigmf-meta file for the example towards the beginn
  import datetime as dt
  from sigmf import SigMFFile
  
- # <code from example>
+ # <код з прикладу
  
  # r.tofile('bpsk_in_noise.iq')
- r.tofile('bpsk_in_noise.sigmf-data') # replace line above with this one
+ r.tofile('bpsk_in_noise.sigmf-data') # замінити рядок вище на цей
  
- # create the metadata
+ # створюємо метадані
  meta = SigMFFile(
-     data_file='example.sigmf-data', # extension is optional
+     data_file='example.sigmf-data', # розширення необов'язкове
      global_info = {
          SigMFFile.DATATYPE_KEY: 'cf32_le',
          SigMFFile.SAMPLE_RATE_KEY: 8000000,
-         SigMFFile.AUTHOR_KEY: 'Your name and/or email',
-         SigMFFile.DESCRIPTION_KEY: 'Simulation of BPSK with noise',
+         SigMFFile.AUTHOR_KEY: 'Ваше ім'я та/або email',
+         SigMFFile.DESCRIPTION_KEY: 'Імітація BPSK з шумом',
          SigMFFile.VERSION_KEY: sigmf.__version__,
      }
  )
  
- # create a capture key at time index 0
+ # створити ключ захоплення з часовим індексом 0
  meta.add_capture(0, metadata={
      SigMFFile.FREQUENCY_KEY: 915000000,
      SigMFFile.DATETIME_KEY: dt.datetime.utcnow().isoformat()+'Z',
  })
  
- # check for mistakes and write to disk
+ # перевірка на помилки та запис на диск
  meta.validate()
- meta.tofile('bpsk_in_noise.sigmf-meta') # extension is optional
+ meta.tofile('bpsk_in_noise.sigmf-meta') # розширення не обов'язкове
 
-Simply replace :code:`8000000` and :code:`915000000` with the variables you used to store sample rate and center frequency respectively. 
+Просто замініть :code:`8000000` та :code:`915000000` на змінні, які ви використовували для зберігання частоти дискретизації та центральної частоти відповідно. 
 
-To read in a SigMF recording into Python, use the following code.  In this example the two SigMF files should be named :code:`bpsk_in_noise.sigmf-meta` and :code:`bpsk_in_noise.sigmf-data`.
+Щоб прочитати запис у форматі SigMF у Python, скористайтеся наступним кодом.  У цьому прикладі два SigMF-файли слід назвати :code:`bpsk_in_noise.sigmf-meta` і :code:`bpsk_in_noise.sigmf-data`.
 
 .. code-block:: python
 
  from sigmf import SigMFFile, sigmffile
  
- # Load a dataset
+ # Завантажити набір даних
  filename = 'bpsk_in_noise'
  signal = sigmffile.fromfile(filename)
  samples = signal.read_samples().view(np.complex64).flatten()
- print(samples[0:10]) # lets look at the first 10 samples
+ print(samples[0:10]) # виводимо перші 10 зразків
  
- # Get some metadata and all annotations
+ # отримуємо метадані та всі анотації
  sample_rate = signal.get_global_field(SigMFFile.SAMPLE_RATE_KEY)
  sample_count = signal.sample_count
  signal_duration = sample_count / sample_rate
 
-For more details reference `the SigMF documentation <https://github.com/gnuradio/SigMF>`_.
+За більш детальною інформацією зверніться до `документації SigMF <https://github.com/gnuradio/SigMF>`_.
 
-A little bonus for those who read this far; the SigMF logo is actually stored as a SigMF recording itself, and when the signal is plotted as a constellation (IQ plot) over time, it produces the following animation:
+Невеликий бонус для тих, хто дочитав до цього місця: логотип SigMF фактично зберігається як сам запис SigMF, і коли сигнал будується у вигляді сузір'я (IQ-діаграма) у часі, він створює наступну анімацію:
 
 .. image:: ../_images/sigmf_logo.gif
-   :scale: 100 %   
+   масштаб: 100 %   
    :align: center
-   :alt: The SigMF logo animation
+   :alt: Анімація логотипу SigMF
 
-The Python code used to read in the logo file (located `here <https://github.com/gnuradio/SigMF/tree/master/logo>`_) and produce the animated gif above is shown below, for those curious:
+Код на Python, який використовується для зчитування файлу логотипу (розташованого `тут <https://github.com/gnuradio/SigMF/tree/master/logo>`_) і створення анімованого gif-файлу, показано нижче, для тих, кому цікаво:
 
 .. code-block:: python
 
@@ -242,12 +242,12 @@ The Python code used to read in the logo file (located `here <https://github.com
  import imageio
  from sigmf import SigMFFile, sigmffile
  
- # Load a dataset
- filename = 'sigmf_logo' # assume its in the same directory as this script
+ # Завантажуємо набір даних
+ filename = 'sigmf_logo' # вважаємо, що він знаходиться у тому ж каталозі, що і цей скрипт
  signal = sigmffile.fromfile(filename)
  samples = signal.read_samples().view(np.complex64).flatten()
  
- # Add zeros to the end so its clear when the animation repeats
+ # Додаємо нулі в кінці, щоб було зрозуміло, коли анімація повторюється
  samples = np.concatenate((samples, np.zeros(50000)))
  
  sample_count = len(samples)
@@ -256,19 +256,19 @@ The Python code used to read in the logo file (located `here <https://github.com
  filenames = []
  for i in range(num_frames):
      print("frame", i, "out of", num_frames)
-     # Plot the frame
+     # Побудувати графік кадру
      fig, ax = plt.subplots(figsize=(5, 5))
      samples_frame = samples[i*samples_per_frame:(i+1)*samples_per_frame]
      ax.plot(np.real(samples_frame), np.imag(samples_frame), color="cyan", marker=".", linestyle="None", markersize=1)
-     ax.axis([-0.35,0.35,-0.35,0.35]) # keep axis constant
-     ax.set_facecolor('black') # background color
+     ax.axis([-0.35,0.35,-0.35,0.35]) # зберігаємо вісь постійною
+     ax.set_facecolor('black') # колір фону
      
-     # Save the plot to a file
+     # Зберегти графік у файл
      filename = '/tmp/sigmf_logo_' + str(i) + '.png'
      fig.savefig(filename, bbox_inches='tight')
      filenames.append(filename)
  
- # Create animated gif
+ # Створюємо анімований gif
  images = []
  for filename in filenames:
      images.append(imageio.imread(filename))

@@ -1,187 +1,133 @@
 .. _link-budgets-chapter:
 
 ##################
-Link Budgets
+Бюджети посилань
 ##################
 
-This chapter covers link budgets, a big portion of which is understanding transmit/receive power, path loss, antenna gain, noise, and SNR.  We finish by constructing an example link budget for ADS-B, which are signals transmitted by commercial aircraft to share their position and other information.  
+У цій главі розглядаються бюджети каналів зв'язку, значна частина яких присвячена розумінню потужності передачі/прийому, втрат у тракті, коефіцієнту підсилення антени, шуму і SNR.  Ми закінчуємо прикладом побудови бюджету каналу зв'язку для ADS-B, тобто сигналів, які передаються комерційними літаками для обміну інформацією про своє місцезнаходження та іншою інформацією.  
 
 *************************
-Introduction
+Вступ
 *************************
 
-A link budget is an accounting of all of the gains and losses from the transmitter to the receiver in a communication system.  Link budgets describe one direction of the wireless link.  Most communications systems are bidirectional, so there must be a separate uplink and downlink budget.  The "result" of the link budget will tell you roughly how much signal-to-noise ratio (abbreviated as SNR, which this textbook uses, or S/N) you should expect to have at your receiver.  Further analysis would be needed to check if that SNR is high enough for your application.
+Бюджет лінії зв'язку - це облік всіх виграшів і втрат на шляху від передавача до приймача в системі зв'язку.  Бюджет каналу описує один напрямок бездротового зв'язку.  Більшість систем зв'язку є двонаправленими, тому має бути окремий бюджет для висхідної та низхідної лінії зв'язку.  "Результат" бюджету лінії зв'язку покаже вам приблизно, яке співвідношення сигнал/шум (скорочено SNR, яке використовується в цьому підручнику, або S/N) ви можете очікувати на вашому приймачі.  Подальший аналіз буде необхідний для того, щоб перевірити, чи є це SNR достатньо високим для вашого застосування.
 
-You study link budgets not for the purpose of being able to actually make a link budget for some situation, but to learn and develop a system-layer point of view of wireless communications.
+Ви вивчаєте бюджети каналів зв'язку не для того, щоб мати можливість фактично скласти бюджет каналу зв'язку для певної ситуації, а для того, щоб вивчити і розвинути системну точку зору на бездротовий зв'язок.
 
-We will first cover the received signal power budget, then the noise power budget, and finally combine the two to find SNR (signal power divided by noise power).
+Спочатку ми розглянемо бюджет потужності прийнятого сигналу, потім бюджет потужності шуму і, нарешті, об'єднаємо ці два бюджети, щоб знайти SNR (потужність сигналу, поділена на потужність шуму).
 
 *************************
-Signal Power Budget
+Бюджет потужності сигналу
 *************************
 
-Below shows the most basic diagram of a generic wireless link.  In this chapter we will focus on one direction, i.e., from a transmitter (Tx) to receiver (Rx).  For a given system, we know the *transmit* power; it is usually a setting in the transmitter.  How do we figure out the *received* power at the receiver?
+Нижче показано найпростішу схему типового бездротового з'єднання.  У цій главі ми зосередимося на одному напрямку, тобто від передавача (Tx) до приймача (Rx).  Для даної системи ми знаємо потужність *передачі*; зазвичай це налаштування в передавачі.  Як визначити *прийняту* потужність на приймачі?
 
 .. image:: ../_images/tx_rx_system.svg
    :align: center 
    :target: ../_images/tx_rx_system.svg
 
-We need four system parameters to determine the received power, which are provided below with their common abbreviations. This chapter will delve into each of them.
+Для визначення отриманої потужності нам знадобляться чотири системні параметри, які наведено нижче з їхніми загальними скороченнями. У цьому розділі ми розглянемо кожен з них.
 
-- **Pt** - Transmit power
-- **Gt** - Gain of transmit antenna
-- **Gr** - Gain of receive antenna
-- **Lp** - Distance between Tx and Rx (i.e., how much wireless path loss)
+- **Pt** - Передавана потужність
+- **Gt** - Коефіцієнт підсилення передавальної антени
+- **Gr** - Коефіцієнт підсилення приймальної антени
+- **Lp** - відстань між Tx і Rx (тобто, скільки втрат на бездротовому шляху)
 
 .. image:: ../_images/tx_rx_system_params.svg
    :align: center 
    :target: ../_images/tx_rx_system_params.svg
-   :alt: Parameters within a link budget depicted
+   :alt: Зображено параметри у межах бюджету каналу зв'язку
 
-Transmit Power
+Потужність передачі
 #####################
 
-Transmit power is fairly straightforward; it will be a value in watts, dBW, or dBm (recall dBm is shorthand for dBmW).  Every transmitter has one or more amplifiers, and the transmit power is mostly a function of those amplifiers.  An analogy for transmit power would be the watt rating (power) of a light bulb: the higher the wattage, the more light transmitted by the bulb.  Here are examples of approximate transmit power for different technologies:
+Потужність передачі досить проста; це буде значення у ватах, дБВт або дБм (нагадаємо, що дБм - це скорочення від дБмВт).  Кожен передавач має один або кілька підсилювачів, і потужність передачі в основному залежить від цих підсилювачів.  Аналогією потужності передачі може бути номінальна потужність лампочки: чим вища потужність, тим більше світла вона випромінює.  Ось приклади приблизних значень потужності для різних технологій:
 
-==================  =====  =======
-\                       Power    
-------------------  --------------
-Bluetooth           10 mW  -20 dBW   
-WiFi                100mW  -10 dBW
-LTE base-station    1W     0 dBW
-FM station          10kW   40 dBW
-==================  =====  =======
+================== ===== =======
+\ Потужність    
+------------------ --------------
+Bluetooth 10 мВт -20 дБВт   
+WiFi 100 мВт -10 дБВт
+Базова станція LTE 1 Вт 0 дБВт
+FM-станція 10 кВт 40 дБВт
+================== ===== =======
 
-Antenna Gains
+Коефіцієнт підсилення антени
 #####################
 
-Transmit and receive antenna gains are crucial for calculating link budgets. What is the antenna gain, you might ask?  It indicates the directivity of the antenna.  You might see it referred to as antenna power gain, but don't let that mislead you, the only way for an antenna to have a higher gain is to direct energy in a more focused region.
+Коефіцієнт підсилення передавальної та приймальної антен має вирішальне значення для розрахунку бюджету лінії зв'язку. Що таке коефіцієнт підсилення антени, запитаєте ви?  Він вказує на спрямованість антени.  Ви можете бачити, що його називають коефіцієнтом підсилення потужності антени, але нехай це не вводить вас в оману, єдиний спосіб для антени мати більший коефіцієнт підсилення - це спрямувати енергію в більш сфокусовану область.
 
-Gains will be depicted in dB (unit-less); feel free to learn or remind yourself why dB is unit-less for our scenario in the :ref:`noise-chapter` chapter.  Typically, antennas are either omnidirectional, meaning their power radiates in all directions, or directional, meaning their power radiates in a specific direction.  If they are omnidirectional their gain will be 0 dB to 3 dB.  A directional antenna will have a higher gain, usually 5 dB or higher, and anywhere up to 60 dB or so.
+Коефіцієнт підсилення буде показано в дБ (без одиниць); не соромтеся дізнатися або нагадати собі, чому дБ без одиниць для нашого сценарію, в розділі :ref:`noise-chapter`.  Зазвичай антени бувають або всеспрямованими, тобто їхня потужність випромінюється в усіх напрямках, або спрямованими, тобто їхня потужність випромінюється у певному напрямку.  Якщо вони всеспрямовані, їхній коефіцієнт підсилення буде від 0 дБ до 3 дБ.  Спрямована антена має вищий коефіцієнт підсилення, зазвичай 5 дБ або вище, і десь до 60 дБ або близько того.
 
 .. image:: ../_images/antenna_gain_patterns.png
    :scale: 80 % 
    :align: center 
 
-When a directional antenna is used, it must be either installed facing the correct direction or attached to a mechanical gimbal. It could also be a phased array, which can be electronically steered (i.e., by software).
+Якщо використовується спрямована антена, вона повинна бути або встановлена в правильному напрямку, або прикріплена до механічного підвісу. Це також може бути фазована решітка, якою можна керувати електронно (тобто за допомогою програмного забезпечення).
 
 .. image:: ../_images/antenna_steering.png
    :scale: 80 % 
    :align: center 
    
-Omnidirectional antennas are used when pointing in the right direction is not possible, like your cellphone and laptop.  In 5G, phones can operate in the higher frequency bands like 28 GHz (Verizon) and 39 GHz (AT&T) using an array of antennas and electronic beam steering.
+Всеспрямовані антени використовуються, коли неможливо спрямувати пристрій у правильному напрямку, як у вашому мобільному телефоні або ноутбуці.  У 5G телефони можуть працювати у вищих частотних діапазонах, таких як 28 ГГц (Verizon) і 39 ГГц (AT&T), використовуючи масив антен і електронне керування променем.
 
-In a link budget, we must assume that any directional antenna, whether transmit or receive, is pointed in the right direction.  If it's not pointed correctly then our link budget won't be accurate and there could be loss of communication, (e.g., the satellite dish on your roof gets hit by basketball and moves).  In general, our link budgets assume ideal circumstances while adding a miscellaneous loss to account for real-world factors.
-
-Path Loss
-#####################
-
-As a signal moves through the air (or vacuum), it reduces in strength.  Imagine holding a small solar panel in front of a light bulb.  The further away the solar panel is, the less energy it will absorb from the light bulb.  **Flux** is a term in physics and mathematics, defined as "how much stuff goes through your thing".  For us, it's the amount of electromagnetic field passing into our receive antenna.  We want to know how much power is lost, for a given distance.
-
-.. image:: ../_images/flux.png
-   :scale: 80 % 
-   :align: center 
-
-Free Space Path Loss (FSPL) tells us the path loss when there are no obstacles for a given distance.  In its general form, :math:`\mathrm{FSPL} = ( 4\pi d / \lambda )^2`. Google Friis transmission formula for more info.  (Fun fact: signals encounter 377 ohms impedance moving through free space.)  For generating link budgets, we can use this same equation but converted to dB:
-
-.. math::
- \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ dB \right]
-
-In link budgets it will show up in dB, unit-less because it is a loss.  :math:`d` is in meters and is the distance between the transmitter and receiver.  :math:`f` is in Hz and is the carrier frequency.  There's only one problem with this simple equation; we won't always have free space between the transmitter and receiver.  Frequencies bounce a lot indoors (most frequencies can go through walls, just not metal or thick masonry). For these situations there are various non-free-space models. A common one for cities and suburban areas (e.g., cellular) is the Okumura–Hata model:
-
-.. math::
- L_{path} = 69.55 + 26.16 \log_{10} f - 13.82 \log_{10} h_B - C_H + \left[ 44.9 - 6.55 \log_{10} h_B \right] \log_{10} d
-
-where :math:`L_{path}` is the path loss in dB, :math:`h_B` is the height of the transmit antenna above ground level in meters, :math:`f` is the carrier frequency in MHz, :math:`d` is the distance between Tx and Rx in km, and :math:`C_H` is called the "antenna high correction factor" and is defined based on the size of city and carrier frequency range:
-
-:math:`C_H` for small/medium cities:
-
-.. math::
- C_H = 0.8 + (1.1 \log_{10} f - 0.7 ) h_M - 1.56 \log_{10} f
-
-:math:`C_H` for large cities when :math:`f` is below 200 MHz:
-
-.. math::
- C_H = 8.29 ( log_{10}(1.54 h_M))^2 - 1.1
- 
-:math:`C_H` for large cities when :math:`f` is above 200 MHz but less than 1.5 GHz:
-
-.. math::
- C_H = 3.2 ( log_{10}(11.75 h_M))^2 - 4.97
-
-where :math:`h_M` is the height of the receiving antenna above ground level in meters.
-
-Don't worry if the above Okumura–Hata model seemed confusing; it is mainly shown here to demonstrate how non-free-space path loss models are much more complicated than our simple FSPL equation.  The final result of any of these models is a single number we can use for the path loss portion of our link budget.  We'll stick to using FSPL for the rest of this chapter.
-
-Miscellaneous Losses
-#####################
-
-In our link budget we also want to take into account miscellaneous losses.  We will lump these together into one term, usually somewhere between 1 – 3 dB.  Examples of miscellaneous losses:
-
-- Cable loss
-- Atmospheric Loss
-- Antenna pointing imperfections
-- Precipitation
-
-The plot below shows atmospheric loss in dB/km over frequency (we will usually be < 40 GHz).  If you take some time to understand the y-axis, you'll see that short range communications below 40 GHz **and** less than 1 km have 1 dB or less of atmospheric loss, and thus we generally ignore it.  When atmospheric loss really comes into play is with satellite communications, where the signal has to travel many km through the atmosphere. 
-
-.. image:: ../_images/atmospheric_attenuation.svg
+:: ../_images/atmospheric_attenuation.svg
    :align: center 
    :target: ../_images/atmospheric_attenuation.svg
-   :alt: Plot of atmospheric attenuation in dB/km over frequency showing the spikes from H2O (water) and O2 (oxygen)
+   :alt: Графік залежності атмосферного загасання в дБ/км від частоти, що показує піки від H2O (вода) і O2 (кисень)
 
-Signal Power Equation
+
+Рівняння потужності сигналу
 #####################
 
-Now it's time to put all of these gains and losses together to calculate our signal power at the receiver, :math:`P_r`:
+Тепер прийшов час скласти всі ці посилення і втрати разом, щоб обчислити потужність нашого сигналу на приймачі, :math:`P_r`:
 
 .. math::
  P_r = P_t + G_t + G_r - L_p - L_{misc} \quad \mathrm{dBW}
 
-Overall it's an easy equation. We add up the gains and losses. Some might not even consider it an equation at all.  We usually show the gains, losses, and total in a table, similar to accounting, like this:
+Загалом, це просте рівняння. Ми додаємо прибутки і збитки. Дехто може навіть не вважати це рівнянням.  Зазвичай ми показуємо прибутки, збитки і загальну суму в таблиці, подібно до бухгалтерської звітності, ось так:
 
 .. list-table::
    :widths: 15 10
    :header-rows: 0
    
-   * - Pt = 1.0 W
-     - 0 dBW
+   * - Pt = 1.0 Вт
+     - 0 дБВт
    * - Gt = 100
-     - 20.0 dB
+     - 20.0 дБ
    * - Gr = 1
-     - 0 dB
+     - 0 дБ
    * - Lp
-     - -162.0 dB
+     - -162.0 дБ
    * - Lmisc
-     - -1.0 dB
+     - -1.0 дБ
    * - **Pr**
-     - **-143.0 dBW**
-
+     - **-143.0 дБВт**
 
 *************************
-Noise Power Budget
+Бюджет шумопоглинання
 *************************
 
-Now that we know the received signal power, let's change topic to received noise, since we need both to calculate SNR after all.  We can find received noise with a similar style power budget.
+Тепер, коли ми знаємо потужність прийнятого сигналу, давайте перейдемо до шуму, оскільки для розрахунку SNR нам потрібні обидва показники.  Ми можемо знайти прийнятий шум зі схожим бюджетом потужності.
 
-Now is a good time to talk about where noise enters our comms link.  Answer: **At the receiver!**  The signal is not corrupted with noise until we go to receive it.  It is *extremely* important to understand this fact! Many students don't quite internalize it, and they end up making a foolish error as a result.  There is not noise floating around us in the air. The noise comes from the fact that our receiver has an amplifier and other electronics that are not perfect and not at 0 degrees Kelvin (K).
+Зараз саме час поговорити про те, звідки шум потрапляє в нашу лінію зв'язку.  Відповідь: **У приймачі!** Сигнал не спотворюється шумом, поки ми не підемо його приймати.  Дуже важливо зрозуміти цей факт! Багато студентів не зовсім його засвоюють, і в результаті роблять безглузді помилки.  Навколо нас у повітрі немає ніякого шуму. Шум виникає через те, що наш приймач має підсилювач та іншу електроніку, яка не є досконалою і не працює при температурі 0 градусів Кельвіна (К).
 
-A popular and simple formulation for the noise budget uses the "kTB" approach:
+Популярне і просте формулювання бюджету шуму використовує підхід "kTB":
 
 .. math::
  P_{noise} = kTB
 
-- :math:`k` – Boltzmann’s constant = 1.38 x 10-23 J/K = **-228.6 dBW/K/Hz**.  For anyone curious, Boltzmann’s constant is a physical constant relating the average kinetic energy of particles in a gas with the temperature of the gas.
-- :math:`T` – System noise temperature in K (cryocoolers anyone?), largely based on our amplifier.  This is the term that is most difficult to find, and is usually very approximate.  You might pay more for an amplifier with a lower noise temperature. 
-- :math:`B` – Signal bandwidth in Hz, assuming you filter out the noise around your signal.  So an LTE downlink signal that is 10 MHz wide will have :math:`B` set to 10 MHz, or 70 dBHz.
+- де :math:`k` - стала Больцмана = 1.38 x 10-23 Дж/К = **-228.6 дБВт/К/Гц**.  Для тих, кому цікаво, постійна Больцмана - це фізична константа, яка пов'язує середню кінетичну енергію частинок у газі з температурою газу.
+- :math:`T` - шумова температура системи в К (хто-небудь пам'ятає кріокулери?), в значній мірі заснована на нашому підсилювачі.  Це термін, який найважче знайти, і зазвичай він дуже приблизний.  Ви можете заплатити більше за підсилювач з нижчою температурою шуму. 
+- math:`B` - смуга пропускання сигналу в Гц, за умови, що ви відфільтровуєте шум навколо сигналу.  Отже, сигнал низхідної лінії зв'язку LTE шириною 10 МГц матиме значення :math:`B`, встановлене на 10 МГц, або 70 дБГц.
 
-Multiplying out (or adding in dB) kTB gives our noise power, i.e., the bottom term of of our SNR equation.
+Віднімання (або додавання в дБ) кТБ дає потужність шуму, тобто нижній член нашого рівняння SNR.
 
 *************************
 SNR
 *************************
 
-Now that we have both numbers, we can take the ratio to find SNR, (see the :ref:`noise-chapter` chapter for more information about SNR):
+Тепер, коли ми маємо обидва числа, ми можемо скористатися співвідношенням, щоб знайти SNR (див. розділ :ref:`noise-chapter` для отримання додаткової інформації про SNR):
 
 .. math::
    \mathrm{SNR} = \frac{P_{signal}}{P_{noise}}
@@ -189,43 +135,43 @@ Now that we have both numbers, we can take the ratio to find SNR, (see the :ref:
 .. math::
    \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{noise\_dB}
 
-We typically shoot for an SNR > 10 dB, although it really depends on the application.  In practice, SNR can be verified by looking at the FFT of the received signal or by calculating the power with and without the signal present (recall variance = power).  The higher the SNR, the more bits per symbol you can manage without too many errors.
+Зазвичай ми прагнемо отримати SNR > 10 дБ, хоча це залежить від конкретного застосування.  На практиці SNR можна перевірити, подивившись на БПФ прийнятого сигналу або обчисливши потужність з присутнім сигналом і без нього (нагадаємо, що дисперсія = потужність).  Чим вище SNR, тим більше бітів на символ ви можете обробляти без зайвих помилок.
 
 ***************************
-Example Link Budget: ADS-B
+Приклад бюджету каналу зв'язку: ADS-B
 ***************************
 
-Automatic Dependent Surveillance-Broadcast (ADS-B) is a technology used by aircraft to broadcast signals that share their position and other status with air traffic control ground stations and other aircraft.  ADS-B is automatic in that it requires no pilot or external input; it depends on data from the aircraft's navigation system and other computers.  The messages are not encrypted (yay!).  ADS-B equipment is currently mandatory in portions of Australian airspace, while the United States requires some aircraft to be equipped, depending on the size.
+Автоматичне залежне спостереження-трансляція (ADS-B) - це технологія, яка використовується літаками для трансляції сигналів, що повідомляють про їхнє місцезнаходження та інший статус наземним станціям управління повітряним рухом та іншим повітряним суднам.  ADS-B є автоматичною, оскільки не вимагає участі пілота або зовнішнього втручання; вона залежить від даних з навігаційної системи літака та інших комп'ютерів.  Повідомлення не шифруються (ура!).  Наразі обладнання ADS-B є обов'язковим у частині повітряного простору Австралії, в той час як Сполучені Штати вимагають оснащення деяких літаків, залежно від їхнього розміру.
 
 .. image:: ../_images/adsb.jpg
-   :scale: 120 % 
+   :масштаб: 120 % 
    :align: center 
    
-The Physical (PHY) Layer of ADS-B has the following characteristics:
+Фізичний (PHY) рівень ADS-B має наступні характеристики:
 
-- Transmitted on 1,090 MHz
-- Signal bandwidth around 2 MHz
-- PPM modulation
-- Data rate of 1 Mbit/s, with messages between 56 - 112 microseconds
-- Messages carry 15 bytes of data each, so multiple messages are usually needed for the entire aircraft information
-- Multiple access is achieved by having messages broadcast with a period that ranges randomly between 0.4 and 0.6 seconds.  This randomization is designed to prevent aircraft from having all of their transmissions on top of each other (some may still collide but that's fine)
-- ADS-B antennas are vertically polarized
-- Transmit power varies, but should be in the ballpark of 100 W (20 dBW)
-- Transmit antenna gain is omnidirectional but only pointed downward, so let's say 3 dB
-- ADS-B receivers also have an omnidirectional antenna gain, so let's say 0 dB
+- Передається на частоті 1,090 МГц
+- Смуга пропускання сигналу близько 2 МГц
+- PPM модуляція
+- Швидкість передачі даних 1 Мбіт/с, з повідомленнями від 56 до 112 мікросекунд
+- Повідомлення містять 15 байт даних кожне, тому для отримання всієї інформації про літак зазвичай потрібно декілька повідомлень
+- Багаторазовий доступ досягається шляхом трансляції повідомлень з періодом, який випадковим чином коливається між 0,4 і 0,6 секунди.  Ця рандомізація призначена для того, щоб запобігти накладанню всіх передач літаків одна на одну (деякі все одно можуть зіткнутися, але це не страшно)
+- Антени ADS-B вертикально поляризовані
+- Потужність передачі варіюється, але повинна бути в районі 100 Вт (20 дБВт)
+- Коефіцієнт підсилення передавальної антени всеспрямований, але спрямований лише вниз, тому, скажімо, 3 дБ
+- Приймачі ADS-B також мають всеспрямований коефіцієнт підсилення антени, тому, скажімо, 0 дБ
 
-The path loss depends on how far away the aircraft is from our receiver.  As an example, it's about 30 km between the University of Maryland (where the course that this textbook's content originated from was taught) and the BWI airport.  Let's calculate FSPL for that distance and a frequency of 1,090 MHz:
+Втрати на шляху залежать від того, як далеко знаходиться літак від нашого приймача.  Наприклад, між Університетом Меріленда (де читався курс, на якому ґрунтується зміст цього підручника) і аеропортом BWI близько 30 км.  Давайте розрахуємо FSPL для цієї відстані і частоти 1090 МГц:
 
 .. math::
-    \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55  \left[ \mathrm{dB} \right]
+    \mathrm{FSPL}_{dB} = 20 \log_{10} d + 20 \log_{10} f - 147.55 \left[ \mathrm{dB} \right]
     
-    \mathrm{FSPL}_{dB} = 20 \log_{10} 30e3 + 20 \log_{10} 1090e6 - 147.55  \left[ \mathrm{dB} \right]
+    \mathrm{FSPL}_{dB} = 20 \log_{10} 30e3 + 20 \log_{10} 1090e6 - 147.55 \left[ \mathrm{dB} \right]
 
     \mathrm{FSPL}_{dB} = 122.7 \left[ \mathrm{dB} \right]
 
-Another option is to leave :math:`d` as a variable in the link budget and figure out how far away we can hear signals based on a required SNR. 
+Інший варіант - залишити :math:`d` як змінну у бюджеті каналу і з'ясувати, на якій відстані ми зможемо чути сигнали, виходячи з необхідного SNR. 
 
-Now because we definitely won't have free space, let's add another 3 dB of miscellaneous loss.  We will make the miscellaneous loss 6 dB total, to take into account our antenna not being well matched and cable/connector losses.  Given all of this criteria, our signal link budget looks like:
+Тепер, оскільки у нас точно не буде вільного місця, давайте додамо ще 3 дБ різних втрат.  Ми зробимо загальні втрати 6 дБ, щоб врахувати погане узгодження нашої антени і втрати в кабелі/конекторі.  Враховуючи всі ці критерії, наш бюджет сигнальної лінії виглядає наступним чином:
 
 .. list-table::
    :widths: 15 10
@@ -244,15 +190,15 @@ Now because we definitely won't have free space, let's add another 3 dB of misce
    * - **Pr**
      - **-105.7 dBW**
 
-For our noise budget:
+Для нашого бюджету шуму:
 
-- B = 2 MHz = 2e6 = 63 dBHz
-- T we have to approximate, let's say 300 K, which is 24.8 dBK.  It will vary based on quality of the receiver
-- k is always -228.6 dBW/K/Hz 
+- B = 2 МГц = 2e6 = 63 дБГц
+- T ми повинні наблизити, скажімо, до 300 К, що становить 24,8 дБК.  Це буде залежати від якості приймача
+- k завжди дорівнює -228,6 дБВт/К/Гц 
 
-.. math::
- P_{noise} = k + T + B = -140.8 \quad \mathrm{dBW}
+.. математика::
+ P_{шум} = k + T + B = -140.8 \quad \mathrm{dBW}
  
-Therefore our SNR is -105.7 - (-140.8) = **35.1 dB**.  It's not surprising it is a huge number, considering we are claiming to only be 30 km from the aircraft under free space.  If ADS-B signals couldn't reach 30 km then ADS-B wouldn't be a very effective system--no one would hear each other until they were very close.  Under this example we can easily decode the signals; pulse-position modulation (PPM) is fairly robust and does not require that high an SNR.  What's difficult is when you try to receive ADS-B while inside a classroom, with an antenna that is very poorly matched, and a strong FM radio station nearby causing interference.  Those factors could easily lead to 20-30 dB of losses.
+Отже, наш SNR становить -105.7 - (-140.8) = **35.1 дБ**.  Не дивно, що це величезне число, враховуючи, що ми стверджуємо, що знаходимося лише на відстані 30 км від літака у вільному просторі.  Якби сигнали ADS-B не могли досягати 30 км, то ADS-B не була б дуже ефективною системою - ніхто не чув би один одного, поки не опинився б дуже близько.  У цьому прикладі ми можемо легко декодувати сигнали; імпульсно-позиційна модуляція (ІПМ) є досить надійною і не вимагає такого високого SNR.  Складність полягає в тому, що ви намагаєтеся прийняти ADS-B, перебуваючи в класі, з антеною, яка дуже погано узгоджена, і потужною FM-радіостанцією поблизу, яка створює перешкоди.  Ці фактори можуть легко призвести до 20-30 дБ втрат.
 
-This example was really just a back-of-the-envelope calculation, but it demonstrated the basics of creating a link budget and understanding the important parameters of a comms link. 
+Цей приклад насправді був лише приблизним розрахунком, але він продемонстрував основи створення бюджету каналу зв'язку та розуміння важливих параметрів каналу зв'язку.

@@ -1,190 +1,189 @@
 .. _noise-chapter:
 
 #############
-Noise and dB
+Шум і дБ
 #############
 
-In this chapter we will discuss noise, including how it is modeled and handled in a wireless communications system.  Concepts include AWGN, complex noise, and SNR/SINR.  We will also introduce decibels (dB) along the way, as it is widely within wireless comms and SDR.
+У цій главі ми обговоримо шум, включаючи те, як він моделюється і обробляється в системі бездротового зв'язку.  Поняття включають AWGN, комплексний шум і SNR/SINR.  Ми також познайомимося з децибелами (дБ), оскільки вони широко використовуються в бездротовому зв'язку та SDR.
 
 ************************
-Gaussian Noise
+Гауссівський шум
 ************************
 
-Most people are aware of the concept of noise: unwanted fluctuations that can obscure our desired signal(s). Noise looks something like:
+Більшість людей знайомі з поняттям шуму: небажані флуктуації, які можуть затьмарювати бажаний сигнал (сигнали). Шум виглядає приблизно так:
 
 .. image:: ../_images/noise.png
    :scale: 70 % 
    :align: center 
 
-Note how the average value is zero in the time domain graph.  If the average value wasn't zero, then we could subtract the average value, call it a bias, and we would be left with an average of zero.  Also note that the individual points in the graph are *not* "uniformly random", i.e., larger values are rarer, most of the points are closer to zero.
+Зверніть увагу, що середнє значення дорівнює нулю на часовому графіку.  Якби середнє значення не дорівнювало нулю, то ми могли б відняти середнє значення, назвати його зсувом, і у нас залишилося б середнє значення, що дорівнює нулю.  Також зверніть увагу, що окремі точки на графіку *не* "рівномірно випадкові", тобто більші значення зустрічаються рідше, більшість точок ближче до нуля.
 
-We call this type of noise "Gaussian noise". It's a good model for the type of noise that comes from many natural sources, such as thermal vibrations of atoms in the silicon of our receiver's RF components.  The **central limit theorem** tells us that the summation of many random processes will tend to have a Gaussian distribution, even if the individual processes have other distributions.  In other words, when a lot of random things happen and accumulate, the result appears approximately Gaussian, even when the individual things are not Gaussian distributed.
+Ми називаємо цей тип шуму "гаусівським шумом". Це хороша модель для типу шуму, який походить від багатьох природних джерел, таких як теплові коливання атомів у кремнії радіочастотних компонентів нашого приймача.  Теорема про центральну межу говорить нам, що сума багатьох випадкових процесів буде мати гаусівський розподіл, навіть якщо окремі процеси мають інші розподіли.  Іншими словами, коли відбувається і накопичується багато випадкових подій, результат виглядає приблизно гауссівським, навіть якщо окремі події не розподілені за гауссівським законом.
 
 
 .. image:: ../_images/central_limit_theorem.svg
    :align: center 
    :target: ../_images/central_limit_theorem.svg
-   :alt: Central limit theorem visualized as the sum of many random processes leading to a normal distribution (a.k.a. gaussian distribution)
+   :alt: Центральна гранична теорема, візуалізована як сума багатьох випадкових процесів, що приводять до нормального розподілу (так званого гауссового розподілу)
 
-The Gaussian distribution is also called the "Normal" distribution (recall a bell curve).
+Розподіл Гауса також називають "нормальним" розподілом (згадайте криву дзвону).
 
-The Gaussian distribution has two parameters: mean and variance.  We already discussed how the mean can be considered zero because you can always remove the mean, or bias, if it's not zero.  The variance changes how "strong" the noise is.  A higher variance will result in larger numbers.  It is for this reason that variance defines the noise power.
+Розподіл Гауса має два параметри: середнє значення і дисперсію.  Ми вже обговорювали, як середнє значення можна вважати нульовим, тому що ви завжди можете вилучити середнє значення, або зміщення, якщо воно не дорівнює нулю.  Дисперсія показує, наскільки "сильним" є шум.  Вища дисперсія призводить до більших чисел.  Саме з цієї причини дисперсія визначає потужність шуму.
 
-Variance equals standard deviation squared (:math:`\sigma^2`).
+Дисперсія дорівнює стандартному відхиленню в квадраті (:math:`\sigma^2`).
 
 ************************
-Decibels (dB)
+Децибели (дБ)
 ************************
 
-We are going to take a quick tangent to formally introduce dB.  You may have heard of dB, and if you are already familiar with it feel free to skip this section.
+Ми зробимо невеликий екскурс, щоб формально ввести дБ.  Можливо, ви вже чули про дБ, і якщо ви вже знайомі з ним, можете пропустити цей розділ.
 
-Working in dB is extremely useful when we need to deal with small numbers and big numbers at the same time, or just a bunch of really big numbers. Consider how cumbersome it would be to work with numbers of the scale in Example 1 and Example 2.
+Робота в дБ надзвичайно корисна, коли нам потрібно мати справу з малими і великими числами одночасно, або просто з купою дуже великих чисел. Розглянемо, наскільки громіздкою була б робота з числами шкали в Прикладі 1 і Прикладі 2.
 
-Example 1: Signal 1 is received at 2 watts and the noise floor is at 0.0000002 watts.
+Приклад 1: Сигнал 1 приймається потужністю 2 Вт, а рівень шуму становить 0,0000002 Вт.
 
-Example 2: A garbage disposal is 100,000 times louder than a quiet rural area, and a chain saw is 10,000 times louder than a garbage disposal (in terms of power of sound waves).
+Приклад 2: Сміттєпровід працює в 100 000 разів голосніше, ніж у тихій сільській місцевості, а ланцюгова пила в 10 000 разів голосніше, ніж сміттєпровід (з точки зору потужності звукових хвиль).
 
-Without dB, meaning working in normal "linear" terms, we need to use a lot of 0's to represent the values in Examples 1 and 2. Frankly, if we were to plot something like Signal 1 over time, we wouldn't even see the noise floor. If the scale of the y-axis went from 0 to 3 watts, for example, the noise would be too small to show up in the plot. To represent these scales simultaneously, we work in a log-scale.
+Без децибел, тобто працюючи в звичайних "лінійних" термінах, ми повинні використовувати багато 0 для представлення значень у прикладах 1 і 2. Чесно кажучи, якби ми побудували графік чогось подібного до сигналу 1 у часі, ми б навіть не побачили рівень шуму. Наприклад, якби шкала осі Y змінювалася від 0 до 3 Вт, шум був би надто малим, щоб його можна було побачити на графіку. Щоб представити ці шкали одночасно, ми працюємо в логарифмічній шкалі.
 
-To further illustrate the problems of scale we encounter in signal processing, consider the below waterfalls of three of the same signals. The left-hand side is the original signal in linear scale, and the right-hand side shows the signals converted to a logarithmic scale (dB).  Both representations use the exact same colormap, where blue is lowest value and yellow is highest.  You can barely see the signal on the left in the linear scale.
+Щоб ще більше проілюструвати проблеми масштабу, з якими ми стикаємося при обробці сигналів, розглянемо наведені нижче водоспади трьох однакових сигналів. Ліворуч - вихідний сигнал у лінійному масштабі, а праворуч - сигнали, перетворені в логарифмічну шкалу (дБ).  Обидва представлення використовують однакову кольорову карту, де синій колір означає найнижче значення, а жовтий - найвище.  Ви ледве можете побачити сигнал зліва в лінійній шкалі.
 
 .. image:: ../_images/linear_vs_log.png
    :scale: 70 % 
    :align: center
-   :alt: Depiction of why it's important to understand dB or decibels, showing a spectrogram using linear vs log scale
+   :alt: Зображення того, чому важливо розуміти дБ або децибели, показуючи спектрограму з використанням лінійної та логарифмічної шкали
 
-For a given value x, we can represent x in dB using the following formula:
+Для заданого значення x ми можемо представити x у дБ за допомогою наступної формули:
 
 .. math::
     x_{dB} = 10 \log_{10} x
 
-In Python:  
+У мові Python  
 
 .. code-block:: python
 
  x_db = 10.0 * np.log10(x)
 
-You may have seen that :code:`10 *` be a :code:`20 *` in other domains.  Whenever you are dealing with a power of some sort, you use 10, and you use 20 if you are dealing with a non-power value like voltage or current.  In DSP we tend to deal with a power. In fact there is not a single time in this whole textbook we need to use 20 instead of 10.
+Ви могли бачити, що :code:`10 *` може бути :code:`20 *` в інших доменах.  Щоразу, коли ви маєте справу з якоюсь потужністю, ви використовуєте 10, і ви використовуєте 20, якщо ви маєте справу з неенергетичними величинами, такими як напруга або струм.  В DSP ми, як правило, маємо справу з потужністю. Насправді, в цьому підручнику немає жодного разу, коли нам потрібно було б використовувати 20 замість 10.
 
-We convert from dB back to linear (normal numbers) using:
+Ми перетворюємо з дБ назад в лінійні (звичайні числа) за допомогою:
 
 .. math::
     x = 10^{x_{dB}/10}
 
-In Python: 
+У Python 
 
 .. code-block:: python
 
  x = 10.0 ** (x_db / 10.0)
 
-Don't get caught up in the formula, as there is a key concept to take away here.  In DSP we deal with really big numbers and really small numbers together (e.g., the strength of a signal compared to the strength of the noise). The logarithmic scale of dB lets us have more dynamic range when we express numbers or plot them.  It also provides some conveniences like being able to add when we would normally multiply (as we will see in the :ref:`link-budgets-chapter` chapter).
+Не зациклюйтеся на формулі, оскільки тут є ключова концепція, яку потрібно винести за дужки.  В DSP ми маємо справу з дуже великими і дуже малими числами (наприклад, рівень сигналу в порівнянні з рівнем шуму). Логарифмічна шкала в дБ дозволяє нам мати більший динамічний діапазон, коли ми виражаємо числа або будуємо графіки.  Вона також надає деякі зручності, наприклад, можливість додавання, коли ми зазвичай множимо (як ми побачимо у розділі :ref:`link-budgets-chapter`).
 
-Some common errors people will run into when new to dB are:
+Деякі типові помилки, з якими можуть зіткнутися новачки у dB, такі:
 
-1. Using natural log instead of log base 10 because most programming language's log() function is actually the natural log.
-2. Forgetting to include the dB when expressing a number or labeling an axis.  If we are in dB we need to identify it somewhere.
-3. When you're in dB you add/subtract values instead of multiplying/dividing, e.g.:
+1. Використання натурального лога замість лога з основою 10, оскільки функція log() у більшості мов програмування насправді є натуральним логом.
+2. Забути включити дБ при вираженні числа або позначенні осі.  Якщо ми маємо справу з дБ, нам потрібно десь його позначити.
+3. Коли ви використовуєте дБ, ви додаєте/віднімаєте значення замість того, щоб множити/ділити, наприклад:
 
 .. image:: ../_images/db.png
-   :scale: 80 % 
+   :scale: 80 
    :align: center 
 
-It is also important to understand that dB is not technically a "unit".  A value in dB alone is unit-less, like if something is 2x larger, there are no units until I tell you the units.  dB is a relative thing.  In audio when they say dB, they really mean dBA which is units for sound level (the A is the units). In wireless we typically use watts to refer to an actual power level.  Therefore, you may see dBW as a unit, which is relative to 1 W. You may also see dBmW (often written dBm for short) which is relative to 1 mW.   For example, someone can say "our transmitter is set to 3 dBW" (so 2 watts).  Sometimes we use dB by itself, meaning it is relative and there are no units. One can say, "our signal was received 20 dB above the noise floor".  Here's a little tip: 0 dBm = -30 dBW.
+Також важливо розуміти, що дБ технічно не є "одиницею".  Значення в дБ саме по собі не має одиниць виміру, наприклад, якщо щось в 2 рази більше, то одиниць виміру немає, поки я не скажу вам одиниці виміру. дБ - це відносна величина.  В аудіо, коли говорять дБ, насправді мають на увазі дБА, що є одиницею вимірювання рівня звуку (A - це одиниці). У бездротовому зв'язку ми зазвичай використовуємо вати для позначення фактичного рівня потужності.  Тому ви можете побачити dBW як одиницю, яка відноситься до 1 Вт. Ви також можете побачити dBmW (часто пишуть dBm для скорочення), яка відноситься до 1 мВт.   Наприклад, хтось може сказати "наш передавач налаштований на 3 дБВт" (тобто 2 Вт).  Іноді ми використовуємо дБ сам по собі, маючи на увазі, що він відносний і не має одиниць виміру. Можна сказати: "наш сигнал був прийнятий на 20 дБ вище рівня шуму".  Ось невелика підказка: 0 дБм = -30 дБВт.
 
-Here are some common conversions that I recommend memorizing:
+Ось кілька поширених перетворень, які я рекомендую запам'ятати:
 
-======  =====
-Linear   dB
-======  ===== 
-1x      0 dB 
-2x      3 dB 
-10x     10 dB 
-0.5x    -3 dB  
-0.1x    -10 dB
-100x    20 dB
-1000x   30 dB
-10000x  40 dB
-======  ===== 
+====== =====
+Лінійні дБ
+====== ===== 
+1x 0 дБ 
+2x 3 дБ 
+10x 10 дБ 
+0.5x -3 дБ  
+0.1x -10 дБ
+100x 20 дБ
+1000x 30 дБ
+10000x 40 дБ
+====== ===== 
 
-Finally, to put these numbers into perspective, below are some example power levels, in dBm:
+Нарешті, щоб розглянути ці цифри в перспективі, нижче наведені деякі приклади рівнів потужності в дБм:
 
 =========== ===
-80 dBm      Tx power of rural FM radio station
-62 dBm      Max power of a ham radio transmitter
-60 dBm      Power of typical home microwave
-37 dBm      Max power of typical handheld CB or ham radio
-27 dBm      Typical cell phone transmit power
-15 dBm      Typical WiFi transmit power
-10 dBm      Bluetooth (version 4) max transmit power
--10 dBm     Max received power for WiFi
--70 dBm     Example received power for a ham signal
--100 dBm    Minimum received power for WiFi
--127 dBm    Typical received power from GPS satellites
+80 дБм Передавальна потужність сільської FM-радіостанції
+62 дБм Максимальна потужність радіоаматорського передавача
+60 дБм Потужність типової домашньої мікрохвильової печі
+37 дБм Максимальна потужність типової портативної радіостанції CB або радіоаматорської радіостанції
+27 дБм Типова потужність передавача мобільного телефону
+15 дБм Типова потужність передачі WiFi
+10 дБм Максимальна потужність передачі Bluetooth (версія 4)
+-10 дБм Максимальна потужність прийому для WiFi
+-70 дБм Приклад прийнятої потужності для радіосигналу
+-100 дБм Мінімальна потужність прийому для WiFi
+-127 дБм Типова потужність прийому від супутників GPS
 =========== ===
 
-
 *************************
-Noise in Frequency Domain
+Шум в частотній області
 *************************
 
-In the :ref:`freq-domain-chapter` chapter we tackled "Fourier pairs", i.e., what a certain time domain signal looks like in the frequency domain.  Well, what does Gaussian noise look like in the frequency domain?  The following graphs show some simulated noise in the time domain (top) and a plot of the Power Spectral Density (PSD) of that noise (below).  These plots were taken from GNU Radio.
+У розділі :ref:`freq-domain-chapter` ми розглянули "пари Фур'є", тобто те, як певний сигнал часової області виглядає у частотній області.  Як же виглядає гаусівський шум у частотній області?  На наступних графіках показано деякий змодельований шум у часовій області (вгорі) і графік спектральної щільності потужності (PSD) цього шуму (внизу).  Ці графіки взято з GNU Radio.
 
 .. image:: ../_images/noise_freq.png
-   :scale: 110 % 
+   :масштаб: 110 % 
    :align: center
-   :alt: AWGN in the time domain is also Gaussian noise in the frequency domain, although it looks like a flat line when you take the magnitude and perform averaging
+   :alt: AWGN у часовій області - це також гаусівський шум у частотній області, хоча він виглядає як плоска лінія, якщо взяти амплітуду і виконати усереднення
 
-We can see that it looks roughly the same across all frequencies and is fairly flat.  It turns out that Gaussian noise in the time domain is also Gaussian noise in the frequency domain.  So why don't the two plots above look the same?  It's because the frequency domain plot is showing the magnitude of the FFT, so there will only be positive numbers. Importantly, it's using a log scale, or showing the magnitude in dB.  Otherwise these graphs would look the same.  We can prove this to ourselves by generating some noise (in the time domain) in Python and then taking the FFT.
+Ми бачимо, що він виглядає приблизно однаково на всіх частотах і є досить плоским.  Виходить, що гаусівський шум у часовій області є також гаусівським шумом у частотній області.  Так чому ж два графіки вище не виглядають однаково?  Це тому, що графік в частотній області показує величину ШПФ, тому там будуть тільки позитивні числа. Важливо, що він використовує логарифмічну шкалу, або показує величину в дБ.  Інакше ці графіки виглядали б однаково.  Ми можемо довести це собі, згенерувавши деякий шум (у часовій області) у Python, а потім отримавши ШПФ.
 
-.. code-block:: python
+.. блок коду:: python
 
  import numpy as np
  import matplotlib.pyplot as plt
  
- N = 1024 # number of samples to simulate, choose any number you want
+ N = 1024 # кількість відліків для моделювання, виберіть будь-яке число
  x = np.random.randn(N)
  plt.plot(x, '.-')
  plt.show()
  
  X = np.fft.fftshift(np.fft.fft(x))
- X = X[N//2:] # only look at positive frequencies.  remember // is just an integer divide
+ X = X[N/2:] # дивимось тільки додатні частоти. пам'ятайте, що // це просто цілочисельне ділення
  plt.plot(np.real(X), '.-')
  plt.show()
 
-Take note that the randn() function by default uses mean = 0 and variance = 1.  Both of the plots will look something like this:
+Зверніть увагу, що функція randn() за замовчуванням використовує mean = 0 і variance = 1.  Обидва графіки будуть виглядати приблизно так:
 
 .. image:: ../_images/noise_python.png
    :scale: 100 % 
    :align: center
-   :alt: Example of white noise simulated in Python
+   :alt: Приклад імітації білого шуму у Python
 
-You can then produce the flat PSD that we had in GNU Radio by taking the log and averaging a bunch together.  The signal we generated and took the FFT of was a real signal (versus complex), and the FFT of any real signal will have matching negative and positive portions, so that's why we only saved the positive portion of the FFT output (the 2nd half).  But why did we only generate "real" noise, and how do complex signals work into this?
+Потім ви можете створити пласку PSD, яку ми мали у GNU Radio, взявши запис і усереднивши його разом.  Сигнал, який ми згенерували і взяли ШПФ, був реальним сигналом (а не комплексним), і ШПФ будь-якого реального сигналу матиме відповідні від'ємні та додатні частини, тому ми зберегли лише додатну частину результату ШПФ (2-гу половину).  Але чому ми згенерували лише "реальний" шум, і як комплексні сигнали пов'язані з цим?
 
 *************************
-Complex Noise
+Комплексний шум
 *************************
 
-"Complex Gaussian" noise is what we will experience when we have a signal at baseband; the noise power is split between the real and imaginary portions equally.  And most importantly, the real and imaginary parts are independent of each other; knowing the values of one doesn't give you the values of the other.
+"Комплексний гаусівський" шум - це те, що ми відчуваємо, коли маємо сигнал в основній смузі частот; потужність шуму ділиться між реальною та уявною частинами порівну.  І найголовніше, що реальна та уявна частини не залежать одна від одної; знаючи значення однієї з них, ви не отримаєте значення іншої.
 
-We can generate complex Gaussian noise in Python using:
+Ми можемо згенерувати складний гаусівський шум у Python за допомогою
 
 .. code-block:: python
 
  n = np.random.randn() + 1j * np.random.randn()
 
-But wait!  The equation above doesn't generate the same "amount" of noise as :code:`np.random.randn()`, in terms of power (known as noise power).  We can find the average power of a zero-mean signal (or noise) using:
+Але зачекайте!  Наведене вище рівняння не генерує таку ж "кількість" шуму, як :code:`np.random.randn()`, з точки зору потужності (відомої як потужність шуму).  Ми можемо знайти середню потужність сигналу (або шуму) з нульовим середнім значенням за допомогою:
 
 .. code-block:: python
 
  power = np.var(x)
 
-where np.var() is the function for variance.  Here the power of our signal n is 2.  In order to generate complex noise with "unit power", i.e., a power of 1 (which makes things convenient), we have to use:
+де np.var() - функція для дисперсії.  Тут потужність нашого сигналу n дорівнює 2. Для того, щоб згенерувати складний шум з "одиничною потужністю", тобто потужністю 1 (що робить речі зручними), ми повинні використовувати
 
 .. code-block:: python
 
- n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # AWGN with unity power
+ n = (np.random.randn(N) + 1j*np.random.randn(N))/np.sqrt(2) # AWGN з одиничною потужністю
 
-To plot complex noise in the time domain, like any complex signal we need two lines:
+Для побудови графіка складного шуму в часовій області, як і будь-якого складного сигналу, нам знадобляться два рядки:
 
 .. code-block:: python
 
@@ -197,13 +196,13 @@ To plot complex noise in the time domain, like any complex signal we need two li
 .. image:: ../_images/noise3.png
    :scale: 80 % 
    :align: center
-   :alt: Complex noise simulated in Python
+   :alt: Складний шум, змодельований у Python
 
-You can see that the real and imaginary portions are completely independent.
+Ви можете бачити, що дійсна та уявна частини повністю незалежні.
 
-What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot shows the real portion (horizontal axis) and the imaginary portion (vertical axis), both of which are independent random Gaussians.
+Як виглядає складний гаусівський шум на IQ-діаграмі?  Пам'ятайте, що графік IQ показує дійсну частину (горизонтальна вісь) і уявну частину (вертикальна вісь), обидві з яких є незалежними випадковими гаусівськими величинами.
 
-.. code-block:: python
+.. блок коду:: python
 
  plt.plot(np.real(n),np.imag(n),'.')
  plt.grid(True, which='both')
@@ -213,60 +212,58 @@ What does complex Gaussian noise look like on an IQ plot?  Remember the IQ plot 
 .. image:: ../_images/noise_iq.png
    :scale: 60 % 
    :align: center
-   :alt: Complex noise on an IQ or constellation plot, simulated in Python
+   :alt: Складний шум на графіку IQ або сузір'їв, змодельований у Python
 
-It looks how we would expect; a random blob centered around 0 + 0j, or the origin.  Just for fun, let's try adding noise to a QPSK signal to see what the IQ plot looks like:
+Це виглядає так, як ми і очікували: випадкова пляма з центром в 0 + 0j, або в початку координат.  Заради інтересу спробуємо додати шум до QPSK-сигналу, щоб побачити, як виглядає IQ-діаграма:
 
 .. image:: ../_images/noisey_qpsk.png
    :scale: 60 % 
    :align: center
-   :alt: Noisy QPSK simulated in Python
+   :alt: Симуляція зашумленого QPSK у Python
 
-Now what happens when the noise is stronger?  
+А що станеться, коли шум буде сильнішим?  
 
 .. image:: ../_images/noisey_qpsk2.png
    :scale: 50 % 
    :align: center 
 
-We are starting to get a feel for why transmitting data wirelessly isn't that simple. We want to send as many bits per symbol as we can, but if the noise is too high then we will get erroneous bits on the receiving end.
+Ми починаємо розуміти, чому передача даних бездротовим способом не така проста. Ми хочемо відправити якомога більше бітів на символ, але якщо шум занадто високий, ми отримаємо помилкові біти на приймальному боці.
 
 *************************
 AWGN
 *************************
 
-Additive White Gaussian Noise (AWGN) is an abbreviation you will hear a lot in the DSP and SDR world.  The GN, Gaussian Noise, we already discussed.  Additive just means the noise is being added to our received signal.  White, in the frequency domain, means the spectrum is flat across our entire observation band.  It will almost always be white in practice,or approximately white.  In this textbook we will use AWGN as the only form of noise when dealing with communications links and link budgets and such.  Non-AWGN noise tends to be a niche topic.
+Additive White Gaussian Noise (AWGN) - це абревіатура, яку ви часто чуєте в світі DSP і SDR.  Про GN, гауссівський шум, ми вже говорили.  Адитивний просто означає, що шум додається до прийнятого сигналу.  Білий колір в частотній області означає, що спектр є плоским у всій смузі спостереження.  На практиці він майже завжди буде білим, або приблизно білим.  У цьому підручнику ми будемо використовувати AWGN як єдину форму шуму, коли маємо справу з лініями зв'язку, бюджетами ліній зв'язку тощо.  Шум, який не є AWGN, як правило, є вузькоспеціалізованою темою.
 
 *************************
-SNR and SINR
+SNR і SINR
 *************************
 
-Signal-to-Noise Ratio (SNR) is how we will measure the differences in strength between the signal and noise. It's a ratio so it's unit-less.  SNR is almost always in dB, in practice.  Often in simulation we code in a way that our signals are one unit power (power = 1).  That way, we can create a SNR of 10 dB by producing noise that is -10 dB in power by adjusting the variance when we generate the noise.
+Відношення сигнал/шум (SNR) - це те, як ми будемо вимірювати різницю в силі між сигналом і шумом. Це відношення не має одиниць виміру.  На практиці SNR майже завжди вимірюється в дБ.  Часто при моделюванні ми кодуємо сигнали таким чином, щоб вони мали одиничну потужність (потужність = 1).  Таким чином, ми можемо створити SNR 10 дБ, генеруючи шум потужністю -10 дБ, регулюючи дисперсію під час генерації шуму.
 
 .. math::
-   \mathrm{SNR} = \frac{P_{signal}}{P_{noise}}
+   \mathrm{SNR} = \frac{P_{сигнал}}{P_{шум}}
 
 .. math::
    \mathrm{SNR_{dB}} = P_{signal\_dB} - P_{noise\_dB}
 
-If someone says "SNR = 0 dB" it means the signal and noise power are the same.  A positive SNR means our signal is higher power than the noise, while a negative SNR means the noise is higher power.  Detecting signals at negative SNR is usually pretty tough.  
+Якщо хтось каже "SNR = 0 дБ", це означає, що потужність сигналу і шуму однакова.  Позитивне значення SNR означає, що наш сигнал має більшу потужність, ніж шум, тоді як негативне значення SNR означає, що шум має більшу потужність.  Виявлення сигналів з від'ємним SNR зазвичай досить складне.  
 
-Like we mentioned before, the power in a signal is equal to the variance of the signal.  So we can represent SNR as the ratio of the signal variance to noise variance:
-
-.. math::
-   \mathrm{SNR} = \frac{P_{signal}}{P_{noise}} = \frac{\sigma^2_{signal}}{\sigma^2_{noise}}
-
-Signal-to-Interference-plus-Noise Ratio (SINR) is essentially the same as SNR except you include interference along with the noise, in the denominator.  
+Як ми вже згадували раніше, потужність сигналу дорівнює дисперсії сигналу.  Отже, ми можемо представити SNR як відношення дисперсії сигналу до дисперсії шуму:
 
 .. math::
-   \mathrm{SINR} = \frac{P_{signal}}{P_{interference} + P_{noise}}
+   \mathrm{SNR} = \frac{P_{сигнал}}{P_{шум}} = \frac{\sigma^2_{сигнал}}{\sigma^2_{шум}}
 
-What constitutes interference is based on the application/situation, but typically it is another signal that is interfering with the signal of interest (SOI), and is either overlapping with the SOI in frequency, and/or cannot be filtered out for some reason.  
+Відношення сигнал/завада плюс шум (SINR) по суті те саме, що й SNR, за винятком того, що до знаменника ви додаєте заваду разом із шумом.  
+
+.. math::
+   \mathrm{SINR} = \frac{P_{signal}}{P_{interference} + P_{шум}}
+
+Що є завадою, залежить від застосування/ситуації, але зазвичай це інший сигнал, який заважає сигналу, що становить інтерес (SOI), і який або перекриває SOI по частоті, або не може бути відфільтрований з якихось причин.  
 
 *************************
-External Resources
+Зовнішні ресурси
 *************************
-
-Further resources about AWGN, SNR, and variance:
 
 1. https://en.wikipedia.org/wiki/Additive_white_Gaussian_noise
 2. https://en.wikipedia.org/wiki/Signal-to-noise_ratio
