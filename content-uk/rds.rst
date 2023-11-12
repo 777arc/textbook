@@ -1,99 +1,52 @@
-.. _rds-chapter:
-
-##################
-End-to-End Example
-##################
-
-In this chapter we bring together many of the concepts we previously learned about, and walk through a full example of receiving and decoding a real digital signal.  We will be looking at Radio Data System (RDS), which is a communications protocol for embedding small amounts of information in FM radio broadcasts, such as station and song name.  We will have to demodulate FM, frequency shift, filter, decimate, resample, synchronize, decode, and parse the bytes.  An example IQ file is provided for testing purposes or if you don't have an SDR handy.
-
-********************************
-Introduction to FM Radio and RDS
-********************************
-
-To understand RDS we must first review FM radio broadcasts and how their signals are structured.  You are probably familiar with the audio portion of FM signals, which are simply audio signals frequency modulated and transmitted at center frequencies corresponding to the station's name, e.g., "WPGC 95.5 FM" is centered at exactly 95.5 MHz.  In addition to the audio portion, each FM broadcast contains some other components that are frequency modulated along with the audio.  Instead of just Googling the signal structure, let's take a look at the power spectral density (PSD) of an example FM signal, *after* the FM demodulation. We only view the positive portion because the output of FM demodulation is a real signal, even though the input was complex (we will view the code to perform this demodulation shortly). 
-
-.. image:: ../_images/fm_psd.svg
-   :align: center 
-   :target: ../_images/fm_psd.svg
-   :alt: Power spectral density (PSD) of an FM radio signal after the FM demodulation, showing RDS
-
-By looking at the signal in the frequency domain, we notice the following individual signals:
-
-#. A high power signal between 0 - 17 kHz
-#. A tone at 19 kHz
-#. Centered at 38 kHz and roughly 30 kHz wide we see an interesting looking symmetric signal
-#. Double-lobe shaped signal centered at 57 kHz
-#. Single-lobe shaped signal centered at 67 kHz
-
-This is essentially all we are able to determine by just looking at the PSD, and remember that this is *after* the FM demodulation.  The PSD before the FM demodulation looks like the following, which doesn't really tell us much.
-
-.. image:: ../_images/fm_before_demod.svg
-   :align: center 
-   :target: ../_images/fm_before_demod.svg
-   :alt: Power spectral density (PSD) of an FM radio signal before any demodulation
-   
-That being said, it's important to understand that when you FM modulate a signal, a higher frequency in the data signal will lead to a higher frequency in the resulting FM signal.  So that signal centered at 67 kHz being present is increasing the total bandwidth occupied by the transmitted FM signal, as the maximum frequency component is now around 75 kHz as shown in the first PSD above.  `Carson's bandwidth rule <https://en.wikipedia.org/wiki/Carson_bandwidth_rule>`_ applied to FM tells us that FM stations occupy roughly 250 kHz of spectrum, which is why we usually sample at 250 kHz (recall that when using quadrature/IQ sampling, your received bandwidth equals your sampling rate).
-
-As a quick aside, some readers may be familiar with looking at the FM band using an SDR or spectrum analyzer and seeing the following spectrogram, and thinking that the block-y signals adjacent to some of the FM stations are RDS.  
-
-.. image:: ../_images/fm_band_psd.png
-   :scale: 80 % 
+:: ../_images/fm_components.png
+   :scale: 80 
    :align: center
-   :alt: Spectrogram of the FM band
+   :alt: Компоненти FM-радіосигналу, зокрема моно- і стереозвук, RDS і сигнали DirectBand
 
-It turns out that those block-y signals are actually HD Radio, a digital version of the same FM radio signal (same audio content).  This digital version leads to a higher quality audio signal at the receiver because analog FM will always include some noise after demodulation, since it's an analog scheme, but the digital signal can be demodulated/decoded with zero noise, assuming there are zero bit errors.  
+Пройдімося по кожному з цих сигналів у довільному порядку:
 
-Back to the five signals we discovered in our PSD; the following diagram labels what each signal is used for.  
+Моно та стерео аудіосигнали просто переносять аудіосигнал, додавання та віднімання яких дає вам лівий та правий канали.
 
-.. image:: ../_images/fm_components.png
-   :scale: 80 % 
-   :align: center
-   :alt: Components within an FM radio signal, including mono and stereo audio, RDS, and DirectBand signals
+Пілотний тон 19 кГц використовується для демодуляції стереозвуку.  Якщо ви подвоїте тон, він діятиме як опорна частота і фаза, оскільки стереозвук центрований на частоті 38 кГц.  Подвоєння тону можна зробити простим піднесенням відліків до квадрата, згадайте властивість Фур'є зсуву частоти, про яку ми дізналися у розділі :ref:`freq-domain-chapter`.
 
-Going through each of these signals in no particular order:
+DirectBand - це бездротова мережа передачі даних у Північній Америці, що належала та управлялася компанією Microsoft, також відома як "MSN Direct" на споживчих ринках. DirectBand передавала інформацію на такі пристрої, як портативні GPS-приймачі, наручні годинники та домашні метеостанції.  Він навіть дозволяв користувачам отримувати короткі повідомлення з Windows Live Messenger.  Одним з найуспішніших застосувань DirectBand було відображення даних про місцевий трафік у реальному часі на GPS-приймачах Garmin, якими користувалися мільйони людей до того, як смартфони стали повсюдним явищем.  Служба DirectBand була закрита в січні 2012 року, що викликає питання, чому ми бачимо її в наших FM-сигналах, які були записані після 2012 року?  Моє єдине припущення полягає в тому, що більшість FM-передавачів були спроектовані і виготовлені задовго до 2012 року, і навіть без активної "подачі" DirectBand вони все одно щось передають, можливо, пілотні символи.
 
-The mono and stereo audio signals simply carry the audio signal, in a pattern where adding and subtracting them gives you the left and right channels.
-
-The 19 kHz pilot tone is used to demodulate the stereo audio.  If you double the tone it acts as a frequency and phase reference, since the stereo audio signal is centered at 38 kHz.  Doubling the tone can be done by simply squaring the samples, recall the frequency shift Fourier property we learned about in the :ref:`freq-domain-chapter` chapter.
-
-DirectBand was a North America wireless datacast network owned and operated by Microsoft, also called "MSN Direct" within consumer markets. DirectBand transmitted information to devices like portable GPS receivers, wristwatches, and home weather stations.  It even allowed users to receive short messages from Windows Live Messenger.  One of the most successful applications of DirectBand was realtime local traffic data displayed on Garmin GPS receivers, which were used by millions of people before smartphones became ubiquitous.  The DirectBand service was shut down on January 2012, which raises the question, why do we see it in our FM signal that was recorded after 2012?  My only guess is that most FM transmitters were designed and built way before 2012, and even without any DirectBand "feed" active, it still transmits something, perhaps pilot symbols.
-
-Lastly, we come to RDS, which is the focus of the rest of this chapter.  As we can see in our first PSD, RDS is roughly 4 kHz in bandwidth (before it gets FM modulated), and sits in between the stereo audio and DirectBand signal.  It is a low data rate digital communications protocol that allows FM stations to include station identification, program information, time, and other miscellaneous information alongside the audio.  The RDS standard is published as IEC standard 62106 and can be `found here <http://www.interactive-radio-system.com/docs/EN50067_RDS_Standard.pdf>`_.
+Нарешті, ми підійшли до RDS, якому присвячена решта цієї глави.  Як ми бачили в нашому першому PSD, смуга пропускання RDS становить приблизно 4 кГц (до того, як він отримує FM-модуляцію), і знаходиться між стереозвуком і сигналом DirectBand.  Це протокол цифрового зв'язку з низькою швидкістю передачі даних, який дозволяє FM-станціям передавати разом зі звуком ідентифікацію станції, інформацію про програму, час та іншу інформацію.  Стандарт RDS опублікований як стандарт IEC 62106 і може бути `знайдений тут <http://www.interactive-radio-system.com/docs/EN50067_RDS_Standard.pdf>`_.
 
 ********************************
-The RDS Signal
+Сигнал RDS
 ********************************
 
-In this chapter we will use Python to receive RDS, but in order to best understand how to receive it, we must first learn about how the signal is formed and transmitted.  
+У цій главі ми будемо використовувати Python для прийому RDS, але для того, щоб краще зрозуміти, як його приймати, ми повинні спочатку дізнатися про те, як формується і передається сигнал.  
 
-Transmit Side
+Передавальна сторона
 #############
 
-The RDS information to be transmitted by the FM station (e.g., track name, etc.) is encoded into sets of 8 bytes.  Each set of 8 bytes, which corresponds to 64 bits, is combined with 40 "check bits" to make a single "group".  These 104 bits are transmitted together, although there is no gap of time between groups, so from the receiver's perspective it receives these bits nonstop and must determine the boundary between the groups of 104 bits.   We will see more details on the encoding and message structure once we dive into the receive side.
+RDS-інформація, яка передається FM-станцією (наприклад, назва треку тощо), кодується у набори по 8 байт.  Кожен набір з 8 байт, що відповідає 64 бітам, об'єднується з 40 "контрольними бітами" в одну "групу".  Ці 104 біти передаються разом, хоча між групами немає часового проміжку, тому з точки зору одержувача, він отримує ці біти безперервно і повинен визначити межу між групами з 104 біт.   Ми побачимо більше деталей про кодування і структуру повідомлень, коли зануримося в сторону прийому.
 
-To transmit these bits wirelessly, RDS uses BPSK, which as we learned in the :ref:`modulation-chapter` chapter is a simple digital modulation scheme used to map 1's and 0's to the phase of a carrier.  Like many BPSK-based protocols, RDS uses differential coding, which simply means the 1's and 0's of data are encoded in changes of 1's and 0's instead, which lets you no longer care whether you are 180 degrees out of phase (more on this later).  The BPSK symbols are transmitted at 1187.5 symbols per second, and because BPSK carries one bit per symbol, that means RDS has a raw data rate of roughly 1.2 kbps (including overhead).  RDS does not contain any channel coding (a.k.a. forward error correction), although the data packets do contain a cyclic redundancy check (CRC) to know when an error occurred.
+Для бездротового передавання цих бітів RDS використовує BPSK, яка, як ми дізналися з розділу :ref:`modulation-chapter`, є простою схемою цифрової модуляції, що використовується для зіставлення одиниць і нулів з фазою несучої.  Як і багато протоколів на основі BPSK, RDS використовує диференціальне кодування, яке просто означає, що одиниці і нулі даних кодуються зміною одиниць і нулів, що дозволяє вам більше не перейматися тим, що ви зсунуті по фазі на 180 градусів (докладніше про це пізніше).  Символи BPSK передаються зі швидкістю 1187,5 символів на секунду, а оскільки BPSK несе один біт на символ, це означає, що RDS має необроблену швидкість передачі даних приблизно 1,2 кбіт/с (включаючи накладні витрати).  RDS не містить канального кодування (так званої прямої корекції помилок), хоча пакети даних містять циклічну перевірку надлишковості (CRC), щоб знати, коли сталася помилка.
 
-The final BPSK signal is then frequency shifted up to 57 kHz and added to all the other components of the FM signal, before being FM modulated and transmitted over the air at the station's frequency.  FM radio signals are transmitted at an extremely high power compared to most other wireless communications, up to 80 kW!  This is why many SDR users have an FM-reject filter (i.e., a band-stop filter) in-line with their antenna; so FM does not add interference to what they are trying to receive.
+Потім остаточний сигнал BPSK зсувається по частоті до 57 кГц і додається до всіх інших компонентів FM-сигналу, після чого модулюється і передається в ефір на частоті радіостанції.  FM-радіосигнали передаються з надзвичайно високою потужністю порівняно з більшістю інших бездротових засобів зв'язку - до 80 кВт!  Ось чому багато користувачів SDR встановлюють FM-фільтр (тобто фільтр, що обмежує смугу пропускання) в лінію з антеною; таким чином, FM не додає перешкод до того, що вони намагаються прийняти.
 
-While this was only a brief overview of the transmit side, we will be diving into more details when we discuss receiving RDS.
+Хоча це був лише короткий огляд сторони передачі, ми зануримося в подробиці, коли будемо обговорювати прийом RDS.
 
-Receive Side
+Сторона прийому
 ############
 
-In order to demodulate and decode RDS, we will perform the following steps, many of which are transmit-side steps in reverse (no need to memorize this list, we will walk through each step individually below):
+Для того, щоб демодулювати і декодувати RDS, ми виконаємо наступні кроки, багато з яких є кроками на стороні передачі у зворотному порядку (не потрібно запам'ятовувати цей список, ми пройдемося по кожному кроку окремо нижче):
 
-#. Receive an FM radio signal centered at the station's frequency (or read in an IQ recording), usually at a sample rate of 250 kHz
-#. Demodulate the FM using what is called "quadrature demodulation"
-#. Frequency shift by 57 kHz so the RDS signal is centered at 0 Hz
-#. Low-pass filter, to filter out everything besides RDS (also acts as matched filter)
-#. Decimate by 10 so that we can work at a lower sample rate, since we filtered out the higher frequencies anyway
-#. Resample to 19 kHz which will give us an integer number of samples per symbol
-#. Symbol-level time synchronization, using Mueller and Muller in this example
-#. Fine frequency synchronization using a Costas loop
-#. Demodulate the BPSK to 1's and 0's
-#. Differential decoding, to undo the differential encoding that was applied
-#. Decoding of the 1's and 0's into groups of bytes
-#. Parsing of the groups of bytes into our final output
+#. Отримайте FM-радіосигнал, центрований на частоті станції (або прочитаний у записі IQ), зазвичай з частотою дискретизації 250 кГц
+#. Демодулюйте FM за допомогою так званої "квадратурної демодуляції"
+#. Зсув частоти на 57 кГц, щоб сигнал RDS був центрований на 0 Гц
+#. Фільтр низьких частот, щоб відфільтрувати все, крім RDS (також діє як узгоджений фільтр)
+#. Зменшити на 10, щоб ми могли працювати з меншою частотою дискретизації, оскільки ми все одно відфільтрували вищі частоти
+#. Передискретизуємо до 19 кГц, що дасть нам цілу кількість відліків на символ
+#. Синхронізація часу на рівні символів, з використанням Мюллера і Мюллера у цьому прикладі
+#. Точна частотна синхронізація за допомогою циклу Костаса
+#. Демодуляція BPSK в 1 та 0
+#. Диференціальне декодування, щоб скасувати застосоване диференціальне кодування
+#. Декодування 1 та 0 у групи байт
+#. Синтаксичний аналіз груп байтів у наш кінцевий результат
 
 While this may seem like a lot of steps, RDS is actually one of the simplest wireless digital communications protocols out there.  A modern wireless protocol like WiFi or 5G requires a whole textbook to cover just the high-level PHY/MAC layer information.
 
