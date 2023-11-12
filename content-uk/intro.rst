@@ -1,62 +1,62 @@
 .. _intro-chapter:
 
 #############
-Introduction
+Вступ
 #############
 
 ***************************
-Purpose and Target Audience
+Мета та цільова аудиторія
 ***************************
 
-First and foremost, a couple important terms:
+Перш за все, кілька важливих термінів:
 
-**Software-Defined Radio (SDR):**
-    A radio that uses software to perform signal-processing tasks that were traditionally performed by hardware
+**Програмно-визначене радіо (SDR):**.
+    Радіо, яке використовує програмне забезпечення для виконання завдань обробки сигналів, які традиційно виконувалися апаратним забезпеченням
   
-**Digital Signal Processing (DSP):**
-    The digital processing of signals, in our case RF signals
+**Цифрова обробка сигналів (DSP):**.
+    Цифрова обробка сигналів, у нашому випадку радіосигналів
 
-This textbook acts as a hands-on introduction to the areas of DSP, SDR, and wireless communications.  It is designed for someone who is:
+Цей підручник є практичним вступом до DSP, SDR та бездротового зв'язку.  Він призначений для тих, хто:
 
-#. Interested in *using* SDRs to do cool stuff
-#. Good with Python
-#. Relatively new to DSP, wireless communications, and SDR
-#. A visual learner, preferring animations over equations
-#. Better at understanding equations *after* learning the concepts
-#. Looking for concise explanations, not a 1,000 page textbook
+#. Зацікавлений у *використанні* SDR для створення крутих речей
+#. Добре знається на Python
+#. Відносно новачок в DSP, бездротовому зв'язку та SDR
+#. Візуальний учень, що віддає перевагу анімації, а не рівнянням
+#. Краще розуміє рівняння *після* вивчення концепцій
+#. Шукає стислі пояснення, а не 1000-сторінковий підручник
 
-An example is a Computer Science student interested in a job involving wireless communications after graduation, although it can be used by anyone itching to learn about SDR who has programming experience.  As such, it covers the necessary theory to understand DSP techniques without the intense math that is usually included in DSP courses.  Instead of burying ourselves in equations, an abundance of images and animations are used to help convey the concepts, such as the Fourier series complex plane animation below.  I believe that equations are best understood *after* learning the concepts through visuals and practical exercises.  The heavy use of animations is why PySDR will never have a hardcopy version being sold on Amazon.  
+Прикладом може бути студент факультету комп'ютерних наук, зацікавлений у роботі, пов'язаній з бездротовим зв'язком, після закінчення навчання, хоча цей посібник може бути використаний будь-ким, хто хоче дізнатися про SDR і має досвід програмування.  Таким чином, він охоплює необхідну теорію для розуміння методів ЦОС без інтенсивної математики, яка зазвичай включається в курси з ЦОС.  Замість того, щоб занурюватися в рівняння, використовується велика кількість зображень та анімацій, які допомагають передати концепції, як, наприклад, складна плоска анімація ряду Фур'є, наведена нижче.  Я вважаю, що рівняння найкраще розуміються *після* вивчення концепцій за допомогою візуальних образів і практичних вправ.  Інтенсивне використання анімації є причиною того, що PySDR ніколи не буде продаватися в друкованому вигляді на Amazon.  
 
 .. image:: ../_images/fft_logo_wide.gif
    :scale: 70 %   
    :align: center
-   :alt: The PySDR logo created using a Fourier transform
+   :alt: Логотип PySDR, створений за допомогою перетворення Фур'є
    
-This textbook is meant to introduce concepts quickly and smoothly, enabling the reader to perform DSP and use SDRs intelligently.  It's not meant to be a reference textbook for all DSP/SDR topics; there are plenty of great textbooks already out there, such as `Analog Device's SDR textbook
-<https://www.analog.com/en/education/education-library/software-defined-radio-for-engineers.html>`_ and `dspguide.com <http://www.dspguide.com/>`_.  You can always use Google to recall trig identities or the Shannon limit.  Think of this textbook like a gateway into the world of DSP and SDR: it's lighter and less of a time and monetary commitment, when compared to more traditional courses and textbooks.
+Цей підручник призначений для швидкого і плавного введення понять, що дозволить читачеві виконувати DSP і розумно використовувати SDR.  Він не є довідником з усіх тем DSP/SDR; вже існує безліч чудових підручників, таких як `Analog Device's SDR textbook
+<https://www.analog.com/en/education/education-library/software-defined-radio-for-engineers.html>`_ та `dspguide.com <http://www.dspguide.com/>`_.  Ви завжди можете скористатися Google, щоб згадати тригонометричні тотожності або межу Шеннона.  Подумайте про цей підручник як про ворота у світ DSP і SDR: він легший і вимагає менше часу і грошей, якщо порівнювати з більш традиційними курсами і підручниками.
 
-To cover foundational DSP theory, an entire semester of "Signals and Systems", a typical course within electrical engineering, is condensed into a few chapters.  Once the DSP fundamentals are covered, we launch into SDRs, although DSP and wireless communications concepts continue to come up throughout the textbook.
+Щоб охопити фундаментальну теорію ЦОС, цілий семестр "Сигналів і систем", типового курсу в електротехніці, стиснуто до кількох розділів.  Після вивчення основ ЦОС ми переходимо до SDR, хоча концепції ЦОС і бездротового зв'язку продовжують з'являтися протягом усього підручника.
 
-Code examples are provided in Python.  They utilize NumPy, which is Python's standard library for arrays and high-level math.  The examples also rely upon Matplotlib, which is a Python plotting library that provides an easy way to visualize signals, arrays, and complex numbers.  Note that while Python is "slower" than C++ in general, most math functions within Python/NumPy are implemented in C/C++ and heavily optimized.  Likewise, the SDR API we use is simply a set of Python bindings for C/C++ functions/classes.  Those who have little Python experience yet a solid foundation in MATLAB, Ruby, or Perl will likely be fine after familiarizing themselves with Python's syntax.
+Приклади коду подано мовою Python.  Вони використовують NumPy, яка є стандартною бібліотекою Python для масивів і високорівневої математики.  Приклади також спираються на Matplotlib - бібліотеку побудови графіків Python, яка забезпечує простий спосіб візуалізації сигналів, масивів і комплексних чисел.  Зауважте, що хоча Python загалом "повільніша" за C++, більшість математичних функцій у Python/NumPy реалізовано на C/C++ і добре оптимізовано.  Аналогічно, SDR API, який ми використовуємо, є просто набором прив'язок Python до функцій/класів C/C++.  Ті, хто має невеликий досвід роботи з Python, але міцну основу в MATLAB, Ruby або Perl, швидше за все, будуть в порядку після ознайомлення з синтаксисом Python.
 
 
 ***************
-Contributing
+Долучитися
 ***************
 
-If you get through any amount of this textbook and email me at pysdr@vt.edu with questions/comments/suggestions, then congratulations, you will have contributed to this textbook!  You can also edit the source material directly on the `textbook's GitHub page <https://github.com/777arc/textbook/tree/master/content>`_ (your change will start a new pull request).  Feel free to submit an issue or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes will be permanently added to the acknowledgments section below.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
+Якщо ви прочитаєте будь-яку частину цього підручника і напишете мені на pysdr@vt.edu з питаннями/коментарями/пропозиціями, то вітаємо, ви зробили свій внесок у створення цього підручника!  Ви також можете редагувати вихідний матеріал безпосередньо на сторінці `підручника на GitHub <https://github.com/777arc/textbook/tree/master/content>`_ (ваша зміна покладе початок новому запиту на витягування).  Не соромтеся надсилати проблему або навіть запит на вилучення (PR) з виправленнями або покращеннями.  Ті, хто надсилає цінні відгуки/виправлення, будуть постійно додаватися до розділу подяк нижче.  Не дуже добре володієте Git'ом, але хочете запропонувати зміни?  Не соромтеся писати мені на pysdr@vt.edu.
 
-If you got value from PySDR, please share it with colleagues, students, and other lifelong learners who may be interested in the material.  There is also a donate button on the left that can be used as a way to say thanks.
+Якщо ви отримали користь від PySDR, будь ласка, поділіться нею з колегами, студентами та іншими людьми, які навчаються впродовж життя і можуть бути зацікавлені в цьому матеріалі.  Також зліва є кнопка "Пожертвувати", яку можна використати як спосіб подякувати.
 
 *****************
-Acknowledgements
+Подяки
 *****************
 
-Thank you to anyone who has read any portion of this textbook and provided feedback, and especially to:
+Дякуємо всім, хто прочитав будь-яку частину цього підручника і залишив відгук, і особливо
 
-- `Barry Duggan <http://github.com/duggabe>`_
-- Matthew Hannon
-- James Hayek
-- Deidre Stuffer
-- Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_
-- `Daniel Versluis <https://versd.bitbucket.io/content/about.html>`_ for `translating PySDR to Dutch <https://pysdr.org/nl/index-nl.html>`_
+- Баррі Даґґану (Barry Duggan <http://github.com/duggabe>)
+- Метью Хеннону
+- Джеймсу Хайєку
+- Дейдрі Стаффер
+- Таріку Бенадді за переклад PySDR французькою мовою <https://pysdr.org/fr/index-fr.html>`_.
+- Даніелю Верслуїсу <https://versd.bitbucket.io/content/about.html>`_ за переклад PySDR голландською мовою <https://pysdr.org/nl/index-nl.html>`_.
