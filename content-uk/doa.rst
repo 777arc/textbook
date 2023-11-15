@@ -4,80 +4,80 @@
 DOA & Beamforming
 ####################################
 
-In this chapter we cover the concepts of beamforming, direction-of-arrival (DOA), and phased arrays in general.  Techniques such as Capon and MUSIC are discussed, using Python simulation examples. We cover beamforming vs. DOA, and go through the two different types of phased arrays (Passive electronically scanned array or PESA and Active electronically scanned array or AESA).
+У цій главі ми розглядаємо поняття формування променя, напрямку прильоту (DOA) і фазованих масивів загалом.  Обговорюються такі методи, як Capon і MUSIC, з використанням прикладів моделювання на Python. Ми порівнюємо формування променя з DOA і розглядаємо два різні типи фазованих решіток (пасивні решітки з електронним скануванням або PESA та активні решітки з електронним скануванням або AESA).
 
 ************************
-Overview and Terminology
+Огляд та термінологія
 ************************
 
-A phased array, a.k.a. electronically steered array, is an array of antennas that can be used on the transmit or receive side to form beams in one or more desired directions.  They are used in both communications and radar, and you'll find them on the ground, airborne, and on satellites.  
+Фазована решітка, також відома як решітка з електронним керуванням, - це сукупність антен, які можуть використовуватися на стороні передачі або прийому для формування променів в одному або декількох бажаних напрямках.  Вони використовуються як у зв'язку, так і в радіолокації, і ви знайдете їх на землі, в повітрі та на супутниках.  
 
-Phased arrays can be broken down into three types:
+Фазовані антенні решітки можна розділити на три типи:
 
-1. **Passive electronically scanned array (PESA)**, a.k.a. analog or traditional phased arrays, where analog phase shifters are used to steer the beam.  On the receive side, all elements are summed after phase shifting (and optionally, adjustable gain) and turned into a signal channel which is downconverted and received.  On the transmit side the inverse takes place; a single digital signal is outputted from the digital side, and on the analog side phase shifters and gain stages are used to produce the output going to each antenna.  These digital phase shifters will have a limited number of bits of resolution, and control latency.
-2. **Active electronically scanned array (AESA)**, a.k.a. fully digital arrays, where every single element has its own RF front end, and the beamforming is done entirely in the digital domain.  This is the most expensive approach, as RF components are expensive, but it provides much more flexibility and speed than PESAs.  Digital arrays are popular with SDRs, although the number of receive or transmit channels of the SDR limits the number of elements in your array.
-3. **Hybrid array**, which consists of subarrays that individually resemble PESAs, where each subarray has its own RF front end just like with AESAs.  This is the most common approach for modern phased arrays, as it provides the best of both worlds.
+1. **Пасивні електронно-скановані решітки (PESA)**, також відомі як аналогові або традиційні фазовані решітки, в яких для керування променем використовуються аналогові фазообертачі.  На стороні прийому всі елементи підсумовуються після фазового зсуву (і, опціонально, регульованого посилення) і перетворюються в канал сигналу, який перетворюється вниз і приймається.  На стороні передачі відбувається зворотний процес: з цифрової сторони виводиться один цифровий сигнал, а на аналоговій стороні використовуються фазообертачі і каскади посилення для отримання вихідного сигналу, що йде на кожну антену.  Ці цифрові фазообертачі мають обмежену кількість бітів роздільної здатності та затримку керування.
+2. **Активні електронно-скановані решітки (AESA)**, також відомі як повністю цифрові решітки, де кожен елемент має власний радіочастотний фронт, а формування діаграми спрямованості здійснюється повністю в цифровій області.  Це найдорожчий підхід, оскільки радіочастотні компоненти є дорогими, але він забезпечує набагато більшу гнучкість і швидкість, ніж PESA.  Цифрові решітки популярні серед SDR, хоча кількість каналів прийому або передачі SDR обмежує кількість елементів у вашому масиві.
+3. **Гібридний масив**, який складається з підмасивів, які індивідуально нагадують PESA, де кожен підмасив має власний радіочастотний фронт, так само, як і в AESA.  Це найпоширеніший підхід для сучасних фазованих решіток, оскільки він забезпечує найкраще з обох світів.
 
-An example of each of the types is shown below.
+Приклад кожного з типів наведено нижче.
 
 .. image:: ../_images/beamforming_examples.svg
    :align: center 
    :target: ../_images/beamforming_examples.svg
-   :alt: Example of phased arrays including Passive electronically scanned array (PESA), Active electronically scanned array (AESA), Hybrid array, showing Raytheon's MIM-104 Patriot Radar, ELM-2084 Israeli Multi-Mission Radar, Starlink User Terminal, aka Dishy
+ :alt: Приклад фазованих решіток, включаючи пасивну решітку з електронним скануванням (PESA), активну решітку з електронним скануванням (AESA), гібридну решітку, показуючи радар MIM-104 Patriot компанії Raytheon, ізраїльський багатоцільовий радар ELM-2084, термінал користувача Starlink, також відомий як Dishy
 
-In this chapter we primarily focus on DSP for fully digital arrays, as they are more suited towards simulation and DSP, but in the next chapter we get hands-on with the "Phaser" array and SDR from Analog Devices that has 8 analog phase shifters feeding a Pluto.
+У цій главі ми зосередимося на ЦОС для повністю цифрових решіток, оскільки вони більше підходять для моделювання і ЦОС, але в наступній главі ми попрацюємо з решіткою "Phaser" і SDR від Analog Devices, яка має 8 аналогових фазообертачів, що живлять "Плутон".
 
-We typically refer to the antennas that make up an array as elements, and sometimes the array is called a "sensor" instead.  These array elements are most often omnidirectional antennas, equally spaced in either a line or across two dimensions. 
+Зазвичай ми називаємо антени, з яких складається решітка, елементами, а іноді решітку називають "сенсором".  Ці елементи решітки найчастіше є всеспрямованими антенами, однаково віддаленими одна від одної як по лінії, так і в двох вимірах. 
 
-A beamformer is essentially a spatial filter; it filters out signals from all directions except the desired direction(s).  Instead of taps, we use weights (a.k.a. coefficients) applied to each element of an array.  We then manipulate the weights to form the beam(s) of the array, hence the name beamforming!  We can steer these beams (and nulls) extremely fast; must faster than mechanically gimballed antennas which can be thought of as an alternative to phased arrays.  A single array can electronically track multiple signals at once while nulling out interferers, as long as it has enough elements.  We'll typically discuss beamforming within the context of a communications link, where the receiver aims to receive one or more signals at as high SNR as possible. 
+Формувач променя - це, по суті, просторовий фільтр; він відфільтровує сигнали з усіх напрямків, окрім потрібного напрямку (напрямків).  Замість відводів ми використовуємо ваги (так звані коефіцієнти), що застосовуються до кожного елемента масиву.  Потім ми маніпулюємо вагами, щоб сформувати промінь (промені) масиву, звідси і назва - формування променя!  Ми можемо керувати цими променями (і нулями) надзвичайно швидко; швидше, ніж антенами з механічним шарнірним кріпленням, які можна розглядати як альтернативу фазованим решіткам.  Одна решітка може електронно відстежувати кілька сигналів одночасно, одночасно пригнічуючи перешкоди, якщо вона має достатньо елементів.  Зазвичай ми обговорюємо формування променя в контексті лінії зв'язку, де приймач має на меті отримати один або кілька сигналів з якомога вищим SNR. 
 
-Beamforming approaches are typically broken down into conventional and adaptive.  With conventional beamforming you assume you already know the direction of arrival of the signal of interest, and the beamformer involves choosing weights to maximize gain in that direction.  This can be used on the receive or transmit side of a communication system.  Adaptive beamforming, on the other hand, involves constantly adjusting the weights based on the beamformer output, to optimize some criteria, often involving nulling out an interferer.  Due to the closed loop and adaptive nature, adaptive beamforming is typically just used on the receive side.  
+Підходи до формування променя зазвичай поділяють на традиційні та адаптивні.  При звичайному формуванні променя ви припускаєте, що вже знаєте напрямок приходу сигналу, який вас цікавить, і формувач променя підбирає ваги, щоб максимізувати посилення в цьому напрямку.  Це може бути використано на стороні прийому або передачі системи зв'язку.  Адаптивне формування променя, з іншого боку, передбачає постійне коригування вагових коефіцієнтів на основі вихідного сигналу формувача променя для оптимізації деяких критеріїв, часто з метою зведення до нуля перешкод.  Через замкнутий цикл і адаптивну природу адаптивне формування променя, як правило, використовується тільки на стороні прийому.  
 
-Direction-of-Arrival (DOA) within DSP/SDR refers to the process of using an array of antennas to estimate the DOA of one or more signals received by that array (versus traditional beamforming, where we are trying to receive a signal and possibly reject interference).  Although DOA certainly falls under the beamforming umbrella, so the terms can get confusing, just know that the term DOA will be used if the goal is to find the angles of arrival for one or more signals, versus beamforming used as a spatial filter to isolate and receive one or more signals for demodulation or other processing.  Some techniques such as MVDR will apply to both DOA and beamforming, while others like MUSIC are strictly for the purpose of DOA.
+Напрямок приходу (Direction-of-Arrival, DOA) в DSP/SDR відноситься до процесу використання масиву антен для оцінки DOA одного або декількох сигналів, отриманих цим масивом (на відміну від традиційного формування променя, де ми намагаємося отримати сигнал і, можливо, відкинути перешкоди).  Хоча DOA, безумовно, підпадає під парасольку формування променя, тому терміни можуть бути заплутані, просто знайте, що термін DOA буде використовуватися, якщо метою є знаходження кутів приходу одного або декількох сигналів, на відміну від формування променя, яке використовується як просторовий фільтр для виділення і прийому одного або декількох сигналів для демодуляції або іншої обробки.  Деякі методи, такі як MVDR, застосовуються як для DOA, так і для формування променя, тоді як інші, такі як MUSIC, призначені виключно для DOA.
 
-Phased arrays and beamforming/DOA find use in all sorts of applications, although you will most often see them used in multiple forms of radar, mmWave communication within 5G, satellite communications, and jamming.  Any applications that require a high-gain antenna, or require a rapidly moving high-gain antenna, are good candidates for phased arrays.
+Фазовані решітки і формування променя/DOA знаходять застосування у всіх видах застосувань, хоча найчастіше ви побачите їх у різних формах радарів, зв'язку mmWave в рамках 5G, супутниковому зв'язку і придушенні перешкод.  Будь-які додатки, які потребують антени з високим коефіцієнтом підсилення або швидко рухомої антени з високим коефіцієнтом підсилення, є хорошими кандидатами на використання фазованих решіток.
 
 *******************
-SDR Requirements
+Вимоги до SDR
 *******************
 
-As discussed, analog phased arrays involve an analog phase shifter (and usually adjustable gain) per channel, meaning an analog phased array is a dedicated piece of hardware that must go alongside an SDR.  On the other hand, any SDR that contains more than one channel can be used as a digital array with no extra hardware, as long as the channels are phase coherent and sampled using the same clock, which is typically the case for SDRs that have multiple recieve channels onboard.  There are many SDRs that contain **two** receive channels, such as the Ettus USRP B210 and Analog Devices Pluto (the 2nd channel is exposed using a uFL connector on the board itself).  Unfortunately, going beyond two channels involves entering the $10k+ segment of SDRs, at least as of 2023, such as the USRP N310.  The main problem is that low-cost SDRs are typically not able to be "chained" together to scale the number of channels.  The exception is the KerberosSDR (4 channels) and KrakenSDR (5 channels) which use multiple RTL-SDRs sharing an LO to form a low-cost digital array; the downside being the very limited sample rate (up to 2.56 MHz) and tuning range (up to 1766 MHz).  The KrakenSDR board and example antenna configuration is shown below.
+Як уже зазначалося, аналогові фазовані решітки включають аналоговий фазообертач (і, як правило, регульований коефіцієнт підсилення) на канал, тобто аналогова фазована решітка - це спеціальне обладнання, яке повинно йти разом з SDR.  З іншого боку, будь-яка SDR, що містить більше одного каналу, може використовуватися як цифрова решітка без додаткового обладнання, якщо канали фазово когерентні і дискретизуються з використанням одного і того ж тактового генератора, що, як правило, має місце для SDR, які мають кілька каналів прийому на борту.  Існує багато SDR, які містять **два** канали прийому, наприклад, Ettus USRP B210 і Analog Devices Pluto (2-й канал виводиться за допомогою роз'єму uFL на самій платі).  На жаль, вихід за межі двох каналів передбачає вихід у сегмент SDR вартістю понад $10 тис., принаймні з 2023 року, як, наприклад, USRP N310.  Основна проблема полягає в тому, що недорогі SDR, як правило, не можуть бути "зчеплені" разом для масштабування кількості каналів.  Винятком є KerberosSDR (4 канали) і KrakenSDR (5 каналів), які використовують декілька RTL-SDR, що мають спільний LO для формування недорогого цифрового масиву; недоліком є дуже обмежена частота дискретизації (до 2,56 МГц) і діапазон налаштування (до 1766 МГц).  Плата KrakenSDR і приклад конфігурації антени показані нижче.
 
 .. image:: ../_images/krakensdr.jpg
    :align: center 
    :alt: The KrakenSDR
    :target: ../_images/krakensdr.jpg
 
-In this chapter we don't use any specific SDRs; instead we simulate the receiving of signals using Python, and then go through the DSP used to perform beamforming/DOA for ditital arrays.
+У цій главі ми не використовуємо жодних конкретних SDR; натомість ми моделюємо прийом сигналів за допомогою Python, а потім розглядаємо DSP, який використовується для виконання променевого формування/DOA для числових масивів.
 
 *******************
-Array Factor Math
+Математичний аналіз масивів
 *******************
 
-To get to the fun part we have to get through a little bit of math, but the following section has been written so that the math is extremely simple and has diagrams to go along with it, only the most basic trig and exponential properties are used.  It's important to understand the basic math behind what we'll do in Python to perform DOA.
+Щоб перейти до найцікавішого, нам доведеться трохи розібратися з математикою, але наступний розділ написаний таким чином, щоб математика була надзвичайно простою і супроводжувалася діаграмами, використовуючи лише найпростіші тригонометричні та експоненціальні властивості.  Важливо розуміти базову математику, яка лежить в основі того, що ми будемо робити в Python для виконання DOA.
 
-Consider a 1D three-element uniformly spaced array:
+Розглянемо одновимірний триелементний рівномірно розподілений масив:
 
 .. image:: ../_images/doa.svg
    :align: center 
    :target: ../_images/doa.svg
-   :alt: Diagram showing direction of arrival (DOA) of a signal impinging on a uniformly spaced antenna array, showing boresight angle and distance between elements or apertures
+      :alt: Діаграма, що показує напрямок приходу (DOA) сигналу, який падає на рівномірно розташовану антенну решітку, із зазначенням кута нахилу та відстані між елементами або діафрагмами
 
-In this example a signal is coming in from the right side, so it's hitting the right-most element first.  Let's calculate the delay between when the signal hits that first element and when it reaches the next element.  We can do this by forming the following trig problem, try to visualize how this triangle was formed from the diagram above.  The segment highlighted in red represents the distance the signal has to travel *after* it has reached the first element, before it hits the next one.
+У цьому прикладі сигнал надходить з правого боку, тому першим він потрапляє на крайній правий елемент.  Давайте обчислимо затримку між моментом, коли сигнал потрапляє на цей перший елемент, і моментом, коли він досягає наступного елемента.  Ми можемо зробити це, сформувавши наступну тригонометричну задачу, спробуйте візуалізувати, як цей трикутник був сформований з наведеної вище діаграми.  Відрізок, виділений червоним кольором, показує відстань, яку повинен пройти сигнал *після* того, як він досягне першого елемента, перш ніж потрапить на наступний.
 
 .. image:: ../_images/doa_trig.svg
    :align: center 
    :target: ../_images/doa_trig.svg
-   :alt: Trig associated with direction of arrival (DOA) of uniformly spaced array
+    :alt: Триг, пов'язаний з напрямком прибуття (DOA) рівномірно розташованого масиву
 
-If you recall SOH CAH TOA, in this case we are interested in the "adjacent" side and we have the length of the hypotenuse (:math:`d`), so we need to use a cosine:
+Якщо ви пам'ятаєте SOH CAH TOA, в даному випадку нас цікавить "прилегла" сторона і у нас є довжина гіпотенузи (:math:`d`), тому нам потрібно використовувати косинус:
 
 .. math::
   \cos(90 - \theta) = \frac{\mathrm{adjacent}}{\mathrm{hypotenuse}}
 
-We must solve for adjacent, as that is what will tell us how far the signal must travel between hitting the first and second element, so it becomes adjacent :math:`= d \cos(90 - \theta)`.  Now there is a trig identity that lets us convert this to adjacent :math:`= d \sin(\theta)`.  This is just a distance though, we need to convert this to a time, using the speed of light: time elapsed :math:`= d \sin(\theta) / c` [seconds].  This equation applies between any adjacent elements of our array, although we can multiply the whole thing by an integer to calculate between non-adjacent elements since they are uniformly spaced (we'll do this later).  
+Ми повинні знайти суміжність, оскільки саме вона покаже нам, яку відстань повинен пройти сигнал між потраплянням на перший і другий елемент, щоб він став суміжним :math:`= d \cos(90 - \theta)`.  Тепер існує тригонометрична тотожність, яка дозволяє нам перетворити це в сусідній :math:`= d \sin(\theta)`.  Однак це лише відстань, нам потрібно перетворити її на час, використовуючи швидкість світла: час, що минув :math:`= d \sin(\theta) / c` [секунди].  Це рівняння застосовується між будь-якими сусідніми елементами нашого масиву, хоча ми можемо помножити все це на ціле число для обчислення між несуміжними елементами, оскільки вони розташовані рівномірно (ми зробимо це пізніше).  
 
-Now to connect this trig and speed of light math to the signal processing world.  Let's denote our transmit signal at baseband :math:`s(t)` and it's being transmitting at some carrier, :math:`f_c` , so the transmit signal is :math:`s(t) e^{2j \pi f_c t}`.  Lets say this signal hits the first element at time :math:`t = 0`, which means it hits the next element after :math:`d \sin(\theta) / c` [seconds] like we calculated above.  This means the 2nd element receives:
+Тепер пов'яжемо цю математику тригонометрії та швидкості світла зі світом обробки сигналів.  Позначимо наш передавальний сигнал у базовій смузі :math:`s(t)` і він передається на деякій несучій, :math:`f_c`, тому передавальний сигнал має вигляд :math:`s(t) e^{2j \pi f_c t}`.  Скажімо, цей сигнал потрапляє на перший елемент у момент часу :math:`t = 0`, що означає, що він потрапляє на наступний елемент через :math:`d \sin(\theta) / c` [секунд], як ми обчислили вище.  Це означає, що 2-й елемент отримує:
 
 .. math::
  s(t - \Delta t) e^{2j \pi f_c (t - \Delta t)}
@@ -85,9 +85,9 @@ Now to connect this trig and speed of light math to the signal processing world.
 .. math::
  \mathrm{where} \quad \Delta t = d \sin(\theta) / c
 
-recall that when you have a time shift, it is subtracted from the time argument.
+Нагадаємо, що коли у вас є часовий зсув, він віднімається від часового аргументу.
 
-When the receiver or SDR does the downconversion process to receive the signal, its essentially multiplying it by the carrier but in the reverse direction, so after doing downconversion the receiver sees:
+Коли приймач або SDR виконує процес пониження частоти для прийому сигналу, він по суті множить його на несучу, але у зворотному напрямку, тому після виконання пониження частоти приймач бачить:
 
 .. math::
  s(t - \Delta t) e^{2j \pi f_c (t - \Delta t)} e^{-2j \pi f_c t}
@@ -95,9 +95,10 @@ When the receiver or SDR does the downconversion process to receive the signal, 
 .. math::
  = s(t - \Delta t) e^{-2j \pi f_c \Delta t}
 
-Now we can do a little trick to simplify this even further; consider how when we sample a signal it can be modeled by substituting :math:`t` for :math:`nT` where :math:`T` is sample period and :math:`n` is just 0, 1, 2, 3...  Substituting this in we get :math:`s(nT - \Delta t) e^{-2j \pi f_c \Delta t}`. Well, :math:`nT` is so much greater than :math:`\Delta t` that we can get rid of the first :math:`\Delta t` term and we are left with :math:`s(nT) e^{-2j \pi f_c \Delta t}`.  If the sample rate ever gets fast enough to approach the speed of light over a tiny distance, we can revisit this, but remember that our sample rate only needs to be a bit larger than the signal of interest's bandwidth.
+Тепер ми можемо зробити невеликий трюк, щоб спростити це ще більше; розглянемо, як, коли ми робимо вибірку сигналу, його можна змоделювати, замінивши :math:`t` на :math:`nT`, де :math:`T` - період вибірки, а :math:`n` - це просто 0, 1, 2, 3...  Підставивши це, отримаємо :math:`s(nT - \Delta t) e^{-2j \pi f_c \Delta t}`. Що ж, :math:`nT` настільки більше за :math:`\Delta t`, що ми можемо позбутися першого доданка :math:`\Delta t` і залишимось з :math:`s(nT) e^{-2j \pi f_c \Delta t}`.  Якщо частота дискретизації коли-небудь стане достатньо швидкою, щоб наблизитися до швидкості світла на крихітній відстані, ми можемо повернутися до цього питання, але пам'ятайте, що наша частота дискретизації повинна бути лише трохи більшою за пропускну здатність сигналу, який нас цікавить.
 
-Let's keep going with this math but we'll start representing things in discrete terms so that it will better resemble our Python code.  The last equation can be represented as the following, let's plug back in :math:`\Delta t`:
+
+Давайте продовжимо з цією математикою, але почнемо представляти речі в дискретних термінах, щоб це краще нагадувало наш код на Python.  Останнє рівняння можна представити наступним чином, давайте знову вставимо :math:`\Delta t`:
 
 .. math::
  s[n] e^{-2j \pi f_c \Delta t}
@@ -105,7 +106,7 @@ Let's keep going with this math but we'll start representing things in discrete 
 .. math::
  = s[n] e^{-2j \pi f_c d \sin(\theta) / c}
 
-We're almost done, but luckily there's one more simplification we can make.  Recall the relationship between center frequency and wavelength: :math:`\lambda = \frac{c}{f_c}` or the form we'll use: :math:`f_c = \frac{c}{\lambda}`.  Plugging this in we get:
+Ми майже закінчили, але, на щастя, є ще одне спрощення, яке ми можемо зробити.  Згадайте співвідношення між центральною частотою і довжиною хвилі: :math:`\lambda = \frac{c}{f_c}` або форму, яку ми будемо використовувати: :math:`f_c = \frac{c}{\lambda}`.  Підставивши це, отримаємо:
 
 .. math::
  s[n] e^{-2j \pi \frac{c}{\lambda} d \sin(\theta) / c}
@@ -113,32 +114,31 @@ We're almost done, but luckily there's one more simplification we can make.  Rec
 .. math::
  = s[n] e^{-2j \pi d \sin(\theta) / \lambda}
 
-
-In DOA what we like to do is represent :math:`d`, the distance between adjacent elements, as a fraction of wavelength (instead of meters), the most common value chosen for :math:`d` during the array design process is to use one half the wavelength. Regardless of what :math:`d` is, from this point on we're going to represent :math:`d` as a fraction of wavelength instead of meters, making the equation and all our code simpler:
+У DOA нам подобається представляти :math:`d`, відстань між сусідніми елементами, як частку довжини хвилі (замість метрів), найпоширенішим значенням для :math:`d` під час проектування масиву є використання половини довжини хвилі. Незалежно від того, що таке :math:`d`, з цього моменту ми будемо представляти :math:`d` як частку довжини хвилі замість метрів, що спрощує рівняння і весь наш код:
 
 .. math::
  s[n] e^{-2j \pi d \sin(\theta)}
 
-This is for adjacent elements, for the :math:`k`'th element we just need to multiply :math:`d` times :math:`k`:
+Це для сусідніх елементів, для :math:`k`'-го елемента нам просто потрібно помножити :math:`d` на :math:`k`:
 
 .. math::
  s[n] e^{-2j \pi d k \sin(\theta)}
 
-And we're done! This equation above is what you'll see in DOA papers and implementations everywhere! We typically call that exponential term the "array factor" (often denoted as :math:`a`) and represent it as an array, a 1D array for a 1D antenna array, etc.  In python :math:`a` is:
+І все готово! Це рівняння, наведене вище, є тим, що ви побачите у статтях DOA та повсюдних реалізаціях! Зазвичай ми називаємо цей експоненціальний член "коефіцієнтом масиву" (часто позначається як :math:`a`) і представляємо його як масив, одновимірний масив для одновимірної антенної решітки тощо.  У python :math:`a` це:
 
 .. code-block:: python
 
- a = [np.exp(-2j*np.pi*d*0*np.sin(theta)), np.exp(-2j*np.pi*d*1*np.sin(theta)), np.exp(-2j*np.pi*d*2*np.sin(theta)), ...] # note the increasing k
- # or
- a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # where Nr is the number of receive antenna elements
+ a = [np.exp(-2j*np.pi*d*0*np.sin(theta)), np.exp(-2j*np.pi*d*1*np.sin(theta)), np.exp(-2j*np.pi*d*2*np.sin(theta)), ...] # зверніть увагу на зростаюче k
+ # або
+ a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # де Nr - кількість елементів приймальної антени
 
-Note how element 0 results in a 1+0j (because :math:`e^{0}=1`); this makes sense because everything above was relative to that first element, so it's receiving the signal as-is without any relative phase shifts.  This is purely how the math works out, in reality any element could be thought of as the reference, but as you'll see in our math/code later on, what matters is the difference in phase/amplitude received between elements.  It's all relative.
+Зверніть увагу, що елемент 0 дає 1+0j (тому що :math:`e^{0}=1`); це має сенс, оскільки все вище було відносно цього першого елемента, тому він приймає сигнал як є, без будь-яких відносних фазових зсувів.  Це чисто математично, насправді будь-який елемент можна вважати еталонним, але, як ви побачите в нашому математичному коді пізніше, важлива різниця у фазі/амплітуді, отримана між елементами.  Це все відносно.
 
 *******************
-Receiving a Signal
+Отримання сигналу
 *******************
 
-Let's use the array factor concept to simulate a signal arriving at an array.  For a transmit signal we'll just use a tone for now:
+Давайте використаємо концепцію коефіцієнта масиву для моделювання сигналу, що надходить на масив.  Для передавання сигналу ми поки що будемо використовувати просто тон:
 
 .. code-block:: python
 
@@ -146,39 +146,42 @@ Let's use the array factor concept to simulate a signal arriving at an array.  F
  import matplotlib.pyplot as plt
  
  sample_rate = 1e6
- N = 10000 # number of samples to simulate
+ N = 10000 # кількість семплів для симуляції
  
- # Create a tone to act as the transmitter signal
- t = np.arange(N)/sample_rate # time vector
+ # створюємо тон, який буде виступати в якості сигналу передавача
+ t = np.arange(N)/sample_rate # вектор часу
  f_tone = 0.02e6
  tx = np.exp(2j * np.pi * f_tone * t)
 
-Now let's simulate an array consisting of three omnidirectional antennas in a line, with 1/2 wavelength between adjacent ones (a.k.a. "half-wavelength spacing").  We will simulate the transmitter's signal arriving at this array at a certain angle, theta.  Understanding the array factor :code:`a` below is why we went through all that math above.
+Тепер змоделюємо антенну решітку, що складається з трьох всеспрямованих антен, розташованих в лінію, з відстанню між сусідніми антенами в 1/2 довжини хвилі (так званий "інтервал у півхвилі").  Ми змоделюємо сигнал передавача, що приходить на цю решітку під певним кутом, тета.  Розуміння коефіцієнта решітки :code:`a`, наведеного нижче, є причиною того, що ми пройшли через усю цю математику вище.
 
 .. code-block:: python
 
- d = 0.5 # half wavelength spacing
+ d = 0.5 # половина довжини хвилі
  Nr = 3
- theta_degrees = 20 # direction of arrival (feel free to change this, it's arbitrary)
- theta = theta_degrees / 180 * np.pi # convert to radians
- a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # array factor
- print(a) # note that it's a 1x3, it's complex, and the first element is 1+0j
+ theta_degrees = 20 # напрямок приходу (не соромтеся змінювати це значення, воно довільне)
+ theta = theta_degrees / 180 * np.pi # перевести в радіани
+ a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # коефіцієнт масиву
+ print(a) # зверніть увагу, що це масив 1х3, він комплексний і перший елемент 1+0j
 
-To apply the array factor we have to do a matrix multiplication of :code:`a` and :code:`tx`, so first let's convert both to matrices, as NumPy arrays which don't let us do 1D matrix math that we need for beamforming/DOA.  We then perform the matrix multiply, note that the @ symbol in Python means matrix multiply (it's a NumPy thing).  We also have to convert :code:`a` from a row vector to a column vector (picture it rotating 90 degrees) so that the matrix multiply inner dimensions match.
+Щоб застосувати коефіцієнт масиву, нам потрібно виконати матричне множення :code:`a` і :code:`tx`, тому спочатку перетворимо їх у матриці, як масиви NumPy, які не дозволяють нам виконувати одномірні матричні обчислення, які нам потрібні для формування променя/DOA.  Потім ми виконаємо матричне множення, зауважте, що символ @ у Python означає матричне множення (це фішка NumPy).  Ми також повинні перетворити :code:`a` з вектора-рядка у вектор-стовпець (уявіть, що він повертається на 90 градусів) так, щоб внутрішні розміри матричного множення збігалися.
 
 .. code-block:: python
 
  a = np.asmatrix(a)
  tx = np.asmatrix(tx)
 
- r = a.T @ tx  # don't get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
- print(r.shape) # r is now going to be a 2D array, 1D is time and 1D is the spatial dimension
+ r = a.T @ tx # не звертайте уваги на транспонування a, головне, що ми множимо коефіцієнт масиву на сигнал tx
+ print(r.shape) # тепер r буде двовимірним масивом, 1D - час і 1D - просторовий вимір
 
-At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of Python is having to switch to matrix type for matrix math, then having to switch back to normal NumPy arrays, we need to add the .squeeze() to get it back to a normal 1D NumPy array.
+
+Наразі :code:`r` є двовимірним масивом, розміром 3 x 10000, оскільки у нас є три елементи масиву і змодельовано 10000 відліків.  Ми можемо витягнути кожен окремий сигнал і побудувати графік перших 200 відліків, нижче ми покажемо лише дійсну частину, але є ще й уявна частина, як і у будь-якого сигналу базової смуги.  Однією з неприємних особливостей Python є необхідність перемикання на матричний тип для матричної математики, а потім повернення до звичайних масивів NumPy, тому нам потрібно додати .squeeze(), щоб повернути його до звичайного 1D масиву NumPy.
+
 
 .. code-block:: python
 
- plt.plot(np.asarray(r[0,:]).squeeze().real[0:200]) # the asarray and squeeze are just annoyances we have to do because we came from a matrix
+
+ plt.plot(np.asarray(r[0,:]).squeeze().real[0:200]) # asarray і squeeze - це просто прикрість, яку нам доводиться робити, тому що ми прийшли з матриці
  plt.plot(np.asarray(r[1,:]).squeeze().real[0:200])
  plt.plot(np.asarray(r[2,:]).squeeze().real[0:200])
  plt.show()
@@ -187,44 +190,44 @@ At this point :code:`r` is a 2D array, size 3 x 10000 because we have three arra
    :align: center 
    :target: ../_images/doa_time_domain.svg
 
-Note the phase shifts between elements like we expect to happen (unless the signal arrives at boresight in which case it will reach all elements at the same time and there wont be a shift, set theta to 0 to see).  Element 0 appears to arrive first, with the others slightly delayed.  Try adjusting the angle and see what happens.
+Зверніть увагу на фазові зсуви між елементами, як ми і очікували (за винятком випадків, коли сигнал надходить на пряму видимість, коли він досягає всіх елементів одночасно і зсуву не буде, встановіть тета на 0, щоб побачити це).  Елемент 0 прибуває першим, а інші дещо затримуються.  Спробуйте змінити кут і подивіться, що станеться.
 
-One thing we didn't bother doing yet- let's add noise to this received signal.  AWGN with a phase shift applied is still AWGN, and we want to apply the noise after the array factor is applied, because each element experiences an independent noise signal.  
+Єдине, що ми ще не зробили - додамо шум до отриманого сигналу.  AWGN з фазовим зсувом - це все ще AWGN, і ми хочемо застосувати шум після застосування коефіцієнта масиву, тому що кожен елемент відчуває незалежний шумовий сигнал.  
 
 .. code-block:: python
 
  n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
- r = r + 0.1*n # r and n are both 3x10000
+ r = r + 0.1*n # r та n рівні 3x10000
 
 .. image:: ../_images/doa_time_domain_with_noise.svg
    :align: center 
    :target: ../_images/doa_time_domain_with_noise.svg
 
 *******************
-Basic DOA
+Базовий DOA
 *******************
 
-So far this has been simulating the receiving of a signal from a certain angle of arrival.  In your typical DOA problem you are given samples and have to estimate the angle of arrival(s).  There are also problems where you have multiple received signals from different directions and one is the signal-of-interest (SOI) while another might be a jammer or interferer you have to null out to extract the SOI with at as high SNR as possible.
+Досі ми симулювали прийом сигналу під певним кутом падіння.  У вашій типовій задачі DOA вам надаються зразки, і ви повинні оцінити кут приходу сигналу(ів).  Існують також проблеми, коли ви отримуєте кілька сигналів з різних напрямків, і один з них є сигналом інтересу (SOI), а інші можуть бути завадами або перешкодами, які вам потрібно обнулити, щоб виділити SOI з якомога вищим SNR.
 
-Next let's use this signal :code:`r` but pretend we don't know which direction the signal is coming in from, let's try to figure it out with DSP and some Python code!  We'll start with the "conventional" beamforming approach, which involves scanning through (sampling) all directions of arrival from -pi to +pi (-180 to +180 degrees).  At each direction we point the array towards that angle by applying the weights associated with pointing in that direction; applying the weights will give us a 1D array of samples, as if we received it with 1 directional antenna.  You're probably starting to realize where the term electrically steered array comes in.  This conventional beamforming method involves calculating the mean of the magnitude squared, as if we were making an energy detector.  We'll apply the beamforming weights and do this calculation at a ton of different angles, so that we can check which angle gave us the max energy.
+Далі використаємо цей сигнал :code:`r`, але уявімо, що ми не знаємо, з якого напрямку приходить сигнал, спробуємо з'ясувати це за допомогою DSP і деякого коду на Python!  Почнемо зі "звичайного" підходу до формування променя, який передбачає сканування (вибірку) всіх напрямків приходу від -pi до +pi (від -180 до +180 градусів).  У кожному напрямку ми спрямовуємо масив у бік цього кута, застосовуючи ваги, пов'язані зі спрямуванням у цьому напрямку; застосування ваг дасть нам одномірний масив відліків, як якщо б ми отримували його за допомогою 1 спрямованої антени.  Ви, мабуть, починаєте розуміти, звідки з'явився термін "електрично керована решітка".  Цей звичайний метод формування променя передбачає обчислення середнього квадрата величини, як якщо б ми створювали енергетичний детектор.  Ми застосуємо ваги для формування променя і зробимо цей розрахунок під безліччю різних кутів, щоб перевірити, який кут дає нам максимальну енергію.
 
-.. code-block:: python
+.. code-block :: python
 
- theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 1000 different thetas between -180 and +180 degrees
+ theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 1000 різних тет від -180 до +180 градусів
  results = []
- for theta_i in theta_scan:
+ для theta_i в theta_scan:
      #print(theta_i)
-     w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
-     r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
-     r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
-     results.append(np.mean(np.abs(r_weighted)**2)) # energy detector
- 
- # print angle that gave us the max value
+     w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # знайоме?
+     r_weighted = np.conj(w) @ r # застосовуємо наші ваги, що відповідають напрямку theta_i
+     r_weighted = np.asarray(r_weighted).squeeze() # повертаємо до нормального 1d масиву
+     results.append(np.mean(np.abs(r_weighted)**2)) # детектор енергії
+
+  # виводимо кут, який дав нам максимальне значення
  print(theta_scan[np.argmax(results)] * 180 / np.pi) # 19.99999999999998
  
- plt.plot(theta_scan*180/np.pi, results) # lets plot angle in degrees
- plt.xlabel("Theta [Degrees]")
- plt.ylabel("DOA Metric")
+ plt.plot(theta_scan*180/np.pi, results) # виводить кут у градусах
+ plt.xlabel("Тета [градуси]")
+ plt.ylabel("Метрика DOA")
  plt.grid()
  plt.show()
 
@@ -232,215 +235,212 @@ Next let's use this signal :code:`r` but pretend we don't know which direction t
    :align: center 
    :target: ../_images/doa_conventional_beamformer.svg
 
-We found our signal!  Try increasing the amount of noise to push it to its limit, you might need to simulate more samples being received for low SNRs.  Also try changing the direction of arrival.
+Ми знайшли наш сигнал!  Спробуйте збільшити кількість шуму, щоб довести його до межі, можливо, вам доведеться імітувати отримання більшої кількості відліків для низького SNR.  Також спробуйте змінити напрямок приходу.
 
-If you prefer viewing angle on a polar plot, use the following code:
+Якщо ви віддаєте перевагу куту огляду на полярній ділянці, використовуйте наступний код:
 
 .. code-block:: python
 
- fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
- ax.plot(theta_scan, results) # MAKE SURE TO USE RADIAN FOR POLAR
- ax.set_theta_zero_location('N') # make 0 degrees point up
- ax.set_theta_direction(-1) # increase clockwise
+ fig, ax = plt.subplots(subplot_kw={'проекція': 'полярна'})
+ ax.plot(theta_scan, results) # ПЕРЕКОНАЙТЕСЯ, ЩО ВИКОРИСТОВУЄМО RADIAN ДЛЯ POLAR
+ ax.set_theta_zero_location('N') # робимо 0 градусів спрямованими вгору
+ ax.set_theta_direction(-1) # збільшити за годинниковою стрілкою
  ax.set_rgrids([0,2,4,6,8]) 
- ax.set_rlabel_position(22.5)  # Move grid labels away from other labels
+ ax.set_rlabel_position(22.5) # відсунути мітки сітки від інших міток
  plt.show()
 
 .. image:: ../_images/doa_conventional_beamformer_polar.svg
    :align: center 
    :target: ../_images/doa_conventional_beamformer_polar.svg
-   :alt: Example polar plot of performing direction of arrival (DOA) showing the beam pattern and 180 degree ambiguity
+   :alt: Приклад полярної діаграми напрямку приходу (DOA), що показує діаграму спрямованості променя та неоднозначність на 180 градусів
 
 ********************
-180 Degree Ambiguity
+Неоднозначність 180 градусів
 ********************
 
-Let's talk about why is there a second peak at 160 degrees; the DOA we simulated was 20 degrees, but it is not a coincidence that 180 - 20 = 160.  Picture three omnidirectional antennas in a line placed on a table.  The array's boresight is 90 degrees to the axis of the array, as labeled in the first diagram in this chapter.  Now imagine the transmitter in front of the antennas, also on the (very large) table, such that its signal arrives at a +20 degree angle from boresight.  Well the array sees the same effect whether the signal is arriving with respect to its front or back, the phase delay is the same, as depicted below with the array elements in red and the two possible transmitter DOA's in green.  Therefore, when we perform the DOA algorithm, there will always be a 180 degree ambiguity like this, the only way around it is to have a 2D array, or a second 1D array positioned at any other angle w.r.t the first array.  You may be wondering if this means we might as well only calculate -90 to +90 degrees to save compute cycles, and you would be correct!
+Поговоримо про те, чому є другий пік на 160 градусах; ДН, яку ми змоделювали, становила 20 градусів, але це не випадково, що 180 - 20 = 160.  Уявіть собі три всеспрямовані антени в лінію, розміщені на столі.  Вісь антени розташована під кутом 90 градусів до осі решітки, як показано на першій діаграмі в цій главі.  Тепер уявіть собі передавач перед антенами, також на (дуже великому) столі, так, щоб його сигнал надходив під кутом +20 градусів від візування.  Що ж, решітка бачить той самий ефект, незалежно від того, чи надходить сигнал спереду або ззаду, фазова затримка однакова, як показано нижче: елементи решітки позначені червоним кольором, а два можливих DOA передавача - зеленим.  Тому, коли ми виконуємо алгоритм DOA, завжди буде існувати неоднозначність на 180 градусів, і єдиний спосіб обійти її - це мати 2D масив або другий 1D масив, розташований під будь-яким іншим кутом по відношенню до першого масиву.  Ви можете запитати, чи означає це, що ми можемо обчислювати тільки від -90 до +90 градусів, щоб заощадити обчислювальні цикли, і ви будете праві!
 
 .. image:: ../_images/doa_from_behind.svg
    :align: center 
    :target: ../_images/doa_from_behind.svg
 
 ***********************
-Broadside of the Array
+Зворотний бік масиву
 ***********************
 
-To demonstrate this next concept, let's try sweeping the angle of arrival (AoA) from -90 to +90 degrees instead of keeping it constant at 20:
+Щоб продемонструвати наступну концепцію, давайте спробуємо змінити кут прильоту (AoA) від -90 до +90 градусів замість того, щоб залишити його постійним на рівні 20:
 
 .. image:: ../_images/doa_sweeping_angle_animation.gif
    :scale: 100 %
    :align: center
-   :alt: Animation of direction of arrival (DOA) showing the broadside of the array
+  :alt: Анімація напрямку прибуття (DOA), що показує широку сторону масиву
 
-As we approach the broadside of the array (a.k.a. endfire), which is when the signal arrives at or near the axis of the array, performance drops.  We see two main degradations: 1) the main lobe gets wider and 2) we get ambiguity and don't know whether the signal is coming from the left or the right.  This ambiguity adds to the 180 degree ambiguity discussed earlier, where we get an extra lobe at 180 - theta, causing certain AoA to lead to three lobes of roughly equal size.  This broadside ambiguity makes sense though, the phase shifts that occur between elements are identical whether the signal arrives from the left or right side w.r.t. the array axis.  Just like with the 180 degree ambiguity, the solution is to use a 2D array or two 1D arrays at different angles.  In general, beamforming works best when the angle is closer to the boresight.
+Коли ми наближаємося до широкої сторони антенної решітки (так званий "кінець вогню"), тобто коли сигнал надходить на вісь решітки або поблизу неї, продуктивність падає.  Ми бачимо два основних погіршення: 1) головна пелюстка стає ширшою і 2) ми отримуємо неоднозначність і не знаємо, звідки надходить сигнал - зліва чи справа.  Ця неоднозначність додається до неоднозначності на 180 градусів, про яку ми говорили раніше, коли ми отримуємо додаткову пелюстку на 180 - тета, що призводить до того, що певні АП призводять до трьох пелюсток приблизно однакового розміру.  Ця широка неоднозначність має сенс, оскільки фазові зсуви, які відбуваються між елементами, ідентичні, незалежно від того, чи сигнал надходить з лівого або правого боку відносно осі решітки.  Як і у випадку з 180-градусною неоднозначністю, рішення полягає у використанні двовимірної решітки або двох одновимірних решіток під різними кутами.  Загалом, формування променя найкраще працює, коли кут ближчий до кута нахилу.
 
 *******************
-When d is not λ/2
+Коли d не дорівнює λ/2
 *******************
 
-So far we have been using a distance between elements, d, equal to one half wavelength.  So for example, an array designed for 2.4 GHz WiFi with λ/2 spacing would have a spacing of 3e8/2.4e9/2 = 12.5cm or about 5 inches, meaning a 4x4 element array would be about 15" x 15" x the height of the antennas.  There are times when an array may not be able to achieve exactly λ/2 spacing, such as when space is restricted, or when the same array has to work on a variety of carrier frequencies.
+Досі ми використовували відстань між елементами d, що дорівнює половині довжини хвилі.  Так, наприклад, решітка, призначена для 2,4 ГГц WiFi з відстанню λ/2, матиме відстань 3e8/2.4e9/2 = 12,5 см або близько 5 дюймів, що означає, що решітка з 4х4 елементів матиме розмір приблизно 15" x 15" x висоту антен.  Бувають випадки, коли масив не може забезпечити точну відстань λ/2, наприклад, коли простір обмежений, або коли один і той же масив повинен працювати на різних несучих частотах.
 
-Let's examine when the spacing is greater than λ/2, i.e., too much spacing, by varying d between λ/2 and 4λ.  We will remove the bottom half of the polar plot since it's a mirror of the top anyway.
+Дослідимо, коли інтервал більший за λ/2, тобто занадто великий, змінюючи d між λ/2 та 4λ.  Ми видалимо нижню половину полярного графіка, оскільки вона є дзеркальним відображенням верхньої.
 
 .. image:: ../_images/doa_d_is_large_animation.gif
    :scale: 100 %
    :align: center
-   :alt: Animation of direction of arrival (DOA) showing what happens when distance d is much more than half-wavelength
+   :alt: Анімація напрямку приходу (DOA), яка показує, що відбувається, коли відстань d набагато більша за півхвилі
 
-As you can see, in addition to the 180 degree ambiguity we discussed earlier, we now have additional ambiguity, and it gets worse as d gets higher (extra/incorrect lobes form).  These extra lobes are known as grating lobes, and they are a result of "spatial aliasing".  As we learned in the :ref:`sampling-chapter` chapter, when we don't sample fast enough we get aliasing.  The same thing happens in the spatial domain; if our elements are not spaced close enough together w.r.t. the carrier frequency of the signal being observed, we get garbage results in our analysis.  You can think of spacing out antennas as sampling space!  In this example we can see that the grating lobes don't get too problematic until d > λ, but they will occur as soon as you go above λ/2 spacing.
+Як бачите, на додаток до неоднозначності на 180 градусів, яку ми обговорювали раніше, тепер ми маємо додаткову неоднозначність, і вона погіршується зі збільшенням d (утворюються зайві/неправильні пелюстки).  Ці додаткові пелюстки відомі як пелюстки решітки, і вони є результатом "просторового аліасингу".  Як ми дізналися з розділу :ref:`sampling-chapter`, коли ми робимо вибірку недостатньо швидко, ми отримуємо аліасинг.  Те ж саме відбувається і в просторовій області; якщо наші елементи не розташовані достатньо близько один до одного відносно несучої частоти сигналу, що спостерігається, ми отримуємо сміттєві результати в нашому аналізі.  Ви можете думати про відстань між антенами як про простір дискретизації!  У цьому прикладі ми бачимо, що пелюстки решітки не стають надто проблематичними, поки d > λ, але вони з'являються, як тільки ви перевищуєте відстань λ/2.
 
-Now what happens when d is less than λ/2, such as when we need to fit the array in a small space?  Let's repeat the same simulation:
+А що відбувається, коли d менше λ/2, наприклад, коли нам потрібно розмістити решітку в невеликому просторі?  Повторимо ту саму симуляцію:
 
 .. image:: ../_images/doa_d_is_small_animation.gif
    :scale: 100 %
    :align: center
-   :alt: Animation of direction of arrival (DOA) showing what happens when distance d is much less than half-wavelength
+    :alt: Анімація напрямку приходу (DOA), яка показує, що відбувається, коли відстань d набагато менша за півхвилі
 
-While the main lobe gets wider as d gets lower, it still has a maximum at 20 degrees, and there are no grating lobes, so in theory this would still work (at least at high SNR).  To better understand what breaks as d gets too small, let's repeat the experiment but with an additional signal arriving from -40 degrees:
+Хоча головна пелюстка стає ширшою зі зменшенням d, вона все ще має максимум при 20 градусах, і немає гратчастих пелюсток, тому теоретично це все ще має працювати (принаймні, при високому SNR).  Щоб краще зрозуміти, що відбувається, коли d стає занадто малим, повторимо експеримент, але з додатковим сигналом, що надходить з кута -40 градусів:
 
 .. image:: ../_images/doa_d_is_small_animation2.gif
    :scale: 100 %
    :align: center
-   :alt: Animation of direction of arrival (DOA) showing what happens when distance d is much less than half-wavelength and there are two signals present
+   :alt: Анімація напрямку приходу (DOA), яка показує, що відбувається, коли відстань d набагато менша за півхвилі і присутні два сигнали
 
-Once we get lower than λ/4 there is no distinguishing between the two different paths, and the array performs poorly.  As we will see later in this chapter, there are beamforming techniques that provide more precise beams than conventional beamforming, but keeping d as close to λ/2 as possible will continue to be a theme.
-
-*******************
-Antennas
-*******************
-
-Coming soon!
-
-* common antenna types used for arrays (eg patch, monopole)
-
-
+Як тільки відстань стає меншою за λ/4, неможливо розрізнити два різні шляхи, і решітка працює погано.  Як ми побачимо далі в цій главі, існують методи формування променя, які забезпечують точніші промені, ніж звичайне формування променя, але утримання d якомога ближче до λ/2 залишатиметься актуальною темою.
 
 *******************
-Number of Elements
+Антени
 *******************
 
-Coming soon!
+Скоро буде!
 
+* загальні типи антен, що використовуються для антенних решіток (наприклад, патч, монополь)
 
 *******************
-Capon's Beamformer
+Кількість елементів
 *******************
 
-In the basic DOA example we swept across all angles, multiplying :code:`r` by the weights :code:`w`, applying an energy detector to the resulting 1D array.  In that example, :code:`w` was equal to the array factor, :code:`a`, so we were essentially just multiplying :code:`r` by :code:`a`.  We will now look at a beamformer that is slightly more complicated but tends to perform much better, called Capon's Beamformer, a.k.a. the minimum variance distortionless response (MVDR) beamformer.  This beamformer can be summarized in the following equation:
+Скоро буде!
+
+*******************
+Променеутворювач Capon's Beamformer
+*******************
+
+У базовому прикладі DOA ми пройшлися по всіх кутах, помноживши :code:`r` на ваги :code:`w`, застосувавши до отриманого 1D масиву детектор енергії.  У цьому прикладі :code:`w` дорівнював коефіцієнту масиву, :code:`a`, тому ми просто множили :code:`r` на :code:`a`.  Тепер ми розглянемо формувач променя, який є дещо складнішим, але має тенденцію працювати набагато краще, який називається формувачем променя Капона, також відомим як формувач променя з мінімальною дисперсією без спотворень (MVDR).  Цей формувач променя можна узагальнити в наступному рівнянні:
 
 .. math::
  \hat{\theta} = \mathrm{argmax}\left(\frac{1}{a^H R^{-1} a}\right)
 
-where :math:`R` is the sample covariance matrix, calculated by multiplying r with the complex conjugate transpose of itself, :math:`R = r r^H`, and the result will be a :code:`Nr` x :code:`Nr` size matrix (3x3 in the examples we have seen so far).  This covariance matrix tells us how similar the samples received from the three elements are, although to use Capon's method we don't have to fully understand how that works.  In textbooks and other resources you might see the Capon's equation with some terms in the numerator; these are purely for scaling/normalization and they don't change the results.
+де :math:`R` - коваріаційна матриця вибірки, обчислена множенням r на комплексне спряжене перенесення самої себе, :math:`R` = r r^H`, і результатом буде матриця розміром :code:`Nr` x :code:`Nr` (3x3 у прикладах, які ми розглядали до цього часу).  Ця коваріаційна матриця показує нам, наскільки подібні вибірки, отримані з трьох елементів, хоча для використання методу Кейпона нам не обов'язково повністю розуміти, як це працює.  У підручниках та інших джерелах ви можете побачити рівняння Кейпона з деякими членами в чисельнику; вони призначені виключно для масштабування/нормалізації і не змінюють результати.
 
-We can implement the equations above in Python fairly easily:
+Ми можемо досить легко реалізувати наведені вище рівняння на Python:
 
 .. code-block:: python
 
- theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # between -180 and +180 degrees
+ theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # між -180 та +180 градусами
  results = []
- for theta_i in theta_scan:
-     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # array factor
-     a = a.T # needs to be a column vector for the math below
+ для theta_i у theta_scan:
+     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # множник масиву
+     a = a.T # має бути вектором-стовпчиком для математики нижче
  
-     # Calc covariance matrix
-     R = r @ r.H # gives a Nr x Nr covariance matrix of the samples
+     # Обчислити коваріаційну матрицю
+     R = r @ r.H # повертає коваріаційну матрицю вибірок Nr x Nr
  
-     Rinv = np.linalg.pinv(R) # pseudo-inverse tends to work better than a true inverse
+     Rinv = np.linalg.pinv(R) # псевдоінверсія має тенденцію працювати краще, ніж справжня інверсія
  
-     metric = 1/(a.H @ Rinv @ a) # Capon's method!
-     metric = metric[0,0] # convert the 1x1 matrix to a Python scalar, it's still complex though
-     metric = np.abs(metric) # take magnitude
-     metric = 10*np.log10(metric) # convert to dB so its easier to see small and large lobes at the same time
+     metric = 1/(a.H @ Rinv @ a) # Метод Капона!
+     metric = metric[0,0] # перетворюємо матрицю 1х1 у скаляр Python, хоча це все ще складно
+     metric = np.abs(metric) # взяти величину
+     metric = 10*np.log10(metric) # конвертуємо в дБ, щоб легше було бачити малі та великі пелюстки одночасно
      results.append(metric)
  
- results /= np.max(results) # normalize
+ results /= np.max(results) # нормалізуємо
 
-When applied to the previous DOA example code, we get the following:
+При застосуванні до попереднього прикладу коду DOA ми отримаємо наступне:
 
 .. image:: ../_images/doa_capons.svg
    :align: center 
    :target: ../_images/doa_capons.svg
 
-Works fine, but to really compare this to other techniques we'll have to create a more interesting problem.  Let's set up a simulation with an 8-element array receiving three signals from different angles: 20, 25, and 40 degrees, with the 40 degree one received at a much lower power than the other two.  Our goal will be to detect all three.  The code to generate this new scenario is as follows:
+Працює чудово, але щоб дійсно порівняти його з іншими методами, нам доведеться створити цікавішу задачу.  Давайте створимо симуляцію з 8-елементною решіткою, яка приймає три сигнали під різними кутами: 20, 25 і 40 градусів, причому сигнал під кутом 40 градусів приймається зі значно меншою потужністю, ніж два інших.  Нашою метою буде виявити всі три сигнали.  Код для генерації цього нового сценарію виглядає наступним чином:
 
 .. code-block:: python
 
- Nr = 8 # 8 elements
- theta1 = 20 / 180 * np.pi # convert to radians
+ Nr = 8 # 8 елементів
+ theta1 = 20 / 180 * np.pi # перевести в радіани
  theta2 = 25 / 180 * np.pi
  theta3 = -40 / 180 * np.pi
- a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
- a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
- a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
- # we'll use 3 different frequencies
+ a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1))
+ a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2))
+ a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3))
+ # використовуємо 3 різні частоти
  r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
      a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
      0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
  n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
  r = r + 0.04*n
 
-And if we run our Capon's beamformer on this new scenario we get the following results:
+І якщо ми запустимо наш формувач променя Capon's beamformer за цим новим сценарієм, то отримаємо наступні результати:
 
 .. image:: ../_images/doa_capons2.svg
    :align: center 
    :target: ../_images/doa_capons2.svg
 
-It works pretty well, we can see the two signals received only 5 degrees apart, and we can also see the 3rd signal (at -40 or 320 degrees) that was received at one tenth the power of the others.   Now let's run the simple beamformer which is just an energy detector on this new scenario:
+Він працює досить добре, ми бачимо два сигнали, отримані з різницею лише в 5 градусів, а також бачимо 3-й сигнал (при -40 або 320 градусах), який був отриманий на одну десяту потужності від інших.   Тепер запустимо простий формувач променя, який є просто детектором енергії, на цьому новому сценарії:
 
 .. image:: ../_images/doa_complex_scenario.svg
    :align: center 
    :target: ../_images/doa_complex_scenario.svg
 
-While it might be a pretty shape, it's not finding all three signals at all...  By comparing these two results we can see the benefit from using a more complex beamformer.  There are many more beamformers out there, but next we are going to dive into a different class of beamformer that use the "subspace" method, often called adaptive beamforming.  
+Хоча це може бути гарна фігура, вона зовсім не знаходить всі три сигнали...  Порівнюючи ці два результати, ми бачимо переваги використання складнішого формувача променя.  Існує набагато більше формувачів променя, але далі ми зануримося в інший клас формувачів променя, які використовують метод "підпростору", який часто називають адаптивним формуванням променя.  
 
 *******************
 MUSIC
-*******************
+******************
 
-We will now change gears and talk about a different kind of beamformer. All of the previous ones have fallen in the "delay-and-sum" category, but now we will dive into "sub-space" methods.  These involve dividing the signal subspace and noise subspace, which means we must estimate how many signals are being received by the array, to get a good result.  MUltiple SIgnal Classification (MUSIC) is a very popular sub-space method that involves calculating the eigenvectors of the covariance matrix (which is a computationally intensive operation by the way).  We split the eigenvectors into two groups: signal sub-space and noise-subspace, then project steering vectors into the noise sub-space and steer for nulls.  That might seem confusing at first, which is part of why MUSIC seems like black magic!
+Тепер ми перемкнемось і поговоримо про інший тип формувача променя. Всі попередні підпадали під категорію "затримка і сума", але зараз ми зануримося в "підпросторові" методи.  Вони передбачають поділ підпростору сигналу і підпростору шуму, тобто ми повинні оцінити, скільки сигналів надходить на масив, щоб отримати хороший результат.  MUltiple SIgnal Classification (MUSIC) - дуже популярний метод підпростору, який передбачає обчислення власних векторів коваріаційної матриці (що, до речі, є обчислювально інтенсивною операцією).  Ми розділимо власні вектори на дві групи: підпростір сигналу та підпростір шуму, а потім спроектуємо вектори керування в підпростір шуму і будемо шукати нулі.  Спочатку це може здатися заплутаним, і саме тому MUSIC схожа на чорну магію!
 
-The core MUSIC equation is the following:
+Основне рівняння MUSIC наступне:
 
 .. math::
  \hat{\theta} = \mathrm{argmax}\left(\frac{1}{a^H V_n V^H_n a}\right)
 
-where :math:`V_n` is that list of noise sub-space eigenvectors we mentioned (a 2D matrix).  It is found by first calculating the eigenvectors of :math:`R`, which is done simply by :code:`w, v = np.linalg.eig(R)` in Python, and then splitting up the vectors (:code:`w`) based on how many signals we think the array is receiving.  There is a trick for estimating the number of signals that we'll talk about later, but it must be between 1 and :code:`Nr - 1`.  I.e., if you are designing an array, when you are choosing the number of elements you must have one more than the number of anticipated signals.  One thing to note about the equation above is :math:`V_n` does not depend on the array factor :math:`a`, so we can precalculate it before we start looping through theta.  The full MUSIC code is as follows:
+де :math:`V_n` - це список власних векторів шумового підпростору, про який ми згадували (двовимірна матриця).  Його знаходять, спочатку обчислюючи власні вектори :math:`R`, що робиться просто :code:`w, v = np.linalg.eig(R)` у Python, а потім розбиваючи вектори (:code:`w`) на основі того, скільки сигналів, на нашу думку, отримує масив.  Існує трюк для оцінки кількості сигналів, про який ми поговоримо пізніше, але вона повинна бути між 1 і :code:`Nr - 1`.  Тобто, якщо ви проектуєте масив, при виборі кількості елементів ви повинні мати на один елемент більше, ніж очікувана кількість сигналів.  У наведеному вище рівнянні :math:`V_n` не залежить від коефіцієнта масиву :math:`a`, тому ми можемо його попередньо обчислити до того, як почнемо перебирати тета-цикл.  Повний код MUSIC виглядає наступним чином:
 
 .. code-block:: python
 
- num_expected_signals = 3 # Try changing this!
- 
- # part that doesn't change with theta_i
- R = r @ r.H # Calc covariance matrix, it's Nr x Nr
- w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
- eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
- v = v[:, eig_val_order] # sort eigenvectors using this order
- # We make a new eigenvector matrix representing the "noise subspace", it's just the rest of the eigenvalues
+ num_expected_signals = 3 # Спробуйте змінити це!
+  
+ # частина, яка не змінюється при зміні theta_i
+ R = r @ r.H # Обчислюємо коваріаційну матрицю, це Nr x Nr
+ w, v = np.linalg.eig(R) # розклад за власними значеннями, v[:,i] - власний вектор, що відповідає власному значенню w[i]
+ eig_val_order = np.argsort(np.abs(w)) # знаходимо порядок величини власних значень
+ v = v[:, eig_val_order] # сортуємо власні вектори за цим порядком
+ # створюємо нову матрицю власних векторів, що представляє "шумовий підпростір", це просто решта власних значень
  V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64))
  for i in range(Nr - num_expected_signals):
     V[:, i] = v[:, i]
  
- theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # -180 to +180 degrees
+ theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # від -180 до +180 градусів
  results = []
- for theta_i in theta_scan:
-     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # array factor
+ for theta_i у theta_scan:
+     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # множник масиву
      a = a.T
-     metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
-     metric = np.abs(metric[0,0]) # take magnitude
-     metric = 10*np.log10(metric) # convert to dB
+     metric = 1 / (a.H @ V @ V.H @ a) # Основне рівняння MUSIC
+     metric = np.abs(metric[0,0]) # взяти амплітуду
+     metric = 10*np.log10(metric) # перевести в дБ
      results.append(metric) 
  
- results /= np.max(results) # normalize
+ results /= np.max(results) # нормалізуємо
 
-Running this algorithm on the complex scenario we have been using, we get the following very precise results, showing the power of MUSIC:
+Запустивши цей алгоритм на складному сценарії, який ми використовували, ми отримали наступні дуже точні результати, що демонструють силу МУЗИКИ:
 
 .. image:: ../_images/doa_music.svg
    :align: center 
    :target: ../_images/doa_music.svg
-   :alt: Example of direction of arrival (DOA) using MUSIC algorithm beamforming
+   :alt: Приклад формування напрямку прибуття (DOA) за допомогою алгоритму формування променя MUSIC
 
-Now what if we had no idea how many signals were present?  Well there is a trick; you sort the eigenvalue magnitudes from highest to lowest, and plot them (it may help to plot them in dB):
+Що робити, якщо ми не знаємо, скільки сигналів присутні?  Є один трюк: відсортуйте власні значення від найбільшого до найменшого і побудуйте графік (може бути корисно побудувати графік у дБ):
 
 .. code-block:: python
 
@@ -450,9 +450,9 @@ Now what if we had no idea how many signals were present?  Well there is a trick
    :align: center 
    :target: ../_images/doa_eigenvalues.svg
 
-The eigenvalues associated with the noise-subspace are going to be the smallest, and they will all tend around the same value, so we can treat these low values like a "noise floor", and any eigenvalue above the noise floor represents a signal.  Here we can clearly see there are three signals being received, and adjust our MUSIC algorithm accordingly.  If you don't have a lot of IQ samples to process or the signals are at low SNR, the number of signals might not be as obvious.  Feel free to play around by adjusting :code:`num_expected_signals` between 1 and 7, you'll find that underestimating the number will lead to missing signal(s) while overestimating will only slightly hurt performance.
+Власні значення, пов'язані з підпростором шуму, будуть найменшими, і всі вони матимуть однакове значення, тому ми можемо вважати ці низькі значення "шумовим рівнем", а будь-яке власне значення, що перевищує шумовий рівень, є сигналом.  Тут ми можемо чітко бачити, що отримуємо три сигнали, і відповідно налаштувати наш алгоритм MUSIC.  Якщо у вас не так багато семплів IQ для обробки або сигнали мають низький SNR, кількість сигналів може бути не такою очевидною.  Не соромтеся експериментувати, змінюючи :code:`num_expected_signals` між 1 і 7, ви побачите, що заниження кількості призведе до пропущених сигналів, тоді як завищення лише трохи погіршить продуктивність.
 
-Another experiment worth trying with MUSIC is to see how close two signals can arrive at (in angle) while still distinguishing between them; sub-space techniques are especially good at that.  The animation below shows an example, with one signal at 18 degrees and another slowly sweeping angle of arrival.
+Ще один експеримент, який варто спробувати з MUSIC, - подивитися, наскільки близько (за кутом) два сигнали можуть зблизитися, але при цьому їх можна розрізнити; особливо добре для цього підпросторові методи.  На анімації нижче показано приклад, де один сигнал приходить під кутом 18 градусів, а інший повільно змінює кут приходу.
 
 .. image:: ../_images/doa_music_animation.gif
    :scale: 100 %
@@ -462,25 +462,25 @@ Another experiment worth trying with MUSIC is to see how close two signals can a
 ESPRIT
 *******************
 
-Coming soon!
+Незабаром!
 
 *******************
 2D DOA
 *******************
 
-Coming soon!
+Скоро буде!
 
 *******************
 Steering Nulls
 *******************
 
-Coming soon!
+Скоро буде!
 
 *************************
-Conclusion and References
+Висновки та список використаної літератури
 *************************
 
-All Python code, including code used to generate the figures/animations, can be found `on the textbook's GitHub page <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/doa.py>`_.
+Весь код на Python, включаючи код, що використовується для генерації малюнків/анімацій, можна знайти `на сторінці підручника на GitHub <https://github.com/777arc/textbook/blob/master/figure-generating-scripts/doa.py>`_.
 
-* DOA implementation in GNU Radio - https://github.com/EttusResearch/gr-doa
-* DOA implementation used by KrakenSDR - https://github.com/krakenrf/krakensdr_doa/blob/main/_signal_processing/krakenSDR_signal_processor.py
+* Реалізація DOA на GNU Radio - https://github.com/EttusResearch/gr-doa
+* Реалізація DOA у KrakenSDR - https://github.com/krakenrf/krakensdr_doa/blob/main/_signal_processing/krakenSDR_signal_processor.py
