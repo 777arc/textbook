@@ -336,7 +336,7 @@ IQ-діаграми не можна використовувати для від
 
 .. image:: ../_images/phase_jitter.svg
    :align: center
-   target: ../_images/phase_jitter.svg
+   :target: ../_images/phase_jitter.svg
    :alt: QPSK з фазовим джиттером, згенерованим або змодельованим у Python
 
 Ви навіть можете комбінувати фазовий шум з AWGN, щоб отримати повний ефект:

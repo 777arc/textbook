@@ -45,7 +45,7 @@ Pulse Shaping
 
 Як насправді розділити фільтр навпіл?  Згортання є асоціативним, що означає:
 
-.. математично::
+.. math::
  (f * g) * h = f * (g * h)
 
 Уявімо собі :math:`f` як наш вхідний сигнал, а :math:`g` і :math:`h` - це фільтри.  Фільтрація :math:`f` за допомогою :math:`g`, а потім :math:`h` - це те ж саме, що і фільтрація одним фільтром, рівним :math:`g * h`.
@@ -246,17 +246,18 @@ The below graph represents the ideal position in time to sample, along with the 
 
 Compare that to the worst time to sample.  Notice the three clusters in the constellation.  We are sampling directly in between each symbol; our samples are going to be way off.
 
-.. image:: ../_images/symbol_sync3.png
+. image:: ../_images/symbol_sync3.png
    :scale: 40 % 
    :align: center 
-   :alt: GNU Radio simulation showing imperfect sampling as far as timing
+   :alt: Симуляція GNU Radio, що демонструє недосконалу вибірку за часом
 
-Here is another example of a poor sample time, somewhere in between our ideal and worst cases. Heed the four clusters.  With a high SNR we might be able to get away with this sampling time interval, though it isn't advisable.
+Ось ще один приклад поганого часу дискретизації, десь між нашим ідеальним і найгіршим випадками. Зверніть увагу на чотири кластери.  З високим SNR ми могли б уникнути такого інтервалу часу вибірки, хоча це і не рекомендується.
 
 .. image:: ../_images/symbol_sync4.png
    :scale: 40 % 
    :align: center 
-   По-друге, вертикальні лінії були створені в циклі for для наочності.  Вони призначені для демонстрації того, де зустрічаються інтервали :math:`Ts`.  Ці інтервали показують, де цей сигнал буде дискретизовано приймачем.  Зверніть увагу, що для інтервалів :math:`Ts` крива має значення точно 1.0 або -1.0, що робить їх ідеальними моментами часу для дискретизації.
+   
+Пам'ятайте, що наші значення Q не показані на часовому графіку, оскільки вони приблизно дорівнюють нулю, що дозволяє графіку IQ поширюватися лише по горизонталі.
 
 Якби ми хотіли перетворити і передати цей сигнал, приймач мав би визначити, коли знаходяться межі :math:`Ts`, наприклад, за допомогою алгоритму символьної синхронізації.  Таким чином, приймач знає, коли саме робити вибірку, щоб отримати правильні дані.  Якщо приймач зробить вибірку занадто рано або занадто пізно, він побачить значення, які будуть дещо викривлені через ISI, а якщо занадто пізно, то отримає купу дивних чисел.
 
@@ -288,4 +289,3 @@ Here is another example of a poor sample time, somewhere in between our ideal an
    
 Пам'ятайте, що наші значення Q не показані на часовому графіку, оскільки вони приблизно дорівнюють нулю, що дозволяє графіку IQ поширюватися лише по горизонталі.
 
-Remember that our Q values are not shown on the time domain plot because they are roughly zero, allowing the IQ plots to spread horizontally only.
