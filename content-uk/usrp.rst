@@ -1,46 +1,46 @@
 .. _usrp-chapter:
 
 ####################################
-USRP in Python
+USRP на Python
 ####################################
 
 .. image:: ../_images/usrp.png
    :scale: 50 % 
    :align: center
-   :alt: The family of USRP radios from Ettus Research
+   :alt: Сімейство USRP-радіостанцій від Ettus Research
    
-In this chapter we learn how to use the UHD Python API to control and receive/transmit signals with a `USRP <https://www.ettus.com/>`_ which is a series of SDRs made by Ettus Research (now part of NI).  We will discuss transmitting and receiving on the USRP in Python, and dive into USRP-specific topics including stream args, subdevices, channels, 10 MHz and PPS synchronization.  
+У цій главі ми навчимося використовувати UHD Python API для керування та прийому/передачі сигналів за допомогою `USRP <https://www.ettus.com/>`_ - серії SDR від компанії Ettus Research (тепер частина NI).  Ми обговоримо передачу та прийом на USRP в Python, а також зануримося в специфічні для USRP теми, включаючи аргументи потоку, субпристрої, канали, 10 МГц і PPS синхронізацію.  
 
 ************************
-Software/Drivers Install
+Встановлення програмного забезпечення/драйверів
 ************************
 
-While the Python code provided in this textbook should work under Windows, Mac, and Linux, we will only be providing driver/API install instructions specific to Ubuntu 22 (although the instructions below should work on most Debian-based distributions).  We will start by creating an Ubuntu 22 VirtualBox VM; feel free to skip the VM portion if you already have your OS ready to go.  Alternatively, if you're on Windows 11, Windows Subsystem for Linux (WSL) using Ubuntu 22 tends to run fairly well and supports graphics out-of-the-box. 
+Хоча код на Python, наведений у цьому підручнику, має працювати під Windows, Mac і Linux, ми надамо лише інструкції зі встановлення драйверів/API для Ubuntu 22 (хоча наведені нижче інструкції мають працювати на більшості дистрибутивів на основі Debian).  Ми почнемо зі створення віртуальної машини Ubuntu 22 VirtualBox; можете пропустити частину про віртуальну машину, якщо у вас вже є готова до роботи ОС.  Крім того, якщо ви використовуєте Windows 11, Windows Subsystem for Linux (WSL) з Ubuntu 22 працює досить добре і підтримує графіку "з коробки". 
 
-Setting Up an Ubuntu 22 VM
+Налаштування віртуальної машини Ubuntu 22
 ##########################
 
-(Optional)
+(Необов'язково)
 
-1. Download Ubuntu 22.04 Desktop .iso- https://ubuntu.com/download/desktop
-2. Install and open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
-3. Create a new VM.  For memory size, I recommend using 50% of your computer’s RAM.
-4. Create the virtual hard disk, choose VDI, and dynamically allocate size.  15 GB should be enough. If you want to be really safe you can use more.
-5. Start the VM. It will ask you for installation media. Choose the Ubuntu 22 desktop .iso file.  Choose “install ubuntu”, use default options, and a pop up will warn you about the changes you are about to make. Hit continue.  Choose name/password and then wait for the VM to finish initializing.  After finishing the VM will restart, but you should power off the VM after the restart.
-6. Go into the VM settings (the gear icon).
-7. Under system > processor > choose at least 3 CPUs.  If you have an actual video card then in display > video memory > choose something much higher.
-8. Start up your VM.
-9. For USB type USRPs you'll need to install VM guest additions. Within the VM go to Devices > Insert Guest Additions CD > hit run when a box pops up.  Follow the instructions. Restart the VM, then attempt to forward the USRP to the VM, assuming it shows up in the list under Devices > USB.  The shared clipboard can be enabled through Devices > Shared Clipboard > Bidirectional.
+1. Завантажте Ubuntu 22.04 Desktop .iso - https://ubuntu.com/download/desktop
+2. Встановіть і відкрийте `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
+3. Створіть нову віртуальну машину.  Для розміру пам'яті я рекомендую використовувати 50% оперативної пам'яті вашого комп'ютера.
+4. Створіть віртуальний жорсткий диск, виберіть VDI і динамічно розподіліть обсяг.  15 ГБ повинно бути достатньо. Якщо ви хочете бути дійсно безпечними, ви можете використовувати більше.
+5. Запустіть віртуальну машину. Вона запитає вас про інсталяційний носій. Виберіть файл .iso для робочого столу Ubuntu 22.  Виберіть "встановити ubuntu", скористайтеся параметрами за замовчуванням, і спливаюче вікно попередить вас про зміни, які ви збираєтеся зробити. Натисніть "продовжити".  Виберіть ім'я/пароль і зачекайте, поки віртуальна машина закінчить ініціалізацію.  Після завершення ВМ перезавантажиться, але вам слід вимкнути ВМ після перезавантаження.
+6. Перейдіть до налаштувань ВМ (іконка з шестернею).
+7. У розділі система > процесор > виберіть принаймні 3 процесори.  Якщо у вас справжня відеокарта, то в розділі дисплей > відеопам'ять > виберіть щось набагато більше.
+8. Запустіть віртуальну машину.
+9. Для USRP типу USB вам потрібно буде встановити гостьові доповнення до ВМ. У віртуальній машині перейдіть до Пристрої > Вставити компакт-диск з гостьовими додатками > натисніть запустити, коли з'явиться вікно.  Дотримуйтесь інструкцій. Перезапустіть віртуальну машину, а потім спробуйте переслати USRP на віртуальну машину, припускаючи, що вона з'явиться у списку Пристрої > USB.  Спільний буфер обміну можна увімкнути за допомогою Пристрої > Спільний буфер обміну > Двонаправлений.
 
-Installing UHD and Python API
+Встановлення UHD та Python API
 #############################
 
-The terminal commands below should build and install the latest version of UHD, including the Python API:
+Наведені нижче команди терміналу мають зібрати та встановити останню версію UHD, включно з Python API:
 
 .. code-block:: bash
 
  sudo apt-get install git cmake libboost-all-dev libusb-1.0-0-dev python3-docutils python3-mako python3-numpy python3-requests python3-ruamel.yaml python3-setuptools build-essential
- cd ~
+ cd ~{{}}}
  git clone https://github.com/EttusResearch/uhd.git
  cd uhd/host
  mkdir build
@@ -50,12 +50,12 @@ The terminal commands below should build and install the latest version of UHD, 
  sudo make install
  sudo ldconfig
 
-For more help see Ettus' official `Building and Installing UHD from source <https://files.ettus.com/manual/page_build_guide.html>`_ page.  Note that there are also methods of installing the drivers that don't require building from source.
+Докладнішу інформацію можна знайти на офіційній сторінці Ettus `Складання та встановлення UHD з коду <https://files.ettus.com/manual/page_build_guide.html>`_.  Зауважте, що існують також способи встановлення драйверів, які не потребують збирання з коду.
 
-Testing UHD Drivers and Python API
+Тестування драйверів UHD і Python API
 ###################################
 
-Open a new terminal and type the following commands:
+Відкрийте новий термінал і введіть наступні команди:
 
 .. code-block:: bash
 
@@ -65,255 +65,257 @@ Open a new terminal and type the following commands:
  samples = usrp.recv_num_samps(10000, 100e6, 1e6, [0], 50)
  print(samples[0:10])
 
-If no errors occur, you are good to go!
+Якщо не виникло жодних помилок, ви готові до роботи!
 
-
-Benchmarking USRP Speed in Python
+Бенчмаркінг швидкості USRP на Python
 #################################
 
-(Optional)
+(Необов'язково)
 
-If you used the standard from-source install, the following command should benchmark the receive rate of your USRP using the Python API.  If using 56e6 caused many dropped samples or overruns, try lowering the number.  Dropped samples aren't necessarily going to ruin anything, but it's a good way to test the inefficiencies that might come with using a VM or older computer, for example.  If using a B 2X0, a fairly modern computer with a USB 3.0 port running properly should manage to do 56 MHz without dropped samples, especially with num_recv_frames set so high.
+Якщо ви використовували стандартне встановлення з вихідного коду, наступна команда повинна протестувати швидкість отримання вашого USRP за допомогою API Python.  Якщо використання 56e6 спричинило багато втрачених вибірок або перевиконання, спробуйте зменшити це число.  Втрачені вибірки не обов'язково щось зіпсують, але це хороший спосіб протестувати неефективність, яка може виникнути, наприклад, при використанні віртуальної машини або старого комп'ютера.  Якщо ви використовуєте B 2X0, досить сучасний комп'ютер з портом USB 3.0, який працює належним чином, повинен працювати на частоті 56 МГц без пропущених семплів, особливо з таким високим значенням num_recv_frames.
 
 .. code-block:: bash
 
  python /usr/lib/uhd/examples/python/benchmark_rate.py --rx_rate 56e6 --args "num_recv_frames=1000"
 
-
 ************************
-Receiving
+Отримання
 ************************
 
-Receiving samples off a USRP is extremely easy using the built-in convenience function "recv_num_samps()", below is Python code that tunes the USRP to 100 MHz, using a sample rate of 1 MHz, and grabs 10,000 samples off the USRP, using a receive gain of 50 dB:
+Отримати вибірки з USRP надзвичайно просто за допомогою вбудованої функції "recv_num_samps()", нижче наведено код на Python, який налаштовує USRP на 100 МГц, використовуючи частоту дискретизації 1 МГц, і отримує 10 000 вибірок з USRP, використовуючи коефіцієнт підсилення прийому 50 дБ:
 
 .. code-block:: python
 
  import uhd
  usrp = uhd.usrp.MultiUSRP()
- samples = usrp.recv_num_samps(10000, 100e6, 1e6, [0], 50) # units: N, Hz, Hz, list of channel IDs, dB
- print(samples[0:10])
+ .. _usrp-chapter:
 
-The [0] is telling the USRP to use its first input port, and only receive one channel worth of samples (for a B210 to receive on two channels at once, for example, you could use [0, 1]).  
+####################################
+USRP на Python
+####################################
 
-Here's a tip if you are trying to receive at a high rate but are getting overflows (O's are showing up in your console).  Instead of :code:`usrp = uhd.usrp.MultiUSRP()`, use:
+.. image:: ../_images/usrp.png
+   :scale: 50 % 
+   :align: center
+   :alt: Сімейство USRP-радіостанцій від Ettus Research
+   
+У цій главі ми навчимося використовувати UHD Python API для керування та прийому/передачі сигналів за допомогою `USRP <https://www.ettus.com/>`_ - серії SDR від компанії Ettus Research (тепер частина NI).  Ми обговоримо передачу та прийом на USRP в Python, а також зануримося в специфічні для USRP теми, включаючи аргументи потоку, субпристрої, канали, 10 МГц і PPS синхронізацію.  
 
-.. code-block:: python
+************************
+Встановлення програмного забезпечення/драйверів
+************************
 
- usrp = uhd.usrp.MultiUSRP("num_recv_frames=1000")
+Хоча код на Python, наведений у цьому підручнику, має працювати під Windows, Mac і Linux, ми надамо лише інструкції зі встановлення драйверів/API для Ubuntu 22 (хоча наведені нижче інструкції мають працювати на більшості дистрибутивів на основі Debian).  Ми почнемо зі створення віртуальної машини Ubuntu 22 VirtualBox; можете пропустити частину про віртуальну машину, якщо у вас вже є готова до роботи ОС.  Крім того, якщо ви використовуєте Windows 11, Windows Subsystem for Linux (WSL) з Ubuntu 22 працює досить добре і підтримує графіку "з коробки". 
 
-which makes the receive buffer much larger (the default value is 32), helping to reduce overflows.   The actual size of the buffer in bytes depends on the USRP and type of connection, but simply setting :code:`num_recv_frames` to a value much higher than 32 tends to help.
+Налаштування віртуальної машини Ubuntu 22
+##########################
 
-For more serious applications I recommend not using the convenience function recv_num_samps(), because it hides some of the interesting behavior going on under the hood, and there is some set up that happens each call that we might only want to do once at the beginning, e.g., if we want to receive samples indefinitely.  The following code has the same functionality as recv_num_samps(), in fact it's almost exactly what gets called when you use the convenience function, but now we have the option to modify the behavior:
+(Необов'язково)
 
-.. code-block:: python
+1. Завантажте Ubuntu 22.04 Desktop .iso - https://ubuntu.com/download/desktop
+2. Встановіть і відкрийте `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
+3. Створіть нову віртуальну машину.  Для розміру пам'яті я рекомендую використовувати 50% оперативної пам'яті вашого комп'ютера.
+4. Створіть віртуальний жорсткий диск, виберіть VDI і динамічно розподіліть обсяг.  15 ГБ повинно бути достатньо. Якщо ви хочете бути дійсно безпечними, ви можете використовувати більше.
+5. Запустіть віртуальну машину. Вона запитає вас про інсталяційний носій. Виберіть файл .iso для робочого столу Ubuntu 22.  Виберіть "встановити ubuntu", скористайтеся параметрами за замовчуванням, і спливаюче вікно попередить вас про зміни, які ви збираєтеся зробити. Натисніть "продовжити".  Виберіть ім'я/пароль і зачекайте, поки віртуальна машина закінчить ініціалізацію.  Після завершення ВМ перезавантажиться, але вам слід вимкнути ВМ після перезавантаження.
+6. Перейдіть до налаштувань ВМ (іконка з шестернею).
+7. У розділі система > процесор > виберіть принаймні 3 процесори.  Якщо у вас справжня відеокарта, то в розділі дисплей > відеопам'ять > виберіть щось набагато більше.
+8. Запустіть віртуальну машину.
+9. Для USRP типу USB вам потрібно буде встановити гостьові доповнення до ВМ. У віртуальній машині перейдіть до Пристрої > Вставити компакт-диск з гостьовими додатками > натисніть запустити, коли з'явиться вікно.  Дотримуйтесь інструкцій. Перезапустіть віртуальну машину, а потім спробуйте переслати USRP на віртуальну машину, припускаючи, що вона з'явиться у списку Пристрої > USB.  Спільний буфер обміну можна увімкнути за допомогою Пристрої > Спільний буфер обміну > Двонаправлений.
 
+Встановлення UHD та Python API
+#############################
+
+Наведені нижче команди терміналу мають зібрати та встановити останню версію UHD, включно з Python API:
+
+.. code-block:: bash
+
+ sudo apt-get install git cmake libboost-all-dev libusb-1.0-0-dev python3-docutils python3-mako python3-numpy python3-requests python3-ruamel.yaml python3-setuptools build-essential
+ cd ~{{}}}
+ git clone https://github.com/EttusResearch/uhd.git
+ cd uhd/host
+ mkdir build
+ cd build
+ cmake -DENABLE_TESTS=OFF -DENABLE_C_API=OFF -DENABLE_MANUAL=OFF ..
+ make -j8
+ sudo make install
+ sudo ldconfig
+
+Докладнішу інформацію можна знайти на офіційній сторінці Ettus `Складання та встановлення UHD з коду <https://files.ettus.com/manual/page_build_guide.html>`_.  Зауважте, що існують також способи встановлення драйверів, які не потребують збирання з коду.
+
+Тестування драйверів UHD і Python API
+###################################
+
+Відкрийте новий термінал і введіть наступні команди:
+
+.. code-block:: bash
+
+ python3
  import uhd
- import numpy as np
- 
  usrp = uhd.usrp.MultiUSRP()
- 
- num_samps = 10000 # number of samples received
- center_freq = 100e6 # Hz
- sample_rate = 1e6 # Hz
- gain = 50 # dB
- 
- usrp.set_rx_rate(sample_rate, 0)
- usrp.set_rx_freq(uhd.libpyuhd.types.tune_request(center_freq), 0)
- usrp.set_rx_gain(gain, 0)
- 
- # Set up the stream and receive buffer
- st_args = uhd.usrp.StreamArgs("fc32", "sc16")
- st_args.channels = [0]
- metadata = uhd.types.RXMetadata()
- streamer = usrp.get_rx_stream(st_args)
- recv_buffer = np.zeros((1, 1000), dtype=np.complex64)
- 
- # Start Stream
- stream_cmd = uhd.types.StreamCMD(uhd.types.StreamMode.start_cont)
- stream_cmd.stream_now = True
- streamer.issue_stream_cmd(stream_cmd)
- 
- # Receive Samples
- samples = np.zeros(num_samps, dtype=np.complex64)
- for i in range(num_samps//1000):
-     streamer.recv(recv_buffer, metadata)
-     samples[i*1000:(i+1)*1000] = recv_buffer[0]
- 
- # Stop Stream
- stream_cmd = uhd.types.StreamCMD(uhd.types.StreamMode.stop_cont)
- streamer.issue_stream_cmd(stream_cmd)
- 
- print(len(samples))
+ samples = usrp.recv_num_samps(10000, 100e6, 1e6, [0], 50)
  print(samples[0:10])
 
-With num_samps set to 10,000 and the recv_buffer set to 1000, the for loop will run 10 times, i.e., there will be 10 calls to streamer.recv.  Note that we hard-coded recv_buffer to 1000 but you can find the maximum allowed value using :code:`streamer.get_max_num_samps()`, which is often around 3000-something.  Also note that recv_buffer must be 2d because the same API is used when receiving multiple channels at once, but in our case we just received one channel, so recv_buffer[0] gave us the 1D array of samples that we wanted.  You don't need to understand too much about how the stream starts/stops for now, but know that there are other options besides "continuous" mode, such as receiving a specific number of samples and having the stream stop automatically.  Although we don't process metadata in this example code, it contains any errors that occur, among other things, which you can check by looking at metadata.error_code at each iteration of the loop, if desired (errors tend to also show up in the console itself, as a result of UHD, so don't feel like you have to check for them within your Python code).  
+Якщо не виникло жодних помилок, ви готові до роботи!
 
-Receive Gain
-############
+Бенчмаркінг швидкості USRP на Python
+#################################
 
-The following list shows the gain range of the different USRPs, they all go from 0 dB to the number specified below.  Note that this is not dBm, it's essentially dBm combined with some unknown offset because these are not calibrated devices. 
+(Необов'язково)
 
-* B200/B210/B200-mini: 76 dB
-* X310/N210 with WBX/SBX/UBX: 31.5 dB
-* X310 with TwinRX: 93 dB
-* E310/E312: 76 dB
-* N320/N321: 60 dB
+Якщо ви використовували стандартне встановлення з вихідного коду, наступна команда повинна протестувати швидкість отримання вашого USRP за допомогою API Python.  Якщо використання 56e6 спричинило багато втрачених вибірок або перевиконання, спробуйте зменшити це число.  Втрачені вибірки не обов'язково щось зіпсують, але це хороший спосіб протестувати неефективність, яка може виникнути, наприклад, при використанні віртуальної машини або старого комп'ютера.  Якщо ви використовуєте B 2X0, досить сучасний комп'ютер з портом USB 3.0, який працює належним чином, повинен працювати на частоті 56 МГц без пропущених семплів, особливо з таким високим значенням num_recv_frames.
 
-You can also use the command :code:`uhd_usrp_probe` in a terminal and in the RX Frontend section it will mention the gain range.
+.. code-block:: bash
 
-When specifying the gain, you can use the normal set_rx_gain() function which takes in the gain value in dB, but you can also use set_normalized_rx_gain() which takes in a value from 0 to 1 and automatically converts it to the range of the USRP you're using.  This is convenient when making an app that supports different models of USRP.  The downside of using normalized gain is that you no longer have your units in dB, so if you want to increase your gain by 10 dB, for example, you now have to calculate the amount.
+ python /usr/lib/uhd/examples/python/benchmark_rate.py --rx_rate 56e6 --args "num_recv_frames=1000"
 
-Automatic Gain Control
-######################
+************************
+Отримання
+************************
 
-Some USRPs, including the B200 and E310 series, support automatic gain control (AGC) which will automatically adjust the receive gain in response to the received signal level, in an attempt to best "fill" the ADC's bits.  AGC can be turned on using:
+Отримати вибірки з USRP надзвичайно просто за допомогою вбудованої функції "recv_num_samps()", нижче наведено код на Python, який налаштовує USRP на 100 МГц, використовуючи частоту дискретизації 1 МГц, і отримує 10 000 вибірок з USRP, використовуючи коефіцієнт підсилення прийому 50 дБ:
 
 .. code-block:: python
 
- usrp.set_rx_agc(True, 0) # 0 for channel 0, i.e. the first channel of the USRP
+ usrp.set_rx_agc(True, 0) # 0 для каналу 0, тобто першого каналу USRP
 
-If you have a USRP that does not implement an AGC, an exception will be thrown when running the line above.  With AGC on, setting the gain won't do anything. 
+Якщо у вас USRP, який не реалізує АРУ, при виконанні наведеного вище рядка буде згенеровано виключення.  Якщо АРУ увімкнено, встановлення коефіцієнта підсилення нічого не дасть. 
 
-Stream Arguments
+Аргументи потоку
 ****************
 
-In the full example above you'll see the line :code:`st_args = uhd.usrp.StreamArgs("fc32", "sc16")`.  The first argument is the CPU data format, which is the data type of the samples once they are on your host computer.  UHD supports the following CPU data types when using the Python API:
+У повному прикладі вище ви побачите рядок :code:`st_args = uhd.usrp.StreamArgs("fc32", "sc16")`.  Перший аргумент - це формат даних процесора, який є типом даних семплів, щойно вони опиняться на вашому комп'ютері.  UHD підтримує наступні типи даних процесора при використанні Python API:
 
 .. list-table::
    :widths: 15 20 30
    :header-rows: 1
    
-   * - Stream Arg
-     - Numpy Data Type
-     - Description
+   * - Потік Arg
+     - Numpy тип даних
+     - Опис
    * - fc64
      - np.complex128
-     - Complex-valued double-precision data
+     - Комплексні дані подвійної точності
    * - fc32
      - np.complex64
-     - Complex-valued single-precision data
+     - Комплексні дані одинарної точності
 
-You might see other options in documentation for the UHD C++ API, but these were never implemented within the Python API, at least at the time of this writing.
+Ви можете побачити інші варіанти у документації до UHD C++ API, але вони ніколи не були реалізовані у Python API, принаймні на момент написання цієї статті.
 
-The second argument is the "over-the-wire" data format, i.e. the data type as the samples are sent over USB/Ethernet/SFP to the host.  For the Python API, the options are: "sc16", "sc12", and "sc8", with the 12 bit option only supported by certain USRPs.  This choice is important because the connection between the USRP and host computer is often the bottleneck, so by switching from 16 bits to 8 bits you might achieve a higher rate.  Also remember that many USRPs have ADCs limited to 12 or 14 bits, using "sc16" doesn't mean the ADC is 16 bits. 
+Другий аргумент - це "дротовий" формат даних, тобто тип даних, у якому зразки надсилаються через USB/Ethernet/SFP на хост.  Для Python API можливі такі варіанти: "sc16", "sc12" і "sc8", причому 12-бітовий варіант підтримується лише певними USRP.  Цей вибір важливий, оскільки з'єднання між USRP і хост-комп'ютером часто є вузьким місцем, тому, переключившись з 16 біт на 8 біт, ви можете досягти вищої швидкості.  Також пам'ятайте, що багато USRP мають АЦП, обмежені 12 або 14 бітами, тому використання "sc16" не означає, що АЦП має 16 біт. 
 
-For the channel portion of the :code:`st_args`, see the Subdevice and Channels subsection below.
+Щодо канальної частини :code:`st_args`, див. підрозділ Підпристрої та канали нижче.
 
 ************************
-Transmitting
+Передавання
 ************************
 
-Similar to the recv_num_samps() convenience function, UHD provides the send_waveform() function to transmit a batch of samples, an example is shown below.  If you specify a duration (in seconds) longer than the provided signal, it will simply repeat it.  It helps to keep the values of samples between -1.0 and 1.0.
+Подібно до функції recv_num_samps(), UHD надає функцію send_waveform() для передавання пачки відліків, приклад якої показано нижче.  Якщо ви вкажете тривалість (у секундах), більшу за наданий сигнал, вона просто повторить його.  Це допомагає утримувати значення відліків між -1.0 і 1.0.
 
 .. code-block:: python
 
  import uhd
  import numpy as np
  usrp = uhd.usrp.MultiUSRP()
- samples = 0.1*np.random.randn(10000) + 0.1j*np.random.randn(10000) # create random signal
- duration = 10 # seconds
+ samples = 0.1*np.random.randn(10000) + 0.1j*np.random.randn(10000) # створюємо випадковий сигнал
+ duration = 10 # секунд
  center_freq = 915e6
  sample_rate = 1e6
- gain = 20 # [dB] start low then work your way up
+ gain = 20 # [dB] починаємо з низького рівня, потім збільшуємо
  usrp.send_waveform(samples, duration, center_freq, sample_rate, [0], gain)
 
-For details about how this convenience function works under the hood, see the source code `here <https://github.com/EttusResearch/uhd/blob/master/host/python/uhd/usrp/multi_usrp.py>`_. 
+Детальніше про те, як ця зручна функція працює під капотом, дивіться у вихідному коді `тут <https://github.com/EttusResearch/uhd/blob/master/host/python/uhd/usrp/multi_usrp.py>`_. 
 
-
-Transmit Gain
+Коефіцієнт підсилення передачі
 #############
 
-Similar to the receive side, the transmit gain range varies based on USRP model, going from 0 dB to the specified number below:
+Як і на стороні прийому, діапазон коефіцієнта підсилення передачі залежить від моделі USRP і може варіюватися від 0 дБ до вказаного нижче значення:
 
-* B200/B210/B200-mini: 90 dB
-* N210 with WBX: 25 dB
-* N210 with SBX or UBX: 31.5 dB
-* E310/E312: 90 dB
-* N320/N321: 60 dB
+* B200/B210/B200-mini: 90 дБ
+* N210 з WBX: 25 дБ
+* N210 з SBX або UBX: 31,5 дБ
+* E310/E312: 90 дБ
+* N320/N321: 60 дБ
 
-There is also a set_normalized_tx_gain() function if you would like to specify the transmit gain using the range 0 to 1. 
+Існує також функція set_normalized_tx_gain(), якщо ви хочете вказати коефіцієнт підсилення передачі, використовуючи діапазон від 0 до 1. 
 
 ************************************************
-Transmitting and Receiving Simultaneously
+Одночасне передавання та приймання
 ************************************************
 
-If you want to transmit and receive using the same USRP at the same time, the key is to do it using multiple threads within the same process; the USRP can't span multiple processes.  For example, in the `txrx_loopback_to_file <https://github.com/EttusResearch/uhd/blob/master/host/examples/txrx_loopback_to_file.cpp>`_ C++ example a separate thread is created to run the transmitter, and the receiving is done in the main thread.  You can also just spawn two threads, one for transmit and one for receive, as is done in the `benchmark_rate <https://github.com/EttusResearch/uhd/blob/master/host/examples/python/benchmark_rate.py>`_ Python example.  A full example is not shown here, simply because it would be a fairly long example and Ettus' benchmark_rate.py can always act as a starting point for someone.
-
+Якщо ви хочете одночасно передавати і приймати за допомогою одного і того ж USRP, ключовим моментом є використання декількох потоків в межах одного процесу; USRP не може охоплювати декілька процесів.  Наприклад, у прикладі `txrx_loopback_to_file <https://github.com/EttusResearch/uhd/blob/master/host/examples/txrx_loopback_to_file.cpp>`_ C++ створюється окремий потік для запуску передавача, а прийом виконується у головному потоці.  Ви також можете просто створити два потоки, один для передавання і один для приймання, як це зроблено у прикладі `benchmark_rate <https://github.com/EttusResearch/uhd/blob/master/host/examples/python/benchmark_rate.py>`_ Python.  Повний приклад тут не показано, просто тому, що це був би досить довгий приклад, а Ettus' benchmark_rate.py завжди може слугувати відправною точкою для когось.
 
 *********************************
-Subdevice, Channels, and Antennas
+Пристрої, канали та антени
 *********************************
 
-One common source of confusion when using USRPs is how to pick the right subdevice and channel ID.  You may have noticed in every example above we used channel 0, and did not specify anything related to subdev.  If you're using a B210 and just want to use RF:B instead of RF:A, all you have to do is choose channel 1 instead of 0.  But on USRPs like the X310 that have two daughterboard slots, you have to tell UHD whether you want to use slot A or B, and which channel on that daughterboard, for example:
+Одне з поширених джерел плутанини при використанні USRP - це вибір правильного ідентифікатора підпристрою і каналу.  Ви могли помітити, що в кожному з наведених вище прикладів ми використовували канал 0 і не вказували нічого, пов'язаного з підпристроєм.  Якщо ви використовуєте B210 і хочете використовувати RF:B замість RF:A, все, що вам потрібно зробити, це вибрати канал 1 замість 0. Але на таких USRP, як X310, які мають два слоти для дочірніх плат, ви повинні вказати UHD, чи хочете ви використовувати слот A або B, і який канал на цій дочірній платі, наприклад:
 
 .. code-block:: python
 
  usrp.set_rx_subdev_spec("B:0")
 
-If you want to use the TX/RX port instead of RX2 (the default), it's as simple as:
+Якщо ви хочете використовувати порт TX/RX замість RX2 (за замовчуванням), це так само просто, як:
 
 .. code-block:: python
 
- usrp.set_rx_antenna('TX/RX', 0) # set channel 0 to 'TX/RX'
+ usrp.set_rx_antenna('TX/RX', 0) # встановити канал 0 на 'TX/RX'
 
-which essentially just controls an RF switch onboard the USRP, to route from the other SMA connector.
+який, по суті, просто керує радіоперемикачем на борту USRP, для маршрутизації з іншого роз'єму SMA.
 
-To receive or transmit on two channels at once, instead of using :code:`st_args.channels = [0]` you provide a list, such as :code:`[0,1]`.  The receive samples buffer will have to be of size (2, N) in this case, instead of (1,N).  Just remember that with most USRPs, both channels share an LO, so you cant tune to different frequencies at once.
+
+Щоб приймати або передавати на двох каналах одночасно, замість :code:`st_args.channels = [0]` ви вказуєте список, наприклад :code:`[0,1]`.  У цьому випадку буфер отриманих зразків повинен мати розмір (2, N), а не (1,N).  Просто пам'ятайте, що у більшості USRP обидва канали мають спільний LO, тому ви не можете налаштуватися на різні частоти одночасно.
 
 **************************
-Syncing to 10 MHz and PPS
+Синхронізація на 10 МГц і PPS
 **************************
 
-One of the huge advantages of using a USRP over other SDRs is their ability to synchronize to an external source or onboard `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_, allowing multi-receiver applications such as TDOA.  If you have connected an external 10 MHz and PPS source to your USRP, you will want to make sure to call these two lines after initializing your USRP:
+Однією з величезних переваг використання USRP над іншими SDR є можливість синхронізації з зовнішнім джерелом або бортовим `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_, що дозволяє використовувати декілька приймачів, наприклад, TDOA.  Якщо ви підключили зовнішнє джерело 10 МГц і PPS до вашого USRP, вам потрібно переконатися, що ви викликаєте ці два рядки після ініціалізації вашого USRP:
 
 .. code-block:: python
 
  usrp.set_clock_source("external")
  usrp.set_time_source("external")
 
-If you are using an onboard GPSDO, you will instead use:
+Якщо ви використовуєте вбудований GPSDO, замість цього використовуйте:
 
 .. code-block:: python
 
  usrp.set_clock_source("gpsdo")
  usrp.set_time_source("gpsdo")
 
-On the frequency sync side there's not much else to do; the LO used in the USRP's mixer is now going to be tied to the external source or `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_.  But on the timing side, you may wish to command the USRP to start sampling exactly on the PPS, for example.  This can be done with the following code:
+Щодо синхронізації частоти, то тут більше нічого не потрібно робити; LO, що використовується у мікшері USRP, тепер буде прив'язано до зовнішнього джерела або `GPSDO <https://www.ettus.com/all-products/gpsdo-tcxo-module/>`_.  Але з точки зору синхронізації, ви, можливо, захочете наказати USRP починати вибірку саме з PPS, наприклад.  Це можна зробити за допомогою наступного коду:
 
 .. code-block:: python
 
- # copy the receive example above, everything up until # Start Stream
+ # скопіюйте приклад receive вище, все до # Start Stream
 
- # Wait for 1 PPS to happen, then set the time at next PPS to 0.0
+ # Дочекайтеся 1 PPS, потім встановіть час на наступному PPS рівним 0.0
  time_at_last_pps = usrp.get_time_last_pps().get_real_secs()
  while time_at_last_pps == usrp.get_time_last_pps().get_real_secs():
-     time.sleep(0.1) # keep waiting till it happens- if this while loop never finishes then the PPS signal isn't there
+     time.sleep(0.1) # продовжуємо чекати, поки це станеться - якщо цей цикл ніколи не завершиться, значить сигналу PPS немає
  usrp.set_time_next_pps(uhd.libpyuhd.types.time_spec(0.0))
  
- # Schedule Rx of num_samps samples exactly 3 seconds from last PPS
+ # Запланувати Rx відліків num_samps рівно через 3 секунди після останнього PPS
  stream_cmd = uhd.types.StreamCMD(uhd.types.StreamMode.num_done)
  stream_cmd.num_samps = num_samps
  stream_cmd.stream_now = False
- stream_cmd.time_spec = uhd.libpyuhd.types.time_spec(3.0) # set start time (try tweaking this)
+ stream_cmd.time_spec = uhd.libpyuhd.types.time_spec(3.0) # встановлюємо час запуску (спробуйте налаштувати)
  streamer.issue_stream_cmd(stream_cmd)
  
- # Receive Samples.  recv() will return zeros, then our samples, then more zeros, letting us know it's done
- waiting_to_start = True # keep track of where we are in the cycle (see above comment)
+ # отримуємо вибірки. recv() поверне нулі, потім наші вибірки, потім знову нулі, даючи нам знати, що все зроблено
+ waiting_to_start = True # відстежуємо, де ми знаходимося у циклі (див. коментар вище)
  nsamps = 0
  i = 0
  samples = np.zeros(num_samps, dtype=np.complex64)
- while nsamps != 0 or waiting_to_start:
+ while nsamps != 0 or waiting_to_start
      nsamps = streamer.recv(recv_buffer, metadata)
-     if nsamps and waiting_to_start:
+     if nsamps та waiting_to_start:
          waiting_to_start = False
      elif nsamps:
          samples[i:i+nsamps] = recv_buffer[0][0:nsamps]
      i += nsamps
 
-If it seems like it's not working, but is not throwing any errors, try changing that 3.0 number from anything between 1.0 and 5.0.  You can also check the metadata after the call to recv(), simply check :code:`if metadata.error_code != uhd.types.RXMetadataErrorCode.none:`.  
+Якщо здається, що це не працює, але не видає жодних помилок, спробуйте змінити число 3.0 на будь-що від 1.0 до 5.0.  Ви також можете перевірити метадані після виклику recv(), просто перевірте :code:`if metadata.error_code != uhd.types.RXMetadataErrorCode.none:`.  
      
-For debugging sake, you can verify the 10 MHz signal is showing up to the USRP by checking the return of :code:`usrp.get_mboard_sensor("ref_locked", 0)`.  If the PPS signal isn't showing up, you'll know it because the first while loop in the code above will never finish.
-     
-     
-     
+Для налагодження ви можете перевірити, що сигнал 10 МГц надходить до USRP, перевіривши повернення :code:`usrp.get_mboard_sensor("ref_locked", 0)`.  Якщо сигнал PPS не відображається, ви дізнаєтеся про це, оскільки перший цикл while у наведеному вище коді ніколи не завершиться.
      

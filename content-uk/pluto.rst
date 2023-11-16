@@ -1,61 +1,61 @@
 .. _pluto-chapter:
 
 ####################################
-PlutoSDR in Python
+PlutoSDR на Python
 ####################################
 
 .. image:: ../_images/pluto.png
    :scale: 50 % 
    :align: center
-   :alt: The PlutoSDR by Analog Devices
+   :alt: PlutoSDR від Analog Devices
    
-In this chapter we learn how to use the Python API for the `PlutoSDR <https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`_, which is a low-cost SDR from Analog Devices.  We will cover the PlutoSDR install steps to get the drivers/software running, and then discuss transmitting and receiving with the PlutoSDR in Python.
+У цьому розділі ми навчимося використовувати API Python для `PlutoSDR <https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`_, який є недорогим SDR від Analog Devices.  Ми розглянемо кроки встановлення PlutoSDR для запуску драйверів/програмного забезпечення, а потім обговоримо передачу та прийом даних за допомогою PlutoSDR у Python.
 
 ************************
-Software/Drivers Install
+Встановлення програмного забезпечення/драйверів
 ************************
 
-Setting up VM
+Налаштування віртуальної машини
 #############
 
-While the Python code provided in this textbook should work under Windows, Mac, and Linux, the install instructions below are specific to Ubuntu 22. If you have trouble installing the software on your OS following `the instructions provided by Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>`_, I recommend installing an Ubuntu 22 VM and trying the instructions below.  Alternatively, if you're on Windows 11, Windows Subsystem for Linux (WSL) using Ubuntu 22 tends to run fairly well and supports graphics out-of-the-box. 
+Хоча код на Python, наведений у цьому підручнику, має працювати під Windows, Mac і Linux, наведені нижче інструкції з встановлення стосуються лише Ubuntu 22. Якщо у вас виникли проблеми з встановленням програмного забезпечення у вашій ОС за "інструкціями, наданими Analog Devices <https://wiki.analog.com/university/tools/pluto/users/quick_start>", я рекомендую встановити віртуальну машину Ubuntu 22 і спробувати скористатися наведеними нижче інструкціями.  Крім того, якщо ви використовуєте Windows 11, підсистема Windows для Linux (WSL) з використанням Ubuntu 22 працює досить добре і підтримує графіку "з коробки". 
 
-1. Install and open `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
-2. Create a new VM.  For memory size, I recommend using 50% of your computer’s RAM.
-3. Create the virtual hard disk, choose VDI, and dynamically allocate size.  15 GB should be enough. If you want to be really safe you can use more.
-4. Download Ubuntu 22 Desktop .iso- https://ubuntu.com/download/desktop
-5. Start the VM. It will ask you for installation media. Choose the Ubuntu 22 desktop .iso file.  Choose “install ubuntu”, use default options, and a pop up will warn you about the changes you are about to make. Hit continue.  Choose name/password and then wait for the VM to finish initializing.  After finishing the VM will restart, but you should power off the VM after the restart.
-6. Go into the VM settings (the gear icon).
-7. Under system > processor > choose at least 3 CPUs.  If you have an actual video card then in display > video memory > choose something much higher.
-8. Start up your VM.
-9. I recommend installing VM guest additions. Within the VM go to Devices > Insert Guest Additions CD > hit run when a box pops up.  Follow the instructions. Restart the VM.  The shared clipboard can be enabled through Devices > Shared Clipboard > Bidirectional.
+1. Встановіть і відкрийте `VirtualBox <https://www.virtualbox.org/wiki/Downloads>`_.
+2. Створіть нову віртуальну машину.  Для розміру пам'яті я рекомендую використовувати 50% оперативної пам'яті вашого комп'ютера.
+3. Створіть віртуальний жорсткий диск, виберіть VDI і динамічно розподіліть обсяг.  15 ГБ повинно бути достатньо. Якщо ви хочете бути дійсно в безпеці, ви можете використовувати більше.
+4. Завантажте Ubuntu 22 Desktop .iso - https://ubuntu.com/download/desktop
+5. Запустіть віртуальну машину. Вона запитає вас про інсталяційний носій. Виберіть файл Ubuntu 22 desktop .iso.  Виберіть "встановити ubuntu", скористайтеся параметрами за замовчуванням, і спливаюче вікно попередить вас про зміни, які ви збираєтеся зробити. Натисніть "продовжити".  Виберіть ім'я/пароль і зачекайте, поки віртуальна машина закінчить ініціалізацію.  Після завершення ВМ перезавантажиться, але вам слід вимкнути ВМ після перезавантаження.
+6. Перейдіть до налаштувань ВМ (іконка з шестернею).
+7. У розділі система > процесор > виберіть принаймні 3 процесори.  Якщо у вас справжня відеокарта, то в розділі дисплей > відеопам'ять > виберіть щось набагато більше.
+8. Запустіть віртуальну машину.
+9. Я рекомендую встановити гостьові доповнення до ВМ. У віртуальній машині перейдіть до Пристрої > Вставити компакт-диск з гостьовими доповненнями > натисніть запустити, коли з'явиться вікно.  Дотримуйтесь інструкцій. Перезапустіть ВМ.  Спільний буфер обміну можна увімкнути за допомогою Пристрої > Спільний буфер обміну > Двонаправлений.
 
-Connecting PlutoSDR
+Підключення PlutoSDR
 ###################
 
-1. If running OSX, within OSX, not the VM, in system preferences, enable "kernel extensions".  Then install HoRNDIS (you may need to reboot after).
-2. If running Windows, install this driver: https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
-3. If running Linux you shouldn't have to do anything special.
-4. Plug Pluto into the host machine over USB. Make sure to use the middle USB port on Pluto because the other is for power only.  Plugging in Pluto should create a virtual network adapter, i.e., the Pluto appears like a USB ethernet adapter.
-5. On the host machine (not VM), open a terminal or your preferred ping tool and ping 192.168.2.1.  If that doesn't work, stop and debug the network interface.
-6. Within the VM, open a new terminal
-7. Ping 192.168.2.1.  If that doesn't work stop here and debug.  While pinging, unplug your Pluto and make sure the pinging stalls out, if it keeps pinging then something else at that IP address is on the network, and you'll have to change the IP of the Pluto (or other device) before moving on.
-8. Write down the IP address of the Pluto because you'll need it when we start using the Pluto in Python.
+1. Якщо ви працюєте під управлінням OSX, то в OSX, а не у віртуальній машині, у системних налаштуваннях увімкніть "розширення ядра".  Потім встановіть HoRNDIS (після цього може знадобитися перезавантаження).
+2. Якщо ви використовуєте Windows, встановіть цей драйвер: https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases/download/v0.7/PlutoSDR-M2k-USB-Drivers.exe
+3. Якщо ви використовуєте Linux, вам не потрібно робити нічого особливого.
+4. Підключіть Pluto до комп'ютера через USB. Переконайтеся, що ви використовуєте середній порт USB на Pluto, оскільки інший призначений лише для живлення.  Підключення Плутона має створити віртуальний мережевий адаптер, тобто Плутон буде виглядати як адаптер USB ethernet.
+5. На хост-машині (не віртуальній машині) відкрийте термінал або ваш улюблений інструмент ping і виконайте ping 192.168.2.1.  Якщо це не спрацює, зупиніться і налагодьте мережевий інтерфейс.
+6. У віртуальній машині відкрийте новий термінал
+7. Пропінгуйте 192.168.2.1.  Якщо це не спрацює, зупиніться тут і налагодьте.  Під час пінгування відключіть Pluto від мережі і переконайтеся, що пінг припинився, якщо він продовжує пінгувати, значить в мережі є щось ще з цією IP-адресою, і вам доведеться змінити IP-адресу Pluto (або іншого пристрою), перш ніж рухатися далі.
+8. Запишіть IP-адресу Pluto, оскільки вона вам знадобиться, коли ми почнемо використовувати Pluto у Python.
 
-Installing PlutoSDR Driver
+Встановлення драйвера PlutoSDR
 ##########################
 
-The terminal commands below should build and install the latest version of:
+Команди терміналу, наведені нижче, повинні зібрати і встановити останню версію:
 
-1. **libiio**, Analog Device’s “cross-platform” library for interfacing hardware
-2. **libad9361-iio**, AD9361 is the specific RF chip inside the PlutoSDR
-3. **pyadi-iio**, the Pluto's Python API, *this is our end goal*, but it depends on the previous two libraries
+1. **libiio**, "крос-платформної" бібліотеки Analog Device для взаємодії з апаратним забезпеченням
+2. **libad9361-iio**, AD9361 - спеціальна радіочастотна мікросхема всередині PlutoSDR
+3. **pyadi-iio**, Python API Pluto, *це наша кінцева мета*, але вона залежить від попередніх двох бібліотек
 
 
 .. code-block:: bash
 
  sudo apt-get install build-essential git libxml2-dev bison flex libcdk5-dev cmake python3-pip libusb-1.0-0-dev libavahi-client-dev libavahi-common-dev libaio-dev
- cd ~
+ cd ~{{}}
  git clone --branch v0.23 https://github.com/analogdevicesinc/libiio.git
  cd libiio
  mkdir build
@@ -65,7 +65,7 @@ The terminal commands below should build and install the latest version of:
  sudo make install
  sudo ldconfig
  
- cd ~
+ cd ~{{}}}
  git clone https://github.com/analogdevicesinc/libad9361-iio.git
  cd libad9361-iio
  mkdir build
@@ -74,191 +74,173 @@ The terminal commands below should build and install the latest version of:
  make -j$(nproc)
  sudo make install
  
- cd ~
+ cd ~{{}}
  git clone --branch v0.0.14 https://github.com/analogdevicesinc/pyadi-iio.git
  cd pyadi-iio
  pip3 install --upgrade pip
  pip3 install -r requirements.txt
  sudo python3 setup.py install
 
-Testing PlutoSDR Drivers
+Тестування драйверів PlutoSDR
 ##########################
 
-Open a new terminal (in your VM) and type the following commands:
+Якщо з якихось причин IP-адреса за замовчуванням 192.168.2.1 не працює, тому що у вас вже є підмережа 192.168.2.0, або тому що ви хочете підключити кілька Pluto одночасно, ви можете змінити IP-адресу, виконавши такі дії:
 
-.. code-block:: bash
+1. Відредагуйте файл config.txt на запам'ятовуючому пристрої PlutoSDR (тобто на USB-накопичувачі, який з'являється після підключення Pluto).  Введіть нову IP-адресу, яку ви хочете.
+2. Вийміть пристрій зберігання даних (не відключайте Pluto!). В Ubuntu 22 поруч з пристроєм PlutoSDR у файловому провіднику є символ виймання.
+3. Зачекайте кілька секунд, а потім перезавантажте пристрій, від'єднавши і знову підключивши його до мережі.  Поверніться до файлу config.txt і перевірте, чи збереглися ваші зміни.
 
- python3
- import adi
- sdr = adi.Pluto('ip:192.168.2.1') # or whatever your Pluto's IP is
- sdr.sample_rate = int(2.5e6)
- sdr.rx()
+Зверніть увагу, що ця процедура також використовується для прошивання іншого образу прошивки на Pluto. Докладнішу інформацію можна знайти на сторінці https://wiki.analog.com/university/tools/pluto/users/firmware.
 
-If you get this far without an error, then continue with the next steps.
-
-Changing Pluto's IP Address
+Як "зламати" PlutoSDR, щоб збільшити радіус дії
 ####################################
 
-If for some reason the default IP of 192.168.2.1 does not work because you already have a 192.168.2.0 subnet, or because you want multiple Pluto's connected at the same time, you can change the IP using these steps:
+PlutoSDR має обмежений діапазон центральних частот і частоту дискретизації, але мікросхема, що лежить в його основі, здатна працювати на значно вищих частотах.  Виконайте ці кроки, щоб розблокувати повний частотний діапазон мікросхеми.  Будь ласка, майте на увазі, що цей процес надається компанією Analog Devices, тому він має мінімальний ризик.  Обмеження частоти PlutoSDR пов'язане з тим, що компанія Analog Devices "розбила" AD9364 на частини на основі суворих вимог до продуктивності на високих частотах. .... Як ентузіасти та експериментатори SDR, ми не надто переймаємося цими вимогами до продуктивності.
 
-1. Edit the config.txt file on the PlutoSDR mass storage device (i.e., the USB-drive looking thing that shows up after you plug in the Pluto).  Enter the new IP you want.
-2. Eject the mass storage device (don't unplug the Pluto!). In Ubuntu 22 there's an eject symbol next to the PlutoSDR device, when looking at the file explorer.
-3. Wait a few seconds, and then cycle power by unplugging the Pluto and plugging it back in.  Go back into the config.txt to determine if your change(s) saved.
-
-Note that this procedure is also used to flash a different firmware image onto the Pluto. For more details see https://wiki.analog.com/university/tools/pluto/users/firmware.
-
-"Hack" PlutoSDR to Increase RF Range
-####################################
-
-The PlutoSDR's ship with a limited center frequency range and sampling rate, but the underlying chip is capable of much higher frequencies.  Follow these steps to unlock the full frequency range of the chip.  Please bear in mind that this process is provided by Analog Devices, thus it is as low risk as you can get.  The PlutoSDR's frequency limitation has to do with Analog Devices "binning" the AD9364 based on strict performance requirements at the higher frequencies. .... As SDR enthusiasts and experimenters, we're not too concerned about said performance requirements.
-
-Time to hack! Open a terminal (either host or VM, doesn't matter):
+Час хакнути! Відкрийте термінал (на хості або віртуальній машині, не має значення):
 
 .. code-block:: bash
 
  ssh root@192.168.2.1
 
-The default password is :code:`analog`
+Пароль за замовчуванням: :code:`analog`.
 
-You should see the PlutoSDR welcome screen. You have now SSHed into the ARM CPU on the Pluto itself!
-If you have a Pluto with firmware version 0.31 or lower, type the following commands in:
+Ви повинні побачити екран привітання PlutoSDR. Ви отримали доступ по SSH до процесора ARM на самому Pluto!
+Якщо у вас Pluto з прошивкою версії 0.31 або нижче, введіть наступні команди:
 
 .. code-block:: bash
 
- fw_setenv attr_name compatible
+ fw_setenv attr_name сумісний
  fw_setenv attr_val ad9364
- reboot
+ перезавантажити
 
-And for 0.32 and higher use:
+А для версій 0.32 і вище використовуйте
 
 .. code-block:: bash
  
- fw_setenv compatible ad9364
- reboot
+ fw_setenv сумісний ad9364
+ перезавантаження
 
-You should now be able to tune up to 6 GHz and down to 70 MHz, not to mention use a sample rate up to 56 MHz!  Yay!
+Тепер ви зможете налаштовуватися на частоту до 6 ГГц і до 70 МГц, не кажучи вже про використання частоти дискретизації до 56 МГц!  Ура!
 
 ************************
-Receiving
+Отримання
 ************************
 
-Sampling using the PlutoSDR's Python API is straightforward.  With any SDR app we know we must tell it the center frequency, sample rate, and gain (or whether to use automatic gain control).  There might be other details, but those three parameters are necessary for the SDR to have enough information to receive samples.  Some SDRs have a command to tell it to start sampling, while others like the Pluto will start to sample as soon as you initialize it. Once the SDR's internal buffer fills up, the oldest samples are dropped.  All SDR APIs have some sort of "receive samples" function, and for the Pluto it's rx(), which returns a batch of samples.  The specific number of samples per batch is defined by the buffer size set beforehand.
+Здійснювати вибірки за допомогою Python API PlutoSDR дуже просто.  З будь-яким SDR-додатком ми знаємо, що повинні повідомити йому центральну частоту, частоту дискретизації та коефіцієнт підсилення (або чи використовувати автоматичне регулювання підсилення).  Можуть бути й інші деталі, але ці три параметри необхідні для того, щоб SDR мав достатньо інформації для отримання семплів.  Деякі SDR мають команду для початку дискретизації, тоді як інші, такі як Pluto, починають дискретизацію одразу після ініціалізації. Як тільки внутрішній буфер SDR заповнюється, найстаріші зразки відкидаються.  Всі SDR API мають функцію "отримати вибірки", а для Pluto це rx(), яка повертає пакет вибірки.  Конкретна кількість семплів у пакеті визначається розміром буфера, встановленим заздалегідь.
 
-The code below assumes you have the Pluto's Python API installed.  This code initializes the Pluto, sets the sample rate to 1 MHz, sets the center frequency to 100 MHz, and sets the gain to 70 dB with automatic gain control turned off.  Note it usually doesn't matter the order in which you set the center frequency, gain, and sample rate.  In the code snippet below, we tell the Pluto that we want it to give us 10,000 samples per call to rx().  We print out the first 10 samples.
+Наведений нижче код передбачає, що у вас встановлено Python API Pluto.  Цей код ініціалізує Pluto, встановлює частоту дискретизації 1 МГц, центральну частоту 100 МГц і коефіцієнт підсилення 70 дБ з вимкненим автоматичним регулюванням підсилення.  Зауважте, що зазвичай не має значення порядок, у якому ви встановлюєте центральну частоту, коефіцієнт підсилення та частоту дискретизації.  У наведеному нижче фрагменті коду ми вказуємо Плутону, що хочемо, щоб він видавав нам 10 000 відліків за один виклик rx().  Ми виводимо перші 10 відліків.
 
 .. code-block:: python
 
     import numpy as np
     import adi
     
-    sample_rate = 1e6 # Hz
+    sample_rate = 1e6 # Гц
     center_freq = 100e6 # Hz
-    num_samps = 10000 # number of samples returned per call to rx()
+    num_samps = 10000 # кількість відліків, що повертаються за один виклик rx()
     
     sdr = adi.Pluto()
     sdr.gain_control_mode_chan0 = 'manual'
-    sdr.rx_hardwaregain_chan0 = 70.0 # dB
+    sdr.rx_hardwaregain_chan0 = 70.0 # дБ
     sdr.rx_lo = int(center_freq)
     sdr.sample_rate = int(sample_rate)
-    sdr.rx_rf_bandwidth = int(sample_rate) # filter width, just set it to the same as sample rate for now
+    sdr.rx_rf_bandwidth = int(sample_rate) # ширина фільтра, поки що встановлюємо рівною частоті дискретизації
     sdr.rx_buffer_size = num_samps
     
-    samples = sdr.rx() # receive samples off Pluto
+    samples = sdr.rx() # отримуємо семпли з Плутона
     print(samples[0:10])
 
+Наразі ми не будемо робити з цими прикладами нічого цікавого, але решта цього підручника заповнена кодом на Python, який працює з прикладами IQ, подібно до того, що ми отримали вище.
 
-For now we aren't going to do anything interesting with these samples, but the rest of this textbook is filled with Python code that works on IQ samples just like what we received above.
-
-
-Receive Gain
+Отримання приросту
 ############
 
-The Pluto can be configured to either have a fixed receive gain or an automatic one. An automatic gain control (AGC) will automatically adjust the receive gain to maintain a strong signal level (-12dBFS for anyone who is curious).  AGC is not to be confused with the analog-to-digital converter (ADC) that digitizes the signal.  Technically speaking, AGC is a closed-loop feedback circuit that controls the amplifier's gain in response to the received signal.  Its goal is to maintain a constant output power level despite a varying input power level.  Typically, the AGC will adjust the gain to avoid saturating the receiver (i.e., hitting the upper limit of the ADC's range) while simultaneously allowing the signal to "fill in" as many ADC bits as possible.
+Pluto можна налаштувати на фіксоване або автоматичне посилення прийому. Автоматичне регулювання підсилення (АРУ) автоматично підлаштовує коефіцієнт підсилення для підтримання високого рівня сигналу (-12 дБFS для тих, кому цікаво).  АРУ не слід плутати з аналого-цифровим перетворювачем (АЦП), який оцифровує сигнал.  Технічно кажучи, АРУ - це замкнутий ланцюг зворотного зв'язку, який контролює коефіцієнт підсилення підсилювача у відповідь на отриманий сигнал.  Його мета - підтримувати постійний рівень вихідної потужності, незважаючи на зміну рівня вхідної потужності.  Зазвичай АРУ регулює коефіцієнт підсилення, щоб уникнути насичення приймача (тобто досягнення верхньої межі діапазону АЦП), одночасно дозволяючи сигналу "заповнити" якомога більше бітів АЦП.
 
-The radio-frequency integrated circuit, or RFIC, inside the PlutoSDR has an AGC module with a few different settings.  (An RFIC is a chip that functions as a transceiver: it transmits and receives radio waves.)  First, note that the receive gain on the Pluto has a range from 0 to 74.5 dB.  When in "manual" AGC mode, the AGC is turned off, and you must tell the Pluto what receive gain to use, e.g.:
+Радіочастотна інтегральна схема, або RFIC, всередині PlutoSDR має модуль АРУ з кількома різними налаштуваннями.  (RFIC - це мікросхема, яка функціонує як приймач: вона передає і приймає радіохвилі).  По-перше, зверніть увагу, що коефіцієнт підсилення прийому на Pluto має діапазон від 0 до 74,5 дБ.  У "ручному" режимі АРУ вимкнено, і ви повинні вказати Плутону, який коефіцієнт підсилення прийому використовувати, наприклад:
 
 .. code-block:: python
-
   
-  sdr.gain_control_mode_chan0 = "manual" # turn off AGC
-  gain = 50.0 # allowable range is 0 to 74.5 dB
-  sdr.rx_hardwaregain_chan0 = gain # set receive gain
+  sdr.gain_control_mode_chan0 = "manual" # вимкнути АРУ
+  gain = 50.0 # допустимий діапазон від 0 до 74.5 дБ
+  sdr.rx_hardwaregain_chan0 = gain # встановити коефіцієнт підсилення прийому
 
-If you want to enable the AGC, you must choose from one of two modes:
+Якщо ви хочете увімкнути АРУ, ви повинні вибрати один з двох режимів:
 
-1. :code:`sdr.gain_control_mode_chan0 = "slow_attack"`
-2. :code:`sdr.gain_control_mode_chan0 = "fast_attack"`
+1. :code:`sdr.gain_control_mode_mode_chan0 = "slow_attack"``.
+2. :code:`sdr.gain_control_mode_chan0 = "fast_attack"`.
 
-And with AGC enabled you don't provide a value to :code:`rx_hardwaregain_chan0`. It will get ignored because the Pluto itself adjusts the gain for the signal. The Pluto has two modes for AGC: fast attack and slow attack, as shown in the code snipped above. The difference between the two is intuitive, if you think about it. Fast attack mode reacts quicker to signals.  In other words, the gain value will change faster when the received signal changes level.  Adjusting to signal power levels can be important, especially for time-division duplex (TDD) systems that use the same frequency to transmit and receive. Setting the gain control to fast attack mode for this scenario limits signal attenuation.  With either mode, if there is no signal present and only noise, the AGC will max out the gain setting; when a signal does show up it will saturate the receiver briefly, until the AGC is able to react and ramp down the gain.  You can always check the current gain level in realtime with:
+А з увімкненим АРУ ви не вказуєте значення для :code:`rx_hardwaregain_chan0`. Він буде проігнорований, оскільки Плутон сам підлаштовує коефіцієнт підсилення під сигнал. Плутон має два режими АРУ: швидка атака і повільна атака, як показано у наведеному вище коді. Різниця між ними інтуїтивно зрозуміла, якщо подумати. Режим швидкої атаки швидше реагує на сигнали.  Іншими словами, значення коефіцієнта підсилення змінюється швидше, коли рівень сигналу змінюється.  Пристосування до рівня потужності сигналу може бути важливим, особливо для дуплексних систем з часовим розділенням каналів (TDD), які використовують ту саму частоту для передавання і приймання. Встановлення регулятора підсилення в режим швидкої атаки для цього сценарію обмежує згасання сигналу.  У будь-якому з цих режимів, якщо немає сигналу, а є лише шум, АРУ максимально збільшить налаштування посилення; коли сигнал з'являється, він ненадовго насичує приймач, доки АРУ не зможе відреагувати і зменшити посилення.  Ви завжди можете перевірити поточний рівень підсилення у реальному часі за допомогою:
 
 .. code-block:: python
  
  sdr._get_iio_attr('voltage0','hardwaregain', False)
 
-For more details about the Pluto's AGC, such as how to change the advanced AGC settings, refer to `the "RX Gain Control" section of this page <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361>`_.
+Для отримання більш детальної інформації про АРУ Pluto, зокрема про те, як змінити розширені налаштування АРУ, зверніться до `розділу "Керування коефіцієнтом підсилення RX" на цій сторінці <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361>`_.
 
 ************************
-Transmitting
+Передача
 ************************
 
-Before you transmit any signal with your Pluto, make sure to connect a SMA cable between the Pluto's TX port, and whatever device will be acting as the receiver.  It's important to always start by transmitting over a cable, especially while you are learning *how* to transmit, to make sure the SDR is behaving how you intend.  Always keep your transmit power extremely low, as to not overpower the receiver, since the cable does not attenuate the signal like the wireless channel does.  If you own an attenuator (e.g. 30 dB), now would be a good time to use it.  If you do not have another SDR or a spectrum analyzer to act as the receiver, in theory you can use the RX port on the same Pluto, but it can get complicated.  I would recommend picking up a $10 RTL-SDR to act as the receiving SDR.
+Перш ніж передавати будь-який сигнал за допомогою Pluto, переконайтеся, що ви підключили SMA-кабель між портом TX Pluto і будь-яким пристроєм, який буде виконувати роль приймача.  Важливо завжди починати з передачі по кабелю, особливо коли ви вчитеся "як" передавати, щоб переконатися, що SDR поводиться так, як ви плануєте.  Завжди тримайте потужність передачі на дуже низькому рівні, щоб не перевантажувати приймач, оскільки кабель не послаблює сигнал так, як це робить бездротовий канал.  Якщо у вас є атенюатор (наприклад, 30 дБ), зараз саме час ним скористатися.  Якщо у вас немає іншої SDR або аналізатора спектра, який би виконував роль приймача, теоретично ви можете використовувати порт RX на тому ж Pluto, але це може бути складно.  Я б рекомендував придбати RTL-SDR за $10, щоб використовувати його в якості приймача SDR.
 
-Transmitting is very similar to receiving, except instead of telling the SDR to receive a certain number of samples, we will give it a certain number of samples to transmit.  Instead of :code:`rx_lo` we will be setting :code:`tx_lo`, to specify what carrier frequency to transmit on.  The sample rate is shared between the RX and TX, so we will be setting it like normal.  A full example of transmitting is shown below, where we generate a sinusoid at +100 kHz, then transmit the complex signal at a carrier frequency of 915 MHz, causing the receiver to see a carrier at 915.1 MHz.  There is really no practical reason to do this, we could have just set the center_freq to 915.1e6 and transmitted an array of 1's, but we wanted to generate complex samples for demonstration purposes. 
+Передача дуже схожа на прийом, за винятком того, що замість того, щоб сказати SDR отримати певну кількість семплів, ми дамо йому певну кількість семплів для передачі.  Замість :code:`rx_lo` ми будемо задавати :code:`tx_lo`, щоб вказати, на якій несучій частоті передавати.  Частота дискретизації є спільною для RX і TX, тому ми будемо задавати її як зазвичай.  Повний приклад передачі показано нижче, де ми генеруємо синусоїду на частоті +100 кГц, а потім передаємо складний сигнал на несучій частоті 915 МГц, в результаті чого приймач бачить несучу на частоті 915,1 МГц.  Насправді немає ніякої практичної причини робити це, ми могли б просто встановити center_freq на 915.1e6 і передати масив одиниць, але ми хотіли згенерувати складні зразки для демонстраційних цілей. 
 
 .. code-block:: python
     
     import numpy as np
     import adi
 
-    sample_rate = 1e6 # Hz
+    sample_rate = 1e6 # Гц
     center_freq = 915e6 # Hz
 
     sdr = adi.Pluto("ip:192.168.2.1")
     sdr.sample_rate = int(sample_rate)
-    sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
+    sdr.tx_rf_bandwidth = int(sample_rate) # смуга пропускання фільтра, просто встановіть її рівною частоті дискретизації
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain_chan0 = -50 # Increase to increase tx power, valid range is -90 to 0 dB
-
-    N = 10000 # number of samples to transmit at once
+    sdr.tx_hardwaregain_chan0 = -50 # Збільшення для збільшення потужності tx, допустимий діапазон від -90 до 0 дБ
+    
+    N = 10000 # кількість відліків для передачі за один раз
     t = np.arange(N)/sample_rate
-    samples = 0.5*np.exp(2.0j*np.pi*100e3*t) # Simulate a sinusoid of 100 kHz, so it should show up at 915.1 MHz at the receiver
-    samples *= 2**14 # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
+    samples = 0.5*np.exp(2.0j*np.pi*100e3*t) # Імітуємо синусоїду з частотою 100 кГц, тому на приймачі вона має з'явитися на частоті 915.1 МГц
+    samples *= 2**14 # PlutoSDR очікує, що відліки будуть між -2^14 та +2^14, а не між -1 та +1, як у деяких SDR
 
-    # Transmit our batch of samples 100 times, so it should be 1 second worth of samples total, if USB can keep up
-    for i in range(100):
-        sdr.tx(samples) # transmit the batch of samples once
+    # Передамо нашу партію відліків 100 разів, таким чином, це має бути 1 секунда відліків сумарно, якщо USB витримає
+    для i в range(100):
+        sdr.tx(samples) # передаємо пакет семплів один раз
 
-Here are some notes about this code.  First, you want to simulate your IQ samples so that they are between -1 and 1, but then before transmitting them we have to scale by 2^14 due to how Analog Devices implemented the :code:`tx()` function.  If you are not sure what your min/max values are, simply print them out with :code:`print(np.min(samples), np.max(samples))` or write an if statement to make sure they never go above 1 or below -1 (assuming that code comes before the 2^14 scaling).  As far as transmit gain, the range is -90 to 0 dB, so 0 dB is the highest transmit power.  We always want to start at a low transmit power, and then work our way up if needed, so we have the gain set to -50 dB by default which is towards the low end.  Don't simply set it to 0 dB just because your signal is not showing up; there might be something else wrong, and you don't want to fry your receiver. 
+Ось кілька зауважень щодо цього коду.  По-перше, ви хочете змоделювати ваші IQ-зразки так, щоб вони були між -1 і 1, але потім перед передачею ми повинні масштабувати їх на 2^14 через те, як Analog Devices реалізували функцію :code:`tx()`.  Якщо ви не впевнені, які ваші min/max значення, просто роздрукуйте їх за допомогою :code:`print(np.min(samples), np.max(samples))` або напишіть інструкцію if, щоб переконатися, що вони ніколи не будуть вищими за 1 або нижчими за -1 (припускаючи, що код йде перед масштабуванням на 2^14).  Що стосується коефіцієнта підсилення передачі, то діапазон становить від -90 до 0 дБ, тобто 0 дБ - це найвища потужність передачі.  Ми завжди хочемо починати з низької потужності передачі, а потім збільшувати її, якщо це необхідно, тому за замовчуванням ми встановили коефіцієнт підсилення на -50 дБ, що є нижньою межею діапазону.  Не встановлюйте його на 0 дБ лише тому, що ваш сигнал не з'являється; можливо, щось ще не так, і ви не хочете підсмажити свій приймач. 
 
-Transmitting Samples on Repeat
+Передача семплів у режимі повтору
 ##############################
 
-If you want to continuously transmit the same set of samples on repeat, instead of using a for/while loop within Python like we did above, you can tell the Pluto to do so using just one line:
+Якщо ви хочете безперервно передавати один і той самий набір семплів на повторі, замість того, щоб використовувати цикл for/while в Python, як ми робили вище, ви можете сказати Pluto, щоб він це робив, використовуючи лише один рядок:
 
 .. code-block:: python
 
- sdr.tx_cyclic_buffer = True # Enable cyclic buffers
+ sdr.tx_cyclic_buffer = True # Увімкнути циклічні буфери
 
-You would then transmit your samples like normal: :code:`sdr.tx(samples)` just one time, and the Pluto will keep transmitting the signal indefinitely, until the sdr object destructor is called.  To change the samples that are being continuously transmitted, you cannot simply call :code:`sdr.tx(samples)` again with a new set of samples, you have to first call :code:`sdr.tx_destroy_buffer()`, then call :code:`sdr.tx(samples)`.
+Після цього ви передасте свої семпли як зазвичай: :code:`sdr.tx(samples)` лише один раз, а Pluto продовжить передачу сигналу безперервно, доки не буде викликано деструктор об'єкта sdr.  Щоб змінити семпли, які безперервно передаються, не можна просто викликати :code:`sdr.tx(samples)` знову з новим набором семплів, потрібно спочатку викликати :code:`sdr.tx_destroy_buffer()`, а потім викликати :code:`sdr.tx(samples)`.
 
-Transmitting Over the Air Legally
+Легальна передача в ефір
 #################################
 
-Countless times I have been asked by students what frequencies they are allowed to transmit on with an antenna (in the United States).  The short answer is none, as far as I am aware.  Usually when people point to specific regulations that talk about transmit power limits, they are referring to `the FCC's "Title 47, Part 15" (47 CFR 15) regulations <https://www.ecfr.gov/cgi-bin/text-idx?SID=7ce538354be86061c7705af3a5e17f26&mc=true&node=pt47.1.15&rgn=div5>`_.  But those are regulations for manufacturers building and selling devices that operate in the ISM bands, and the regulations discuss how they should be tested.  A Part 15 device is one where an individual does not need a license to operate the device in whatever spectrum it's using, but the device itself must be authorized/certified to show they are operating following FCC regulations before they are marketed and sold.  The Part 15 regulations do specify maximum transmit and received power levels for the different pieces of spectrum, but none of it actually applies to a person transmitting a signal with an SDR or their home-built radio.  The only regulations I could find related to radios that aren't actually products being sold were specific to operating a low-power AM or FM radio station in the AM/FM bands.  There is also a section on "home-built devices", but it specifically says it doesn't apply to anything constructed from a kit, and it would be a stretch to say a transmit rig using an SDR is a home-built device.  In summary, the FCC regulations aren't as simple as "you can transmit at these frequencies only below these power levels", but rather they are a huge set of rules meant for testing and compliance.
+Незліченну кількість разів студенти запитували мене, на яких частотах їм дозволено передавати за допомогою антени (у Сполучених Штатах).  Наскільки мені відомо, коротка відповідь - жодної.  Зазвичай, коли люди вказують на конкретні правила, які говорять про обмеження потужності передачі, вони мають на увазі "Розділ 47, частина 15" (47 CFR 15) правил FCC <https://www.ecfr.gov/cgi-bin/text-idx?SID=7ce538354be86061c7705af3a5e17f26&mc=true&node=pt47.1.15&rgn=div5>`_.  Але це правила для виробників, які створюють і продають пристрої, що працюють у діапазонах ISM, і в цих правилах обговорюється, як їх слід тестувати.  Пристрої, що підпадають під дію Частини 15, не потребують ліцензії на експлуатацію в будь-якому спектрі, але сам пристрій повинен мати дозвіл/сертифікат, який підтверджує, що він працює відповідно до правил FCC, перш ніж його можна буде продавати.  Правила Частини 15 визначають максимальні рівні потужності передачі та прийому для різних частин спектра, але жоден з них насправді не стосується людини, яка передає сигнал за допомогою SDR або саморобного радіоприймача.  Єдині правила, які я зміг знайти щодо радіоприймачів, які не є продуктами, що продаються, стосуються роботи малопотужних радіостанцій у діапазонах AM або FM.  Існує також розділ про "саморобні пристрої", але в ньому конкретно сказано, що він не поширюється на все, що зібрано з набору, і було б великою натяжкою сказати, що передавальна установка, яка використовує SDR, є саморобним пристроєм.  Таким чином, правила FCC - це не просто "ви можете передавати на цих частотах тільки нижче цих рівнів потужності", а скоріше величезний набір правил, призначених для тестування і дотримання вимог.
 
-Another way to look at it would be to say "well, these aren't Part 15 devices, but let's follow the Part 15 rules as if they were".  For the 915 MHz ISM band, the rules are that "The field strength of any emissions radiated within the specified frequency band shall not exceed 500 microvolts/meter at 30 meters. The emission limit in this paragraph is based on measurement instrumentation employing an average detector."  So as you can see, it's not as simple as a maximum transmit power in watts.
+Інший спосіб подивитися на це - сказати: "Ну, це не пристрої Частини 15, але давайте дотримуватися правил Частини 15, як якщо б це були пристрої Частини 15".  Для діапазону 915 МГц ISM правила такі: "Напруженість поля будь-яких випромінювань, що випромінюються в зазначеному діапазоні частот, не повинна перевищувати 500 мікровольт/метр на відстані 30 метрів. Межа випромінювання в цьому пункті базується на вимірювальних приладах, що використовують середній детектор".  Отже, як бачите, це не так просто, як максимальна потужність передачі у ватах.
 
-Now, if you have your amateur radio (ham) license, the FCC allows you to use certain bands set aside for amateur radio.  There are still guidelines to follow and maximum transmit powers, but at least these numbers are specified in watts of 
-effective radiated power.  `This info-graphic <http://www.arrl.org/files/file/Regulatory/Band%20Chart/Band%20Chart%20-%2011X17%20Color.pdf>`_ shows which bands are available to use depending on your license class (Technician, General and Extra).  I would recommend anyone interested in transmitting with SDRs to get their ham radio license, see `ARRL's Getting Licensed page <http://www.arrl.org/getting-licensed>`_ for more info. 
+Тепер, якщо у вас є ліцензія на аматорське радіо (ham), FCC дозволяє вам використовувати певні діапазони, відведені для аматорського радіо.  Існують певні правила, яких слід дотримуватися, і максимальні потужності передачі, але, принаймні, ці цифри вказані у ватах 
+ефективної випромінюваної потужності.  Ця інфографіка <http://www.arrl.org/files/file/Regulatory/Band%20Chart/Band%20Chart%20-%2011X17%20Color.pdf> показує, які діапазони доступні для використання залежно від класу вашої ліцензії (Технік, Загальна і Додаткова).  Я б рекомендував усім, хто зацікавлений у передаванні з використанням SDR, отримати ліцензію на радіоаматорську діяльність, див. `ARRL's Getting Licence page <http://www.arrl.org/getting-licensed>`_ для отримання додаткової інформації. 
 
-If anyone has more details about what is allowed and not allowed, please email me.
+Якщо хтось має більш детальну інформацію про те, що дозволено, а що ні, будь ласка, напишіть мені.
 
 ************************************************
-Transmitting and Receiving Simultaneously
+Одночасна передача і прийом
 ************************************************
 
-Using the tx_cyclic_buffer trick you can easily receive and transmit at the same time, by kicking off the transmitter, then receiving. 
-The following code shows a working example of transmitting a QPSK signal in the 915 MHz band, receiving it, and plotting the PSD.
+Використовуючи трюк tx_cyclic_buffer, ви можете легко приймати і передавати одночасно, запускаючи передавач, а потім приймаючи. 
+Наступний код показує робочий приклад передачі QPSK-сигналу в смузі 915 МГц, його прийому і побудови PSD.
 
 .. code-block:: python
 
@@ -268,151 +250,149 @@ The following code shows a working example of transmitting a QPSK signal in the 
 
     sample_rate = 1e6 # Hz
     center_freq = 915e6 # Hz
-    num_samps = 100000 # number of samples per call to rx()
+    num_samps = 100000 # кількість відліків за виклик rx()
 
     sdr = adi.Pluto("ip:192.168.2.1")
     sdr.sample_rate = int(sample_rate)
 
-    # Config Tx
-    sdr.tx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
+    # Конфігурація Tx
+    sdr.tx_rf_bandwidth = int(sample_rate) # смуга пропускання фільтра, просто встановіть її рівною частоті дискретизації
     sdr.tx_lo = int(center_freq)
-    sdr.tx_hardwaregain_chan0 = -50 # Increase to increase tx power, valid range is -90 to 0 dB
+    sdr.tx_hardwaregain_chan0 = -50 # Збільшення для збільшення потужності tx, допустимий діапазон від -90 до 0 дБ
 
-    # Config Rx
+    # Конфігурація Rx
     sdr.rx_lo = int(center_freq)
     sdr.rx_rf_bandwidth = int(sample_rate)
     sdr.rx_buffer_size = num_samps
     sdr.gain_control_mode_chan0 = 'manual'
-    sdr.rx_hardwaregain_chan0 = 0.0 # dB, increase to increase the receive gain, but be careful not to saturate the ADC
+    sdr.rx_hardwaregain_chan0 = 0.0 # dB, збільшуйте, щоб збільшити коефіцієнт підсилення прийому, але будьте обережні, щоб не наситити АЦП
 
-    # Create transmit waveform (QPSK, 16 samples per symbol)
+    # Створити форму сигналу передачі (QPSK, 16 відліків на символ)
     num_symbols = 1000
-    x_int = np.random.randint(0, 4, num_symbols) # 0 to 3
-    x_degrees = x_int*360/4.0 + 45 # 45, 135, 225, 315 degrees
-    x_radians = x_degrees*np.pi/180.0 # sin() and cos() takes in radians
-    x_symbols = np.cos(x_radians) + 1j*np.sin(x_radians) # this produces our QPSK complex symbols
-    samples = np.repeat(x_symbols, 16) # 16 samples per symbol (rectangular pulses)
-    samples *= 2**14 # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
+    x_int = np.random.randint(0, 4, num_symbols) # від 0 до 3
+    x_degrees = x_int*360/4.0 + 45 # 45, 135, 225, 315 градусів
+    x_radians = x_degrees*np.pi/180.0 # sin() і cos() беруть в радіанах
+    x_symbols = np.cos(x_radians) + 1j*np.sin(x_radians) # отримуємо наші комплексні символи QPSK
+    samples = np.repeat(x_symbols, 16) # 16 відліків на символ (прямокутні імпульси)
+    samples *= 2**14 # PlutoSDR очікує, що відліки будуть між -2^14 та +2^14, а не -1 та +1, як у деяких SDR
 
-    # Start the transmitter
-    sdr.tx_cyclic_buffer = True # Enable cyclic buffers
-    sdr.tx(samples) # start transmitting
+    # Запустити передавач
+    sdr.tx_cyclic_buffer = True # Увімкнути циклічні буфери
+    sdr.tx(samples) # почати передачу
 
-    # Clear buffer just to be safe
+    # Про всяк випадок очистимо буфер
     for i in range (0, 10):
         raw_data = sdr.rx()
         
-    # Receive samples
+    # Отримуємо зразки
     rx_samples = sdr.rx()
     print(rx_samples)
 
-    # Stop transmitting
+    # Зупинити передачу
     sdr.tx_destroy_buffer()
 
-    # Calculate power spectral density (frequency domain version of signal)
+    # Обчислити спектральну щільність потужності (частотна версія сигналу)
     psd = np.abs(np.fft.fftshift(np.fft.fft(rx_samples)))**2
     psd_dB = 10*np.log10(psd)
     f = np.linspace(sample_rate/-2, sample_rate/2, len(psd))
 
-    # Plot time domain
+    # Побудова часової області графіка
     plt.figure(0)
     plt.plot(np.real(rx_samples[::100]))
     plt.plot(np.imag(rx_samples[::100]))
     plt.xlabel("Time")
 
-    # Plot freq domain
+    # Побудувати область частот
     plt.figure(1)
     plt.plot(f/1e6, psd_dB)
-    plt.xlabel("Frequency [MHz]")
+    plt.xlabel("Частота [МГц]")
     plt.ylabel("PSD")
     plt.show()
 
-
-You should see something that looks like this, assuming you have proper antennas or a cable connected:
+Ви повинні побачити щось на зразок цього, якщо у вас справні антени або підключений кабель:
 
 .. image:: ../_images/pluto_tx_rx.svg
    :align: center 
 
-It is a good exercise to slowly adjust :code:`sdr.tx_hardwaregain_chan0` and :code:`sdr.rx_hardwaregain_chan0` to make sure the received signal is getting weaker/stronger as expected.
+Корисно повільно відрегулювати :code:`sdr.tx_hardwaregain_chan0` і :code:`sdr.rx_hardwaregain_chan0`, щоб переконатися, що отриманий сигнал слабшає/посилюється відповідно до очікувань.
 
 ************************
-Reference API
+Довідковий API
 ************************
 
-For the entire list of sdr properties and functions you can call, refer to the `pyadi-iio Pluto Python code (AD936X) <https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py>`_.
+Повний список властивостей і функцій sdr, які можна викликати, наведено у коді `pyadi-iio Pluto Python (AD936X) <https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py>`_.
 
 ************************
-Python Exercises
+Вправи з Python
 ************************
 
-Instead of providing you code to run, I have created multiple exercises where 95% of the code is provided and the remaining code is fairly straightforward Python for you to create.  The exercises aren't meant to be difficult. They are missing just enough code to get you to think.
+Замість того, щоб надавати вам код для виконання, я створив кілька вправ, де 95% коду надано, а решту коду досить просто написати на Python, щоб ви могли його створити.  Вправи не мають бути складними. У них бракує лише достатньої кількості коду, щоб змусити вас подумати.
 
-Exercise 1: Determine Your USB Throughput
+Вправа 1: Визначення пропускної здатності USB
 #########################################
 
-Let's try receiving samples from the PlutoSDR, and in the process, see how many samples per second we can push through the USB 2.0 connection.  
+Давайте спробуємо отримати зразки з PlutoSDR, і в процесі подивимося, скільки зразків в секунду ми зможемо пропустити через USB 2.0 з'єднання.  
 
-**Your task is to create a Python script that determines the rate samples are received in Python, i.e., count the samples received and keep track of time to figure out the rate.  Then, try using different sample_rate's and buffer_size's to see how it impacts the highest achievable rate.**
+**Ваше завдання - створити Python-скрипт, який визначатиме швидкість отримання семплів у Python, тобто підраховуватиме отримані семпли і відстежуватиме час, щоб визначити швидкість.  Потім спробуйте використовувати різні значення sample_rate і buffer_size, щоб побачити, як це впливає на максимальну досяжну швидкість.**.
 
-Keep in mind, if you receive fewer samples per second than the specified sample_rate, it means you are losing/dropping some fraction of samples, which will likely happen at high sample_rate's. The Pluto only uses USB 2.0.
+Майте на увазі, якщо ви отримуєте менше семплів на секунду, ніж вказано sample_rate, це означає, що ви втрачаєте/відкидаєте певну частину семплів, що, швидше за все, станеться на високих sample_rate. Pluto використовує лише USB 2.0.
 
-The following code will act as a starting point yet contains the instructions you need to accomplish this task.
+Наступний код буде відправною точкою, але містить інструкції, необхідні для виконання цього завдання.
 
 .. code-block:: python
 
  import numpy as np
  import adi
  import matplotlib.pyplot as plt
- import time
+ час імпорту
  
  sample_rate = 10e6 # Hz
  center_freq = 100e6 # Hz
  
  sdr = adi.Pluto("ip:192.168.2.1")
  sdr.sample_rate = int(sample_rate)
- sdr.rx_rf_bandwidth = int(sample_rate) # filter cutoff, just set it to the same as sample rate
+ sdr.rx_rf_bandwidth = int(sample_rate) # смуга пропускання фільтра, просто встановіть її рівною частоті дискретизації
  sdr.rx_lo = int(center_freq)
- sdr.rx_buffer_size = 1024 # this is the buffer the Pluto uses to buffer samples
- samples = sdr.rx() # receive samples off Pluto
+ sdr.rx_buffer_size = 1024 # це буфер, який плутон використовує для буферизації семплів
+ samples = sdr.rx() # отримуємо вибірки з Плутона
 
-Additionally, in order to time how long something takes, you can use the following code:
+Крім того, для того, щоб засікти час виконання чогось, ви можете використати наступний код:
 
 .. code-block:: python
 
  start_time = time.time()
- # do stuff
+ # робимо щось
  end_time = time.time()
- print('seconds elapsed:', end_time - start_time)
+ print('пройшло секунд:', end_time - start_time)
 
-Here are several hints to get you started.
+Ось кілька підказок, які допоможуть вам розпочати роботу.
 
-Hint 1: You'll need to put the line "samples = sdr.rx()" into a loop that runs many times (e.g., 100 times). You must count how many samples you get each call to sdr.rx() while tracking how much time has elapsed.
+Порада 1: Вам потрібно помістити рядок "samples = sdr.rx()" у цикл, який виконується багато разів (наприклад, 100 разів). Ви повинні порахувати, скільки зразків ви отримаєте при кожному виклику sdr.rx(), відстежуючи при цьому, скільки часу пройшло.
 
-Hint 2: Just because you are calculating samples per second, that doesn't mean you have to perform exactly 1 second's worth of receiving samples. You can divide the number of samples you received by the amount of time that passed.
+Підказка 2: Те, що ви підраховуєте кількість відліків за секунду, не означає, що ви повинні отримувати відліки рівно за 1 секунду. Ви можете розділити кількість отриманих відліків на кількість часу, що минув.
 
-Hint 3: Start at sample_rate = 10e6 like the code shows because this rate is way more than USB 2.0 can support. You will be able to see how much data gets through.  Then you can tweak rx_buffer_size. Make it a lot larger and see what happens.  Once you have a working script and have fiddled with rx_buffer_size, try adjusting sample_rate. Determine how low you have to go until you are able to receive 100% of samples in Python (i.e., sample at a 100% duty cycle).
+Підказка 3: Почніть з sample_rate = 10e6, як показано у коді, оскільки ця швидкість набагато більша, ніж може підтримувати USB 2.0. Ви зможете побачити, скільки даних проходить.  Потім ви можете змінити rx_buffer_size. Зробіть його набагато більшим і подивіться, що станеться.  Після того, як у вас буде робочий скрипт і ви погралися з rx_buffer_size, спробуйте відрегулювати sample_rate. Визначте, наскільки низько вам потрібно опуститися, щоб отримувати 100% відліків у Python (тобто, відліки зі 100% робочим циклом).
 
-Hint 4: In your loop where you call sdr.rx(), try to do as little as possible so that it doesn't add extra delay in execution time. Don't do anything intensive like print from inside the loop.
+Порада 4: У вашому циклі, де ви викликаєте sdr.rx(), намагайтеся робити якомога менше, щоб не додавати додаткової затримки у часі виконання. Не робіть нічого інтенсивного, наприклад, не друкуйте зсередини циклу.
 
-As part of this exercise you will get an idea for the max throughput of USB 2.0. You can look up online to verify your findings.
+У цій вправі ви отримаєте уявлення про максимальну пропускну здатність USB 2.0. Ви можете знайти інформацію в Інтернеті, щоб перевірити свої висновки.
 
-As a bonus, try changing the center_freq and rx_rf_bandwidth to see if it impacts the rate you can receive samples off the Pluto.
+Як бонус, спробуйте змінити center_freq і rx_rf_bandwidth, щоб побачити, чи впливає це на швидкість отримання зразків з Pluto.
 
-
-Exercise 2: Create a Spectrogram/Waterfall
+Вправа 2: Створення спектрограми/водоспаду
 ##########################################
 
-For this exercise you will create a spectrogram, a.k.a. waterfall, like we learned about at the end of the :ref:`freq-domain-chapter` chapter.  A spectrogram is simply a bunch of FFT's displayed stacked on top of each other. In other words, it's an image with one axis representing frequency and the other axis representing time.
+У цій вправі ви створите спектрограму, так званий водоспад, про який ми дізналися наприкінці розділу :ref:`freq-domain-chapter`.  Спектрограма - це просто набір відображених БПФ, накладених один на одного. Іншими словами, це зображення, одна вісь якого представляє частоту, а інша - час.
 
-In the :ref:`freq-domain-chapter` chapter we learned the Python code to perform an FFT.  For this exercise you can use code snippets from the previous exercise, as well as a little bit of basic Python code.
+У розділі :ref:`freq-domain-chapter` ми вивчили код Python для виконання ШПФ.  Для цієї вправи ви можете використовувати фрагменти коду з попередньої вправи, а також трохи базового коду Python.
 
-Hints:
+Підказки:
 
-1. Try setting sdr.rx_buffer_size to the FFT size so that you always perform 1 FFT for each call to `sdr.rx()`.
-2. Build a 2d array to hold all the FFT results where each row is 1 FFT.  A 2d array filled with zeros can be created with: `np.zeros((num_rows, fft_size))`.  Access row i of the array with: `waterfall_2darray[i,:]`.
-3. `plt.imshow()` is a convenient way to display a 2d array. It scales the color automatically.
+1. Спробуйте встановити розмір буфера sdr.rx_buffer_size рівним розміру ШПФ, щоб завжди виконувати 1 ШПФ для кожного виклику `sdr.rx()`.
+2. Створіть двовимірний масив для зберігання всіх результатів ШПФ, де кожен рядок - це 1 ШПФ.  Створити двовимірний масив, заповнений нулями, можна за допомогою `np.zeros((num_rows, fft_size))`.  Доступ до рядка i масиву з допомогою: `waterfall_2darray[i,:]`.
+3. `plt.imshow()` - зручний спосіб виведення на екран двовимірного масиву. Він автоматично масштабує колір.
 
-As a stretch goal, make the spectrogram update live.
+Як варіант, зробіть оновлення спектрограми в реальному часі.
 
 
 

@@ -1,75 +1,74 @@
 .. _phaser-chapter:
 
 ####################################
-Phased Arrays with Phaser
+Фазовані решітки з фазером
 ####################################
    
-In this chapter we use the `Analog Devices Phaser <https://wiki.analog.com/resources/eval/user-guides/circuits-from-the-lab/cn0566>`_, (a.k.a. CN0566 or ADALM-PHASER) which is an 8-channel low-cost phased array SDR that combines a PlutoSDR, Raspberry Pi, and ADAR1000 beamformers, designed to operate around 10.25 GHz.  We will cover the setup and calibration steps, and then go through some beamforming examples in Python.  For those that do not have a Phaser, we have included screenshots and animations of what the user would see.
+У цій главі ми використовуємо `Analog Devices Phaser <https://wiki.analog.com/resources/eval/user-guides/circuits-from-the-lab/cn0566>`_, (також відомий як CN0566 або ADALM-PHASER), який є 8-канальною недорогою фазованою решіткою SDR, що поєднує в собі PlutoSDR, Raspberry Pi і формувач променя ADAR1000, призначений для роботи на частоті близько 10,25 ГГц.  Ми розглянемо етапи налаштування та калібрування, а потім розглянемо кілька прикладів формування променя на Python.  Для тих, хто не має фазообертача, ми додали скріншоти та анімації того, що побачить користувач.
 
 .. image:: ../_images/phaser_on_tripod.png
    :scale: 60 % 
    :align: center
-   :alt: The Phaser (CN0566) by Analog Devices
+   :alt: Фазер (CN0566) від Analog Devices
 
 ************************
-Intro to Phased Arrays
+Вступ до фазованих решіток
 ************************
 
----Short intro to phased arrays, and compare to digital beamforming---
+---Короткий вступ до фазованих решіток та порівняння з цифровим формуванням променя
 
 ************************
-Hardware Overview
+Огляд апаратного забезпечення
 ************************
 
 .. image:: ../_images/phaser_front_and_back.png
    :scale: 40 % 
    :align: center
-   :alt: The front and back of the Phaser unit
+   :alt: Передня і задня частини фазообертача
 
-The Phaser is a single board containing the phased array and a bunch of other components, with a Raspberry Pi plugged in on one side and a Pluto mounted to the other side.  The high-level block diagram is shown below.  Some items to note:
+Phaser - це одна плата, що містить фазовану антенну решітку та низку інших компонентів, до якої з одного боку підключено Raspberry Pi, а з іншого боку - Pluto.  Високорівнева блок-схема показана нижче.  Деякі моменти, на які слід звернути увагу:
 
-1. Even though it looks like a 32-element 2d array, it's really an 8-element 1d array
-2. Both receive channels on the Pluto are used (the second channel uses a u.FL connector)
-3. The LO onboard is used to downconvert the received signal from around 10.25 GHz to around 2 GHz, so that the Pluto can receive it
-4. Each ADAR1000 has four phase shifters with adjustable gain, and all four channels are summed together before being sent to the Pluto
-5. The Phaser essentially contains two "subarrays" which each subarray containing four channels
-6. Not shown below are GPIO and serial signals from the Raspberry Pi used to control various components on the Phaser
+1. Хоча це виглядає як 32-елементний двовимірний масив, насправді це 8-елементний одновимірний масив
+2. Використовуються обидва канали прийому на Плутоні (другий канал використовує роз'єм u.FL)
+3. LO на борту використовується для перетворення прийнятого сигналу з частоти близько 10,25 ГГц до частоти близько 2 ГГц, щоб Плутон міг його прийняти
+4. Кожен ADAR1000 має чотири фазообертачі з регульованим коефіцієнтом підсилення, і всі чотири канали підсумовуються перед відправкою на Плутон
+5. Фазообертач по суті містить два "підмасиви", кожен з яких містить чотири канали
+6. Нижче не показані GPIO і послідовні сигнали від Raspberry Pi, які використовуються для керування різними компонентами фазообертача
+
 
 .. image:: ../_images/phaser_components.png
    :scale: 40 % 
    :align: center
-   :alt: The components of the Phaser (CN0566) including ADF4159, LTC5548, ADAR1000
+   :alt: Компоненти фазера (CN0566), включаючи ADF4159, LTC5548, ADAR1000
 
-For now let's ignore the transmit side of the Phaser, as in this chapter we will only be using the HB100 device as a test transmitter.  The ADF4159 is a frequency synthesizer that produces a tone up to 13 GHz in frequency, what we call the local oscillator or LO.  This LO is fed into a mixer, the LTC5548, which is able to do upconversion or downconversion, although we'll be using it for downconversion.  For downconversion it takes in the LO as well as a signal anywhere from 2 - 14 GHz, and multiplies the two together which performs a frequency shift.  The resulting downconverted signal can be anywhere from DC to 6 GHz, although we are going to target around 2 GHz.  The ADAR1000 is a 4-channel analog beamformer, so the Phaser utilizes two of them.  An analog beamformer has independently adjustable phase shifters and gain for each channel, allowing each channel to be time-delayed and attenuated before being summed together in the analog domain (resulting in a single channel).  On the Phaser, each ADAR1000 outputs a signal which gets downconverted and then received by the Pluto.  Using the Raspberry Pi we can control the phase and gain of all eight channels in realtime, to perform beamforming.  We also have the option to do two-channel digital beamforming/array processing, discussed in the next chapter.
+Наразі проігноруємо передавальну частину фазоінвертора, оскільки в цій главі ми використовуватимемо пристрій HB100 лише як тестовий передавач.  ADF4159 - це синтезатор частоти, який виробляє тон з частотою до 13 ГГц, який ми називаємо локальним генератором або LO.  Цей ЛО подається на мікшер LTC5548, який може здійснювати як висхідне, так і низхідне перетворення, хоча ми використовуватимемо його для низхідного перетворення.  Для низхідного перетворення він приймає сигнал LO, а також сигнал в діапазоні від 2 до 14 ГГц, і перемножує їх разом, що призводить до зсуву частоти.  Результуючий сигнал може бути в діапазоні від постійного струму до 6 ГГц, хоча ми націлені на частоту близько 2 ГГц.  ADAR1000 - це 4-канальний аналоговий формувач променя, тому Фазер використовує два з них.  Аналоговий формувач променя має незалежно регульовані фазові перемикачі і коефіцієнт підсилення для кожного каналу, що дозволяє затримувати в часі і послаблювати кожен канал перед підсумовуванням в аналоговому діапазоні (в результаті чого виходить один канал).  На фазообертачі кожен ADAR1000 виводить сигнал, який перетворюється вниз, а потім приймається Плутоном.  Використовуючи Raspberry Pi, ми можемо контролювати фазу і посилення всіх восьми каналів в реальному часі, щоб виконувати формування променя.  У нас також є можливість виконувати двоканальне цифрове формування променя/обробку масивів, що обговорюється в наступному розділі.
 
-For those interested, a slightly more detailed block diagram is provided below.
+Для тих, хто цікавиться, нижче наведено дещо детальнішу блок-схему.
 
 .. image:: ../_images/phaser_detailed_block_diagram.png
    :scale: 80 % 
    :align: center
-   :alt: Detailed block diagram of the Phaser (CN0566)
-
-
-************************
-SD Card Preparation
-************************
-
-We will assume you are using the Raspberry Pi onboard the Phaser (directly, with a monitor/keyboard/mouse).  This simplifies setup, as Analog Devices publishes a pre-built SD card image with all the necessary drivers and software.  You can download the SD card image and find SD imaging instructions `here <https://wiki.analog.com/resources/tools-software/linux-software/kuiper-linux>`_.  The image is based on Raspberry Pi OS and includes all the software you'll need already installed.  
+   :alt: Детальна блок-схема Фазера (CN0566)
 
 ************************
-Hardware Preparation
+Підготовка SD-карти
 ************************
-
-1. Connect Pluto's CENTER micro-USB port to Raspberry Pi
-2. Optionally, carefully thread the tripod into the tripod mount
-3. We will assume you're using an HDMI display, USB keyboard, and USB mouse connected to the Raspberry pi
-4. Power the Pi and Phaser board through the type-C port of the Phaser (CN0566), i.e. do NOT connect a supply to the Raspberry Pi's USB C
+Будемо вважати, що ви використовуєте Raspberry Pi на борту Phaser (безпосередньо, з монітором/клавіатурою/мишею).  Це спрощує налаштування, оскільки Analog Devices публікує готовий образ SD-карти з усіма необхідними драйверами та програмним забезпеченням.  Ви можете завантажити образ SD-карти і знайти інструкції по створенню образу SD-карти `тут <https://wiki.analog.com/resources/tools-software/linux-software/kuiper-linux>`_.  Образ базується на Raspberry Pi OS і включає все необхідне програмне забезпечення, яке вам знадобиться, вже встановлене.  
 
 ************************
-Software Install
+Підготовка обладнання
 ************************
 
-Once you have booted into the Raspberry Pi using the pre-build image, using the default user/pass analog/analog, it is recommended to run the following steps:
+1. Підключіть CENTER порт micro-USB Pluto до Raspberry Pi
+2. За бажанням, акуратно вкрутіть штатив у кріплення для штатива
+3. Ми припускаємо, що ви використовуєте HDMI-дисплей, USB-клавіатуру і USB-мишу, підключені до Raspberry Pi
+4. Підключіть живлення до Pi і плати Phaser через порт Type-C Phaser (CN0566), тобто НЕ підключайте блок живлення до USB C Raspberry Pi.
+
+************************
+Встановлення програмного забезпечення
+************************
+
+Після завантаження в Raspberry Pi за допомогою образу попередньої збірки, використовуючи стандартний користувач/пароль аналог/аналог, рекомендується виконати наступні кроки:
 
 .. code-block:: bash
 
@@ -80,69 +79,69 @@ Once you have booted into the Raspberry Pi using the pre-build image, using the 
  
  sudo raspi-config
 
-For more assistance setting up the Phaser, reference the `Phaser wiki quickstart page <https://wiki.analog.com/resources/eval/user-guides/circuits-from-the-lab/cn0566/quickstart>`_.
+Для отримання додаткової допомоги у налаштуванні Phaser зверніться до `Phaser wiki quickstart page <https://wiki.analog.com/resources/eval/user-guides/circuits-from-the-lab/cn0566/quickstart>`_.
 
 ************************
-HB100 Setup
+Налаштування HB100
 ************************
 
 .. image:: ../_images/phaser_hb100.png
    :scale: 50 % 
    :align: center
-   :alt: HB100 that comes with Phaser
+   :alt: HB100 у комплекті з Phaser
 
-The HB100 that comes with the Phaser is a low-cost Doppler radar module that we will be using as a test transmitter, as it transmits a continuous tone around 10 GHz.  It runs off 2 AA batteries or a 3V benchtop supply, and when it's on it will have a solid red LED.
+HB100, що постачається з Phaser, - це недорогий доплерівський радарний модуль, який ми будемо використовувати як тестовий передавач, оскільки він передає безперервний тон на частоті близько 10 ГГц.  Він працює від 2 батарейок типу АА або від настільного джерела живлення 3 В, і коли він увімкнений, на ньому світиться яскравий червоний світлодіод.
 
-Because the HB100 is low-cost and uses cheap RF components, its transmit frequency varies from unit to unit, over hundreds of MHz, which is a range that is greater than the highest bandwidth we can receive using the Pluto (56 MHz).  So to make sure we are tuning our Pluto and downconverter in a manner that will always receive the HB100 signal, we must determine the HB100's transmit frequency.  This is done using an example app from Analog Devices, which performs a frequency sweep and calculates FFTs while looking for a spike.  Make sure your HB100 is on and in the general vicinity of the Phaser, and then run the utility with:
+Оскільки HB100 є недорогим і використовує дешеві радіочастотні компоненти, його частота передачі варіюється від одиниці до одиниці, понад сотні МГц, що є діапазоном, який перевищує найвищу пропускну здатність, яку ми можемо отримати, використовуючи Плутон (56 МГц).  Тому, щоб переконатися, що ми налаштували наш Pluto і понижуючий перетворювач таким чином, щоб завжди отримувати сигнал HB100, ми повинні визначити частоту передачі HB100.  Це робиться за допомогою прикладної програми від Analog Devices, яка виконує розгортку частоти і обчислює ШПФ, шукаючи пік.  Переконайтеся, що ваш HB100 увімкнений і знаходиться в безпосередній близькості від Phaser, а потім запустіть утиліту з..:
 
 .. code-block:: bash
 
  cd ~/pyadi-iio/examples/phaser
  python phaser_find_hb100.py
 
-It should create a file called hb100_freq_val.pkl in the same directory.  This file contains the HB100 transmit frequency in Hz (pickled, so not viewable in plaintext) which we will use in the next step.
+Він повинен створити файл з назвою hb100_freq_val.pkl у тій самій директорії.  Цей файл містить частоту передачі HB100 в Гц (мариновану, тому її не можна переглянути у відкритому вигляді), яку ми будемо використовувати на наступному кроці.
 
 ************************
-Calibration
+Калібрування
 ************************
 
-Lastly, we need to calibrate the phased array.  This requires holding the HB100 at the array's boresight (0 degrees).  The side of the HB100 with the barcode is the side that transmits the signal, so that face should be held a few feet away from the Phaser, right in-front and centered to it, and then pointed straight at the Phaser.  In the next step you can experiment with different angles and orientations, but for now let's run the calibration utility:
+Нарешті, нам потрібно відкалібрувати фазовану решітку.  Для цього потрібно утримувати HB100 на мушці решітки (0 градусів).  Сторона HB100 зі штрих-кодом є стороною, яка передає сигнал, тому її слід тримати на відстані кількох футів від фазообертача, прямо перед ним і по центру, а потім спрямувати прямо на фазообертач.  На наступному кроці ви можете поекспериментувати з різними кутами та орієнтаціями, а поки що давайте запустимо утиліту калібрування:
 
 .. code-block:: bash
 
  python phaser_examples.py cal
 
-This will create two more pickle files: phase_cal_val.pkl and gain_cal_val.pkl, in the same directory.  Each one contains an array of 8 numbers corresponding to the phase and gain tweaks needed to calibrate each channel.  These values are unique to each Phaser, as they can very during manufacturing.  Subsequent runs of this utility will lead to slightly different values which is normal.
+Це створить ще два пікл-файли: phase_cal_val.pkl і gain_cal_val.pkl, в тому ж каталозі.  Кожен з них містить масив з 8 чисел, що відповідають значенням фази і підсилення, необхідним для калібрування кожного каналу.  Ці значення є унікальними для кожного фазообертача, оскільки вони можуть змінюватися під час виробництва.  Наступні запуски цієї утиліти призведуть до дещо інших значень, що є нормальним явищем.
 
 ************************
-Pre-built Example App
+Попередньо зібраний приклад програми
 ************************
 
-Now that we have calibrated our Phaser and found the HB100 frequency, we can run the example app that Analog Devices provides.
+Тепер, коли ми відкалібрували наш лазер і знайшли частоту HB100, ми можемо запустити приклад програми від Analog Devices.
 
 .. code-block:: bash
 
  python phaser_gui.py
 
-If you check the "Auto Refresh Data" checkbox in the bottom-left it should begin running.  You should see something similar to the following when holding the HB100 in the Phaser's boresight.
+Якщо ви встановите прапорець "Автоматичне оновлення даних" в нижньому лівому кутку, програма почне працювати.  Коли ви тримаєте HB100 у мушці фазера, ви побачите щось подібне до наведеного нижче.
 
 .. image:: ../_images/phaser_gui.png
-   :scale: 50 % 
+   :масштаб: 50 % 
    :align: center
-   :alt: Phaser example GUI tool by Analog Devices
+   :alt: Приклад графічного інтерфейсу фазера від Analog Devices
 
 ************************
-Phaser in Python
+Phaser на Python
 ************************
 
-We will now dive into the hands-on Python portion.  For those who don't have a Phaser, screenshots and animations are provided.
+Тепер ми зануримося в практичну частину на Python.  Для тих, хто не має Phaser, надаються скріншоти та анімації.
 
-Initializing Phaser and Pluto
+Ініціалізація Phaser і Pluto
 ##############################
 
-The following Python code sets up our Phaser and Pluto.  By this point you should have already run the calibration steps, which produce three pickle files.  Make sure you are running the Python script below from within the same directory as these pickle files.
+Наступний код на Python налаштовує наш Phaser і Pluto.  До цього моменту ви вже повинні були виконати кроки калібрування, які створюють три файли pickle.  Переконайтеся, що ви виконуєте скрипт Python, наведений нижче, у тому самому каталозі, де знаходяться ці файли.
 
-There are a lot of settings to deal with, so it's OK if you don't absorb the entire code snippet below, just note that we are using a sample rate of 30 MHz, manual gain which we set very low, we set all of the element gains to the same value, and point the array towards boresight (0 degrees).  
+Тут є багато налаштувань, тому нічого страшного, якщо ви не прочитаєте весь фрагмент коду нижче, просто зауважте, що ми використовуємо частоту дискретизації 30 МГц, ручне посилення, яке ми встановили дуже низьким, ми встановили однакове значення посилення для всіх елементів і спрямували масив у бік бурової лінії (0 градусів).  
 
 .. code-block:: python
 
@@ -157,233 +156,232 @@ There are a lot of settings to deal with, so it's OK if you don't absorb the ent
  phase_cal = pickle.load(open("phase_cal_val.pkl", "rb"))
  gain_cal = pickle.load(open("gain_cal_val.pkl", "rb"))
  signal_freq = pickle.load(open("hb100_freq_val.pkl", "rb"))
- d = 0.014  # element to element spacing of the antenna
+ d = 0.014 # міжелементна відстань антени
  
  phaser = CN0566(uri="ip:localhost")
  sdr = ad9361(uri="ip:192.168.2.1")
  phaser.sdr = sdr
- print("PlutoSDR and CN0566 connected!")
+ print("PlutoSDR та CN0566 підключено!")
  
- time.sleep(0.5) # recommended by Analog Devices
+ time.sleep(0.5) # рекомендовано Analog Devices
  
  phaser.configure(device_mode="rx")
  
- # Set all antenna elements to half scale - a typical HB100 will have plenty of signal power.
- gain = 64 # 64 is about half scale
+ # Встановіть всі елементи антени на половину шкали - типовий HB100 матиме достатньо потужності сигналу.
+ gain = 64 # 64 - це приблизно половина шкали
  for i in range(8):
      phaser.set_chan_gain(i, gain, apply_cal=False)
  
- # Aim the beam at boresight (zero degrees)
+ # Наводимо промінь на мушку (нуль градусів)
  phaser.set_beam_phase_diff(0.0)
  
- # Misc SDR settings, not super critical to understand
+ # Інші налаштування SDR, не надто важливі для розуміння
  sdr._ctrl.debug_attrs["adi,frequency-division-duplex-mode-enable"].value = "1"
- sdr._ctrl.debug_attrs["adi,ensm-enable-txnrx-control-enable"].value = "0" # Disable pin control so spi can move the states
+ sdr._ctrl.debug_attrs["adi,ensm-enable-txnrx-control-enable"].value = "0" # Вимкнути керування виводами, щоб spi міг змінювати стани
  sdr._ctrl.debug_attrs["initialize"].value = "1"
- sdr.rx_enabled_channels = [0, 1] # enable Rx1 and Rx2
- sdr._rxadc.set_kernel_buffers_count(1) # No stale buffers to flush
- sdr.tx_hardwaregain_chan0 = int(-80) # Make sure the Tx channels are attenuated (or off)
+ sdr.rx_enabled_channels = [0, 1] # увімкнути Rx1 та Rx2
+ sdr._rxadc.set_kernel_buffers_count(1) # Не очищати застарілі буфери
+ sdr.tx_hardwaregain_chan0 = int(-80) # Переконайтеся, що канали Tx ослаблені (або вимкнені)
  sdr.tx_hardwaregain_chan1 = int(-80)
  
- # These settings are basic PlutoSDR settings we have seen before
+ # Ці налаштування є базовими налаштуваннями PlutoSDR, які ми бачили раніше
  sample_rate = 30e6
  sdr.sample_rate = int(sample_rate)
- sdr.rx_buffer_size = int(1024)  # samples per buffer
- sdr.rx_rf_bandwidth = int(10e6)  # analog filter bandwidth
+ sdr.rx_buffer_size = int(1024) # кількість відліків у буфері
+ sdr.rx_rf_bandwidth = int(10e6) # смуга пропускання аналогового фільтра
  
- # Manually gain (no automatic gain control) so that we can sweep angle and see peaks/nulls
+  # Ручне регулювання підсилення (без автоматичного регулювання), щоб ми могли розгорнути кут і побачити піки/нулі
  sdr.gain_control_mode_chan0 = "manual"
  sdr.gain_control_mode_chan1 = "manual"
- sdr.rx_hardwaregain_chan0 = 10 # dB, 0 is the lowest gain.  the HB100 is pretty loud
+ sdr.rx_hardwaregain_chan0 = 10 # дБ, 0 - найнижчий коефіцієнт підсилення. HB100 досить гучний
  sdr.rx_hardwaregain_chan1 = 10 # dB
  
- sdr.rx_lo = int(2.2e9) # The Pluto will tune to this freq
+ sdr.rx_lo = int(2.2e9) # Плутон налаштується на цю частоту
  
- # Set the Phaser's PLL (the ADF4159 onboard) to downconvert the HB100 to 2.2 GHz plus a small offset
- offset = 1000000 # add a small arbitrary offset just so we're not right at 0 Hz where there's a DC spike
+ # Налаштуйте PLL фазоінвертора (ADF4159 на борту) на пониження частоти HB100 до 2.2 ГГц плюс невеликий зсув
+ offset = 1000000 # додаємо невелике довільне зміщення, щоб ми не були прямо на 0 Гц, де є стрибок постійного струму
  phaser.lo = int(signal_freq + sdr.rx_lo - offset)
 
-
-Receiving Samples from the Pluto
+Отримання семплів з Плутона
 ################################
 
-At this point the Phaser and Pluto are configured and ready to go.  We can now start receiving data from the Pluto.  Let's grab a single batch of 1024 samples, then take the FFT of each of the two channels.
+На цьому етапі фазер і Плутон налаштовані і готові до роботи.  Тепер ми можемо почати отримувати дані з Плутона.  Давайте візьмемо один пакет з 1024 відліків, а потім зробимо ШПФ кожного з двох каналів.
 
 .. code-block:: python
 
- # Grab some samples (whatever we set rx_buffer_size to), remember we are receiving on 2 channels at the same time
+ # Беремо кілька відліків (скільки б ми не встановили rx_buffer_size), пам'ятаємо, що ми приймаємо по 2 каналах одночасно
  data = sdr.rx()
  
- # Take FFT
+ # Робимо ШПФ
  PSD0 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[0])))**2)
  PSD1 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[1])))**2)
  f = np.linspace(-sample_rate/2, sample_rate/2, len(data[0]))
  
- # Time plot helps us check that we see the HB100 and that we're not saturated (ie gain isnt too high)
+ # Часовий графік допомагає нам перевірити, що ми бачимо HB100 і що ми не перенасичені (тобто коефіцієнт підсилення не є занадто високим)
  plt.subplot(2, 1, 1)
- plt.plot(data[0].real) # Only plot real part
+ plt.plot(data[0].real) # Побудувати лише дійсну частину графіка
  plt.plot(data[1].real)
- plt.xlabel("Data Point")
- plt.ylabel("ADC output")
+ plt.xlabel("Точка даних")
+ plt.ylabel("Вихід АЦП")
  
- # PSDs show where the HB100 is and verify both channels are working
+ # PSD показують, де знаходиться HB100 і перевіряють, що обидва канали працюють
  plt.subplot(2, 1, 2)
  plt.plot(f/1e6, PSD0)
  plt.plot(f/1e6, PSD1)
- plt.xlabel("Frequency [MHz]")
- plt.ylabel("Signal Strength [dB]")
+ plt.xlabel("Частота [МГц]")
+ plt.ylabel("Рівень сигналу [дБ]")
  plt.tight_layout()
  plt.show()
 
-What you see at this point will depend if your HB100 is on and where it's pointing.  If you hold it a few feet from the Phaser and point it towards the center, you should see something like this:
+Те, що ви побачите на цьому етапі, залежатиме від того, чи увімкнений ваш HB100 і куди він спрямований.  Якщо ви тримаєте його на відстані кількох футів від фазера і спрямовуєте до центру, ви побачите щось на зразок цього:
 
 .. image:: ../_images/phaser_rx_psd.png
-   :scale: 100 % 
+   Масштаб: 100 % 
    :align: center
-   :alt: Phaser initial example
+   :alt: Початковий приклад фазера
 
-Note the strong spike near 0 Hz, the 2nd shorter spike is simply an artifact that can be ignored, since it's around 40 dB down.  The top plot, showing the time domain, displays the real part of the two channels, so the relative amplitude between the two will vary slightly depending on where you hold the HB100.
+Зверніть увагу на сильний сплеск біля 0 Гц, 2-й коротший сплеск - це просто артефакт, який можна ігнорувати, оскільки він знаходиться приблизно на 40 дБ нижче.  Верхній графік, що показує часову область, відображає реальну частину двох каналів, тому відносна амплітуда між ними буде дещо відрізнятися залежно від того, де ви тримаєте HB100.
 
-Performing Beamforming
+Виконання формування променя
 ##############################
 
-Next, let's actually sweep the phase!  In the following code we sweep the phase from negative 180 to positive 180 degrees, at a 2 degree step.  Note that this is not the angle the beamformer points; it's the phase difference between adjacent channels.  We must calculate the angle of arrival corresponding to each phase step, using knowledge of the speed of light, the RF frequency of the received signal, and the Phaser's element spacing.  The phase difference between adjacent elements is given by:
+Далі, давайте, власне, розгорнемо фазу!  У наступному коді ми змінюємо фазу від від'ємних 180 до додатних 180 градусів з кроком у 2 градуси.  Зверніть увагу, що це не кут, на який вказує формувач променя; це різниця фаз між сусідніми каналами.  Ми повинні обчислити кут приходу, що відповідає кожному кроку фази, використовуючи знання швидкості світла, радіочастоти прийнятого сигналу і відстані між елементами фазообертача.  Різниця фаз між сусідніми елементами задається формулою:
 
 .. math::
 
  \phi = \frac{2 \pi d}{\lambda} \sin(\theta_{AOA})
 
-where :math:`\theta_{AOA}` is the angle of arrival of the signal with respect to boresight, :math:`d` is the antenna spacing in meters, and :math:`\lambda` is the wavelength of the signal. Using the formula for wavelength and solving for :math:`\theta_{AOA}` we get:
+де :math:`\theta_{AOA}` - кут приходу сигналу відносно антени, :math:`d` - відстань між антенами в метрах, а :math:`\lambda` - довжина хвилі сигналу. Використовуючи формулу для довжини хвилі і розв'язуючи для :math:`\theta_{AOA}`, отримаємо:
 
 .. math::
 
  \theta_{AOA} = \sin^{-1}\left(\frac{c \phi}{2 \pi f d}\right)
 
-You'll see this when we calculate :code:`steer_angle` below:
+Ви побачите це, коли ми обчислимо :code:`steer_angle` нижче:
 
 .. code-block:: python
 
- powers = [] # main DOA result
+ powers = [] # основний результат DOA
  angle_of_arrivals = []
- for phase in np.arange(-180, 180, 2): # sweep over angle
+ для фази в np.arange(-180, 180, 2): # розгортка на кут
      print(phase)
-     # set phase difference between the adjacent channels of devices
+     # встановити різницю фаз між сусідніми каналами пристроїв
      for i in range(8):
-         channel_phase = (phase * i + phase_cal[i]) % 360.0 # Analog Devices had this forced to be a multiple of phase_step_size (2.8125 or 360/2**6bits) but it doesn't seem nessesary
+         channel_phase = (phase * i + phase_cal[i]) % 360.0 # У Analog Devices це значення було кратне phase_step_size (2.8125 або 360/2**6bits), але це не здається необхідним
          phaser.elements.get(i + 1).rx_phase = channel_phase
-     phaser.latch_rx_settings() # apply settings
+     phaser.latch_rx_settings() # застосовуємо налаштування
  
-     steer_angle = np.degrees(np.arcsin(max(min(1, (3e8 * np.radians(phase)) / (2 * np.pi * signal_freq * phaser.element_spacing)), -1))) # arcsin argument must be between 1 and -1, or numpy will throw a warning
-     # If you're looking at the array side of Phaser (32 squares) then add a *-1 to steer_angle
+     steer_angle = np.degrees(np.arcsin(max(min(1, (3e8 * np.radians(phase)) / (2 * np.pi * signal_freq * phaser.element_spacing)), -1))) # Аргумент arcsin має бути в межах від 1 до -1, інакше numpy видасть попередження
+     # Якщо ви дивитеся на сторону масиву Phaser (32 квадрати), то додайте *-1 до steer_angle
      angle_of_arrivals.append(steer_angle) 
-     data = phaser.sdr.rx() # receive a batch of samples
-     data_sum = data[0] + data[1] # sum the two subarrays (within each subarray the 4 channels have already been summed)
+     data = phaser.sdr.rx() # отримуємо пакет відліків
+     data_sum = data[0] + data[1] # підсумовуємо два підмасиви (у кожному підмасиві 4 канали вже підсумовано)
      power_dB = 10*np.log10(np.sum(np.abs(data_sum)**2))
      powers.append(power_dB)
-     # in addition to just taking the power in the signal, we could also do the FFT then grab the value of the max bin, effectively filtering out noise, results came out almost exactly the same in my tests
-     #PSD = 10*np.log10(np.abs(np.fft.fft(data_sum * np.blackman(len(data_sum))))**2) # in dB
+     # на додаток до того, щоб просто взяти потужність сигналу, ми також можемо зробити ШПФ, а потім взяти значення максимального біну, ефективно відфільтрувавши шум, результати вийшли майже однаковими в моїх тестах
+     #PSD = 10*np.log10(np.abs(np.fft.fft(data_sum * np.blackman(len(data_sum))))**2) # у дБ
  
- powers -= np.max(powers) # normalize so max is at 0 dB
+ powers -= np.max(powers) # нормалізуємо, щоб max було на рівні 0 дБ
  
  plt.plot(angle_of_arrivals, powers, '.-')
- plt.xlabel("Angle of Arrival")
- plt.ylabel("Magnitude [dB]")
+ plt.xlabel("Кут приходу")
+ plt.ylabel("Величина [дБ]")
  plt.show()
 
-For each :code:`phase` value (remember, this is the phase between adjacent elements) we set the phase shifters, after adding in the phase calibration values and forcing the degrees to be between 0 and 360.  We then grab one batch of samples with :code:`rx()`, sum the two channels, then calculate the power in the signal.  We then plot power over angle of arrival.  The result should look something like this:
+Для кожного значення :code:`phase` (пам'ятайте, що це фаза між сусідніми елементами) ми встановлюємо фазові зсуви, попередньо додавши значення калібрування фази і примусивши градуси бути між 0 і 360.  Потім ми беремо одну партію відліків за допомогою :code:`rx()`, підсумовуємо два канали і обчислюємо потужність сигналу.  Потім будуємо графік залежності потужності від кута падіння.  Результат має виглядати приблизно так:
 
 .. image:: ../_images/phaser_sweep.png
-   :scale: 100 % 
+   :масштаб: 100 % 
    :align: center
-   :alt: Phaser single sweep
+   :alt: Одиночна розгортка фазера
 
-In this example the HB100 was held slightly to the side of boresight.
+У цьому прикладі HB100 тримався трохи збоку від мушки.
 
-If you want a polar plot you can instead using the following:
+Якщо ви хочете отримати полярну діаграму спрямованості, ви можете використати наступне:
 
 .. code-block:: python
 
- # Polar plot
+ # Полярний графік
  fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
- ax.plot(np.deg2rad(angle_of_arrivals), powers) # x axis in radians
- ax.set_rticks([-40, -30, -20, -10, 0])  # Less radial ticks
- ax.set_thetamin(np.min(angle_of_arrivals)) # in degrees
+ ax.plot(np.deg2rad(angle_of_arrivals), powers) # вісь x у радіанах
+ ax.set_rticks([-40, -30, -20, -10, 0]) # Менше радіальних тиків
+ ax.set_thetamin(np.min(angle_of_arrivals)) # у градусах
  ax.set_thetamax(np.max(angle_of_arrivals))
- ax.set_theta_direction(-1) # increase clockwise
- ax.set_theta_zero_location('N') # make 0 degrees point up
+ ax.set_theta_direction(-1) # збільшити за годинниковою стрілкою
+ ax.set_theta_zero_location('N') # зробити 0 градусів точкою вгору
  ax.grid(True)
  plt.show()
 
 .. image:: ../_images/phaser_sweep_polar.png
    :scale: 100 % 
    :align: center
-   :alt: Phaser single sweep using a polar plot
+   :alt: Одиночна розгортка фазера за допомогою полярного графіка
 
-By taking the max we can estimate the direction of arrival of the signal!
+Взявши максимум, ми можемо оцінити напрямок приходу сигналу!
 
-Realtime and with Spatial Tapering
+У реальному часі та з просторовим звуженням
 ##################################
 
-Now let's take a moment to talk about spatial tapering.  So far we have left the gain adjustments of each channel to equal values, so that all eight channels get summed equally.  Just like we applied a window before taking an FFT, we can apply a window in the spatial domain by applying weights to these eight channels.  We'll use the exact same windowing functions like Hanning, Hamming, etc.  Let's also tweak the code to run in realtime so that it's a little more fun:
+Тепер давайте поговоримо про просторове звуження.  Поки що ми залишили регулювання підсилення кожного каналу на однакових значеннях, так що всі вісім каналів підсумовуються однаково.  Подібно до того, як ми застосовували вікно перед ШПФ, ми можемо застосувати вікно в просторовій області, застосувавши ваги до цих восьми каналів.  Ми використаємо ті самі віконні функції, такі як Ганнінга, Хеммінга тощо.  Давайте також налаштуємо код для роботи в реальному часі, щоб зробити його трохи цікавішим:
 
 .. code-block:: python
 
- plt.ion() # needed for realtime view
- print("Starting, use control-c to stop")
+ plt.ion() # потрібна для перегляду в реальному часі
+ print("Запуск, для зупинки використовуйте control-c")
  try:
      while True:
-         powers = [] # main DOA result
+         powers = [] # основний результат DOA
          angle_of_arrivals = []
-         for phase in np.arange(-180, 180, 6): # sweep over angle
-             # set phase difference between the adjacent channels of devices
+         for phase in np.arange(-180, 180, 6): # розгортка на кут
+             # встановлюємо різницю фаз між сусідніми каналами пристроїв
              for i in range(8):
-                 channel_phase = (phase * i + phase_cal[i]) % 360.0 # Analog Devices had this forced to be a multiple of phase_step_size (2.8125 or 360/2**6bits) but it doesn't seem nessesary
+                 channel_phase = (phase * i + phase_cal[i]) % 360.0 # У Analog Devices це значення було кратне phase_step_size (2.8125 або 360/2**6bits), але це не здається необхідним
                  phaser.elements.get(i + 1).rx_phase = channel_phase
             
-             # set gains, incl the gain_cal, which can be used to apply a taper.  try out each one!
-             gain_list = [127] * 8 # rectangular window          [127, 127, 127, 127, 127, 127, 127, 127]
-             #gain_list = np.rint(np.hamming(8) * 127)         # [ 10,  32,  82, 121, 121,  82,  32,  10]
-             #gain_list = np.rint(np.hanning(10)[1:-1] * 127)  # [ 15,  52,  95, 123, 123,  95,  52,  15]
-             #gain_list = np.rint(np.blackman(10)[1:-1] * 127) # [  6,  33,  80, 121, 121,  80,  33,   6]
-             #gain_list = np.rint(np.bartlett(10)[1:-1] * 127) # [ 28,  56,  85, 113, 113,  85,  56,  28]
+             # встановлюємо коефіцієнти підсилення, включаючи gain_cal, за допомогою яких можна застосувати конусність. спробуйте кожен з них!
+             gain_list = [127] * 8 # прямокутне вікно [127, 127, 127, 127, 127, 127, 127, 127, 127, 127]
+             #gain_list = np.rint(np.hamming(8) * 127)         # [ 10, 32, 82, 121, 121, 82, 32, 10]
+             #gain_list = np.rint(np.hanning(10)[1:-1] * 127)  # [ 15, 52, 95, 123, 123, 95, 52, 15]
+             #gain_list = np.rint(np.blackman(10)[1:-1] * 127) # [ 6, 33, 80, 121, 121, 80, 33, 6]
+             #gain_list = np.rint(np.bartlett(10)[1:-1] * 127) # [ 28, 56, 85, 113, 113, 85, 56, 28]
              for i in range(8):
                  channel_gain = int(gain_list[i] * gain_cal[i])
                  phaser.elements.get(i + 1).rx_gain = channel_gain
  
-             phaser.latch_rx_settings() # apply settings
+             phaser.latch_rx_settings() # застосувати налаштування
  
-             steer_angle = np.degrees(np.arcsin(max(min(1, (3e8 * np.radians(phase)) / (2 * np.pi * signal_freq * phaser.element_spacing)), -1))) # arcsin argument must be between 1 and -1, or numpy will throw a warning
+             steer_angle = np.degrees(np.arcsin(max(min(1, (3e8 * np.radians(phase)) / (2 * np.pi * signal_freq * phaser.element_spacing)), -1))) # аргумент arcsin має бути між 1 та -1, інакше numpy видасть попередження
              angle_of_arrivals.append(steer_angle) 
-             data = phaser.sdr.rx() # receive a batch of samples
-             data_sum = data[0] + data[1] # sum the two subarrays (within each subarray the 4 channels have already been summed)
+             data = phaser.sdr.rx() # отримуємо пакет відліків
+             data_sum = data[0] + data[1] # підсумовуємо два підмасиви (у кожному підмасиві 4 канали вже підсумовано)
              power_dB = 10*np.log10(np.sum(np.abs(data_sum)**2))
              powers.append(power_dB)
  
-         powers -= np.max(powers) # normalize so max is at 0 dB
+         powers -= np.max(powers) # нормалізуємо так, щоб max було на рівні 0 дБ
  
-         # Realtime view
+         # Перегляд у реальному часі
          plt.plot(angle_of_arrivals, powers, '.-')
-         plt.xlabel("Angle of Arrival")
-         plt.ylabel("Magnitude [dB]")
+         plt.xlabel("Кут приходу")
+         plt.ylabel("Величина [дБ]")
          plt.draw()
          plt.pause(0.001)
          plt.clf()
  
- except KeyboardInterrupt:
-     sys.exit() # quit python
+ крім KeyboardInterrupt:
+     sys.exit() # вийти з python
 
-You should see a realtime version of the previous exercise.  Try switching which :code:`gain_list` is used, to play around with the different windows.  Here is an example of the Rectangular window (i.e., no windowing function):
+Ви повинні побачити версію попередньої вправи у реальному часі.  Спробуйте перемикати :code:`gain_list`, щоб погратися з різними вікнами.  Ось приклад прямокутного вікна (тобто без функції розгортання вікна):
 
 .. image:: ../_images/phaser_animation_rect.gif
    :scale: 100 % 
    :align: center
-   :alt: Beamforming animation using the Phaser and a rectangular window
+   :alt: Анімація формування променя за допомогою фазера і прямокутного вікна
 
-and here is an example of the Hamming window:
+а ось приклад вікна Hamming:
 
 .. image:: ../_images/phaser_animation_hamming.gif
    :scale: 100 % 
    :align: center
-   :alt: Beamforming animation using the Phaser and a Hamming window
+   :alt: Анімація формування променя за допомогою фазера і вікна Hamming
 
-Note the lack of sidelobes for Hamming.  In fact, every window aside from Rectangular will greatly reduce the sidelobes, but in return the main lobe will be a little wider.
+Зверніть увагу на відсутність бічних граней для вікна Hamming.  Насправді, кожне вікно, крім Прямокутного, значно зменшить бічні пелюстки, але натомість головна пелюстка стане трохи ширшою.
