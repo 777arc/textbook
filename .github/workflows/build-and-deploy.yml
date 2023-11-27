@@ -49,6 +49,16 @@ jobs:
         env:
           CREATOR_ID: ${{ secrets.CREATOR_ID }}
 
+      - name: Build Dutch
+        run: make html-nl
+        env:
+          CREATOR_ID: ${{ secrets.CREATOR_ID }}
+
+      - name: Build French
+        run: make html-fr
+        env:
+          CREATOR_ID: ${{ secrets.CREATOR_ID }}
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
