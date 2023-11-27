@@ -1,12 +1,12 @@
 # Simple workflow for deploying static content to GitHub Pages
 # adapted from https://github.com/actions/starter-workflows/blob/main/pages/static.yml
-name: Deploy static content to Pages
+name: Build and Deploy to Pages
 
 on:
   # Runs on pushes targeting the default branch
   # TODO: RUN ONCE A DAY SO PATREON UPDATES MAKE IT IN
   push:
-    branches: [$default-branch]
+    branches: [master]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
