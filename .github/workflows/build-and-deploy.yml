@@ -46,6 +46,8 @@ jobs:
 
       - name: Build English
         run: make html
+        env:
+          CREATOR_ID: ${{ secrets.CREATOR_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
