@@ -33,7 +33,9 @@ Note: on one machine I had to add `~/.local/bin` to PATH
 sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe" . _build
 ```
 
-## Getting pdf created (not working yet due to gifs)
+## Creating a PDF Export
+
+Not fully working yet due to gifs
 
 ```
 sudo apt-get install -y latexmk
