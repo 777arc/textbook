@@ -19,6 +19,7 @@ pip install -r requirements.txt
 make html
 make html-fr
 make html-nl
+make html-ukraine
 ```
 
 In _build there should be an index.html that represents the main page of the site
