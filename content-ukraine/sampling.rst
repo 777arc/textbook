@@ -106,7 +106,7 @@
 .. math::
   \mathrm{magnitude} = \sqrt{a^2 + b^2} = 0.806
   
-  \mathrm{фаза} = \tan^{-1} \left( \frac{b}{a} \right) = -29.7^{\circ} = -0.519 \quad \mathrm{радіан} 
+  \mathrm{phase} = \tan^{-1} \left( \frac{b}{a} \right) = -29.7^{\circ} = -0.519 \quad \mathrm{radians} 
   
 У Python ви можете використовувати функції np.abs(x) і np.angle(x) для амплітуди і фази. На вхід може подаватися комплексне число або масив комплексних чисел, а на виході буде **дійсне** число (з типом даних float).
 

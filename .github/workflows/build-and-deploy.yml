@@ -62,8 +62,8 @@ jobs:
         env:
           CREATOR_ID: ${{ secrets.CREATOR_ID }}
 
-      - name: Build Ukrain
-        run: make html-ukrain
+      - name: Build Ukraine
+        run: make html-ukraine
         env:
           CREATOR_ID: ${{ secrets.CREATOR_ID }}
 
