@@ -66,9 +66,15 @@ html:
 #make sure you install sphinxcontrib-tikz python module and pdf2svg application
 .PHONY: html-nl
 html-nl:
-	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/* -D master_doc=index-nl -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel -D imgmath_latex=latex . $(BUILDDIR)/nl/
+	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-nl -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel -D imgmath_latex=latex . $(BUILDDIR)/nl/
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/nl/html."
+
+.PHONY: html-ukraine
+html-ukraine:
+	$(SPHINXBUILD) -b html -D project="PySDR: Посібник з SDR та DSP за допомогою Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-nl.rst,content-nl/* -D master_doc=index-ukraine -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel -D imgmath_latex=latex . $(BUILDDIR)/ukraine/
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/ukraine/html."
 
 .PHONY: dirhtml
 dirhtml:

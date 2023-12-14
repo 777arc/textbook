@@ -20,6 +20,7 @@ On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) i
 make html
 sphinx-build -b html -D exclude_patterns=_build,index.rst,content/* -D master_doc=index-fr . _build/fr/
 make html-nl
+make html-ukraine
 cp -R _build/* ../777arc.github.io/
 ```
 
