@@ -2,29 +2,41 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/777arc/textbook/master/_images/fft_logo_wide.gif" width="350"/>
 </p>
-This repo contains the source content used to generate my textbook, __PySDR: A Guide to SDR and DSP using Python__ , hosted at www.pysdr.org.
+This repo contains the source content used to generate the textbook, __PySDR: A Guide to SDR and DSP using Python__ , hosted at www.pysdr.org.
 
-Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes be permanently added to the acknowledgments section.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
+Feel free to submit an issue, or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes be permanently added to the acknowledgments section.  Not good at Git but have changes to suggest?  Feel free to email Marc at pysdr@vt.edu.
 
-## Building:
+## Building
 
-On windows (this wont include the French version):
+Note that the website is now automatically built and deployed with each push/merge into the main branch, using the github action .github/workflows/build-and-deploy.yml and the GitHub pages system for hosting the website.
+
+### Ubuntu
+
+```bash
+sudo apt update
+sudo apt install -y texlive-latex-extra pdf2svg
+pip install -r requirements.txt
+make html
+make html-fr
+make html-nl
+make html-ukraine
+```
+
+In _build there should be an index.html that represents the main page of the site
+
+Note: on one machine I had to add `~/.local/bin` to PATH
+
+### Windows
+
+(this wont include the French version):
 
 ```
 sphinx-build -b html -D imgmath_latex="C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe" . _build
 ```
 
-On Ubuntu with *latest* sphinx via apt-get (3.2.1 at the time of this writing) installed with pip, I had to add ~/.local/bin to PATH, and apt-get install texlive-latex-extra.  Also after dutch version was added I needed `apt-get install -y pdf2svg` and `pip install sphinxcontrib-tikz`.
+## Creating a PDF Export
 
-```bash
-make html
-sphinx-build -b html -D exclude_patterns=_build,index.rst,content/* -D master_doc=index-fr . _build/fr/
-make html-nl
-make html-ukraine
-cp -R _build/* ../777arc.github.io/
-```
-
-## Getting pdf created (not working yet due to gifs)
+Not fully working yet due to gifs
 
 ```
 sudo apt-get install -y latexmk

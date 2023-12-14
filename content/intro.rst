@@ -44,9 +44,9 @@ Code examples are provided in Python.  They utilize NumPy, which is Python's sta
 Contributing
 ***************
 
-If you get through any amount of this textbook and email me at pysdr@vt.edu with questions/comments/suggestions, then congratulations, you will have contributed to this textbook!  You can also edit the source material directly on the `textbook's GitHub page <https://github.com/777arc/textbook/tree/master/content>`_ (your change will start a new pull request).  Feel free to submit an issue or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes will be permanently added to the acknowledgments section below.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
+If you got value from PySDR, please share it with colleagues, students, and other lifelong learners who may be interested in the material.  You can also donate through the `PySDR Patreon <https://www.patreon.com/PySDR>`_ as a way to say thanks and get your name on the left of every page below the chapter list.
 
-If you got value from PySDR, please share it with colleagues, students, and other lifelong learners who may be interested in the material.  There is also a donate button on the left that can be used as a way to say thanks.
+If you get through any amount of this textbook and email me at pysdr@vt.edu with questions/comments/suggestions, then congratulations, you will have contributed to this textbook!  You can also edit the source material directly on the `textbook's GitHub page <https://github.com/777arc/textbook/tree/master/content>`_ (your change will start a new pull request).  Feel free to submit an issue or even a Pull Request (PR) with fixes or improvements.  Those who submit valuable feedback/fixes will be permanently added to the acknowledgments section below.  Not good at Git but have changes to suggest?  Feel free to email me at pysdr@vt.edu.
 
 *****************
 Acknowledgements
@@ -61,3 +61,5 @@ Thank you to anyone who has read any portion of this textbook and provided feedb
 - Tarik Benaddi for `translating PySDR to French <https://pysdr.org/fr/index-fr.html>`_
 - `Daniel Versluis <https://versd.bitbucket.io/content/about.html>`_ for `translating PySDR to Dutch <https://pysdr.org/nl/index-nl.html>`_
 - `mrbloom <https://github.com/mrbloom>`_ for `translating PySDR to Ukrainian <https://pysdr.org/ukraine/index-ukraine.html>`_
+
+As well as all `PySDR Patreon <https://www.patreon.com/PySDR>`_ supporters!
