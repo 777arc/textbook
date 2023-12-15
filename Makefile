@@ -16,6 +16,7 @@ endif
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+EXTENSIONS      = -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel,sphinxcontrib.tikz -D imgmath_latex=latex -D tikz_includegraphics_path=_images -D tikz_tikzlibraries=positioning,shapes,arrows,snakes
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
@@ -53,7 +54,7 @@ clean:
 
 .PHONY: html
 html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel,sphinxcontrib.tikz -D imgmath_latex=latex -D tikz_includegraphics_path=_images -D tikz_tikzlibraries=positioning,shapes,arrows,snakes $(BUILDDIR)
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(EXTENSIONS) $(BUILDDIR)
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 	@echo replacing title of index page
@@ -66,19 +67,19 @@ html:
 #make sure you install sphinxcontrib-tikz python module and pdf2svg application
 .PHONY: html-nl
 html-nl:
-	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-nl -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel -D imgmath_latex=latex . $(BUILDDIR)/nl/
+	$(SPHINXBUILD) -b html -D project="PySDR: Een handleiding voor SDR en DSP met Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-nl $(EXTENSIONS) . $(BUILDDIR)/nl/
 	@echo
 	@echo "Dutch Build finished. The HTML pages are in $(BUILDDIR)/nl/html."
 
 .PHONY: html-fr
 html-fr:
-	$(SPHINXBUILD) -b html -D project="PySDR : un guide sur SDR et DSP à l'aide de Python" -D exclude_patterns=_build,index.rst,content/*,index-nl.rst,content-nl/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-fr -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel -D imgmath_latex=latex . $(BUILDDIR)/fr/
+	$(SPHINXBUILD) -b html -D project="PySDR : un guide sur SDR et DSP à l'aide de Python" -D exclude_patterns=_build,index.rst,content/*,index-nl.rst,content-nl/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-fr $(EXTENSIONS) . $(BUILDDIR)/fr/
 	@echo
 	@echo "French Build finished. The HTML pages are in $(BUILDDIR)/fr/html."
 
 .PHONY: html-ukraine
 html-ukraine:
-	$(SPHINXBUILD) -b html -D project="PySDR: Посібник з SDR та DSP за допомогою Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-nl.rst,content-nl/* -D master_doc=index-ukraine -D extensions=sphinx.ext.imgmath,sphinx.ext.autosectionlabel -D imgmath_latex=latex . $(BUILDDIR)/ukraine/
+	$(SPHINXBUILD) -b html -D project="PySDR: Посібник з SDR та DSP за допомогою Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-nl.rst,content-nl/* -D master_doc=index-ukraine $(EXTENSIONS) . $(BUILDDIR)/ukraine/
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/ukraine/html."
 
