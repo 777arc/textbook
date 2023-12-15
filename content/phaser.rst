@@ -15,7 +15,7 @@ In this chapter we use the `Analog Devices Phaser <https://wiki.analog.com/resou
 Intro to Phased Arrays
 ************************
 
----Short intro to phased arrays, and compare to digital beamforming---
+Coming soon!
 
 ************************
 Hardware Overview
@@ -387,3 +387,9 @@ and here is an example of the Hamming window:
    :alt: Beamforming animation using the Phaser and a Hamming window
 
 Note the lack of sidelobes for Hamming.  In fact, every window aside from Rectangular will greatly reduce the sidelobes, but in return the main lobe will be a little wider.
+
+************************
+Radar with Phaser
+************************
+
+Coming soon!
