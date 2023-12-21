@@ -279,9 +279,9 @@ The simplest case of differential coding is when used alongside BPSK, which invo
 .. math::
   y_i = y_{i-1} \oplus x_i
 
-Because the output is based on the previous step's output, we must start the output with an arbitrary 1 or 0, and as we'll show during the decoding process, it doesn't matter which one we choose (we must still transmit this starter symbol!).  
+Because the output is based on the previous step's output, we must start the output with an arbitrary 1 or 0, and as we'll show during the decoding process, it doesn't matter which one we choose (we must still transmit this starter symbol!).
 
-For those visual learners, the differential encoding process can be represented as a diagram, where the delay block is a delay-by-1 operation: 
+For those visual learners, the differential encoding process can be represented as a diagram, where the delay block is a delay-by-1 operation:
 
 .. image:: ../_images/differential_coding2.svg
    :align: center
@@ -295,7 +295,7 @@ As an example of encoding, consider transmitting the 10 bits [1, 1, 0, 0, 1, 1, 
  Input:     1 1 0 0 1 1 1 1 1 0
  Output:  1
 
-Next you build the output by comparing the input bit with the **previous** output bit, and apply the XOR operation shown in the table above.  The next output bit is therefore a 0, because 1 and 1 match:
+Next you build the output by comparing the input bit with the previous **output** bit, and apply the XOR operation shown in the table above.  The next output bit is therefore a 0, because 1 and 1 match:
 
 .. code-block::
 
@@ -309,7 +309,7 @@ Repeat for the rest and you will get:
  Input:     1 1 0 0 1 1 1 1 1 0
  Output:  1 0 1 1 1 0 1 0 1 0 0
 
-After applying differential encoding, we would ultimately transmit [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0].  The 1's and 0's are still mapped to the positive and negative symbols we discussed earlier.  
+After applying differential encoding, we would ultimately transmit [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0].  The 1's and 0's are still mapped to the positive and negative symbols we discussed earlier.
 
 The decoding process, which occurs at the receiver, compares the received bit with the previous **received** bit, which is much simpler to understand:
 
