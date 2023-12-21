@@ -272,9 +272,53 @@ In this textbook we are mainly concerned about digital forms of modulation.
 Differential Coding
 *******************
 
-In many wireless (and wired) communications protocols you are likely to run into something called differential coding.  To demonstrate its utility consider receiving a BPSK signal.  As the signal flies through the air it experiences some random delay between the transmitter and receiver, causing a random rotation in the constellation, as we mentioned earlier.  When the receiver synchronizes to it, and aligns the BPSK to the "I" axis, it has no way of knowing if it is 180 degrees out of phase or not, because the constellation is symmetric.  One option is to transmit symbols the receiver knows the value of ahead of time, mixed into the information, known as pilot symbols.  The receiver can use these known symbols to determine which cluster is a 1 or 0, in the case of BPSK.  Pilot symbols must be sent at some period, related to how fast the wireless channel is changing, which will ultimately reduce the data rate.
+In many wireless (and wired) communications protocols based on PSK or QAM, you are likely to run into a step that occurs right before bits are modulated (or right after demodulation), called differential coding.  To demonstrate its utility consider receiving a BPSK signal.  As the signal flies through the air it experiences some random delay between the transmitter and receiver, causing a random rotation in the constellation, as we mentioned earlier.  When the receiver synchronizes to it, and aligns the BPSK to the "I" (real) axis, it has no way of knowing if it is 180 degrees out of phase or not, because the constellation is symmetric.  One option is to transmit symbols the receiver knows the value of ahead of time, mixed into the information, known as pilot symbols.  The receiver can use these known symbols to determine which cluster is a 1 or 0, in the case of BPSK.  Pilot symbols must be sent at some period, related to how fast the wireless channel is changing, which will ultimately reduce the data rate.  Instead of having to mix pilot symbols into the transmitted waveform, we can choose to use differential coding.
 
-Instead of having to mix pilot symbols into the transmitted waveform, we can choose to use differential coding.  In its most basic form, which is what is used for BPSK, differential coding involves transmitting a 0 when the input bit is the same as the encoding of the previous bit, and transmitting a 1 when it differs.  So we still transmit the same number of bits (except one extra bit is needed at the beginning to start the output sequence), but now we don't have to worry about the 180 degree phase ambiguity.  To demonstrate how this works, consider transmitting the bit sequence [x, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0] using BPSK, where x represents the reference bit.  Assume we start the output sequence with 1; it actually doesn't matter whether you use 1 or 0.  After applying differential coding, we would ultimately transmit [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0].  The 1's and 0's are still mapped to the positive and negative symbols we discussed earlier.  It might be easier to visualize the input and output sequences stacked like this:
+The simplest case of differential coding is when used alongside BPSK, which involves one bit per symbol.  Instead of simply transmitting a 1 for binary 1, and a -1 for binary 0, BPSK differential coding involves transmitting a 0 when the input bit is the same as the **encoding** of the previous bit (not the previous input bit itself), and transmitting a 1 when it differs.  We still transmit the same number of bits, aside from one extra bit that is needed at the beginning to start the output sequence, but now we don't have to worry about the 180 degree phase ambiguity.  This encoding scheme can be described using the following equation, where :math:`x` are the input bits and :math:`y` are the output bits that will get modulated with BPSK:
+
+.. math::
+  y_i = y_{i-1} \oplus x_i
+
+Because the output is based on the previous step's output, we must start the output with an arbitrary 1 or 0, and as we'll show during the decoding process, it doesn't matter which one we choose (we must still transmit this starter symbol!).  
+
+For those visual learners, the differential encoding process can be represented as a diagram, where the delay block is a delay-by-1 operation: 
+
+.. image:: ../_images/differential_coding2.svg
+   :align: center
+   :target: ../_images/differential_coding2.svg
+   :alt: Differential coding block diagram
+
+As an example of encoding, consider transmitting the 10 bits [1, 1, 0, 0, 1, 1, 1, 1, 1, 0] using BPSK.  Assume we start the output sequence with 1; it actually doesn't matter whether you use 1 or 0.  It helps to show the bits stacked on top of each other, making sure to shift the input to make room for the starting output bit:
+
+.. code-block::
+
+ Input:     1 1 0 0 1 1 1 1 1 0
+ Output:  1
+
+Next you build the output by comparing the input bit with the **previous** output bit, and apply the XOR operation shown in the table above.  The next output bit is therefore a 0, because 1 and 1 match:
+
+.. code-block::
+
+ Input:     1 1 0 0 1 1 1 1 1 0
+ Output:  1 0
+
+Repeat for the rest and you will get:
+
+.. code-block::
+
+ Input:     1 1 0 0 1 1 1 1 1 0
+ Output:  1 0 1 1 1 0 1 0 1 0 0
+
+After applying differential encoding, we would ultimately transmit [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0].  The 1's and 0's are still mapped to the positive and negative symbols we discussed earlier.  
+
+The decoding process, which occurs at the receiver, compares the received bit with the previous **received** bit, which is much simpler to understand:
+
+.. math::
+  x_i = y_i \oplus y_{i-1}
+
+If you were to receive the BPSK symbols [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0], you would start at the left and check if the first two match; in this case they don't so the first bit is a 1.  Repeat and you will get the sequence we started with, [1, 1, 0, 0, 1, 1, 1, 1, 1, 0].  It may not be obvious, but the starter bit we added could have been a 1 or a 0 and we would get the same result.
+
+The encoding and decoding process is summarized in the following graphic:
 
 .. image:: ../_images/differential_coding.svg
    :align: center
@@ -282,7 +326,9 @@ Instead of having to mix pilot symbols into the transmitted waveform, we can cho
    :alt: Demonstration of differential coding using sequence of encoded and decoded bits
 
 
-The big downside to using differential coding is that if you have a bit error, it will lead to two bit errors.  The alternative to using differential coding for BPSK is to add pilot symbols periodically, which are symbols already known by the receiver, and it can use the known values to not only figure out which cluster is 1 and which is 0, but also reverse multipath caused by the channel.  One problem with pilot symbols is that the wireless channel can change very quickly, on the order of tens or hundreds of symbols if it's a moving receiver and/or transmitter, so you would need pilot symbols often enough to reflect the changing channel.  So if a wireless protocol is putting high emphasis on reducing the complexity of the receiver, such as RDS which we study in the :ref:`rds-chapter` chapter, it may choose to use differential coding.
+The big downside to using differential coding is that if you have a bit error, it will lead to two bit errors.  The alternative to using differential coding for BPSK is to add pilot symbols periodically, as discussed earlier, which can also be used to reverse/invert multipath caused by the channel.  But one problem with pilot symbols is that the wireless channel can change very quickly, on the order of tens or hundreds of symbols if it's a moving receiver and/or transmitter, so you would need pilot symbols often enough to reflect the changing channel.  So if a wireless protocol is putting high emphasis on reducing the complexity of the receiver, such as RDS which we study in the :ref:`rds-chapter` chapter, it may choose to use differential coding.
+
+Remember that the above differential coding example was specific to BPSK.  Differential coding applies at the symbol level, so to apply it to QPSK you work with pairs of bits at a time, and so on for higher order QAM schemes.  Differential QPSK is often referred to as DQPSK.
 
 *******************
 Python Example
