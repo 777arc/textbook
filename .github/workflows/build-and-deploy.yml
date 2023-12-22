@@ -67,6 +67,11 @@ jobs:
         env:
           CREATOR_ID: ${{ secrets.CREATOR_ID }}
 
+      - name: Build Chinese
+        run: make html-zh
+        env:
+          CREATOR_ID: ${{ secrets.CREATOR_ID }}
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
