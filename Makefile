@@ -85,7 +85,7 @@ html-ukraine:
 
 .PHONY: html-zh
 html-zh:
-	$(SPHINXBUILD) -b html -D project="PySDR: A Guide to SDR and DSP using Python" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-nl.rst,content-nl/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-zh $(EXTENSIONS) . $(BUILDDIR)/zh/
+	$(SPHINXBUILD) -b html -D project="PySDR：使用 Python 玩转 SDR 和 DSP" -D exclude_patterns=_build,index.rst,content/*,index-fr.rst,content-fr/*,index-nl.rst,content-nl/*,index-ukraine.rst,content-ukraine/* -D master_doc=index-zh $(EXTENSIONS) . $(BUILDDIR)/zh/
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/zh/html."
 
