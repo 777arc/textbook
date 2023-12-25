@@ -389,7 +389,149 @@ and here is an example of the Hamming window:
 Note the lack of sidelobes for Hamming.  In fact, every window aside from Rectangular will greatly reduce the sidelobes, but in return the main lobe will be a little wider.
 
 ************************
+Monopulse Tracking
+************************
+
+Up until this point we have been performing individual sweeps in order to find the angle of arrival of a test transmitter (the HB100).  But lets say we wish to continuously receive a communications or radar signal, that may be moving an causing the angle of arrival to change over time.  We refer to this process as tracking, and it assumes we already have a rough estimate of the angle of arrival (i.e., the initial sweep has identified a signal of interest).  We will use monopulse tracking to adaptively update the weights in order to keep the main lobe pointed at the signal over time, although note that there are other methods of tracking besides monopulse.
+
+Invented in 1943 by Robert Page at the Naval Research Laboratory (NRL), the basic concept of monopulse tracking is to use two beams, both slightly offset from the current angle of arrival (or at least our estimate of it), but on different sides as shown in the diagram below.  
+
+image of 3 beams
+
+We then take both the sum and difference (a.k.a. delta) of these two beams digitally, which means we must use two digital channels of the Phaser, making this a hybrid array approach (although you could certainly do the sum and difference in analog with custom hardware).  The sum beam will equate to a beam centered at the current angle of arrival estimate, which means this beam can be used for demod/decoding the signal of interest.  The delta beam, as we will call it, will have a null at the angle of arrival estimate, but we can use the difference between the sum beam and delta beam (refered to as the error) to perform our tracking.
+
+example plot of sum and delta (not error)
+
+The error is a complex value, so we will take the magnitude and phase.  The sign of the phase tells us which direction the signal is actually coming from, and the magnitude tells us how far off we are from the signal.  We can then use this information to update the angle of arrival estimate and weights.  By repeating this process in realtime we can track the signal.
+
+Now jumping into the Python example, we will start by copying the code we used earlier to perform a 180 degree sweep.  The only code we will add is to pull out the phase at which the received power was maximum:
+
+.. code-block:: python
+
+   # Sweep phase once to get initial estimate for AOA, using code above
+   # ...
+   current_phase = phase_angles[np.argmax(powers)]
+   print("max_phase:", current_phase)
+
+Next we will create two beams, we will start by trying 5 degrees lower and 5 degrees higher than the current estimate, although note that this is in units of phase, we haven't converted to steering angle, although they are similar.  The following code is essentially two copies of the code we used earlier to set the phase shifters of each channel, except we use the first 4 elements for the lower beam and last 4 elements for upper beam:
+
+.. code-block:: python
+
+   # Now we create the two beams on either side of our current estimate
+   phase_offset = np.radians(5) # TRY TWEAKING THIS - specify offset from center in degrees
+   phase_lower = current_phase - phase_offset
+   phase_upper = current_phase + phase_offset
+   # first 4 elements will be used for lower beam
+   for i in range(0, 4): 
+      channel_phase = (phase_lower * i + phase_cal[i]) % 360.0
+      phaser.elements.get(i + 1).rx_phase = channel_phase
+   # last 4 elements will be used for upper beam
+   for i in range(4, 8): 
+      channel_phase = (phase_upper * i + phase_cal[i]) % 360.0
+      phaser.elements.get(i + 1).rx_phase = channel_phase
+   phaser.latch_rx_settings() # apply settings
+
+Before jumping into doing the actual tracking, lets test the above by keeping the beam weights constant and moving the HB100 left and right (after it finishes initializing to find the starting angle):
+
+.. code-block:: python
+
+   print("START MOVING THE HB100 A LITTLE LEFT AND RIGHT")
+   error_log = []
+   for i in range(1000):
+      data = phaser.sdr.rx() # receive a batch of samples
+      sum_beam = data[0] + data[1]
+      delta_beam = data[0] - data[1]
+      error = np.mean(np.real(delta_beam / sum_beam))
+      error_log.append(error)
+      print(error)
+      time.sleep(0.01)
+
+   plt.plot(error_log)
+   plt.plot([0,len(error_log)], [0,0], 'r--')
+   plt.xlabel("Time")
+   plt.ylabel("Error")
+   plt.show()
+
+.. image:: ../_images/monopulse_waving.svg
+   :align: center 
+   :target: ../_images/monopulse_waving.svg
+   :alt: Showing error function for monopulse tracking without actually updating the weights
+
+What's happening in this example is I'm moving the HB100 around.  I start by holding it in a steady position while the 180 degree sweep happens, then after it's done I move it a little to the right, and wiggle it around, then I move it to the left of where I started and wiggle it around.  Then around time = 400 in the plot I move it back to the other side and hold it there for a moment, before waving it around one more time.  The take-away is that the further the HB100 gets from the starting angle, the higher the error, and the sign of the error tells us which side the HB100 is on relative to the starting angle.
+
+Now lets use the error value to update the weights.  We will get rid of the previous for loop, and make a new for loop around the entire process.  For the sake of clarity we have the entire code example below, except for the initial part where we did the 180 degree sweep:
+
+.. code-block:: python
+
+   # Sweep phase once to get initial estimate for AOA
+   # ...
+   current_phase = phase_angles[np.argmax(powers)]
+   print("max_phase:", current_phase)
+
+   # Now we'll actually update the current_phase based on the error
+   print("START MOVING THE HB100 A LITTLE LEFT AND RIGHT")
+   phase_log = []
+   error_log = []
+   for ii in range(500):
+      # Now we create the two beams on either side of our current estimate, using the specified offset
+      phase_offset = np.radians(5)
+      phase_lower = current_phase - phase_offset
+      phase_upper = current_phase + phase_offset
+      # first 4 elements will be used for lower beam
+      for i in range(0, 4): 
+            channel_phase = (phase_lower * i + phase_cal[i]) % 360.0
+            phaser.elements.get(i + 1).rx_phase = channel_phase
+      # last 4 elements will be used for upper beam
+      for i in range(4, 8): 
+            channel_phase = (phase_upper * i + phase_cal[i]) % 360.0
+            phaser.elements.get(i + 1).rx_phase = channel_phase
+      phaser.latch_rx_settings() # apply settings
+
+      data = phaser.sdr.rx() # receive a batch of samples
+      sum_beam = data[0] + data[1]
+      delta_beam = data[0] - data[1]
+      error = np.mean(np.real(delta_beam / sum_beam))
+      error_log.append(error)
+      print(error)
+
+      # Update our estimated angle of arrival based on error
+      current_phase += -10 * error # was manually tweaked until it seemed to track at a nice speed
+      steer_angle = np.degrees(np.arcsin(max(min(1, (3e8 * np.radians(current_phase)) / (2 * np.pi * signal_freq * phaser.element_spacing)), -1)))
+      phase_log.append(steer_angle) # looks nicer to plot steer angle instead of straight phase
+      
+      time.sleep(0.01)
+
+   fig, [ax0, ax1] = plt.subplots(2, 1, figsize=(8, 10))
+
+   ax0.plot(phase_log)
+   ax0.plot([0,len(phase_log)], [0,0], 'r--')
+   ax0.set_xlabel("Time")
+   ax0.set_ylabel("Phase Estimate [degrees]")
+
+   ax1.plot(error_log)
+   ax1.plot([0,len(error_log)], [0,0], 'r--')
+   ax1.set_xlabel("Time")
+   ax1.set_ylabel("Error")
+
+   plt.show()
+
+.. image:: ../_images/monopulse_tracking.svg
+   :align: center 
+   :target: ../_images/monopulse_tracking.svg
+   :alt: Monopulse tracking demo using a Phaser and HB100 being waved around infront of it
+
+You can see the error is essentially the derivative of the phase estimate; because we're performing successful tracking, the phase estimate is more or less the actual angle of arrival.  It's not clear looking only at these plots, but when there is a sudden movement, it takes the system a small fraction of a second to adjust and catch up.  The goal is for the change in angle of arrival to never be so quick that the signal arrives beyond the main lobes of the two beams.  
+
+
+************************
 Radar with Phaser
 ************************
 
 Coming soon!
+
+************************
+Conclusion
+************************
+
+The entire code used to generate the figures in this chapter is available on the textbook's GitHub page.
+
