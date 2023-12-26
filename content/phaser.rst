@@ -396,15 +396,23 @@ Up until this point we have been performing individual sweeps in order to find t
 
 Invented in 1943 by Robert Page at the Naval Research Laboratory (NRL), the basic concept of monopulse tracking is to use two beams, both slightly offset from the current angle of arrival (or at least our estimate of it), but on different sides as shown in the diagram below.  
 
-image of 3 beams
+.. image:: ../_images/monopulse.svg
+   :align: center 
+   :target: ../_images/monopulse.svg
+   :alt: Monopulse beam diagram showing two beams and the sum beam
 
-We then take both the sum and difference (a.k.a. delta) of these two beams digitally, which means we must use two digital channels of the Phaser, making this a hybrid array approach (although you could certainly do the sum and difference in analog with custom hardware).  The sum beam will equate to a beam centered at the current angle of arrival estimate, which means this beam can be used for demod/decoding the signal of interest.  The delta beam, as we will call it, will have a null at the angle of arrival estimate, but we can use the difference between the sum beam and delta beam (refered to as the error) to perform our tracking.
+We then take both the sum and difference (a.k.a. delta) of these two beams digitally, which means we must use two digital channels of the Phaser, making this a hybrid array approach (although you could certainly do the sum and difference in analog with custom hardware).  The sum beam will equate to a beam centered at the current angle of arrival estimate, as shown above, which means this beam can be used for demod/decoding the signal of interest.  The delta beam, as we will call it, is harder to visualize, but it will have a null at the angle of arrival estimate.  We can use the ratio between the sum beam and delta beam (refered to as the error) to perform our tracking.  This process is best explained with a short Python snippet; recall that the :code:`rx()` function returns a batch of samples from both channels, so in the code below :code:`data[0]` is the first channel of the Pluto (first set of four Phaser elements) and :code:`data[1]` is the second channel (second set of four elements).  In order to create two beams, we will steer each of the two sets separately.  We can calculate the sum, delta, and error as follows:
 
-example plot of sum and delta (not error)
+.. code-block:: python
 
-The error is a complex value, so we will take the magnitude and phase.  The sign of the phase tells us which direction the signal is actually coming from, and the magnitude tells us how far off we are from the signal.  We can then use this information to update the angle of arrival estimate and weights.  By repeating this process in realtime we can track the signal.
+   data = phaser.sdr.rx()
+   sum_beam = data[0] + data[1]
+   delta_beam = data[0] - data[1]
+   error = np.mean(np.real(delta_beam / sum_beam))
 
-Now jumping into the Python example, we will start by copying the code we used earlier to perform a 180 degree sweep.  The only code we will add is to pull out the phase at which the received power was maximum:
+The sign of the error tells us which direction the signal is actually coming from, and the magnitude tells us how far off we are from the signal.  We can then use this information to update the angle of arrival estimate and weights.  By repeating this process in realtime we can track the signal.
+
+Now jumping into the full Python example, we will start by copying the code we used earlier to perform a 180 degree sweep.  The only code we will add is to pull out the phase at which the received power was maximum:
 
 .. code-block:: python
 
@@ -431,7 +439,7 @@ Next we will create two beams, we will start by trying 5 degrees lower and 5 deg
       phaser.elements.get(i + 1).rx_phase = channel_phase
    phaser.latch_rx_settings() # apply settings
 
-Before jumping into doing the actual tracking, lets test the above by keeping the beam weights constant and moving the HB100 left and right (after it finishes initializing to find the starting angle):
+Before doing the actual tracking, lets test the above by keeping the beam weights constant and moving the HB100 left and right (after it finishes initializing to find the starting angle):
 
 .. code-block:: python
 
