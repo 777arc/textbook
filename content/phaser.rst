@@ -528,8 +528,9 @@ Now lets use the error value to update the weights.  We will get rid of the prev
    :target: ../_images/monopulse_tracking.svg
    :alt: Monopulse tracking demo using a Phaser and HB100 being waved around infront of it
 
-You can see the error is essentially the derivative of the phase estimate; because we're performing successful tracking, the phase estimate is more or less the actual angle of arrival.  It's not clear looking only at these plots, but when there is a sudden movement, it takes the system a small fraction of a second to adjust and catch up.  The goal is for the change in angle of arrival to never be so quick that the signal arrives beyond the main lobes of the two beams.  
+You can see the error is essentially the derivative of the phase estimate; because we're performing successful tracking, the phase estimate is more or less the actual angle of arrival.  It's not clear looking only at these plots, but when there is a sudden movement, it takes the system a small fraction of a second to adjust and catch up.  The goal is for the change in angle of arrival to never be so quick that the signal arrives beyond the main lobes of the two beams.
 
+It is a lot easier to visualize the process when the array is only 1D, but practical use-cases of monopulse tracking are almost always 2D (using a 2D/planar array instead of a linear array like the Phaser).  For the 2D case, there are four beams created instead of two, and after process there is a single sum beam and four delta beams used to steer in both dimensions.
 
 ************************
 Radar with Phaser
