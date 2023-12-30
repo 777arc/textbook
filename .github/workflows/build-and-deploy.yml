@@ -81,7 +81,12 @@ jobs:
         with:
           args: zip -qq -r html.zip ./_build
 
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
       - name: Create Release with zip file
         uses: softprops/action-gh-release@v1
         with:
           files: html.zip
+          tag_name: ${{ steps.date.outputs.date }}
