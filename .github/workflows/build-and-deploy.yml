@@ -52,6 +52,11 @@ jobs:
         env:
           CREATOR_ID: ${{ secrets.CREATOR_ID }}
 
+      - name: Zip just English version for Release
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r html.zip ./_build
+
       - name: Build Dutch
         run: make html-nl
         env:
@@ -75,11 +80,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-
-      - name: Zip files
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r html.zip ./_build
 
       - name: Get current date
         id: date
