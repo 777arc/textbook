@@ -83,6 +83,5 @@ jobs:
 
       - name: Create Release with zip file
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: html.zip
