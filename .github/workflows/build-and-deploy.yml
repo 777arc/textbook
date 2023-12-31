@@ -83,10 +83,11 @@ jobs:
 
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')" && echo "::set-output name=day::$(day +'%d')"
 
-      - name: Create Release with zip file
+      - name: Create Release with zip file only on first day of each month
         uses: softprops/action-gh-release@v1
+        if: ${{ steps.date.outputs.day == '01' }}
         with:
           files: html.zip
           tag_name: ${{ steps.date.outputs.date }}
