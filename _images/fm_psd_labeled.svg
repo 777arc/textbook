@@ -29,8 +29,8 @@
      id="namedview362"
      showgrid="false"
      inkscape:zoom="2.1380072"
-     inkscape:cx="281.57061"
-     inkscape:cy="99.157757"
+     inkscape:cx="206.26685"
+     inkscape:cy="99.157758"
      inkscape:window-x="72"
      inkscape:window-y="27"
      inkscape:window-maximized="0"
@@ -1225,46 +1225,19 @@
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:30px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-     x="195.76627"
-     y="55.95208"
+     x="162.09004"
+     y="78.148926"
      id="text1547-3-3-2-4-1"><tspan
        sodipodi:role="line"
        style="font-size:12px;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-       x="195.76627"
-       y="55.95208"
-       id="tspan996-91-1">Stereo</tspan><tspan
+       x="162.09004"
+       y="78.148926"
+       id="tspan996-91-1">Stereo Audio (L-R)</tspan><tspan
        sodipodi:role="line"
        style="font-size:12px;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-       x="195.76627"
-       y="93.45208"
+       x="162.09004"
+       y="115.64893"
        id="tspan1054-54" /></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:30px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-     x="198.43915"
-     y="68.111404"
-     id="text1547-3-3-2-4-9-4"><tspan
-       sodipodi:role="line"
-       style="font-size:12px;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-       x="198.43915"
-       y="68.111404"
-       id="tspan996-91-6-7">Audio</tspan><tspan
-       sodipodi:role="line"
-       style="font-size:12px;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-       x="198.43915"
-       y="105.6114"
-       id="tspan1054-5-9" /></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:30px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-     x="199.92744"
-     y="80.312614"
-     id="text1547-3-3-2-4-2-4"><tspan
-       sodipodi:role="line"
-       style="font-size:12px;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
-       x="199.92744"
-       y="80.312614"
-       id="tspan1054-2-7">(L-R)</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:30px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:round"
