@@ -43,7 +43,7 @@ Il s'avère que ces signaux en forme de blocs sont en fait la Radio HD, une vers
 
 Revenons aux cinq signaux que nous avons découverts dans notre DSP; le diagramme suivant indique à quoi sert chaque signal.  
 
-.. image:: ../_images/fm_components.png
+.. image:: ../_images/fm_psd_labeled.svg
    :scale: 80 % 
    :align: center 
 

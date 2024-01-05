@@ -52,7 +52,7 @@ Deze digitale versie geeft de ontvanger een hogere kwaliteit audio, omdat digita
 
 Weer terug naar de 5 signalen die we in onze PSD herkenden; Het volgende diagram laat zien waar elk signaal voor wordt gebruikt:
 
-.. image:: ../_images/fm_components.png
+.. image:: ../_images/fm_psd_labeled.svg
    :scale: 80 % 
    :align: center 
 

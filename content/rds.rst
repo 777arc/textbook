@@ -45,9 +45,9 @@ It turns out that those block-y signals are actually HD Radio, a digital version
 
 Back to the five signals we discovered in our PSD; the following diagram labels what each signal is used for.  
 
-.. image:: ../_images/fm_components.png
-   :scale: 80 % 
+.. image:: ../_images/fm_psd_labeled.svg
    :align: center
+   :target: ./_images/fm_psd_labeled.svg
    :alt: Components within an FM radio signal, including mono and stereo audio, RDS, and DirectBand signals
 
 Going through each of these signals in no particular order:
