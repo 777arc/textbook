@@ -20,14 +20,15 @@ theta = theta_degrees / 180 * np.pi # convert to radians
 a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta))
 print(a)
 
-# we have to do a matrix multiplication of a and tx, so first lets convert both to matrix' instead of numpy arrays which dont let us do 1d matrix math
-a = np.asmatrix(a)
-tx = np.asmatrix(tx)
+# we have to do a matrix multiplication of a and tx, which currently are both 1D, so we have to make them 2D with reshape
+a = a.reshape(-1,1)
+print(a.shape) # 3x1
+tx = tx.reshape(-1,1)
+print(tx.shape) # 10000x1
 
 # so how do we use this? simple:
-
-r = a.T @ tx  # matrix multiply. dont get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
-print(r.shape) # r is now going to be a 2D array, 1d is time and 1d is spatial
+r = a @ tx.T # matrix multiply. dont get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
+print(r.shape) # 3x10000.  r is now going to be a 2D array, 1d is time and 1d is spatial
 
 # Plot the real part of the first 200 samples of all three elements
 if False:
@@ -40,7 +41,7 @@ if False:
     ax1.grid()
     ax1.legend(['0','1','2'], loc=1)
     plt.show()
-    fig.savefig('../_images/doa_time_domain.svg', bbox_inches='tight')
+    #fig.savefig('../_images/doa_time_domain.svg', bbox_inches='tight')
     exit()
 # note the phase shifts, they are also there on the imaginary portions of the samples
 
@@ -65,7 +66,7 @@ if False:
     ax1.grid()
     ax1.legend(['0','1','2'], loc=1)
     plt.show()
-    fig.savefig('../_images/doa_time_domain_with_noise.svg', bbox_inches='tight')
+    #fig.savefig('../_images/doa_time_domain_with_noise.svg', bbox_inches='tight')
     exit()
 
 # OK lets use this signal r but pretend we don't know which direction the signal is coming in from, lets try to figure it out
@@ -90,9 +91,8 @@ if False:
     results = []
     for theta_i in theta_scan:
         #print(theta_i)
-        w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
-        r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
-        r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+        w = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # look familiar?
+        r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i. remember r is 3x10000 so we can leave w as normal (row) vector
         results.append(np.mean(np.abs(r_weighted)**2)) # energy detector
 
     print(theta_scan[np.argmax(results)] * 180 / np.pi) # 19.99999999999998
@@ -128,13 +128,15 @@ if False:
         print(t_i)
 
         theta = theta_txs[t_i] / 180 * np.pi
-        a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)))
-        r = a.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t))
+        a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta))
+        a = a.reshape(-1,1) # 3x1
+        tone = np.exp(2j*np.pi*0.02e6*t)
+        tone = tone.reshape(-1,1) # 10000x1
+        r = a @ tone.T
 
         for theta_i in range(len(theta_scan)):
-            w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_scan[theta_i]))) # look familiar?
+            w = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_scan[theta_i]))
             r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
-            r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
             results[t_i, theta_i]  = np.mean(np.abs(r_weighted)**2) # energy detector
 
     fig, ax = plt.subplots(1, 1, figsize=(10, 5), subplot_kw={'projection': 'polar'})
@@ -156,15 +158,15 @@ if False:
         return line, ax
     anim = FuncAnimation(fig, update, frames=np.arange(0, len(theta_txs)), interval=100)
     anim.save('../_images/doa_sweeping_angle_animation.gif', dpi=80, writer='imagemagick')
-
+    exit()
 
 
 
 
 # varying d animations
 if False:
-    ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 4.1, 0.05))) # d is large
-    #ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 0.02, -0.01))) # d is small
+    #ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 4.1, 0.05))) # d is large
+    ds = np.concatenate((np.repeat(0.5, 10), np.arange(0.5, 0.02, -0.01))) # d is small
     
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000)
     results = np.zeros((len(ds), len(theta_scan)))
@@ -172,22 +174,28 @@ if False:
         print(d_i)
 
         # Have to recalc r
-        a = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta)))
-        r = a.T @ tx
+        a = np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta))
+        a = a.reshape(-1,1)
+        r = a @ tx.T
 
         # DISABLE FOR THE FIRST TWO ANIMATIONS
-        if False:
+        if True:
             theta1 = 20 / 180 * np.pi
             theta2 = -40 / 180 * np.pi
-            a1 = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta1)))
-            a2 = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta2)))
+            a1 = np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta1))
+            a1 = a1.reshape(-1,1)
+            a2 = np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta2))
+            a2 = a2.reshape(-1,1)
+            freq1 = np.exp(2j*np.pi*0.02e6*t)
+            freq1 = freq1.reshape(-1,1)
+            freq2 = np.exp(2j*np.pi*-0.02e6*t)
+            freq2 = freq2.reshape(-1,1)
             # two tones at diff frequencies and angles of arrival (not sure it actually had to be 2 diff freqs...)
-            r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + a2.T @ np.asmatrix(np.exp(2j*np.pi*-0.02e6*t))
+            r = a1 @ freq1.T + a2 @ freq2.T
 
         for theta_i in range(len(theta_scan)):
-            w = np.asmatrix(np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta_scan[theta_i]))) # look familiar?
+            w = np.exp(-2j * np.pi * ds[d_i] * np.arange(Nr) * np.sin(theta_scan[theta_i]))
             r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
-            r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
             results[d_i, theta_i]  = np.mean(np.abs(r_weighted)**2) # energy detector
 
     fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
@@ -210,42 +218,50 @@ if False:
         text.set_text('d = ' + d_str)
         return line, ax
     anim = FuncAnimation(fig, update, frames=np.arange(0, len(ds)), interval=100)
-    anim.save('../_images/doa_d_is_large_animation.gif', dpi=80, writer='imagemagick')
+    #anim.save('../_images/doa_d_is_large_animation.gif', dpi=80, writer='imagemagick')
     #anim.save('../_images/doa_d_is_small_animation.gif', dpi=80, writer='imagemagick')
-    #anim.save('../_images/doa_d_is_small_animation2.gif', dpi=80, writer='imagemagick')
+    anim.save('../_images/doa_d_is_small_animation2.gif', dpi=80, writer='imagemagick')
+    exit()
 
 
 
 # Capons beamformer
-if False:
+if True:
     if True: # use for doacompons2
         # more complex scenario
         Nr = 8 # 8 elements
         theta1 = 20 / 180 * np.pi # convert to radians
         theta2 = 25 / 180 * np.pi
         theta3 = -40 / 180 * np.pi
-        a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
-        a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
-        a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+        a1 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1))
+        a1 = a1.reshape(-1,1)
+        a2 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2))
+        a2 = a2.reshape(-1,1)
+        a3 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3))
+        a3 = a3.reshape(-1,1)
         # we'll use 3 different frequencies
-        r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
-            a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
-            0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+        tone1 = np.exp(2j*np.pi*0.01e6*t)
+        tone1 = tone1.reshape(1,-1)
+        tone2 = np.exp(2j*np.pi*0.02e6*t)
+        tone2 = tone2.reshape(1,-1)
+        tone3 = np.exp(2j*np.pi*0.03e6*t)
+        tone3 = tone3.reshape(1,-1)
+        r = a1 @ tone1 + a2 @ tone2 + 0.1 * a3 @ tone3
         n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
         r = r + 0.04*n
 
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
     results = []
     for theta_i in theta_scan:
-        a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)))
-        a = a.T
+        a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))
+        a = a.reshape(-1,1) # 3x1
 
         # Calc covariance matrix
-        R = r @ r.H # gives a Nr x Nr covariance matrix of the samples
+        R = r @ r.conj().T # gives a Nr x Nr covariance matrix of the samples
 
-        Rinv = np.linalg.pinv(R)
+        Rinv = np.linalg.pinv(R) # still 3x3
 
-        w = 1/(a.H @ Rinv @ a)
+        w = 1/(a.conj().T @ Rinv @ a) # denominator is 1x3 * 3x3 * 3x1
         metric = np.abs(w[0,0]) # take magnitude
         metric = 10*np.log10(metric)
 
@@ -260,8 +276,7 @@ if False:
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
     #fig.savefig('../_images/doa_capons.svg', bbox_inches='tight')
-    fig.savefig('../_images/doa_capons2.svg', bbox_inches='tight')
-
+    #fig.savefig('../_images/doa_capons2.svg', bbox_inches='tight')
     exit()
 
 
@@ -272,22 +287,28 @@ if False:
     theta1 = 20 / 180 * np.pi # convert to radians
     theta2 = 25 / 180 * np.pi
     theta3 = -40 / 180 * np.pi
-    a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
-    a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
-    a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+    a1 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1))
+    a1 = a1.reshape(-1,1)
+    a2 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2))
+    a2 = a2.reshape(-1,1)
+    a3 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3))
+    a3 = a3.reshape(-1,1)
     # we'll use 3 different frequencies
-    r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
-        a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
-        0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+    tone1 = np.exp(2j*np.pi*0.01e6*t)
+    tone1 = tone1.reshape(-1,1)
+    tone2 = np.exp(2j*np.pi*0.02e6*t)
+    tone2 = tone2.reshape(-1,1)
+    tone3 = np.exp(2j*np.pi*0.03e6*t)
+    tone3 = tone3.reshape(-1,1)
+    r = a1 @ tone1.T + a2 @ tone2.T + 0.1 * a3 @ tone3.T
     n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
     r = r + 0.04*n
 
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
     results = []
     for theta_i in theta_scan:
-        w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
+        w = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # look familiar?
         r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
-        r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
         metric = np.mean(np.abs(r_weighted)**2) # energy detector
         metric = 10*np.log10(metric)
         results.append(metric) 
@@ -300,9 +321,10 @@ if False:
     ax.set_theta_direction(-1) # increase clockwise
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
-    fig.savefig('../_images/doa_complex_scenario.svg', bbox_inches='tight')
-
+    #fig.savefig('../_images/doa_complex_scenario.svg', bbox_inches='tight')
     exit()
+
+
 
 # MUSIC with complex scenario
 if False:
@@ -310,19 +332,26 @@ if False:
     theta1 = 20 / 180 * np.pi # convert to radians
     theta2 = 25 / 180 * np.pi
     theta3 = -40 / 180 * np.pi
-    a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
-    a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
-    a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+    a1 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1))
+    a1 = a1.reshape(-1,1)
+    a2 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2))
+    a2 = a2.reshape(-1,1)
+    a3 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3))
+    a3 = a3.reshape(-1,1)
     # we'll use 3 different frequencies
-    r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
-        a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
-        0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+    tone1 = np.exp(2j*np.pi*0.01e6*t)
+    tone1 = tone1.reshape(-1,1)
+    tone2 = np.exp(2j*np.pi*0.02e6*t)
+    tone2 = tone2.reshape(-1,1)
+    tone3 = np.exp(2j*np.pi*0.03e6*t)
+    tone3 = tone3.reshape(-1,1)
+    r = a1 @ tone1.T + a2 @ tone2.T + 0.1 * a3 @ tone3.T
     n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
     r = r + 0.04*n
 
     # MUSIC Algorithm (part that doesn't change with theta_i)
     num_expected_signals = 3 # Try changing this!
-    R = r @ r.H # Calc covariance matrix, it's Nr x Nr
+    R = r @ r.conj().T # Calc covariance matrix, it's Nr x Nr
     w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
 
     if False:
@@ -336,16 +365,16 @@ if False:
 
     eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
     v = v[:, eig_val_order] # sort eigenvectors using this order
-    V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64)) # Noise subspace is the rest of the eigenvalues
+    V = np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64) # Noise subspace is the rest of the eigenvalues
     for i in range(Nr - num_expected_signals):
         V[:, i] = v[:, i]
 
     theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # 100 different thetas between -180 and +180 degrees
     results = []
     for theta_i in theta_scan:
-        a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
-        a = a.T
-        metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
+        a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))
+        a = a.reshape(-1,1)
+        metric = 1 / (a.conj().T @ V @ V.conj().T @ a) # The main MUSIC equation
         metric = np.abs(metric[0,0]) # take magnitude
         metric = 10*np.log10(metric) # convert to dB
         results.append(metric) 
@@ -359,7 +388,6 @@ if False:
     ax.set_rlabel_position(30)  # Move grid labels away from other labels
     plt.show()
     #fig.savefig('../_images/doa_music.svg', bbox_inches='tight')
-
     exit()
 
 
@@ -374,22 +402,28 @@ if False:
     for theta2s_i in range(len(theta2s)):
         theta1 = 18 / 180 * np.pi # convert to radians
         theta2 = theta2s[theta2s_i]
-        a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
-        a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
-        r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t))
+        a1 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1))
+        a1 = a1.reshape(-1,1)
+        a2 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2))
+        a2 = a2.reshape(-1,1)
+        tone1 = np.exp(2j*np.pi*0.01e6*t)
+        tone1 = tone1.reshape(-1,1)
+        tone2 = np.exp(2j*np.pi*0.02e6*t)
+        tone2 = tone2.reshape(-1,1)
+        r = a1 @ tone1.T + a2 @ tone2.T
         n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
         r = r + 0.01*n
-        R = r @ r.H # Calc covariance matrix, it's Nr x Nr
+        R = r @ r.conj().T # Calc covariance matrix, it's Nr x Nr
         w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
         eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
         v = v[:, eig_val_order] # sort eigenvectors using this order
-        V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64)) # Noise subspace is the rest of the eigenvalues
+        V = np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64) # Noise subspace is the rest of the eigenvalues
         for i in range(Nr - num_expected_signals):
             V[:, i] = v[:, i]
         for theta_i in range(len(theta_scan)):
-            a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_scan[theta_i]))) # look familiar?
-            a = a.T
-            metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
+            a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_scan[theta_i]))
+            a = a.reshape(-1,1)
+            metric = 1 / (a.conj().T @ V @ V.conj().T @ a) # The main MUSIC equation
             metric = np.abs(metric[0,0]) # take magnitude
             metric = 10*np.log10(metric) # convert to dB
             results[theta2s_i, theta_i] = metric

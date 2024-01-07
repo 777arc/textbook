@@ -50,6 +50,71 @@ As discussed, analog phased arrays involve an analog phase shifter (and usually 
 
 In this chapter we don't use any specific SDRs; instead we simulate the receiving of signals using Python, and then go through the DSP used to perform beamforming/DOA for ditital arrays.
 
+**************************************
+Intro to Matrix Math in Python/NumPy
+**************************************
+
+Python has many advantages over MATLAB, such as being free and open-source, diversity of applications, vibrant community, indices start from 0 like every other language, use within AI/ML, and there seems to be a library for anything you can think of.  But where it falls short is how matrix manipulation is coded/represented (computationally/speed-wise, it's plenty fast, with functions implemented under the hood efficiently in C/C++).  It doesn't help that there are multiple ways to represent matrices in Python, with the :code:`np.matrix` method being deprecated in favor of :code:`np.ndarray`.  In this section we provide a brief primer on doing matrix math in Python using NumPy, so that when we get to the DOA examples you'll be more comfortable.
+
+Let's start by jumping into the most annoying part of matrix math in NumPy; vectors are treated as 1D arrays, so there's no way to distinguish between a row vector and column vector (it will be treated as a row vector by default), whereas in MATLAB a vector is a 2D object.  In Python you can create a new vector using :code:`a = np.array([2,3,4,5])` or turn a list into a vector using :code:`mylist = [2, 3, 4, 5]` then :code:`a = np.asarray(mylist)`, but as soon as you want to do any matrix math, orientation matters, and these will be interpreted as row vectors.  Trying to do a transpose on this vector, e.g. using :code:`a.T`, will **not** change it to a column vector!  The way to make a column vector out of a normal vector :code:`a` is to use :code:`a = a.reshape(-1,1)`.  The :code:`-1` tells NumPy to figure out the size of this dimension automatically, while keeping the second dimension length 1.  What this creates is technically a 2D array but the second dimension is length 1, so it's still essentially 1D from a math perspective. It's only one extra line, but it can really throw off the flow of matrix math code.
+
+Now for a quick example of matrix math in Python; we will multiply a :code:`3x10` matrix with a :code:`10x1` matrix.  Remember that :code:`10x1` means 10 rows and 1 column, known as a column vector because it is just one column.  From our early school years we know this is a valid matrix multiplication because the inner dimensions match, and the resulting matrix size is the outer dimensions, or :code:`3x1`.  We will use :code:`np.random.randn()` to create the :code:`3x10` and :code:`np.arange()` to create the :code:`10x1`, for convinience:
+
+.. code-block:: python
+
+ A = np.random.randn(3,10) # 3x10
+ B = np.arange(10) # 1D array of length 10
+ B = B.reshape(-1,1) # 10x1
+ C = A @ B # matrix multiply
+ print(C.shape) # 3x1
+ C = C.squeeze() # see next subsection
+ print(C.shape) # 1D array of length 3, easier for plotting and other non-matrix Python code
+
+After performing matrix math you may find your result looks something like: :code:`[[ 0.  0.125  0.251  -0.376  -0.251 ...]]` which clearly has just one dimension of data, but if you go to plot it you will either get an error or a plot that doesn't show anything.  This is because the result is technically a 2D array, and you need to convert it to a 1D array using :code:`a.squeeze()`.  The :code:`squeeze()` function removes any dimensions of length 1, and comes in handy when doing matrix math in Python.  In the example given above, the result would be :code:`[ 0.  0.125  0.251  -0.376  -0.251 ...]` (notice the missing second brackets), which can be plotted or used in other Python code that expects something 1D.
+
+When coding matrix math the best sanity check you can do is print out the dimensions (using :code:`A.shape`) to verify they are what you expect. Consider sticking the shape in the comments after each line for future reference, and so it's easy to make sure dimensions match when doing matrix or elementwise multiplies.
+
+Here are some common operations in both MATLAB and Python, as a sort of cheat sheet to reference:
+
+.. list-table::
+   :widths: 35 25 40
+   :header-rows: 1
+
+   * - Operation
+     - MATLAB
+     - Python/NumPy
+   * - Create (Row) Vector, size :code:`1 x 4`
+     - :code:`a = [2 3 4 5];`
+     - :code:`a = np.array([2,3,4,5])`
+   * - Create Column Vector, size :code:`4 x 1`
+     - :code:`a = [2; 3; 4; 5];` or :code:`a = [2 3 4 5].'`
+     - :code:`a = np.array([[2],[3],[4],[5]])` or |br| :code:`a = np.array([2,3,4,5])` then |br| :code:`a = a.reshape(-1,1)`
+   * - Create 2D Matrix
+     - :code:`A = [1 2; 3 4; 5 6];`
+     - :code:`A = np.array([[1,2],[3,4],[5,6]])`
+   * - Get Size
+     - :code:`size(A)`
+     - :code:`A.shape`
+   * - Transpose a.k.a. :math:`A^T`
+     - :code:`A.'`
+     - :code:`A.T`
+   * - Complex Conjugate Transpose |br| a.k.a. Conjugate Transpose |br| a.k.a. Hermitian Transpose |br| a.k.a. :math:`A^H`
+     - :code:`A'`
+     - :code:`A.conj().T`
+   * - Elementwise Multiply
+     - :code:`A .* B`
+     - :code:`A * B` or :code:`np.multiply(a,b)`
+   * - Matrix Multiply
+     - :code:`A * B`
+     - :code:`A @ B` or :code:`np.matmul(A,B)`
+   * - Dot Product
+     - :code:`dot(A,B)`
+     - :code:`np.dot(A,B)`
+   * - Concatenate
+     - :code:`[A A]`
+     - :code:`np.concatenate((A,A))`
+
+
 *******************
 Array Factor Math
 *******************
@@ -162,19 +227,22 @@ Now let's simulate an array consisting of three omnidirectional antennas in a li
  theta_degrees = 20 # direction of arrival (feel free to change this, it's arbitrary)
  theta = theta_degrees / 180 * np.pi # convert to radians
  a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta)) # array factor
- print(a) # note that it's a 1x3, it's complex, and the first element is 1+0j
+ print(a) # note that it's 3 elements long, it's complex, and the first element is 1+0j
 
-To apply the array factor we have to do a matrix multiplication of :code:`a` and :code:`tx`, so first let's convert both to matrices, as NumPy arrays which don't let us do 1D matrix math that we need for beamforming/DOA.  We then perform the matrix multiply, note that the @ symbol in Python means matrix multiply (it's a NumPy thing).  We also have to convert :code:`a` from a row vector to a column vector (picture it rotating 90 degrees) so that the matrix multiply inner dimensions match.
+To apply the array factor we have to do a matrix multiplication of :code:`a` and :code:`tx`, so first let's convert both to 2D, using the approach we discussed earlier when we reviewed doing matrix math in Python.  We'll start off by making both into row vectors using :code:`x.reshape(-1,1)`.  We then perform the matrix multiply, note that the :code:`@` symbol in Python means matrix multiply (it's a NumPy thing).  We also have to convert :code:`tx` from a row vector to a column vector using a transpose operation (picture it rotating 90 degrees) so that the matrix multiply inner dimensions match.
 
 .. code-block:: python
 
- a = np.asmatrix(a)
- tx = np.asmatrix(tx)
+ a = a.reshape(-1,1)
+ print(a.shape) # 3x1
+ tx = tx.reshape(-1,1)
+ print(tx.shape) # 10000x1
+ 
+ # matrix multiply
+ r = a @ tx.T  # dont get too caught up by the transpose, the important thing is we're multiplying the array factor by the tx signal
+ print(r.shape) # 3x10000.  r is now going to be a 2D array, 1D is time and 1D is the spatial dimension
 
- r = a.T @ tx  # don't get too caught up by the transpose a, the important thing is we're multiplying the array factor by the tx signal
- print(r.shape) # r is now going to be a 2D array, 1D is time and 1D is the spatial dimension
-
-At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of Python is having to switch to matrix type for matrix math, then having to switch back to normal NumPy arrays, we need to add the .squeeze() to get it back to a normal 1D NumPy array.
+At this point :code:`r` is a 2D array, size 3 x 10000 because we have three array elements and 10000 samples simulated.  We can pull out each individual signal and plot the first 200 samples, below we'll plot the real part only, but there's also an imaginary part, like any baseband signal.  One annoying part of matrix math in Python is needing to add the :code:`.squeeze()`, which removes all dimensions with length 1, to get it back to a normal 1D NumPy array that plotting and other operations expects.
 
 .. code-block:: python
 
@@ -214,9 +282,8 @@ Next let's use this signal :code:`r` but pretend we don't know which direction t
  results = []
  for theta_i in theta_scan:
      #print(theta_i)
-     w = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # look familiar?
-     r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i
-     r_weighted = np.asarray(r_weighted).squeeze() # get it back to a normal 1d numpy array
+     w = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # look familiar?
+     r_weighted = np.conj(w) @ r # apply our weights corresponding to the direction theta_i. remember r is 3x10000 so we can leave w as a normal (row) vector
      results.append(np.mean(np.abs(r_weighted)**2)) # energy detector
  
  # print angle that gave us the max value
@@ -340,15 +407,15 @@ We can implement the equations above in Python fairly easily:
  theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # between -180 and +180 degrees
  results = []
  for theta_i in theta_scan:
-     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # array factor
-     a = a.T # needs to be a column vector for the math below
+     a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))
+     a = a.reshape(-1,1) # 3x1
  
      # Calc covariance matrix
-     R = r @ r.H # gives a Nr x Nr covariance matrix of the samples
+     R = r @ r.conj().T # gives a Nr x Nr covariance matrix of the samples
  
-     Rinv = np.linalg.pinv(R) # pseudo-inverse tends to work better than a true inverse
+     Rinv = np.linalg.pinv(R) # 3x3. pseudo-inverse tends to work better than a true inverse
  
-     metric = 1/(a.H @ Rinv @ a) # Capon's method!
+     w = 1/(a.conj().T @ Rinv @ a) # Capon's method! denominator is 1x3 * 3x3 * 3x1
      metric = metric[0,0] # convert the 1x1 matrix to a Python scalar, it's still complex though
      metric = np.abs(metric) # take magnitude
      metric = 10*np.log10(metric) # convert to dB so its easier to see small and large lobes at the same time
@@ -370,13 +437,20 @@ Works fine, but to really compare this to other techniques we'll have to create 
  theta1 = 20 / 180 * np.pi # convert to radians
  theta2 = 25 / 180 * np.pi
  theta3 = -40 / 180 * np.pi
- a1 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1)))
- a2 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2)))
- a3 = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3)))
+ a1 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta1))
+ a1 = a1.reshape(-1,1)
+ a2 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta2))
+ a2 = a2.reshape(-1,1)
+ a3 = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta3))
+ a3 = a3.reshape(-1,1)
  # we'll use 3 different frequencies
- r = a1.T @ np.asmatrix(np.exp(2j*np.pi*0.01e6*t)) + \
-     a2.T @ np.asmatrix(np.exp(2j*np.pi*0.02e6*t)) + \
-     0.1 * a3.T @ np.asmatrix(np.exp(2j*np.pi*0.03e6*t))
+ tone1 = np.exp(2j*np.pi*0.01e6*t)
+ tone1 = tone1.reshape(-1,1)
+ tone2 = np.exp(2j*np.pi*0.02e6*t)
+ tone2 = tone2.reshape(-1,1)
+ tone3 = np.exp(2j*np.pi*0.03e6*t)
+ tone3 = tone3.reshape(-1,1)
+ r = a1 @ tone1.T + a2 @ tone2.T + 0.1 * a3 @ tone3.T
  n = np.random.randn(Nr, N) + 1j*np.random.randn(Nr, N)
  r = r + 0.04*n
 
@@ -412,21 +486,21 @@ where :math:`V_n` is that list of noise sub-space eigenvectors we mentioned (a 2
  num_expected_signals = 3 # Try changing this!
  
  # part that doesn't change with theta_i
- R = r @ r.H # Calc covariance matrix, it's Nr x Nr
+ R = r @ r.conj().T # Calc covariance matrix, it's Nr x Nr
  w, v = np.linalg.eig(R) # eigenvalue decomposition, v[:,i] is the eigenvector corresponding to the eigenvalue w[i]
  eig_val_order = np.argsort(np.abs(w)) # find order of magnitude of eigenvalues
  v = v[:, eig_val_order] # sort eigenvectors using this order
  # We make a new eigenvector matrix representing the "noise subspace", it's just the rest of the eigenvalues
- V = np.asmatrix(np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64))
+ V = np.zeros((Nr, Nr - num_expected_signals), dtype=np.complex64)
  for i in range(Nr - num_expected_signals):
     V[:, i] = v[:, i]
  
  theta_scan = np.linspace(-1*np.pi, np.pi, 1000) # -180 to +180 degrees
  results = []
  for theta_i in theta_scan:
-     a = np.asmatrix(np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i))) # array factor
-     a = a.T
-     metric = 1 / (a.H @ V @ V.H @ a) # The main MUSIC equation
+     a = np.exp(-2j * np.pi * d * np.arange(Nr) * np.sin(theta_i)) # array factor
+     a = a.reshape(-1,1)
+     metric = 1 / (a.conj().T @ V @ V.conj().T @ a) # The main MUSIC equation
      metric = np.abs(metric[0,0]) # take magnitude
      metric = 10*np.log10(metric) # convert to dB
      results.append(metric) 
@@ -484,3 +558,7 @@ All Python code, including code used to generate the figures/animations, can be 
 
 * DOA implementation in GNU Radio - https://github.com/EttusResearch/gr-doa
 * DOA implementation used by KrakenSDR - https://github.com/krakenrf/krakensdr_doa/blob/main/_signal_processing/krakenSDR_signal_processor.py
+
+.. |br| raw:: html
+
+      <br>
